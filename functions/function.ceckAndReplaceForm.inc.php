@@ -11,7 +11,11 @@ mform function.ceckAndReplaceForm.inc.php
 
 if (!function_exists('ceckAndReplaceForm')) {
   function ceckAndReplaceForm ($arrLine) {
-  
+    
+    foreach($arrLine as $intKey => $strLine) {
+      $arrLine[$intKey] = str_replace("<mform:n/>", chr(10), $strLine);
+    }
+    
     switch ($arrLine[0]) {
       
       /*****************************************
