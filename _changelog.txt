@@ -1,0 +1,5 @@
+<h3>Changelog:</h3>
+<strong>Version 1.2 (R4 Compatible)</strong>
+  - initial release
+  
+  

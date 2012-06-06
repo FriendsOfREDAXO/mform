@@ -1,0 +1,6 @@
+mform_headline = MForm - Modul Formular Parser
+mform_description = MForm soll das erstellen von Modul Inputs erleichtern, bis jetzt ist es bei Redaxo ja so, dass Modul Input Formulare vom Administrator selbst erstellt werden müssen. Dazu muss der Administrator von Hand HTML Code erstellen der alle nötigen Formular Elemente enthält, ihm ist auch die Form in welcher er das Formular anlegt selbst überlassen. An dieser Stelle kommt MForm ist Spiel, mit wenig aufwand kann ganz ohne HTML. Ähnlich wie xform oder anderen Formulargeneratoren fürs Frontend funktioniert auch MForm. Dabei nutzt MForm Templates durch welche jeder Animistrator sein Output so anpassen kann wie er ihn haben möchte.
+mform_headline_example = Beispiel für Modul Input
+mform_example_description = MForm reagiert auf die MForm-Tags <mform></mform> was zwischen diesen Steht wird ausgelesen geparst und durch den geparsten mform-Output ersetzt.
+mform_schema = MForm nutzt folgendes Schema:
+mform_phpcodemarkitup = PHP-Code für Makritup:
