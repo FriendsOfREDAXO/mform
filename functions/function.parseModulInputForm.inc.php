@@ -11,12 +11,9 @@ mform function.parseModulInputForm.inc.php
 
 if (!function_exists('parseModulInputForm')) {
   function parseModulInputForm ($params) {
-    $strOutput = preg_replace_callback('|<mform>(.*?)</mform>|ism', mform_p_r_callback($matches), $params['subject']);
+    $strOutput = preg_replace_callback('|<mform>(.*?)</mform>|ism', function($matches){
+      return !empty($matches[0]) ? parseMFormTemplate(linesToForm($matches[0]),'wrapper') : '';
+    }, $params['subject']);
     return $strOutput; 
-  }
-}
-if (!function_exists('mform_p_r_callback')) {
-  function mform_p_r_callback($matches){
-    return !empty($matches[0]) ? parseMFormTemplate(linesToForm($matches[0]),'wrapper') : '';
-  }
+  } 
 }
