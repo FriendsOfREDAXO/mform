@@ -11,6 +11,7 @@ mform function.linesToForm.inc.php
 
 if (!function_exists('linesToForm')) {
   function linesToForm ($strMatches) {
+    $strOutput = '';
     $arrRows = preg_split('/[\r\n]+/', $strMatches, -1, PREG_SPLIT_NO_EMPTY);
     foreach ($arrRows as $inputLine) {
       $inputLine = str_replace("\t","",$inputLine);

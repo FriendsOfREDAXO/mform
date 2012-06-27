@@ -1,12 +1,12 @@
 <?php
 /*
-mform help.inc.php
+help.inc.php
 
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 @author <a href="http://joachim-doerr.com">joachim-doerr.com</a>
 
 @package redaxo4
-@version 1.2
+@version 2.1.2
 */
 
 $mypage = 'mform';

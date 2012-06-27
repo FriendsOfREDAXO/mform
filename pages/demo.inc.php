@@ -24,7 +24,7 @@ headline|Demo Headline
 
 medialist|1|label3|REX_MEDIALIST[1]|2|preview=1;types=jpg,png,gif
 </mform>';
-
+$arrMarkitupSettings = '$arrMarkitupSettings';
 $phpmarkitup = <<<EOT
 <?php
 // define module Settings

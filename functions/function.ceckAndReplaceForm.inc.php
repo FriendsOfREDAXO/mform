@@ -16,6 +16,8 @@ if (!function_exists('ceckAndReplaceForm')) {
       $arrLine[$intKey] = str_replace("<mform:n/>", chr(10), $strLine);
     }
     
+    $strOutput = '';
+    
     switch ($arrLine[0]) {
       
       /*****************************************

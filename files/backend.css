@@ -36,6 +36,14 @@ table.rex-module tr:hover {
 table.rex-module tr.description:hover {
   background-color: #F0F0F0;
 }
-table.rex-module tr:hover a{
+table.rex-module tr:hover a {
   color: #343434;
+}
+div.rex-form div.rex-form-row table.rex-module label {
+  padding: 0;
+}
+div.rex-form div.rex-form-row table.rex-module label.description,
+div.rex-form div.rex-form-row table.rex-module label.description {
+  margin-left: 5px;
+  display: inline;
 }

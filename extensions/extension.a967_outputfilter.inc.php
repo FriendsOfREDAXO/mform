@@ -1,28 +1,50 @@
 <?php 
 /*
-mform function.parseModulInputForm.inc.php
+extension.a967_outputfilter.inc.php
 
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 @author <a href="http://joachim-doerr.com">joachim-doerr.com</a>
 
 @package redaxo4
-@version 1.2
+@version 2.1.2
 */
 
-if (!function_exists('parseModulInputForm')) {
-  function parseModulInputForm ($params) {
-    $strOutput = preg_replace_callback('|<mform>(.*?)</mform>|ism', "mform_p_r_callback", $params['subject']);
+// INCLUDE CSS INTO BACKEND
+////////////////////////////////////////////////////////////////////////////////
+if (!function_exists('a967_backend_css'))
+{
+  function a967_backend_css($params)
+  {
+		$strHeader =
+	      PHP_EOL.'<!-- mform -->'.
+	    	PHP_EOL.'  <link rel="stylesheet" type="text/css" href="../files/addons/mform/backend.css" media="all" />'.
+	    	PHP_EOL.'<!-- mform -->'.PHP_EOL;
+	    	
+    return str_replace('</head>',$strHeader.'</head>',$params['subject']);
+  }
+}
+
+
+if (!function_exists('a967_parse_form_by_outputfilter'))
+{
+  function a967_parse_form_by_outputfilter($params)
+  {
+    $strOutput = preg_replace_callback('|<mform>(.*?)</mform>|ism', "a967_mform_p_r_callback", $params['subject']);
     return $strOutput; 
   }
 }
-if (!function_exists('mform_p_r_callback')) {
-  function mform_p_r_callback ($matches){
-    return !empty($matches[0]) ? parseMFormTemplate(linesToForm(checkArea($matches[0])),'wrapper') : '';
+if (!function_exists('a967_mform_p_r_callback'))
+{
+  function a967_mform_p_r_callback($matches)
+  {
+    return !empty($matches[0]) ? parseMFormTemplate(linesToForm(a967_checkArea($matches[0])),'wrapper') : '';
   }
 }
-
-function checkArea ($matches) {
-  return str_replace(
+if (!function_exists('a967_checkArea'))
+{
+  function a967_checkArea($matches)
+  {
+    return str_replace(
             array(
               chr(13),
               chr(10),
@@ -63,4 +85,5 @@ function checkArea ($matches) {
               chr(10)."media|",
               chr(10)."medialist|"
             ), trim($matches));
+  }
 }
