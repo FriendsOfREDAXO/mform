@@ -8,9 +8,7 @@ h3. MForm Objekt initialisieren
 
 Ähnlich wie z.B. rex_form muss auch für MForm ein Objekt initialisiert werden.
 
-<code>
-$objForm = new mform();
-</code>
+<code> $objForm = new mform(); </code>
 
 
 h3. Text-Input und Hidden Elemente
@@ -38,24 +36,18 @@ h5. Hinweise:
 
 h6. Einfaches Text Input-Element, Label und CSS-Style werden in der "addTextField" Methode als $arrAttributes übergeben:
 
-<code>
- $objForm->addTextField(1,'REX_VALUE[1]',array('label'=>'Label Name','style'=>'width:200px'));
-</code>
+<code> $objForm->addTextField(1,'REX_VALUE[1]',array('label'=>'Label Name','style'=>'width:200px')); </code>
 
 h6. Selbes Textfeld, Label und CSS-Style sind durch die "setAttributes" Methode erfasst:
 
-<code>
- $objForm->addTextField(1,'REX_VALUE[1]');
- $objForm->setAttributes(array('label'=>'name','style'=>'width:200px'));
-</code>
+<code> $objForm->addTextField(1,'REX_VALUE[1]'); </code>
+<code> $objForm->setAttributes(array('label'=>'name','style'=>'width:200px')); </code>
 
 h6. Selbes Textfeld, Label wird durch die "setLabel" Methode und CSS-Style durch die "setAttributes" Methode erfasst:
 
-<code>
- $objForm->addTextField(1,'REX_VALUE[1]');
- $objForm->setAttributes(array('style'=>'width:200px'));
- $objForm->setLabel('Name');
-</code>
+<code> $objForm->addTextField(1,'REX_VALUE[1]'); </code>
+<code> $objForm->setAttributes(array('style'=>'width:200px')); </code>
+<code> $objForm->setLabel('Name'); </code>
 
 
 h3. Attribute in Text-Input und Hidden Elementen
@@ -83,18 +75,12 @@ Nach dem erzeugen eines Input-Elements kann diesem durch die "setAttributes" Met
 
 h6. Einfaches Text Input-Element, CSS-Style und CSS-Klassen-Definition werden mit der "setAttributes" Methode dem Element zugewiesen:
 
-<code>
- $objForm->addTextField(1,'REX_VALUE[1]');
- $objForm->setAttributes(array('style'=>'width:200px', 'class'=>'text_input_feld'));
-</code>
+<code> $objForm->addTextField(1,'REX_VALUE[1]'); </code>
+<code> $objForm->setAttributes(array('style'=>'width:200px', 'class'=>'text_input_feld')); </code>
 
 h6. Einfaches Text Input-Element, CSS-Style und CSS-Klassen-Definition werden jeweils mit der "setAttributes" Methode dem Element zugewiesen:
 
-<code>
- $objForm->addTextField(1,'REX_VALUE[1]');
- $objForm->setAttributes(array('style'=>'width:200px'));
- $objForm->setAttributes(array('class'=>'text_input_feld'));
-</code>
-
-
+<code> $objForm->addTextField(1,'REX_VALUE[1]'); </code>
+<code> $objForm->setAttributes(array('style'=>'width:200px')); </code>
+<code> $objForm->setAttributes(array('class'=>'text_input_feld')); </code>
 
