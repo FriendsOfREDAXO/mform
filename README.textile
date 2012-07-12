@@ -8,9 +8,9 @@ h3. MForm Objekt initialisieren
 
 Ähnlich wie z.B. rex_form muss auch für MForm ein Objekt initialisiert werden.
 
-```
+<code>
 $objForm = new mform();
-```
+</code>
 
 
 h3. Text-Input und Hidden Elemente
