@@ -1,0 +1,94 @@
+h2. MForm - Redaxo Addon für Modul-Input-Formulare
+
+MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates  welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit welche sich recht einfach einbinden lassen.
+
+
+
+h3. MForm Objekt initialisieren
+
+Ähnlich wie z.B. rex_form muss auch für MForm ein Objekt initialisiert werden.
+
+$objForm = new mform();
+
+
+
+h3. Text-Input und Hidden Elemente
+
+Unterschiedliche Input-Typen werden durch jeweils ihre eigene "Methoen" angesteuert, es gibt 4 Typen:
+
+* addTextField
+* addHiddenField
+* addReadOnlyField
+* addTextAreaField
+	
+Der Konstruktor der Methode erwartet Parameter/Variablen nach folgendem Schema: (ID,'REX_VALUE[ID]',$arrAttributes)
+
+* ID => 1
+* 'REX_VALUE[ID]' => 'REX_VALUE[1]'
+* $arrAttributes => array('label'=>'Label Name')
+
+h5. Hinweise:
+
+* die ersten 2 Übergabewerte sind Pflichtwerde
+* der dritte Wert ist optional, hier kann nur ein Array übergeben werden
+* der erste Wert ID muss der REX_VALUE_ID entsprechen
+* Folgend werden die Beispiel-Werte eingesetzt
+
+
+h4. Einfaches Text Input-Element, Label und CSS-Style werden in der "addTextField" Methode als $arrAttributes übergeben:
+
+ $objForm->addTextField(1,'REX_VALUE[1]',array('label'=>'Label Name','style'=>'width:200px'));
+
+
+h4. Selbes Textfeld, Label und CSS-Style sind durch die "setAttributes" Methode erfasst:
+
+ $objForm->addTextField(1,'REX_VALUE[1]');
+ $objForm->setAttributes(array('label'=>'name','style'=>'width:200px'));
+
+
+h4. Selbes Textfeld, Label wird durch die "setLabel" Methode und CSS-Style durch die "setAttributes" Methode erfasst:
+
+ $objForm->addTextField(1,'REX_VALUE[1]');
+ $objForm->setAttributes(array('style'=>'width:200px'));
+ $objForm->setLabel('Name');
+
+
+
+h3. Attribute in Text-Input und Hidden Elementen
+
+h5. Es gibt 2 Wege Text-Input oder Hidden Elemente Attribute zuzuweisen:
+
+* als Wert über den Konstruktor der Input-Methode
+* als Wert über den Konstruktor der "setAttributes" Methode
+
+h5. Hinweis:
+
+* Attributes werden in als Array dem Konstruktor übergeben
+* das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: array('attribut_1_name'=>'attribut_1_wert', 'attribut_2_name'=>'attribut_2_wert')
+
+
+h4. Attribute dem Konstruktor der Input-Methode übergeben
+
+Der Konstruktor der Input-Element Methoden verarbeitet 3 Übergabewerte, dabei ist der Letzte optional, über ihn kann ein Array mit Attributen übergeben werden.
+
+
+h4. Attribute durch die "setAttributes" Methode übergeben
+
+Nach dem erzeugen eines Input-Elements kann diesem durch die "setAttributes" Methode nachträglich beliebige Attribute zugewiesen werden, dazu werden alle "setAttributes" Methoden die nach dem erzeugten Element eingesetzt werden diesem zugewiesen. Ein neues Formular-Element unterbricht dann diese Logik, die diesem dann folgenden aufrufe der "setAttributes" Methode würden dann im Weiteren dem neuen Element zugewiesen.
+
+
+h4. Einfaches Text Input-Element, CSS-Style und CSS-Klassen-Definition werden mit der "setAttributes" Methode dem Element zugewiesen:
+
+ $objForm->addTextField(1,'REX_VALUE[1]');
+ $objForm->setAttributes(array('style'=>'width:200px', 'class'=>'text_input_feld'));
+
+
+h4. Einfaches Text Input-Element, CSS-Style und CSS-Klassen-Definition werden jeweils mit der "setAttributes" Methode dem Element zugewiesen:
+
+ $objForm->addTextField(1,'REX_VALUE[1]');
+ $objForm->setAttributes(array('style'=>'width:200px'));
+ $objForm->setAttributes(array('class'=>'text_input_feld'));
+
+
+
+

@@ -2,8 +2,8 @@
 /*
 class.a967_parsemform.inc.php
 
+@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
-@author <a href="http://joachim-doerr.com">joachim-doerr.com</a>
 
 @package redaxo4
 @version 2.1.2
