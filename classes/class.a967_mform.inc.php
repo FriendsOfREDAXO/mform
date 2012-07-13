@@ -11,20 +11,24 @@ class.a967_mform.inc.php
 
 // MFROM BASE CLASS
 ////////////////////////////////////////////////////////////////////////////////
+class mform extends a967_mform
+{
+}
+
 class a967_mform extends a967_getmformArray
 {
   /**/
   // define defaults
   /**/
   
-  var $strStyle; // use later
+  public $strStyle; // use later
   
   
   /**/
   // generate element array - add fields
   /**/
   
-  function show_mform()
+  public function show_mform()
   {
     /*
     init parse class

@@ -17,8 +17,8 @@ class a967_parsemform
   // define defaults
   /**/
   
-  var $strOutput;
-  var $strTemplateStyle;
+  public $strOutput;
+  public $strTemplateStyle;
   
   
   /**/
@@ -28,7 +28,7 @@ class a967_parsemform
   /*
   html, headline, description
   */
-  function generateLineElement($arrElement)
+  public function generateLineElement($arrElement)
   {
     $strTemplate = 'single_line';
     if ($arrElement['type'] == 'headline')
@@ -42,7 +42,7 @@ class a967_parsemform
     
     $strElement = <<<EOT
       
-      <mform:output>{$arrElement['default']}</mform:output>
+      <mform:element>{$arrElement['default']}</mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -51,7 +51,7 @@ EOT;
   /*
   hidden, text, password
   */
-  function generateInputElement($arrElement)
+  public function generateInputElement($arrElement)
   {
     $strTemplate = 'default_line';
     if ($arrElement['type'] == 'hidden')
@@ -59,6 +59,11 @@ EOT;
       $strTemplate = 'hidden';
     }
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    if ($arrElement['type'] == 'text-readonly')
+    {
+      $arrElement['type'] = 'text';
+      $arrElement['attributes'] .= ' readonly="readonly"';
+    }
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
@@ -71,9 +76,13 @@ EOT;
   /*
   textarea, markitup
   */
-  function generateAreaElement($arrElement)
+  public function generateAreaElement($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    if ($arrElement['type'] == 'area-readonly')
+    {
+      $arrElement['attributes'] .= ' readonly="readonly"';
+    }
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
@@ -86,7 +95,7 @@ EOT;
   /*
   select, multiselect
   */
-  function generateOptionsElement($arrElement)
+  public function generateOptionsElement($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     $strSelectAttributes = ''; $strMultiselectJavascript = ''; $strMultiselectHidden = ''; $arrHiddenValue = array(); $strOptions = '';
@@ -146,7 +155,7 @@ EOT;
   /*
   radio
   */
-  function generateRadioElement($arrElement)
+  public function generateRadioElement($arrElement)
   {
     $intCount = 0;
     foreach ($arrElement['options'] as $intKey => $strValue)
@@ -171,7 +180,7 @@ EOT;
   /*
   checkbox
   */
-  function generateCheckboxElement($arrElement)
+  public function generateCheckboxElement($arrElement)
   {
     $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options']));
     foreach ($arrElement['options'] as $intKey => $strValue)
@@ -195,7 +204,7 @@ EOT;
   /*
   link, linklist
   */
-  function generateLinkElement($arrElement)
+  public function generateLinkElement($arrElement)
   {
     $arrID = explode('-', $arrElement['id']);
     if ($arrElement['type'] == 'link')
@@ -218,7 +227,7 @@ EOT;
   /*
   media, medialist
   */
-  function generateMediaElement($arrElement) 
+  public function generateMediaElement($arrElement) 
   {
     $arrID = explode('-', $arrElement['id']);
     if ($arrElement['type'] == 'media')
@@ -244,7 +253,7 @@ EOT;
   // get attributes
   /**/
   
-  function getAttributes($arrAttributes)
+  public function getAttributes($arrAttributes)
   {
     $strAttributes = NULL;
     if (sizeof($arrAttributes) > 0)
@@ -270,7 +279,7 @@ EOT;
   // parse form fields by types
   /**/
   
-  function parseFormFields($arrElements)
+  public function parseFormFields($arrElements)
   {
     if (sizeof($arrElements) > 0)
     {
@@ -287,12 +296,13 @@ EOT;
           
           case 'text':
           case 'hidden':
-          case 'password':
+          case 'text-readonly':
             $this->generateInputElement($arrElement);
             break;
                     
           case 'textarea':
           case 'markitup':
+          case 'area-readonly':
             $this->generateAreaElement($arrElement);
             break;
           
@@ -329,7 +339,7 @@ EOT;
   // parse form to template
   /**/
   
-  function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
+  public function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
   {
     global $myroot;
     $strTemplate = implode(file($myroot . "/templates/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
@@ -376,7 +386,7 @@ EOT;
   /*
   final parseing
   */
-  function parse_mform($arrElements)
+  public function parse_mform($arrElements)
   {
     $this->parseFormFields($arrElements);
     $this->parseElementToTemplate($this->strOutput,'wrapper',true);

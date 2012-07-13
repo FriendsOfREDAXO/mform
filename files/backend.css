@@ -36,6 +36,9 @@ table.rex-module tr:hover {
 table.rex-module tr.description:hover {
   background-color: #F0F0F0;
 }
+table.rex-module tr.headline {
+  background-color: #e7e7e7;
+}
 table.rex-module tr:hover a {
   color: #343434;
 }
