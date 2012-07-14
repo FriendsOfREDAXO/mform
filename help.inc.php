@@ -9,20 +9,47 @@ help.inc.php
 @version 2.1.2
 */
 
-$mypage = 'mform';
-require_once $REX['INCLUDE_PATH'].'/addons/' . $mypage . '/pages/site.demo.inc.php';
+// ADDON IDENTIFIER
+////////////////////////////////////////////////////////////////////////////////
+$strAddonName = 'mform';
+$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName.'/';
 
-?>
-<h2><?php echo $I18N->msg('mform_headline'); ?></h2>
-<p><?php echo $I18N->msg('mform_description'); ?></p>
-<br/>
-<h3><?php echo $I18N->msg('mform_headline_example'); ?></h3>
-<?php rex_highlight_string($mdl_im); ?><br/>
 
-<p>
-<?php
-  $file = dirname( __FILE__) .'/_changelog.txt';
-  if(is_readable($file))
-    echo str_replace( '+', '&nbsp;&nbsp;+', nl2br(file_get_contents($file)));
+// LOAD TEXTILEPARSER
+////////////////////////////////////////////////////////////////////////////////
+if (!function_exists('a967_textileparser'))
+{
+  require_once( $strAddonPath . '/functions/function.a967_textileparser.inc.php' );
+}
+
+
+// LOAD I18N FILE
+////////////////////////////////////////////////////////////////////////////////
+if (!OOAddon::isAvailable($strAddonName))
+{
+  $I18N->appendFile(dirname(__FILE__) . '/lang/');
+}
+
+
+// LOAD DEMO MODUL
+////////////////////////////////////////////////////////////////////////////////
+require_once( $strAddonPath . '/pages/site.demo.inc.php' );
+
+
+// HELP CONTENT
+////////////////////////////////////////////////////////////////////////////////
 ?>
-</p>
+<h3 style="clear:both;padding:15px 0;display:block;"><?php echo $I18N->msg($strAddonName.'_help_subheadline_1'); ?></h3>
+<p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_1'); ?></p>
+<p style="margin-bottom:15px;"><?php echo a967_textileparser($I18N->msg($strAddonName.'_help_infotext_2')); ?></p>
+
+<h3 style="clear:both;padding:15px 0;display:block;"><?php echo $I18N->msg($strAddonName.'_help_subheadline_2'); ?></h3>
+<p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_3'); ?></p>
+<p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_4'); ?></p>
+
+
+<h2><?php echo $I18N->msg($strAddonName.'_demo_modul'); ?></h2>
+
+<div class="rex-addon-content">
+  <div><?php echo rex_highlight_string($strModulInputDemo); ?></div>
+</div>

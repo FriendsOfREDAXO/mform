@@ -1,6 +1,6 @@
 <?php
 /*
-class.a967_parsemform.inc.php
+class.a967_parse_mform.inc.php
 
 @copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr

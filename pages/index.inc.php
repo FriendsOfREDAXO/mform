@@ -9,45 +9,36 @@ index.inc.php
 @version 1.2
 */
 
-$mypage = 'mform';
-require_once $REX['INCLUDE_PATH'].'/addons/' . $mypage . '/pages/site.demo.inc.php';
+// ADDON IDENTIFIER
+////////////////////////////////////////////////////////////////////////////////
+$strAddonName = 'mform';
+$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName.'/';
 
-require $REX['INCLUDE_PATH'].'/layout/top.php';
 
-rex_title('MForm');
-?>
-<div class="rex-addon-output">
-  <h2 class="rex-hl2"><?php echo $I18N->msg('mform_headline'); ?></h2>
+// GET PARAMS
+////////////////////////////////////////////////////////////////////////////////
+$strPage      = rex_request('page', 'string', $strAddonName);
+$strFunc      = rex_request('func', 'string');
+$id           = rex_request('id', 'int');
 
-  <div class="rex-addon-content">
-    <p class="rex-tx1"><?php echo $I18N->msg('mform_description'); ?></p>
-  </div>
-</div>
 
-<div class="rex-addon-output">
-  <h2 class="rex-hl2"><?php echo $I18N->msg('mform_headline_example'); ?></h2>
+// REX BACKEND LAYOUT TOP
+//////////////////////////////////////////////////////////////////////////////
+include_once( $REX['INCLUDE_PATH'].'/layout/top.php' );
 
-  <div class="rex-addon-content">
-    <?php rex_highlight_string($mdl_im); ?>
-    <p class="rex-tx1"><?php echo $I18N->msg('mform_example_description'); ?></p>
-  </div>
-</div>
 
-<div class="rex-addon-output">
-  <h2 class="rex-hl2"><?php echo $I18N->msg('mform_schema'); ?></h2>
+// TITLE & SUBPAGE NAVIGATION
+//////////////////////////////////////////////////////////////////////////////
+rex_title($I18N->msg($strAddonName.'_title'), $REX['ADDON']['pages'][$strAddonName]);
 
-  <div class="rex-addon-content">
-    <?php rex_highlight_string(str_replace('&#36;','$',$mformschema)); ?>
-  </div>
-</div>
 
-<div class="rex-addon-output">
-  <h2 class="rex-hl2"><?php echo $I18N->msg('mform_phpcodemarkitup'); ?></h2>
+// INCLUDE SUBPAGE
+/////////////////////////////////////////////////////////////////////////////
+require_once( $strAddonPath . '/pages/site.demo.inc.php' );
+require_once( $strAddonPath . '/pages/site.information.inc.php' );
 
-  <div class="rex-addon-content">
-    <?php rex_highlight_string(str_replace(array('&#92;',"'**"),array("\'**",''),$phpmarkitup)); ?>
-  </div>
-</div>
 
-<?php
-require $REX['INCLUDE_PATH'].'/layout/bottom.php';
+// REX BACKEND LAYOUT BOTTOM
+//////////////////////////////////////////////////////////////////////////////
+include_once( $REX['INCLUDE_PATH'].'/layout/bottom.php' );
+

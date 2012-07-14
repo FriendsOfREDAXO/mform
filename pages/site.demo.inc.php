@@ -9,24 +9,21 @@ demo.inc.php
 @version 1.2
 */
 
-$mdl_im ='<mform>
-text|1|label1|REX_VALUE[1]
-text|2|label2|REX_VALUE[2]|input-css-classe|width:200px;
-
-html|<strong>Demo Eingabe</strong>
-
-media|1|Media Label1|REX_FILE[1]|2|preview=1;types=jpg,png,gif
-media|2|Media Label2|REX_FILE[2]
-
-description|Beschreibungstext zum Media Label2
-
-headline|Demo Headline
-
-medialist|1|label3|REX_MEDIALIST[1]|2|preview=1;types=jpg,png,gif
-</mform>';
 $arrMarkitupSettings = '$arrMarkitupSettings';
-$phpmarkitup = <<<EOT
+
+$strModulInputDemo = <<<EOT
 <?php
+/*
+MODUL INPUT DEMO
+
+@copyright  Copyright (c) 2011 by Doerr Softwaredevelopment
+@author     Joachim Doerr <mail@doerr-softwaredevelopment.com>
+@version    1.0.3
+
+@rex_param  id     1
+@rex_param  name   001 - MODUL INPUT DEMO
+*/
+
 // define module Settings
 $arrMarkitupSettings = array(
   'markitup-width'       => '710',
@@ -44,73 +41,124 @@ $arrMarkitupSettings = array(
      
   '
 );
-
-a287_markitup::markitup(
-  'textarea.markitup1',str_replace(array(' ',"&#92;n"),
+if (OOAddon::isAvailable("markitup"))
+{
+  a287_markitup::markitup(
+    'textarea.markitup1',str_replace(array(' ',"&#92;n"),
   '',
 EOT;
-$phpmarkitup .= '$arrMarkitupSettings["markitup-buttons"]),
-  $arrMarkitupSettings["markitup-width"],
-  $arrMarkitupSettings["markitup-height"]';
-$phpmarkitup .= <<<EOT
+$strModulInputDemo .= '$arrMarkitupSettings["markitup-buttons"]),
+    $arrMarkitupSettings["markitup-width"],
+    $arrMarkitupSettings["markitup-height"]';
+$strModulInputDemo .= <<<EOT
 
-);
+  );
+}
+EOT;
+
+$strModulInputDemo .= '
+// instanziieren
+$objForm = new mform();
+
+// headline
+$objForm->addHeadline(\'Text-Input und Hidden Elemente\');
+
+// text field
+$objForm->addTextField(1,\'REX_VALUE[1]\',array(\'label\'=>\'Name\',\'style\'=>\'width:200px\'));
+
+// hidden field
+$objForm->addHiddenField(2,\'hidden feld string\',array(\'label\'=>\'Hidden\',\'style\'=>\'width:200px\'));
+
+// readonly field
+$objForm->addTextReadOnlyField(3,\'readonly feld string\',array(\'label\'=>\'Readonly\',\'style\'=>\'width:200px\'));
+
+// textarea field
+$objForm->addTextAreaField(4,\'REX_VALUE[4]\',array(\'label\'=>\'Textarea\',\'style\'=>\'width:300px;height:180px\'));
+
+// markitup
+$objForm->addTextAreaField(14,\'REX_VALUE[14]\',array(\'label\'=>\'Textarea\',\'class\'=>"markitup1"));
+
+// textarea readonly field
+$objForm->addTextReadOnlyField(5,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'width:300px;height:180px\'));
+
+
+// headline
+$objForm->addHeadline(\'Select und Multiselect Elemente\');
+
+// select
+$objForm->addSelectField(6,\'REX_VALUE[6]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Select Name\'));
+
+// select mit ausgelagerten Options, Size und Label
+$objForm->addSelectField(7,\'REX_VALUE[7]\');
+$objForm->addOptions(array(1=>\'test-1\',2=>\'test-2\'));
+$objForm->setSize(5);
+$objForm->setLabel(\'Select Name\');
+
+// multiselect
+$objForm->addMultiSelectField(8,\'REX_VALUE[8]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Multiselect Name\',\'size\'=>\'8\'));
+
+// multiselect
+$objForm->addMultiSelectField(9,\'REX_VALUE[9]\',array(1=>\'test-1\',2=>\'test-2\',3=>\'test-3\',4=>\'test-4\'),array(\'label\'=>\'Multiselect Name\'), \'full\');
+
+
+// headline
+$objForm->addHeadline(\'Radio und Checkbox Elemente\');
+
+// checkbox
+$objForm->addCheckboxField(10,\'REX_VALUE[10]\',array(1=>\'test-1\'),array(\'label\'=>\'Multiselect Name\'));
+
+// radiobox
+$objForm->addRadioField(11,\'REX_VALUE[11]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Multiselect Name\'));
+
+
+// headline
+$objForm->addHeadline(\'System-Button Elemente\');
+
+// media button
+$objForm->addMediaField(1,\'REX_FILE[1]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bild\'));
+
+// medialist button
+$objForm->addMedialistField(2,\'REX_MEDIALIST[2]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bildliste\'));
+
+// link button
+$objForm->addLinkField(1,\'REX_LINK_ID[1]\',array(\'label\'=>\'Link\',\'category\'=>3));
+
+// linklist button
+$objForm->addLinklistField(1,\'REX_LINKLIST[1]\',array(\'label\'=>\'Linkliste\',\'category\'=>3));
+
+
+// headline
+$objForm->addHeadline(\'Text Elemente\');
+
+// description
+$objForm->addDescription(\'Beschreibungstext auch Mehrzeilig\');
+
+// HTML
+$objForm->addHtml(\'<b>HTML <i>Text</i></b>\');
+
+
+// get formular
+echo $objForm->show_mform();
+
 ?>
-EOT;
 
-$mformschema = <<<EOT
-Headlines, HTML, Descirptions:
+<br/> Test zwischen zwei verschiedenen MForm Instanzen.  <br/>
 
-typ|Text
+<?php
 
-  -> headline|Demo Headline
-  -> html|<strong>Demo HTML</strong>
-  -> description|Demo Beschreibung
+// instanziieren
+$objForm = new mform();
 
 
-----------------------------------------------------------
+// headline
+$objForm->addHeadline(\'Neues Form\');
+
+// text field
+$objForm->addTextField(12,\'REX_VALUE[12]\',array(\'label\'=>\'Name\',\'style\'=>\'width:200px\'));
 
 
-Text, Hidden, Textarea, Markitup Input:
+// get formular
+echo $objForm->show_mform();
 
-typ|valueId|label|defaultValue|classe|css|
-
-  -> text|1|Name|REX_VALUE[1]|css-classe-input|width:400px
-  -> hidden|1|Name|REX_VALUE[2]|css-classe-hidden
-  -> textarea|2|Message|REX_VALUE[3]|css-classe-textarea|width:300px;height:190px
-  -> markitup|3|Message|REX_VALUE[4]|css-classe-markitup|<?php echo implode(';',&#36;arrMarkitupSettings); ?>
-
-
-----------------------------------------------------------
-
-
-Select, Multiselect, Checkboxen, Radio Buttons:
-
-typ|valueId|label|defaultValue|parameter|classe|css|
-
-  -> select|5|label9|REX_VALUE[5]|1=test1;2=test3;3=test4||width:400px
-  -> multiselect|6|label9|REX_VALUE[6]|1=test1;2=test3;3=test4||width:400px
-
-typ|valueId|label|defaultValue|parameter|
-
-  -> checkbox|7|checkboxlabel|REX_VALUE[7]|checkdefaultvalue=checkboxdesc
-  -> radio|8|radiolabel|REX_VALUE[8]|1=test1;2=test2;3=test3
-
-
-----------------------------------------------------------
-
-
-Media, Medialist, Link, Linklist Buttons:
-
-media|mediaId|label|rex_file|mediacategoryId|settings
-medialist|mediaId|label|rex_medialist|mediacategoryId|settings
-
-  -> media|1|Bildelement|REX_FILE[1]|2|preview=1;types=jpg,png,gif
-  -> medialist|1|Bildelemente|REX_MEDIALIST[1]|2|preview=1;types=jpg,png,gif
-
-link|linkId|label|rex_link|categoryId
-linklist|linkId|label|rex_linklist|categoryId
-
-  -> link|1|Interner Link|REX_LINK_ID[1]|2
-  -> linklist|1|Interne Links|REX_LINKLIST[1]|2
-EOT;
+?>  
+';

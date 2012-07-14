@@ -1,6 +1,6 @@
 <?php
 /*
-class.a967_getmformArray.inc.php
+class.a967_get_mform_array.inc.php
 
 @copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr

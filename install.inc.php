@@ -11,7 +11,7 @@ install.inc.php
 
 // ADDON IDENTIFIER AUS GET PARAMS
 ////////////////////////////////////////////////////////////////////////////////
-$mypage = rex_request('addonname','string');
+$strAddonName = rex_request('addonname','string');
 
 
 // INSTALL CONDITIONS
@@ -27,8 +27,8 @@ $do_install = true;
 $this_REX = $REX['VERSION'].'.'.$REX['SUBVERSION'].'.'.$REX['MINORVERSION'] = "1";
 if(version_compare($this_REX, $requiered_REX, '<'))
 {
-	$REX['ADDON']['installmsg'][$mypage] = 'Dieses Addon ben&ouml;tigt Redaxo Version '.$requiered_REX.' oder h&ouml;her.';
-	$REX['ADDON']['install'][$mypage] = 0;
+	$REX['ADDON']['installmsg'][$strAddonName] = 'Dieses Addon ben&ouml;tigt Redaxo Version '.$requiered_REX.' oder h&ouml;her.';
+	$REX['ADDON']['install'][$strAddonName] = 0;
 	$do_install = false;
 }
 
@@ -37,8 +37,8 @@ if(version_compare($this_REX, $requiered_REX, '<'))
 ////////////////////////////////////////////////////////////////////////////////
 if (intval(PHP_VERSION) < $requiered_PHP)
 {
-	$REX['ADDON']['installmsg'][$mypage] = 'Dieses Addon ben&ouml;tigt mind. PHP '.$requiered_PHP.'!';
-	$REX['ADDON']['install'][$mypage] = 0;
+	$REX['ADDON']['installmsg'][$strAddonName] = 'Dieses Addon ben&ouml;tigt mind. PHP '.$requiered_PHP.'!';
+	$REX['ADDON']['install'][$strAddonName] = 0;
 	$do_install = false;
 }
 
@@ -49,14 +49,14 @@ foreach($requiered_addons as $a)
 {
   if (!OOAddon::isInstalled($a))
   {
-    $REX['ADDON']['installmsg'][$mypage] = '<br />Addon "'.$a.'" ist nicht installiert.  >>> <a href="index.php?page=addon&addonname='.$a.'&install=1">jetzt installieren</a> <<<';
+    $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" ist nicht installiert.  >>> <a href="index.php?page=addon&addonname='.$a.'&install=1">jetzt installieren</a> <<<';
     $do_install = false;
   }
   else
   {
     if (!OOAddon::isAvailable($a))
     {
-      $REX['ADDON']['installmsg'][$mypage] = '<br />Addon "'.$a.'" ist nicht aktiviert.  >>> <a href="index.php?page=addon&addonname='.$a.'&activate=1">jetzt aktivieren</a> <<<';
+      $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" ist nicht aktiviert.  >>> <a href="index.php?page=addon&addonname='.$a.'&activate=1">jetzt aktivieren</a> <<<';
       $do_install = false;
     }
 
@@ -68,5 +68,5 @@ foreach($requiered_addons as $a)
 ////////////////////////////////////////////////////////////////////////////////
 if ($do_install)
 {
-	$REX['ADDON']['install'][$mypage] = 1;
+	$REX['ADDON']['install'][$strAddonName] = 1;
 }

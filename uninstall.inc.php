@@ -11,7 +11,7 @@ uninstall.inc.php
 
 // ADDON IDENTIFIER AUS GET PARAMS
 ////////////////////////////////////////////////////////////////////////////////
-$mypage = rex_request('addonname','string');
+$strAddonName = rex_request('addonname','string');
 
 
-$REX['ADDON']['install'][$mypage] = 0;
+$REX['ADDON']['install'][$strAddonName] = 0;

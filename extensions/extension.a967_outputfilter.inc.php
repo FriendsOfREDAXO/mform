@@ -25,6 +25,8 @@ if (!function_exists('a967_backend_css'))
 }
 
 
+// OLD PARSER METHODE
+////////////////////////////////////////////////////////////////////////////////
 if (!function_exists('a967_parse_form_by_outputfilter'))
 {
   function a967_parse_form_by_outputfilter($params)

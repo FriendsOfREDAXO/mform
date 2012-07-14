@@ -11,24 +11,24 @@ config.inc.php
 
 // ADDON IDENTIFIER
 ////////////////////////////////////////////////////////////////////////////////
-$mypage = 'mform';
-$myroot = $REX['INCLUDE_PATH'].'/addons/'.$mypage.'/';
+$strAddonName = 'mform';
+$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName.'/';
 
 
 // ADDON REX COMMONS
 ////////////////////////////////////////////////////////////////////////////////
-$REX['ADDON']['rxid'][$mypage] = '967';
-$REX['ADDON']['page'][$mypage] = $mypage;
-$REX['ADDON']['name'][$mypage] = $mypage;
-$REX['ADDON'][$mypage]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 1, 'SUBVERSION' => 2);
+$REX['ADDON']['rxid'][$strAddonName] = '967';
+$REX['ADDON']['page'][$strAddonName] = $strAddonName;
+$REX['ADDON']['name'][$strAddonName] = $strAddonName;
+$REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 1, 'SUBVERSION' => 2);
 
-$REX['ADDON']['version'][$mypage] = implode('.', $REX['ADDON'][$mypage]['VERSION']);
-$REX['ADDON']['author'][$mypage] = 'Joachim Doerr';
-$REX['ADDON']['supportpage'][$mypage] = 'forum.redaxo.de';
+$REX['ADDON']['version'][$strAddonName] = implode('.', $REX['ADDON'][$strAddonName]['VERSION']);
+$REX['ADDON']['author'][$strAddonName] = 'Joachim Doerr';
+$REX['ADDON']['supportpage'][$strAddonName] = 'forum.redaxo.de';
 
-$REX['ADDON']['perm'][$mypage] = $mypage.'[]';	//Allows to add this addon as Startpage
-$REX['PERM'][] = $mypage.'[]';					        //Allows restriction for users
-$REX['EXTRAPERM'][] = $mypage.'[extra_perm]';	  //Allows Addon specific restrictions (i.e. for Plugins)
+$REX['ADDON']['perm'][$strAddonName] = $strAddonName.'[]';	//Allows to add this addon as Startpage
+$REX['PERM'][] = $strAddonName.'[]';					        //Allows restriction for users
+$REX['EXTRAPERM'][] = $strAddonName.'[extra_perm]';	  //Allows Addon specific restrictions (i.e. for Plugins)
 
 
 // REDAXO BACKEND
@@ -41,8 +41,8 @@ if ($REX['REDAXO'] === true)
   
   // ADDON MENU
   ////////////////////////////////////////////////////////////////////////////////
-  $REX['ADDON']['name'][$mypage] = $I18N->msg('mform_name');  
-  $REX['ADDON'][$mypage]['SUBPAGES'] = array (
+  $REX['ADDON']['name'][$strAddonName] = $I18N->msg('mform_name');  
+  $REX['ADDON'][$strAddonName]['SUBPAGES'] = array (
   //      subpage    ,label                         ,perm   ,params               ,attributes
   # array (''         ,'Einstellungen'               ,''     ,''                   ,''),
   # array ('connector','Connector (faceless subpage)',''     ,array('faceless'=>1) ,'' /*array('class'=>'blafasel') can't di: rex_title bug*/),
@@ -50,9 +50,9 @@ if ($REX['REDAXO'] === true)
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////
-  array_walk(glob($myroot.'classes/class.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob($myroot.'functions/function.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob($myroot.'extensions/extension.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob($strAddonPath.'classes/class.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob($strAddonPath.'functions/function.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob($strAddonPath.'extensions/extension.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
