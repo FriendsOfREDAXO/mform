@@ -12,7 +12,7 @@ config.inc.php
 // ADDON IDENTIFIER
 ////////////////////////////////////////////////////////////////////////////////
 $strAddonName = 'mform';
-$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName.'/';
+$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName;
 
 
 // ADDON REX COMMONS
@@ -50,9 +50,11 @@ if ($REX['REDAXO'] === true)
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////
-  array_walk(glob($strAddonPath.'classes/class.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob($strAddonPath.'functions/function.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob($strAddonPath.'extensions/extension.*.inc.php'),create_function('$v,$i', 'return require_once($v);')); 
+  $myroot = $strAddonPath;
+  
+  array_walk(glob("$myroot/classes/class.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$myroot/functions/function.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$myroot/extensions/extension.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
