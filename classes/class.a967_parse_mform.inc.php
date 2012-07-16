@@ -341,8 +341,8 @@ EOT;
   
   public function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
   {
-    global $myroot;
-    $strTemplate = implode(file($myroot . "/templates/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
+    global $strAddonPath;
+    $strTemplate = implode(file($strAddonPath . "/templates/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
     
     preg_match('|<mform:label>(.*?)</mform:label>|ism', $strElement, $arrLabel);
     preg_match('|<mform:element>(.*?)</mform:element>|ism', $strElement, $arrElement);

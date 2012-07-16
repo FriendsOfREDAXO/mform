@@ -49,12 +49,10 @@ if ($REX['REDAXO'] === true)
   );
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
-  ////////////////////////////////////////////////////////////////////////////////
-  $myroot = $strAddonPath;
-  
-  array_walk(glob("$myroot/classes/class.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob("$myroot/functions/function.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob("$myroot/extensions/extension.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  ////////////////////////////////////////////////////////////////////////////////  
+  array_walk(glob("$strAddonPath/classes/class.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$strAddonPath/functions/function.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$strAddonPath/extensions/extension.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
