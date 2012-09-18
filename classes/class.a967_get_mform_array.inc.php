@@ -129,17 +129,17 @@ class a967_getmformArray
     return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, $arrOptions);
   }
   
-  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $size)
+  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize)
   {
     return $this->addOptionField('select', $intId, $strValue, $arrAttributes, $arrOptions);
-    $this->setSize($size);
+    $this->setSize($strSize);
   }
   
-  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $size)
+  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize)
   {
     $this->addOptionField('multiselect', $intId, $strValue, $arrAttributes, $arrOptions);
     $this->setMultiple(true);
-    $this->setSize($size);
+    $this->setSize($strSize);
   }
   
   public function setMultiple($boolMultiple)
@@ -150,17 +150,16 @@ class a967_getmformArray
     }
   }
 
-  public function setSize($size)
+  public function setSize($strSize)
   {
-    if ((is_numeric($size) === true &&  $size > 0) or $size == 'full')
+    if ((is_numeric($strSize) === true &&  $strSize > 0) or $strSize == 'full')
     {
-      $this->arrElements[$this->id]['size'] = $size;
+      $this->arrElements[$this->id]['size'] = $strSize;
     }
   }
   
   /*
   add checkboxes
-  typ|valueId|label|defaultValue|parameter|
   */
   public function addCheckboxField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array())
   {
