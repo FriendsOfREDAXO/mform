@@ -57,6 +57,7 @@ EOT;
     if ($arrElement['type'] == 'hidden')
     {
       $strTemplate = 'hidden';
+      $arrElement['label'] = '';
     }
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     if ($arrElement['type'] == 'text-readonly')
@@ -360,6 +361,7 @@ EOT;
     switch ($strTemplateKey)
     {
       case 'default_line':
+      case 'hidden':
         if ($strTemplate != '')
         {
           $strElement = str_replace(array(' />','<mform:label/>','<mform:element/>'), array('/>',$arrLabel[1],$arrElement[1]), $strTemplate);
@@ -381,10 +383,10 @@ EOT;
           $strElement = str_replace(array(' />','<mform:output/>'), array('/>',$strElement), $strTemplate);
         }
         break;
-        
-      case 'hidden':
-        $strElement = $arrElement[1];
-        break;
+    }
+    if ($strElement != '')
+    {
+      $strElement = str_replace(array('<mform:element>','<mform:element/>','<mform:element />'), '', $strElement);
     }
     if ($boolParseFinal === true)
     {
