@@ -173,7 +173,7 @@ EOT;
         {
           $strOptions .= 'checked="checked" ';
         }
-        $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
+        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
       }
     }
     $strElement = <<<EOT
@@ -200,7 +200,7 @@ EOT;
         {
           $strOptions .= 'checked="checked" ';
         }
-        $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
+        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
       }
     }
     $strElement = <<<EOT
