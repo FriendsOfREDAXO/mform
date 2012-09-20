@@ -24,36 +24,11 @@ MODUL INPUT DEMO
 @rex_param  name   001 - MODUL INPUT DEMO
 */
 
-// define module Settings
-$arrMarkitupSettings = array(
-  'markitup-width'       => '710',
-  'markitup-height'      => '480',
-  'markitup-buttons'     => '
-     
-      h1,h2,h3,h4,h5,h6,separator
-      ,bold,italic,underline,stroke,separator
-      ,alignments,color,separator
-      ,listbullet,listnumeric,separator
-      ,table,separator
-      ,subscript,superscript,intlink,extlink,separator
-      ,mailtolink,filelink,separator
-      ,blockquote,preview
-     
-  '
-);
-if (OOAddon::isAvailable("markitup"))
+if(OOAddon::isAvailable('markitup'))
 {
-  a287_markitup::markitup(
-    'textarea.markitup1',str_replace(array(' ',"&#92;n"),
-  '',
-EOT;
-$strModulInputDemo .= '$arrMarkitupSettings["markitup-buttons"]),
-    $arrMarkitupSettings["markitup-width"],
-    $arrMarkitupSettings["markitup-height"]';
-$strModulInputDemo .= <<<EOT
-
-  );
+  a287_markitup::markitup('textarea.markitup1');
 }
+
 EOT;
 
 $strModulInputDemo .= '
