@@ -386,7 +386,7 @@ EOT;
     }
     if ($strElement != '')
     {
-      $strElement = str_replace(array('<mform:element>','<mform:element/>','<mform:element />'), '', $strElement);
+      $strElement = str_replace(array('<mform:element>','<mform:element/>','<mform:element />', '</mform:element>', '</ mform:element>'), '', $strElement);
     }
     if ($boolParseFinal === true)
     {
