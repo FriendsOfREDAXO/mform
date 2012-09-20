@@ -6,7 +6,7 @@ class.a967_parse_mform.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.2
+@version 2.1.3
 */
 
 // MFROM PARSER CLASS
@@ -133,15 +133,18 @@ EOT;
       $arrHiddenValue = array($arrElement['default']);
     }
     
-    foreach ($arrElement['options'] as $intKey => $strValue) {
-      $strOptions .= '<option value="' . $intKey . '" ';
-        foreach ($arrHiddenValue as $strHiddenValue) {
-          if ($intKey == $strHiddenValue)
-          {
-            $strOptions .= 'selected="selected" ';
+    if (array_key_exists('options',$arrElement) === true)
+    {
+      foreach ($arrElement['options'] as $intKey => $strValue) {
+        $strOptions .= '<option value="' . $intKey . '" ';
+          foreach ($arrHiddenValue as $strHiddenValue) {
+            if ($intKey == $strHiddenValue)
+            {
+              $strOptions .= 'selected="selected" ';
+            }
           }
-        }
-      $strOptions .= '>' . $strValue . '</option>';
+        $strOptions .= '>' . $strValue . '</option>';
+      }
     }
     $strElement = <<<EOT
       
@@ -157,16 +160,20 @@ EOT;
   */
   public function generateRadioElement($arrElement)
   {
-    $intCount = 0;
-    foreach ($arrElement['options'] as $intKey => $strValue)
+    $intCount = 0; $strOptions = '';
+    if (array_key_exists('options',$arrElement) === true)
     {
-      $intCount++;
-      $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
-      if ($intKey == $arrElement['default'])
+      foreach ($arrElement['options'] as $intKey => $strValue)
       {
-        $strOptions .= 'checked="checked" ';
+        $intCount++;
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        
+        if ($intKey == $arrElement['default'])
+        {
+          $strOptions .= 'checked="checked" ';
+        }
+        $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
       }
-      $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
     }
     $strElement = <<<EOT
       
@@ -182,15 +189,18 @@ EOT;
   */
   public function generateCheckboxElement($arrElement)
   {
-    $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options']));
-    foreach ($arrElement['options'] as $intKey => $strValue)
+    if (array_key_exists('options',$arrElement) === true)
     {
-      $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
-      if ($intKey == $arrElement['default'])
+      $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
+      foreach ($arrElement['options'] as $intKey => $strValue)
       {
-        $strOptions .= 'checked="checked" ';
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        if ($intKey == $arrElement['default'])
+        {
+          $strOptions .= 'checked="checked" ';
+        }
+        $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
       }
-      $strOptions .= ' /><span for="rv' . $arrElement['id'] . '" class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
     }
     $strElement = <<<EOT
       
@@ -361,7 +371,10 @@ EOT;
       default:
         if (isset($arrLabel[1]) === true or isset($arrElement[1]) === true)
         {
-          $strElement = $arrLabel[1].$arrElement[1];
+          if (sizeof($arrLabel) > 0 && sizeof($arrElement) > 0)
+          {
+            $strElement = $arrLabel[1].$arrElement[1];
+          }
         }
         if ($strTemplate != '')
         {
