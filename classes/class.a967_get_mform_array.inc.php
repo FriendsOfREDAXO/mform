@@ -129,13 +129,13 @@ class a967_getmformArray
     return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, $arrOptions);
   }
   
-  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize)
+  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 1)
   {
     return $this->addOptionField('select', $intId, $strValue, $arrAttributes, $arrOptions);
     $this->setSize($strSize);
   }
   
-  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize)
+  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 3)
   {
     $this->addOptionField('multiselect', $intId, $strValue, $arrAttributes, $arrOptions);
     $this->setMultiple(true);
@@ -195,12 +195,12 @@ class a967_getmformArray
   /*
   add rex link fields
   */
-  public function addLinkField($intId, $strValue = NULL, $arrParameter = array(), $intCatId, $arrAttributes = array())
+  public function addLinkField($intId, $strValue = NULL, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('link', 'link-' . $intId, $strValue, $arrAttributes, array(), $arrParameter, $intCatId);
   }
   
-  public function addLinklistField($intId, $strValue = NULL, $arrParameter = array(), $intCatId, $arrAttributes = array())
+  public function addLinklistField($intId, $strValue = NULL, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('linklist', 'linklist-' . $intId, $strValue, $arrAttributes, array(), $arrParameter, $intCatId);
   }
@@ -208,12 +208,12 @@ class a967_getmformArray
   /*
   add rex media fields
   */
-  public function addMediaField($intId, $strValue = NULL, $arrParameter = array(), $intCatId, $arrAttributes = array())
+  public function addMediaField($intId, $strValue = NULL, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('media', 'media-' . $intId, $strValue, $arrAttributes, array(), $arrParameter, $intCatId);
   }
   
-  public function addMedialistField($intId, $strValue = NULL, $arrParameter = array(), $intCatId, $arrAttributes = array())
+  public function addMedialistField($intId, $strValue = NULL, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('medialist', 'medialist-' . $intId, $strValue, $arrAttributes, array(), $arrParameter, $intCatId);
   }
