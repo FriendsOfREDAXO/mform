@@ -6,7 +6,7 @@ class.a967_parse_mform.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.2
+@version 2.1.3
 */
 
 // MFROM PARSER CLASS
@@ -18,8 +18,7 @@ class a967_parsemform
   /**/
   
   public $strOutput;
-  public $strTemplateStyle;
-  
+  public $strTemplateThemeName;
   
   /**/
   // generate fields
@@ -30,16 +29,20 @@ class a967_parsemform
   */
   public function generateLineElement($arrElement)
   {
-    $strTemplate = 'single_line';
-    if ($arrElement['type'] == 'headline')
+    switch ($arrElement['type'])
     {
-      $strTemplate = 'single_headline';
+      case 'headline':
+        $strTemplate = 'headline';
+        break;
+        
+      case 'description':
+        $strTemplate = 'description';
+        break;
+        
+      default:
+        $strTemplate = 'html';
+        break;
     }
-    if ($arrElement['type'] == 'description')
-    {
-      $strTemplate = 'description_line';
-    }
-    
     $strElement = <<<EOT
       
       <mform:element>{$arrElement['default']}</mform:element>
@@ -53,17 +56,21 @@ EOT;
   */
   public function generateInputElement($arrElement)
   {
-    $strTemplate = 'default_line';
-    if ($arrElement['type'] == 'hidden')
-    {
-      $strTemplate = 'hidden';
-      $arrElement['label'] = '';
-    }
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
-    if ($arrElement['type'] == 'text-readonly')
+    switch ($arrElement['type'])
     {
-      $arrElement['type'] = 'text';
-      $arrElement['attributes'] .= ' readonly="readonly"';
+      case 'hidden':
+        $strTemplate = 'hidden';
+        $arrElement['label'] = '';
+        break;
+        
+      case 'text-readonly':
+        $arrElement['type'] = 'text';
+        $arrElement['attributes'] .= ' readonly="readonly"';
+        
+      default:
+        $strTemplate = 'default';
+        break;
     }
     $strElement = <<<EOT
       
@@ -90,7 +97,7 @@ EOT;
       <mform:element><textarea id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['default']}</textarea></mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   /*
@@ -100,13 +107,11 @@ EOT;
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     $strSelectAttributes = ''; $strMultiselectJavascript = ''; $strMultiselectHidden = ''; $arrHiddenValue = array(); $strOptions = '';
-    
     $strSelectAttributes = (is_numeric($arrElement['size']) === true) ? 'size="' . $arrElement['size'] . '"' : '' ;
     if ($arrElement['size'] == 'full')
     {
       $strSelectAttributes = 'size="' . sizeof($arrElement['options']) . '"';
     }
-    
     if ($arrElement['multi'] === true)
     {
       $strSelectAttributes .= ' multiple="multiple"';
@@ -133,7 +138,6 @@ EOT;
     {
       $arrHiddenValue = array($arrElement['default']);
     }
-    
     if (array_key_exists('options',$arrElement) === true)
     {
       foreach ($arrElement['options'] as $intKey => $strValue) {
@@ -153,7 +157,7 @@ EOT;
       <mform:element><select id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} $strSelectAttributes>$strOptions</select>$strMultiselectHidden</mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   /*
@@ -182,7 +186,7 @@ EOT;
       <mform:element>$strOptions</mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   /*
@@ -209,7 +213,7 @@ EOT;
       <mform:element>$strOptions</mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   /*
@@ -232,7 +236,7 @@ EOT;
       <mform:element>$strOptions</mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   /*
@@ -256,7 +260,7 @@ EOT;
       <mform:element>$strOptions</mform:element>
       
 EOT;
-    return $this->parseElementToTemplate($strElement,'default_line');
+    return $this->parseElementToTemplate($strElement,'default');
   }
   
   
@@ -299,7 +303,6 @@ EOT;
         switch ($arrElement['type'])
         {
           case 'html':
-          case 'single_line':
           case 'headline':
           case 'description':
             $this->generateLineElement($arrElement);
@@ -347,20 +350,50 @@ EOT;
   
   
   /**/
+  // set theme
+  /**/
+  
+  public function setTheme ($strNewTemplateThemeName)
+  {
+  	global $strAddonPath;
+    global $strDefaultTemplateThemeName;
+    
+  	if (is_dir($strAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
+  	{
+  	  $this->strTemplateThemeName = $strNewTemplateThemeName;
+  	  return 
+		PHP_EOL.'<!-- mform -->'.
+		PHP_EOL.'  <link rel="stylesheet" type="text/css" href="include/addons/mform/templates/' . $this->strTemplateThemeName . '_theme/theme.css" media="all" />'.
+		PHP_EOL.'<!-- mform -->'.PHP_EOL;
+  	}
+  }
+  
+  /**/
   // parse form to template
   /**/
   
   public function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
   {
     global $strAddonPath;
-    $strTemplate = implode(file($strAddonPath . "/templates/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
+    global $strDefaultTemplateThemeName;
+    
+    $strTemplateThemeName = $strDefaultTemplateThemeName;
+    if ($this->strTemplateThemeName != '')
+    {
+      $strTemplateThemeName = $this->strTemplateThemeName;
+    }
+    
+    if ($strTemplateKey != '' && $strTemplateKey != 'html')
+    {
+      $strTemplate = implode(file($strAddonPath . "/templates/" . $strTemplateThemeName . "_theme/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
+    }
     
     preg_match('|<mform:label>(.*?)</mform:label>|ism', $strElement, $arrLabel);
     preg_match('|<mform:element>(.*?)</mform:element>|ism', $strElement, $arrElement);
     
     switch ($strTemplateKey)
     {
-      case 'default_line':
+      case 'default':
       case 'hidden':
         if ($strTemplate != '')
         {
@@ -368,7 +401,9 @@ EOT;
         }
         break;
         
-      case 'single_line':
+      case 'html':
+        $strTemplate = '<mform:output/>';
+        
       case 'wrapper':
       default:
         if (isset($arrLabel[1]) === true or isset($arrElement[1]) === true)
@@ -401,8 +436,12 @@ EOT;
   /*
   final parseing
   */
-  public function parse_mform($arrElements)
+  public function parse_mform($arrElements, $strNewTemplateThemeName = false)
   {
+  	if ($strNewTemplateThemeName != false)
+  	{
+  	  $this->strOutput .= $this->setTheme($strNewTemplateThemeName);
+  	}
     $this->parseFormFields($arrElements);
     $this->parseElementToTemplate($this->strOutput,'wrapper',true);
     return $this->strOutput;

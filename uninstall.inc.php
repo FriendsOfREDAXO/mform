@@ -6,7 +6,7 @@ uninstall.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.2
+@version 2.1.3
 */
 
 // ADDON IDENTIFIER AUS GET PARAMS

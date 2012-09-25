@@ -6,7 +6,7 @@ function.a967_textileparser.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.0.1
+@version 2.1.3
 */
 
 // TEXTILE PARSER

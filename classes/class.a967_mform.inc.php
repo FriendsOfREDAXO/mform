@@ -6,7 +6,7 @@ class.a967_mform.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.2
+@version 2.1.3
 */
 
 // MFROM BASE CLASS
@@ -21,8 +21,15 @@ class a967_mform extends a967_getmformArray
   // define defaults
   /**/
   
-  public $strStyle; // use later
+  public $strTemplateThemeName;
   
+  /*
+  set theme
+  */
+  public function setTheme ($strNewTemplateThemeName)
+  {
+  	$this->strTemplateThemeName = $strNewTemplateThemeName;
+  }
   
   /**/
   // generate element array - add fields
@@ -38,6 +45,6 @@ class a967_mform extends a967_getmformArray
     /*
     parce output through array
     */
-    return $objOutput->parse_mform($this->getArray());
+    return $objOutput->parse_mform($this->getArray(), $this->strTemplateThemeName);
   }
 }

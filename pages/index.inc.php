@@ -6,7 +6,7 @@ index.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 1.2
+@version 2.1.3
 */
 
 // ADDON IDENTIFIER
@@ -35,6 +35,7 @@ rex_title($I18N->msg($strAddonName.'_title'), $REX['ADDON']['pages'][$strAddonNa
 // INCLUDE SUBPAGE
 /////////////////////////////////////////////////////////////////////////////
 require_once( $strAddonPath . '/pages/site.demo.inc.php' );
+require_once( $strAddonPath . '/pages/site.form.inc.php' );
 require_once( $strAddonPath . '/pages/site.information.inc.php' );
 
 

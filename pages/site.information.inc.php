@@ -6,7 +6,7 @@ site.information.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.0.1
+@version 2.1.3
 */
 
 // INFORMATION CONTENT

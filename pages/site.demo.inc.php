@@ -1,12 +1,12 @@
 <?php
 /*
-demo.inc.php
+site.demo.inc.php
 
 @copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 1.2
+@version 2.1.3
 */
 
 $arrMarkitupSettings = '$arrMarkitupSettings';
@@ -18,7 +18,7 @@ MODUL INPUT DEMO
 
 @copyright  Copyright (c) 2011 by Doerr Softwaredevelopment
 @author     Joachim Doerr <mail@doerr-softwaredevelopment.com>
-@version    1.0.3
+@version    2.1.3
 
 @rex_param  id     1
 @rex_param  name   001 - MODUL INPUT DEMO
@@ -34,6 +34,9 @@ EOT;
 $strModulInputDemo .= '
 // instanziieren
 $objForm = new mform();
+
+// html
+$objForm->addHtml(\'<b>HTML Code</b>\');
 
 // headline
 $objForm->addHeadline(\'Text-Input und Hidden Elemente\');

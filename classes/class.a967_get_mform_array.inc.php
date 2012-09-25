@@ -6,7 +6,7 @@ class.a967_get_mform_array.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.2
+@version 2.1.3
 */
 
 // MFROM ARRAY GENERATOR CLASS
