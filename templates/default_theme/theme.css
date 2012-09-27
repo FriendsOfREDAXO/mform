@@ -1,52 +1,78 @@
-table.rex-module caption,
-table.rex-module th,
-table.rex-module td {
-  border:0;
-  border-bottom:1px solid #fff;
-  vertical-align:top;
+.mform-cf:before,
+.mform-cf:after {
+  content:"";
+  display:table;
 }
-table.rex-module {
-  border-top:1px solid #fff;
+.mform-cf:after {
   clear:both;
-  width:100%;
-  background:#D6E1E4;
-  border-collapse:collapse;
-  border-spacing:1px;
-  font-size: 100%;
 }
-table + table.rex-module {
-  border-top: 0;
+.mform-cf {
+  zoom:1;
 }
-table.rex-module th {
-  padding: 10px;
+.mform-row {
+  display: block;
+  clear: both;
+}
+div.rex-form-content-editmode div.rex-form-row div.mform-row label, 
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label, 
+div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label {
+  width: 120px;
+  float: left;
   text-align: left;
   font-weight: bold;
   font-size: 1.1em;
-  width: 120px;
 }
-table.rex-module td {
+.mform-wrapper fieldset {
+  border: 1px solid #ccc;
+}
+div.rex-form-content-editmode div.mform-wrapper legend, 
+div.rex-form-content-editmode-add-slice div.mform-wrapper legend, 
+div.rex-form-content-editmode-edit-slice div.mform-wrapper legend {
+  display: block !important;
+  position: relative !important;
+  left: inherit !important;
+  top: inherit !important;
+  overflow: inherit !important;
+  clear: both;
+  float: none;
+  width: auto !important;
+  height: auto !important;
+}
+.mform-description,
+.mform-headline,
+.mform-default {
+  display: block;
+  background-color: #F0F0F0;
+  border-bottom: 1px solid #fff;
+  vertical-align: top;
   padding: 10px;
 }
-table.rex-module tr {
-  background-color: #F0F0F0;
-}
-table.rex-module tr:hover {
+.mform-headline,
+.mform-default:hover {
   background-color: #e7e7e7;
 }
-table.rex-module tr.description:hover {
-  background-color: #F0F0F0;
-}
-table.rex-module tr.headline {
-  background-color: #e7e7e7;
-}
-table.rex-module tr:hover a {
+.mform-default:hover a {
   color: #343434;
 }
-div.rex-form div.rex-form-row table.rex-module label {
-  padding: 0;
+.mform-description {
+  padding-left: 130px;
 }
-div.rex-form div.rex-form-row table.rex-module label.description,
-div.rex-form div.rex-form-row table.rex-module label.description {
+
+div.rex-form-content-editmode div.rex-form-row div.mform-row.mform-headline label, 
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row.mform-headline label, 
+div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row.mform-headline label {
+  width: auto;
+  float: none;
+}
+div.rex-form-content-editmode div.rex-form-row div.mform-row label.description, 
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label.description, 
+div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label.description {
+  width: auto;
+  float: none;
   margin-left: 5px;
   display: inline;
+}
+
+.radio_element {
+  margin-left: 120px;
 }

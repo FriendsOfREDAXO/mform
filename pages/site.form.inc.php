@@ -6,7 +6,7 @@ site.form.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.3
+@version 2.1.4
 */
 
 if ($strFunc == 'savesettings') {

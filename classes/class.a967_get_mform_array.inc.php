@@ -6,7 +6,7 @@ class.a967_get_mform_array.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.3
+@version 2.1.4
 */
 
 // MFROM ARRAY GENERATOR CLASS
@@ -23,7 +23,7 @@ class a967_getmformArray
   public $arrElements = array();
   public $id = NULL;
   public $count = 967;
-  
+  public $validations = NULL;
   
   /**/
   // generate element array - add fields
@@ -32,7 +32,7 @@ class a967_getmformArray
   /*
   add field
   */
-  public function addElement($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array(), $arrParameter = array(), $intCatId = NULL)
+  public function addElement($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array(), $arrParameter = array(), $intCatId = NULL, $arrValidation = array())
   {
     $this->id = $intId;
     $this->arrElements[$this->id] = array(
@@ -42,7 +42,8 @@ class a967_getmformArray
       'cid'        => (is_numeric($intCatId) === true) ? $intCatId : 0,
       'size'       => '',
       'attributes' => array(),
-      'multi'      => ''
+      'multi'      => '',
+      'validation' => array()
     );
     
     // unset attributes
@@ -68,6 +69,14 @@ class a967_getmformArray
     {
       $this->setParameters($arrParameter);
     }
+    
+    // unset validations
+    $this->validations = NULL;
+    
+    if (sizeof($arrValidation) > 0 )
+    {
+      $this->setValidations($arrValidation);
+    }
   }
   
   /*
@@ -86,6 +95,10 @@ class a967_getmformArray
   public function addDescription($strValue)
   {
     return $this->addElement('description', $this->count++, $strValue);
+  }
+  public function addFieldset($strValue)
+  {
+    return $this->addElement('fieldset', $this->count++, $strValue);
   }
   
   /*
@@ -142,22 +155,6 @@ class a967_getmformArray
     $this->setSize($strSize);
   }
   
-  public function setMultiple($boolMultiple)
-  {
-    if ($boolMultiple === true)
-    {
-      $this->arrElements[$this->id]['multi'] = true;
-    }
-  }
-
-  public function setSize($strSize)
-  {
-    if ((is_numeric($strSize) === true &&  $strSize > 0) or $strSize == 'full')
-    {
-      $this->arrElements[$this->id]['size'] = $strSize;
-    }
-  }
-  
   /*
   add checkboxes
   */
@@ -173,25 +170,7 @@ class a967_getmformArray
   {
     return $this->addOptionField('radiobutton', $intId, $strValue, $arrAttributes, $arrOptions);
   }
-  
-  /*
-  add options
-  */
-  public function addOption($strValue,$intKey)
-  {
-    $this->options[$intKey] = $strValue;
-    $this->arrElements[$this->id]['options'] = $this->options;
-  }
-  
-  public function addOptions($arrOptions)
-  {
-    $this->options = array();
-    foreach($arrOptions as $intKey => $strValue)
-    {
-      $this->addOption($strValue, $intKey);
-    }
-  }
-  
+    
   /*
   add rex link fields
   */
@@ -218,6 +197,150 @@ class a967_getmformArray
     return $this->addElement('medialist', 'medialist-' . $intId, $strValue, $arrAttributes, array(), $arrParameter, $intCatId);
   }
   
+  /**/
+  // set label and attributes
+  /**/
+  
+  /*
+  add label
+  */
+  public function setLabel($strLabel)
+  {
+    $this->arrElements[$this->id]['label'] = $strLabel;
+  }
+  
+  /*
+  add attribute s
+  */
+  public function setAttribute($strName, $strValue)
+  {
+  	switch ($strName)
+  	{
+  	  case 'label':
+        $this->setLabel($strValue);
+  	    break;
+  	    
+  	  case 'size':
+  	    $this->setSize($strValue);
+  	    break;
+  	    
+  	  case 'validation':
+  	    if (is_array($strValue))
+  	    {
+  	      $arrValidation = $strValue;
+  	      $this->setValidation($arrValidation);
+  	    }
+  	    break;
+  	    
+  	  default:
+        $this->attributes[$strName] = $strValue;
+        $this->arrElements[$this->id]['attributes'] = $this->attributes;
+  	    break;
+  	}
+  }
+  
+  public function setAttributes($arrAttributes)
+  {
+    $this->attributes = array();
+    foreach ($arrAttributes as $strName => $strValue)
+    {
+      $this->setAttribute($strName, $strValue);
+    }
+  }
+  
+  /**/
+  // set validation
+  /**/
+  
+  /*
+  add default validation
+  */
+  public function setValidation($strKey,$strValue)
+  {
+    switch ($strKey)
+    {
+      case 'empty':
+      case 'integer':
+      case 'compare':
+      case 'email':
+      case 'size':
+      case 'url':
+      case 'custom':
+        $this->validations[$strKey] = $strValue;
+        $this->arrElements[$this->id]['validation'] = $this->validations;
+        break;
+    }
+  }
+  
+  public function setValidations($arrValidations)
+  {
+    $this->validations = array();
+    foreach ($arrValidations as $strKey => $strValue)
+    {
+      $this->setValidation($strKey, $strValue);
+    }
+  }
+  
+  /*
+  add custom validation
+  */
+  public function setCustomValidation($arrCustomValidation)
+  {
+  }
+  
+  public function setCustomValidations($arrCustomValidations)
+  {
+  }
+  
+  
+  /**/
+  // set options, multiple and size
+  /**/
+  
+  /*
+  add options
+  */
+  public function addOption($strValue,$intKey)
+  {
+    $this->options[$intKey] = $strValue;
+    $this->arrElements[$this->id]['options'] = $this->options;
+  }
+  
+  public function addOptions($arrOptions)
+  {
+    $this->options = array();
+    foreach ($arrOptions as $intKey => $strValue)
+    {
+      $this->addOption($strValue, $intKey);
+    }
+  }
+
+  /*
+  add multiple
+  */
+  public function setMultiple($boolMultiple)
+  {
+    if ($boolMultiple === true)
+    {
+      $this->arrElements[$this->id]['multi'] = true;
+    }
+  }
+
+  /*
+  add size
+  */
+  public function setSize($strSize)
+  {
+    if ((is_numeric($strSize) === true &&  $strSize > 0) or $strSize == 'full')
+    {
+      $this->arrElements[$this->id]['size'] = $strSize;
+    }
+  }
+  
+  /**/
+  // set category and parameter
+  /**/
+  
   /*
   add category id
   */
@@ -234,69 +357,34 @@ class a967_getmformArray
   */
   public function setParameter($strName,$strValue)
   {
-    if ($strName == 'category')
+    switch ($strName)
     {
-      $this->setCategory($strValue);
-    }
-    else if ($strName == 'label')
-    {
-      $this->setLabel($strValue);
-    }
-    else
-    {
-      $this->parameter[$strName] = $strValue;
-      $this->arrElements[$this->id]['parameter'] = $this->parameter;
+      case 'category':
+        $this->setCategory($strValue);
+        break;
+      
+      case 'label':
+        $this->setLabel($strValue);
+        break;
+        
+      default:
+        $this->parameter[$strName] = $strValue;
+        $this->arrElements[$this->id]['parameter'] = $this->parameter;
+        break;  
     }
   }
   
   public function setParameters($arrParameter)
   {
     $this->parameter = array();
-    foreach($arrParameter as $strName => $strValue)
+    foreach ($arrParameter as $strName => $strValue)
     {
       $this->setParameter($strName, $strValue);
     }
   }
   
-  
   /**/
-  // set label and attributes
-  /**/
-  
-  public function setLabel($strLabel)
-  {
-    $this->arrElements[$this->id]['label'] = $strLabel;
-  }
-  
-  public function setAttribute($strName, $strValue)
-  {
-    if ($strName == 'label')
-    {
-      $this->setLabel($strValue);
-    }
-    else if ($strName == 'size')
-    {
-      $this->setSize($strValue);
-    }
-    else
-    {
-      $this->attributes[$strName] = $strValue;
-      $this->arrElements[$this->id]['attributes'] = $this->attributes;
-    }
-  }
-  
-  public function setAttributes($arrAttributes)
-  {
-    $this->attributes = array();
-    foreach($arrAttributes as $strName => $strValue)
-    {
-      $this->setAttribute($strName, $strValue);
-    }
-  }
-  
-  
-  /**/
-  // set label and attributes
+  // final output
   /**/
   
   /*

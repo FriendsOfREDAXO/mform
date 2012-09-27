@@ -6,7 +6,7 @@ class.a967_parse_mform.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.3
+@version 2.1.4
 */
 
 // MFROM PARSER CLASS
@@ -18,11 +18,34 @@ class a967_parsemform
   /**/
   
   public $strOutput;
+  public $boolFieldset = false;
   public $strTemplateThemeName;
   
   /**/
   // generate fields
   /**/
+  
+  /*
+  fieldset
+  */
+  public function generateFieldset($arrElement)
+  {
+    if ($this->boolFieldset === true)
+    {
+      $arrElement['close_fieldset'] = '</fieldset>';
+    }
+    else
+    {
+      $this->boolFieldset = true;
+    }
+    
+    $strElement = <<<EOT
+      
+      <mform:element>{$arrElement['close_fieldset']}<fieldset><legend>{$arrElement['default']}</legend></mform:element>
+      
+EOT;
+    return $this->parseElementToTemplate($strElement,$strTemplate);
+  }
   
   /*
   html, headline, description
@@ -32,15 +55,9 @@ class a967_parsemform
     switch ($arrElement['type'])
     {
       case 'headline':
-        $strTemplate = 'headline';
-        break;
-        
       case 'description':
-        $strTemplate = 'description';
-        break;
-        
       default:
-        $strTemplate = 'html';
+        $strTemplate = $arrElement['type'];
         break;
     }
     $strElement = <<<EOT
@@ -263,7 +280,6 @@ EOT;
     return $this->parseElementToTemplate($strElement,'default');
   }
   
-  
   /**/
   // get attributes
   /**/
@@ -302,6 +318,10 @@ EOT;
       {
         switch ($arrElement['type'])
         {
+          case 'fieldset':
+            $this->generateFieldset($arrElement);
+            break;
+            
           case 'html':
           case 'headline':
           case 'description':
@@ -348,12 +368,11 @@ EOT;
     }
   }
   
-  
   /**/
   // set theme
   /**/
   
-  public function setTheme ($strNewTemplateThemeName)
+  public function setTheme($strNewTemplateThemeName)
   {
   	global $strAddonPath;
     global $strDefaultTemplateThemeName;
@@ -402,6 +421,7 @@ EOT;
         break;
         
       case 'html':
+      case 'fieldset':
         $strTemplate = '<mform:output/>';
         
       case 'wrapper':
@@ -425,6 +445,10 @@ EOT;
     }
     if ($boolParseFinal === true)
     {
+      if ($this->boolParseFinal === true)
+      {
+        $strElement = $strElement.'</fieldset>';
+      }
       $this->strOutput = $strElement;
     }
     else
