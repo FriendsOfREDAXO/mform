@@ -11,11 +11,7 @@ class.a967_mform.inc.php
 
 // MFROM BASE CLASS
 ////////////////////////////////////////////////////////////////////////////////
-class mform extends a967_mform
-{
-}
-
-class a967_mform extends a967_getmformArray
+class mform extends a967_getmformArray
 {
   /**/
   // define defaults
