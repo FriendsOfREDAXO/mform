@@ -1,0 +1,12 @@
+version: '3.0'
+name: MForm
+author: 'Joachim Doerr'
+supportpage: www.redaxo.org/de/forum/
+
+navigation:
+  title: 'translate:title'
+  perm: admin
+requires:
+  addons:
+    textile:
+      min-version : '1.0'

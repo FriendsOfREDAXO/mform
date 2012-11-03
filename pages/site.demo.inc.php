@@ -9,6 +9,10 @@ site.demo.inc.php
 @version 2.1.4
 */
 
+$strContent .= '
+  <h2 class="rex-hl2">' . $this->i18n('demo_modul') . '</h2>
+';
+
 $arrMarkitupSettings = '$arrMarkitupSettings';
 
 $strModulInputDemo = <<<EOT

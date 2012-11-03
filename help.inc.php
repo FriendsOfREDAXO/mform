@@ -9,6 +9,11 @@ help.inc.php
 @version 2.1.4
 */
 
+include $this->getBasePath('pages/site.information.inc.php');
+
+echo rex_view::contentBlock($strContent);
+
+/*
 // ADDON IDENTIFIER
 ////////////////////////////////////////////////////////////////////////////////
 $strAddonName = 'mform';
@@ -53,3 +58,4 @@ require_once( $strAddonPath . '/pages/site.demo.inc.php' );
 <div class="rex-addon-content">
   <div><?php echo rex_highlight_string($strModulInputDemo); ?></div>
 </div>
+*/

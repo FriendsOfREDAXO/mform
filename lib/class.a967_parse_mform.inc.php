@@ -92,7 +92,7 @@ EOT;
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><input id="rv{$arrElement['id']}" type="{$arrElement['type']}" name="VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" {$arrElement['attributes']} /></mform:element>
+      <mform:element><input id="rv{$arrElement['id']}" type="{$arrElement['type']}" name="REX_INPUT_VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" {$arrElement['attributes']} /></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -111,7 +111,7 @@ EOT;
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><textarea id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['default']}</textarea></mform:element>
+      <mform:element><textarea id="rv{$arrElement['id']}" name="REX_INPUT_VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['default']}</textarea></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
@@ -144,7 +144,7 @@ EOT;
         </script>
 EOT;
       $strMultiselectHidden = <<<EOT
-        <input id="hidden_rv{$arrElement['id']}" type="hidden" name="VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" />
+        <input id="hidden_rv{$arrElement['id']}" type="hidden" name="REX_INPUT_VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" />
 EOT;
       if ($arrElement['default'] != '')
       {
@@ -171,7 +171,7 @@ EOT;
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label>$strMultiselectJavascript</mform:label>
-      <mform:element><select id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} $strSelectAttributes>$strOptions</select>$strMultiselectHidden</mform:element>
+      <mform:element><select id="rv{$arrElement['id']}" name="REX_INPUT_VALUE[{$arrElement['id']}]" {$arrElement['attributes']} $strSelectAttributes>$strOptions</select>$strMultiselectHidden</mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
@@ -188,7 +188,7 @@ EOT;
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $intCount++;
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="REX_INPUT_VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
         
         if ($intKey == $arrElement['default'])
         {
@@ -216,7 +216,7 @@ EOT;
       $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="REX_INPUT_VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
         if ($intKey == $arrElement['default'])
         {
           $strOptions .= 'checked="checked" ';
@@ -239,13 +239,17 @@ EOT;
   public function generateLinkElement($arrElement)
   {
     $arrID = explode('-', $arrElement['id']);
+    if (sizeof($arrElement['parameter']) >= 0)
+    {
+      $arrElement['parameter'] = array();
+    }
     if ($arrElement['type'] == 'link')
     {
-      $strOptions = rex_var_link::getLinkButton($arrID[1], $arrElement['default'], $arrElement['cid']);
+      $strOptions = rex_var_link::getWidget($arrID[1], 'REX_INPUT_LINK[' . $arrID[1] . ']', $arrElement['default'], $arrElement['parameter']);
     }
     if ($arrElement['type'] == 'linklist')
     {
-      $strOptions = rex_var_link::getLinkListButton($arrID[1], $arrElement['default'], $arrElement['cid']);
+      $strOptions = rex_var_linklist::getWidget($arrID[1], 'REX_INPUT_LINKLIST[' . $arrID[1] . ']', $arrElement['default'], $arrElement['parameter']);
     }
     $strElement = <<<EOT
       
@@ -262,14 +266,17 @@ EOT;
   public function generateMediaElement($arrElement) 
   {
     $arrID = explode('-', $arrElement['id']);
+    if (sizeof($arrElement['parameter']) >= 0)
+    {
+      $arrElement['parameter'] = array();
+    }
     if ($arrElement['type'] == 'media')
     {
-      $strOptions = rex_var_media::getMediaButton($arrID[1], $arrElement['cid'], $arrElement['parameter']);
-      $strOptions = str_replace('REX_MEDIA['. $arrID[1] .']', $arrElement['default'], $strOptions);
+      $strOptions = rex_var_media::getWidget($arrID[1], 'REX_INPUT_MEDIA[' . $arrID[1] . ']', $arrElement['default'], $arrElement['parameter']);
     }
     if ($arrElement['type'] == 'medialist')
     {
-      $strOptions = rex_var_media::getMediaListButton($arrID[1], $arrElement['default'], $arrElement['cid'], $arrElement['parameter']);        
+      $strOptions = rex_var_medialist::getWidget($arrID[1], 'REX_INPUT_MEDIALIST[' . $arrID[1] . ']', $arrElement['default'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
       
@@ -374,10 +381,10 @@ EOT;
   
   public function setTheme($strNewTemplateThemeName)
   {
-  	global $strAddonPath;
-    global $strDefaultTemplateThemeName;
+    $strMformAddonPath = rex_addon::get('mform')->getBasePath();
+    $strDefaultTemplateThemeName = rex_addon::get('mform')->getConfig('mform_template');
     
-  	if (is_dir($strAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
+  	if (is_dir($strMformAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
   	{
   	  $this->strTemplateThemeName = $strNewTemplateThemeName;
   	  return 
@@ -393,8 +400,8 @@ EOT;
   
   public function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
   {
-    global $strAddonPath;
-    global $strDefaultTemplateThemeName;
+    $strMformAddonPath = rex_addon::get('mform')->getBasePath();
+    $strDefaultTemplateThemeName = rex_addon::get('mform')->getConfig('mform_template');
     
     $strTemplateThemeName = $strDefaultTemplateThemeName;
     if ($this->strTemplateThemeName != '')
@@ -404,8 +411,10 @@ EOT;
     
     if ($strTemplateKey != '' && $strTemplateKey != 'html')
     {
-      $strTemplate = implode(file($strAddonPath . "/templates/" . $strTemplateThemeName . "_theme/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
+      $strTemplate = implode(file($strMformAddonPath . "templates/" . $strTemplateThemeName . "_theme/mform_" . $strTemplateKey . ".ini", FILE_USE_INCLUDE_PATH));
     }
+    
+    # echo $strTemplate;
     
     preg_match('|<mform:label>(.*?)</mform:label>|ism', $strElement, $arrLabel);
     preg_match('|<mform:element>(.*?)</mform:element>|ism', $strElement, $arrElement);

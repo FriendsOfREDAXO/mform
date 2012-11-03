@@ -1,5 +1,8 @@
 Changelog:
 
+Version 3.0
+  - Angepasst für Redaxo5
+
 Version 2.1.4
   - Default Validation vorbereitung hinzugefügt
   - Custom Validation ansatzweise vorbereitet

@@ -9,6 +9,18 @@ config.inc.php
 @version 2.1.4
 */
 
+$strMformAddonPath = $this->getBasePath();
+$strDefaultTemplateThemeName = $this->getConfig('mform_template');
+
+$strMode = rex_request('mode', 'string', 'none');
+
+if ($strMode == 'edit')
+{
+  include $this->getBasePath('extensions/extension.a967_outputfilter.inc.php');
+  rex_extension::register('OUTPUT_FILTER', 'a967_backend_css');
+}
+
+/*
 // ADDON IDENTIFIER
 ////////////////////////////////////////////////////////////////////////////////
 $strAddonName = 'mform';
@@ -42,14 +54,6 @@ if ($REX['REDAXO'] === true)
   ////////////////////////////////////////////////////////////////////////////////
   $I18N->appendFile(dirname(__FILE__) . '/lang/');
   
-  // ADDON MENU
-  ////////////////////////////////////////////////////////////////////////////////
-  $REX['ADDON']['name'][$strAddonName] = $I18N->msg($strAddonName.'_name');  
-  $REX['ADDON'][$strAddonName]['SUBPAGES'] = array (
-  //        subpage    ,label                         ,perm   ,params               ,attributes
-  // array (''         ,'Einstellungen'               ,''     ,''                   ,''),
-  // array ('connector','Connector (faceless subpage)',''     ,array('faceless'=>1) ,'' /*array('class'=>'blafasel') can't di: rex_title bug*/),
-  );
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////  
@@ -72,3 +76,4 @@ if ($REX['REDAXO'] === true)
     rex_register_extension('OUTPUT_FILTER', 'a967_backend_css');
   }
 }
+*/

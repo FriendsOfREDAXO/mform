@@ -15,11 +15,11 @@ if (!function_exists('a967_backend_css'))
 {
   function a967_backend_css($params)
   {
-    global $strDefaultTemplateThemeName;
+    $strDefaultTemplateThemeName = rex_addon::get('mform')->getConfig('mform_template');
     
     $strHeader =
 	    PHP_EOL.'<!-- mform -->'.
-	    PHP_EOL.'  <link rel="stylesheet" type="text/css" href="include/addons/mform/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css" media="all" />'.
+	    PHP_EOL.'  <link rel="stylesheet" type="text/css" href="src/addons/mform/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css" media="all" />'.
 	    PHP_EOL.'<!-- mform -->'.PHP_EOL;
 	    	
     return str_replace('</head>',$strHeader.'</head>',$params['subject']);
