@@ -5,8 +5,8 @@ site.demo.inc.php
 @copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
-@package redaxo4
-@version 2.1.4
+@package redaxo5
+@version 3.0
 */
 
 $strContent .= '
@@ -28,11 +28,12 @@ MODUL INPUT DEMO
 @rex_param  name   001 - MODUL INPUT DEMO
 */
 
+/*
 if(OOAddon::isAvailable('markitup'))
 {
   a287_markitup::markitup('textarea.markitup1');
 }
-
+*/
 EOT;
 
 $strModulInputDemo .= '

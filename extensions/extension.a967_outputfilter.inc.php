@@ -5,12 +5,11 @@ extension.a967_outputfilter.inc.php
 @copyright Copyright (c) 2012 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
-@package redaxo4
-@version 2.1.4
+@package redaxo5
+@version 3.0
 */
 
-// INCLUDE CSS INTO BACKEND
-////////////////////////////////////////////////////////////////////////////////
+// set css in site head
 if (!function_exists('a967_backend_css'))
 {
   function a967_backend_css($params)
