@@ -14,3 +14,8 @@ h5. Hinweis
 
 Die neue Version 3.0+< wird unter dem "Master Branch":https://github.com/joachimdoerr/mform weiter entwickelt.
 Die Aktuelle Redaxo4 kompatible Version des Addons 2.1.4 wird künftig unter dem "Redaxo4 Branch":https://github.com/joachimdoerr/mform/tree/redaxo4 weiter entwickelt.
+
+h5. Downloads
+
+* "MForm Version 3.0 - Redaxo5":https://github.com/downloads/joachimdoerr/mform/mform_3.0.zip
+* "Mform Version 2.1.4 - Redaxo4":https://github.com/downloads/joachimdoerr/mform/mform_2.1.4.zip
