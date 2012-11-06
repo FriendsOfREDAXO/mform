@@ -17,5 +17,5 @@ Die Aktuelle Redaxo4 kompatible Version des Addons 2.1.4 wird künftig unter dem
 
 h5. Downloads
 
-* "MForm Version 3.0 - Redaxo5 - (mform_3.0.zip - 32KB)":https://github.com/downloads/joachimdoerr/mform/mform_3.0.zip
-* "MForm Version 2.1.4 - Redaxo4 - (mform_2.1.4.zip - 23KB)":https://github.com/downloads/joachimdoerr/mform/mform_2.1.4.zip
+* "MForm Version 3.0 - Redaxo5 - [mform_3.0.zip - 32KB]":https://github.com/downloads/joachimdoerr/mform/mform_3.0.zip
+* "MForm Version 2.1.4 - Redaxo4 - [mform_2.1.4.zip - 23KB]":https://github.com/downloads/joachimdoerr/mform/mform_2.1.4.zip
