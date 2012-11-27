@@ -21,6 +21,13 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label {
   text-align: left;
   font-weight: bold;
   font-size: 1.1em;
+  display:table;
+}
+.markItUpContainer
+{
+  display:table;
+  position:relative;
+  top:-5px;
 }
 .mform-wrapper fieldset {
   border: 1px solid #ccc;
