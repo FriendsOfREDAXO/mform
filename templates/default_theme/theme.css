@@ -25,12 +25,12 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label {
 }
 .markItUpContainer
 {
- display:table;
- clear:left;
- position:relative;
- top:-2.0em;
- left:120px;
- margin-bottom:-2.0em;
+  display:table;
+  clear:left;
+  position:relative;
+  top:-2.0em;
+  left:120px;
+  margin-bottom:-2.0em;
 }
 .mform-wrapper fieldset {
   border: 1px solid #ccc;
