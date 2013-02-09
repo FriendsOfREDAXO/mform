@@ -297,13 +297,7 @@ EOT;
     {
       foreach ($arrAttributes as $strKey => $strValue)
       {
-        if (
-             $strKey == 'style'
-          or $strKey == 'class'
-          or $strKey == 'rel'
-          or $strKey == 'alt'
-          or $strKey == 'title'
-        )
+        if (!in_array($strKey, array('id', 'name', 'type', 'value')))
         {
           $strAttributes .= ' '.$strKey.'="'.$strValue.'"';
         }
