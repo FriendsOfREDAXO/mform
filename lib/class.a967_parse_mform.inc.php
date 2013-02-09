@@ -212,13 +212,14 @@ EOT;
   {
     if (array_key_exists('options',$arrElement) === true)
     {
+      $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
       $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="REX_INPUT_VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="REX_INPUT_VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ' . $arrElement['attributes'];
         if ($intKey == $arrElement['default'])
         {
-          $strOptions .= 'checked="checked" ';
+          $strOptions .= ' checked="checked" ';
         }
         $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
       }
@@ -297,7 +298,7 @@ EOT;
     {
       foreach ($arrAttributes as $strKey => $strValue)
       {
-        if (!in_array($strKey, array('id', 'name', 'type', 'value')))
+        if (!in_array($strKey, array('id', 'name', 'type', 'value', 'checked', 'selected')))
         {
           $strAttributes .= ' '.$strKey.'="'.$strValue.'"';
         }
