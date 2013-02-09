@@ -188,11 +188,12 @@ EOT;
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $intCount++;
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ';
+        $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ' . $strRadioAttributes;
         
         if ($intKey == $arrElement['default'])
         {
-          $strOptions .= 'checked="checked" ';
+          $strOptions .= ' checked="checked" ';
         }
         $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
       }
