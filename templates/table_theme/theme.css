@@ -50,3 +50,23 @@ div.rex-form div.rex-form-row table.rex-module label.description {
   margin-left: 5px;
   display: inline;
 }
+
+.parsley-validated {
+    
+}
+
+.parsley-success {
+    
+}
+
+.parsley-error {
+    
+}
+
+ul.parsley-error-list {
+    color:#ff0000;
+}
+
+li.parsley-error {
+    
+}
