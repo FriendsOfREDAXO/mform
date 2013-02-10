@@ -104,9 +104,9 @@ class a967_getmformArray
   /*
   add input fields
   */
-  public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array())
+  public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
   {
-    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes);
+    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, NULL, NULL, NULL, $arrValidations);
   }
   
   public function addHiddenField($intId, $strValue = NULL, $arrAttributes = array())
@@ -114,14 +114,14 @@ class a967_getmformArray
     return $this->addInputField('hidden', $intId, $strValue, $arrAttributes);
   }
   
-  public function addTextField($intId, $strValue = NULL, $arrAttributes = array())
+  public function addTextField($intId, $strValue = NULL, $arrAttributes = array(),$arrValidations = array())
   {
-    return $this->addInputField('text', $intId, $strValue, $arrAttributes);
+    return $this->addInputField('text', $intId, $strValue, $arrAttributes, $arrValidations);
   }
   
-  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array())
+  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array(),$arrValidations = array())
   {
-    return $this->addInputField('textarea', $intId, $strValue, $arrAttributes);
+    return $this->addInputField('textarea', $intId, $strValue, $arrAttributes,$arrValidations);
   }
   
   public function addTextReadOnlyField($intId, $strValue = NULL, $arrAttributes = array())
@@ -260,11 +260,48 @@ class a967_getmformArray
     switch ($strKey)
     {
       case 'empty':
+          $this->setAttribute('data-required', 'true');
+      break;
       case 'integer':
+          $this->setAttribute('data-type', 'digits');
+      break;
+      case 'float':
+          $this->setAttribute('data-type', 'number');
+      break;
+      case 'alphanum':
+          $this->setAttribute('data-type', 'alphanum');
+      break;
+      case 'dateIso':
+          $this->setAtttribute('data-type', 'dateIso');
+      break;
       case 'compare':
       case 'email':
-      case 'size':
+          $this->setAttribute('data-type', 'email');
+      break;    
+      case 'minlength':
+          $this->setAttribute('data-minlength', $strValue);
+      break;
+      case 'maxlength':
+          $this->setAttribute('data-maxlength', $strValue);
+      break;
+      case 'min':
+          $this->setAttribute('data-min', $strValue);
+      break;
+      case 'max':
+          $this->setAttribute('data-max', $strValue);
+      break;
       case 'url':
+          $this->setAttribute('data-type', 'url');
+      break;    
+      case 'regexp':
+          $this->setAttribute('data-regexp', $strValue);
+      break;
+      case 'min':
+          $this->setAttribute('data-mincheck', $strValue);
+      break;
+      case 'maxcheck':
+          $this->setAttribute('data-maxcheck', $strValue);
+      break;
       case 'custom':
         $this->validations[$strKey] = $strValue;
         $this->arrElements[$this->id]['validation'] = $this->validations;

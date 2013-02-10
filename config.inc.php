@@ -76,5 +76,6 @@ if ($REX['REDAXO'] === true)
   if ($strMode == 'edit')
   {
     rex_register_extension('OUTPUT_FILTER', 'a967_backend_css');
+    rex_register_extension('OUTPUT_FILTER', 'a967_add_parsley');
   }
 }
