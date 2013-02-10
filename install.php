@@ -2,11 +2,11 @@
 /*
 install.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
 // set default template

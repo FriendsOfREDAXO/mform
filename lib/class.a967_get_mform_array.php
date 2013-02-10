@@ -2,15 +2,15 @@
 /*
 class.a967_get_mform_array.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
 // mform array generator class
-class a967_getmformArray
+class getmformArray
 {
   /**/
   // define defaults
@@ -213,29 +213,29 @@ class a967_getmformArray
   */
   public function setAttribute($strName, $strValue)
   {
-  	switch ($strName)
-  	{
-  	  case 'label':
+    switch ($strName)
+    {
+      case 'label':
         $this->setLabel($strValue);
-  	    break;
-  	    
-  	  case 'size':
-  	    $this->setSize($strValue);
-  	    break;
-  	    
-  	  case 'validation':
-  	    if (is_array($strValue))
-  	    {
-  	      $arrValidation = $strValue;
-  	      $this->setValidation($arrValidation);
-  	    }
-  	    break;
-  	    
-  	  default:
+        break;
+        
+      case 'size':
+        $this->setSize($strValue);
+        break;
+        
+      case 'validation':
+        if (is_array($strValue))
+        {
+          $arrValidation = $strValue;
+          $this->setValidation($arrValidation);
+        }
+        break;
+        
+      default:
         $this->attributes[$strName] = $strValue;
         $this->arrElements[$this->id]['attributes'] = $this->attributes;
-  	    break;
-  	}
+        break;
+    }
   }
   
   public function setAttributes($arrAttributes)

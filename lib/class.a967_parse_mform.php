@@ -2,15 +2,15 @@
 /*
 class.a967_parse_mform.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
 // mform parser class 
-class a967_parsemform
+class parsemform
 {
   /**/
   // define defaults
@@ -376,17 +376,17 @@ EOT;
   
   public function setTheme($strNewTemplateThemeName)
   {
-    $strMformAddonPath = rex_addon::get('mform')->getBasePath();
+    $strMformAddonPath = rex_path::addon('mform');
     $strDefaultTemplateThemeName = rex_addon::get('mform')->getConfig('mform_template');
     
-  	if (is_dir($strMformAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
-  	{
-  	  $this->strTemplateThemeName = $strNewTemplateThemeName;
-  	  return 
-		PHP_EOL.'<!-- mform -->'.
-		PHP_EOL.'  <link rel="stylesheet" type="text/css" href="include/addons/mform/templates/' . $this->strTemplateThemeName . '_theme/theme.css" media="all" />'.
-		PHP_EOL.'<!-- mform -->'.PHP_EOL;
-  	}
+    if (is_dir($strMformAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
+    {
+      $this->strTemplateThemeName = $strNewTemplateThemeName;
+      return 
+        PHP_EOL.'   <!-- mform -->'.
+        PHP_EOL.'     <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $this->strTemplateThemeName . '" media="all" />'.
+        PHP_EOL.'   <!-- mform -->';
+    }
   }
   
   /**/
@@ -395,7 +395,7 @@ EOT;
   
   public function parseElementToTemplate($strElement, $strTemplateKey, $boolParseFinal = false)
   {
-    $strMformAddonPath = rex_addon::get('mform')->getBasePath();
+    $strMformAddonPath = rex_path::addon('mform');
     $strDefaultTemplateThemeName = rex_addon::get('mform')->getConfig('mform_template');
     
     $strTemplateThemeName = $strDefaultTemplateThemeName;
@@ -466,10 +466,10 @@ EOT;
   */
   public function parse_mform($arrElements, $strNewTemplateThemeName = false)
   {
-  	if ($strNewTemplateThemeName != false)
-  	{
-  	  $this->strOutput .= $this->setTheme($strNewTemplateThemeName);
-  	}
+    if ($strNewTemplateThemeName != false)
+    {
+      $this->strOutput .= $this->setTheme($strNewTemplateThemeName);
+    }
     $this->parseFormFields($arrElements);
     $this->parseElementToTemplate($this->strOutput,'wrapper',true);
     return $this->strOutput;

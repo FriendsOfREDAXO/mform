@@ -2,15 +2,15 @@
 /*
 class.a967_mform.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
 // mform base class
-class mform extends a967_getmformArray
+class mform extends getmformArray
 {
   /**/
   // define defaults
@@ -51,7 +51,7 @@ class mform extends a967_getmformArray
     /*
     init parse class
     */
-    $objOutput = new a967_parsemform();
+    $objOutput = new parsemform();
     
     /*
     is checkmode true show output array

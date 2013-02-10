@@ -1,15 +1,15 @@
 <?php
 /*
-site.demo.inc.php
+site.demo.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
-$strContent .= '
+$strPageContent .= '
   <h2 class="rex-hl2">' . $this->i18n('demo_modul') . '</h2>
 ';
 
@@ -88,10 +88,10 @@ $objForm->addMultiSelectField(9,\'REX_VALUE[9]\',array(1=>\'test-1\',2=>\'test-2
 $objForm->addHeadline(\'Radio und Checkbox Elemente\');
 
 // checkbox
-$objForm->addCheckboxField(10,\'REX_VALUE[10]\',array(1=>\'test-1\'),array(\'label\'=>\'Checkbox\'));
+$objForm->addCheckboxField(10,\'REX_VALUE[10]\',array(1=>\'test-1\'),array(\'label\'=>\'Checkbox\',\'data\'=>\'test-data-checkbox\'));
 
 // radiobox
-$objForm->addRadioField(11,\'REX_VALUE[11]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Radio Buttons\'));
+$objForm->addRadioField(11,\'REX_VALUE[11]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Radio Buttons\',\'radio-attr\'=>array(1=>array(\'data\'=>\'text-data-radio-1\'),2=>array(\'data\'=>\'text-data-radio-2\'))));
 
 
 // headline

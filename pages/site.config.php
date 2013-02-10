@@ -1,16 +1,16 @@
 <?php
 /*
-site.form.inc.php
+site.form.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.0
+@version 3.1
 */
 
 // set headline
-$strContent .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
+$strPageContent .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
 
 // rex request
 $config = rex_post('config', array(
@@ -22,18 +22,18 @@ $config = rex_post('config', array(
 if ($config['submit'])
 {
   $this->setConfig('mform_template', $config['mform_template']);
-  $strContent .= rex_view::info($this->i18n('config_saved'));
+  $strPageContent .= rex_view::info($this->i18n('config_saved'));
 }
 
 // read dir
-$handle = opendir($this->getBasePath('templates'));
+$handle = opendir(rex_path::addon('mform', 'templates'));
 while ($strDir = readdir($handle))
 {
   if ($strDir == '.' or $strDir == '..')
   {
   	continue;
   }
-  if (is_dir($this->getBasePath('templates/' . $strDir)))
+  if (is_dir(rex_path::addon('mform', 'templates/' . $strDir)))
   {
     $arrDirName = explode('_', $strDir);
     $arrThemes[] = array(
@@ -45,7 +45,7 @@ while ($strDir = readdir($handle))
 closedir($handle);
 
 // open form
-$strContent .= '
+$strPageContent .= '
   <form action="' . rex_url::currentBackendPage() . '" method="post">
     <fieldset>
 ';
@@ -79,10 +79,10 @@ $arrFormElements[] = $arrElements;
 // parse form content by fragment
 $objFragment = new rex_fragment();
 $objFragment->setVar('elements', $arrFormElements, false);
-$strContent .= $objFragment->parse('form.tpl');
+$strPageContent .= $objFragment->parse('form.tpl');
 
 // close form
-$strContent .= '
+$strPageContent .= '
     </fieldset>
   </form>
 ';
