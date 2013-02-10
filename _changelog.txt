@@ -1,7 +1,11 @@
 Changelog:
 
+Version 2.1.4-rc.2
+  - Checkboxen und Radiobuttons verarbeiten nun auch Attribute
+  - CSS wird über die index.php aufgerufen, was die .htaccess im Ordner templates einspart
+  
 Version 2.1.4
-  - Default Validation vorbereitung hinzugefügt
+  - Default Validation Vorbereitung hinzugefügt
   - Custom Validation ansatzweise vorbereitet
   - neue Methode addFieldset hinzugefügt
   - Code etwas aufgeräumt

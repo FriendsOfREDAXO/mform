@@ -65,6 +65,12 @@ if ($REX['REDAXO'] === true)
   ////////////////////////////////////////////////////////////////////////////////  
   $strDefaultTemplateThemeName = $REX["ADDON"]["mform"]["settings"]["default_template_theme_name"];
   
+  if (rex_request('mform_theme', 'string', '') != '')
+  {
+    mform_generate_css(rex_request('mform_theme', 'string', $strDefaultTemplateThemeName));
+    exit;
+  }
+  
   // EXTENSION POINTS
   ////////////////////////////////////////////////////////////////////////////////
   if ($strMode == 'edit')
