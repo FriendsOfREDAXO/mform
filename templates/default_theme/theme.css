@@ -86,3 +86,23 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label.de
 .radio_element {
   margin-left: 120px;
 }
+
+.parsley-validated {
+    
+}
+
+.parsley-success {
+    
+}
+
+.parsley-error {
+    
+}
+
+ul.parsley-error-list {
+    color:#ff0000;
+}
+
+li.parsley-error {
+    
+}
