@@ -98,13 +98,13 @@ $objForm->addRadioField(11,\'REX_VALUE[11]\',array(1=>\'test-1\',2=>\'test-2\'),
 $objForm->addHeadline(\'System-Button Elemente\');
 
 // media button
-$objForm->addMediaField(1,\'REX_FILE[1]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bild\'));
+$objForm->addMediaField(1,\'REX_MEDIA[1]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bild\'));
 
 // medialist button
-$objForm->addMedialistField(2,\'REX_MEDIALIST[2]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bildliste\'));
+$objForm->addMedialistField(1,\'REX_MEDIALIST[1]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bildliste\'));
 
 // link button
-$objForm->addLinkField(1,\'REX_LINK_ID[1]\',array(\'label\'=>\'Link\',\'category\'=>3));
+$objForm->addLinkField(1,\'REX_LINK[id=1 output=id]\',array(\'label\'=>\'Link\',\'category\'=>3));
 
 // linklist button
 $objForm->addLinklistField(1,\'REX_LINKLIST[1]\',array(\'label\'=>\'Linkliste\',\'category\'=>3));
