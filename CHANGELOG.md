@@ -9,6 +9,7 @@
 * delete extensions folder
 * use new methode rex_view::addCssFile
 * remove deleted setbasepath methode
+* Demo Modul angepasst REX_FILE zu REX_MEDIA etc.
 
 ### Version 3.0
 
