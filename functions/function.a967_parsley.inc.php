@@ -10,7 +10,7 @@ if (!function_exists('a967_add_parsley'))
 
         $init = 'data-validate="parsley" id="REX_FORM">';
 
-        $jquery = '<script type="text/javascript" src="'.$REX['HTDOCS_PATH'].'files/addons/mform/jquery-1.9.1.min.js"></script>';
+        $jquery = '<script type="text/javascript" src="'.$REX['HTDOCS_PATH'].'files/addons/mform/jquery-1.8.3.min.js"></script>';
 
         $out = str_replace('<script src="media/jquery.min.js" type="text/javascript"></script>', $jquery, $out);
 
