@@ -11,13 +11,14 @@ boot.php
 
 if (rex::isBackend())
 {
-  array_walk(glob(rex_path::addon('mform')."/functions/function.*.php"),create_function('$v,$i', 'return require_once($v);')); 
-  
+  $functions = glob(rex_path::addon('mform')."/functions/function.*.php");
+  array_walk($functions,create_function('$v,$i', 'return require_once($v);'));
+
   if (rex_request('function', 'string') == 'edit' or rex_request('function', 'string') == 'add')
   {
     rex_view::addCssFile('?&mform_theme=' . rex_addon::get('mform')->getConfig('mform_template'));
   }
-  
+
   if (rex_request('mform_theme', 'string', '') != '')
   {
    mform_generate_css(rex_request('mform_theme', 'string', rex_addon::get('mform')->getConfig('mform_template')));

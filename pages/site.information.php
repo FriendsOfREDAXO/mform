@@ -10,7 +10,7 @@ site.information.php
 */
 
 // information content
-$strContent .= '
+$strContent = '
       <h3>'. $this->i18n('help_subheadline_1') .'</h3>
       <p>'. rex_textile::parse($this->i18n('help_infotext_1')) .'</p>
       <p>'. rex_textile::parse($this->i18n('help_infotext_2')) .'</p>
