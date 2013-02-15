@@ -10,7 +10,7 @@ site.form.php
 */
 
 // set headline
-$strPageContent .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
+$strPageContent = '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
 
 // rex request
 $config = rex_post('config', array(

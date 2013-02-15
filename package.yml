@@ -4,10 +4,9 @@ name: MForm
 author: 'Joachim Doerr'
 supportpage: www.redaxo.org/de/forum/
 
-navigation:
+page:
   title: 'translate:title'
   perm: admin
 requires:
-  addons:
-    textile:
-      min-version : '1.0'
+  packages:
+    textile: '>=1.0'
