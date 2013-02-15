@@ -13,9 +13,9 @@ index.php
 $content = '';
 
 // include subpages
-include rex_path::addon('mform', 'pages/site.config.php');
-include rex_path::addon('mform', 'pages/site.information.php');
-include rex_path::addon('mform', 'pages/site.demo.php');
+include $this->getPath('pages/site.config.php');
+include $this->getPath('pages/site.information.php');
+include $this->getPath('pages/site.demo.php');
 
 // echo content
 echo rex_view::title($this->i18n('title'));
