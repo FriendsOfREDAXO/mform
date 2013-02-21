@@ -10,10 +10,11 @@ if (!function_exists('a967_add_parsley'))
 
         $init = 'data-validate="parsley" id="REX_FORM">';
 
-        $jquery = '<script type="text/javascript" src="'.$REX['HTDOCS_PATH'].'files/addons/mform/jquery-1.8.3.min.js"></script>';
-
-        $out = str_replace('<script src="media/jquery.min.js" type="text/javascript"></script>', $jquery, $out);
-
+        if($REX['VERSION'].$REX['SUBVERSION'] <= "4.4") {
+            $jquery = '<script type="text/javascript" src="'.$REX['HTDOCS_PATH'].'files/addons/mform/jquery-1.8.3.min.js"></script>';
+            $out = str_replace('<script src="media/jquery.min.js" type="text/javascript"></script>', $jquery, $out);
+        }
+        
         $out = str_replace('id="REX_FORM">', $init, $out);
 
         $out = str_replace('</head>', $js, $out);
