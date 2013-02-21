@@ -96,9 +96,9 @@ class a967_getmformArray
   {
     return $this->addElement('description', $this->count++, $strValue);
   }
-  public function addFieldset($strValue)
+  public function addFieldset($strValue, $arrAttributes = array())
   {
-    return $this->addElement('fieldset', $this->count++, $strValue);
+    return $this->addElement('fieldset', $this->count++, $strValue, $arrAttributes);
   }
   
   /*
