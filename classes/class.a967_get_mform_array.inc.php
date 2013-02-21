@@ -314,7 +314,14 @@ class a967_getmformArray
     $this->validations = array();
     foreach ($arrValidations as $strKey => $strValue)
     {
-      $this->setValidation($strKey, $strValue);
+      if (is_numeric ($strKey) === true)
+      {
+        $this->setValidation($strValue, '');
+      }
+      else
+      {
+        $this->setValidation($strKey, $strValue);
+      }
     }
   }
   
