@@ -30,6 +30,7 @@ class a967_parsemform
   */
   public function generateFieldset($arrElement)
   {
+    $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     if ($this->boolFieldset === true)
     {
       $arrElement['close_fieldset'] = '</fieldset>';
@@ -41,7 +42,7 @@ class a967_parsemform
     
     $strElement = <<<EOT
       
-      <mform:element>{$arrElement['close_fieldset']}<fieldset><legend>{$arrElement['default']}</legend></mform:element>
+      <mform:element>{$arrElement['close_fieldset']}<fieldset {$arrElement['attributes']}><legend>{$arrElement['default']}</legend></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
