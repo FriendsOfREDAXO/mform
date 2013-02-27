@@ -108,10 +108,10 @@ class a967_getmformArray
   {
     if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true)
     {
-      $this->id = $this->count++;
-      $this->arrElements[$this->id] = array(
+      $intId = $this->count++;
+      $this->arrElements[$intId] = array(
         'type'       => 'callback',
-        'id'         => $this->id,
+        'id'         => $intId,
         'callable'   => $callable,
         'parameter'  => $arrParameter
       );
