@@ -1,5 +1,12 @@
 ## MForm Master-Branch Changelog
 
+### Version 3.1-rc.1
+
+* callback Methode integriert
+* Validierung integriert
+* Attributes für Fieldsets hinzugefügt
+* Attributes für Radiobuttons und Checkboxen hinzugefügt
+
 ### Version 3.1
 
 * add boot.php

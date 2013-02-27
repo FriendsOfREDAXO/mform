@@ -29,6 +29,7 @@ class parsemform
   */
   public function generateFieldset($arrElement)
   {
+    $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     if ($this->boolFieldset === true)
     {
       $arrElement['close_fieldset'] = '</fieldset>';
@@ -40,7 +41,7 @@ class parsemform
     
     $strElement = <<<EOT
       
-      <mform:element>{$arrElement['close_fieldset']}<fieldset><legend>{$arrElement['default']}</legend></mform:element>
+      <mform:element>{$arrElement['close_fieldset']}<fieldset {$arrElement['attributes']}><legend>{$arrElement['default']}</legend></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -65,6 +66,21 @@ EOT;
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
+  }
+  
+  /*
+  callback
+  */
+  public function getCallbackElement($arrElement)
+  {
+    $strCallElement = call_user_func($arrElement['callabel'], $arrElement['parameter']);
+
+    $strElement = <<<EOT
+      
+      <mform:element>$strCallElement</mform:element>
+      
+EOT;
+    return $this->parseElementToTemplate($strElement,'html');
   }
   
   /*
@@ -330,6 +346,10 @@ EOT;
             $this->generateLineElement($arrElement);
             break;
           
+          case 'callback':
+            $this->getCallbackElement($arrElement);
+            break;
+                    
           case 'text':
           case 'hidden':
           case 'text-readonly':

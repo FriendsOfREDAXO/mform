@@ -95,9 +95,27 @@ class getmformArray
   {
     return $this->addElement('description', $this->count++, $strValue);
   }
-  public function addFieldset($strValue)
+  
+  public function addFieldset($strValue, $arrAttributes = array())
   {
-    return $this->addElement('fieldset', $this->count++, $strValue);
+    return $this->addElement('fieldset', $this->count++, $strValue, $arrAttributes);
+  }
+  
+  /*
+  add callback
+  */
+  public function callback($callable = NULL, $arrParameter = array())
+  {
+    if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true)
+    {
+      $intId = $this->count++;
+      $this->arrElements[$intId] = array(
+        'type'       => 'callback',
+        'id'         => $intId,
+        'callable'   => $callable,
+        'parameter'  => $arrParameter
+      );
+    }
   }
   
   /*
@@ -227,7 +245,7 @@ class getmformArray
         if (is_array($strValue))
         {
           $arrValidation = $strValue;
-          $this->setValidation($arrValidation);
+          $this->setValidations($arrValidation);
         }
         break;
         
@@ -259,11 +277,48 @@ class getmformArray
     switch ($strKey)
     {
       case 'empty':
+          $this->setAttribute('data-required', 'true');
+      break;
       case 'integer':
+          $this->setAttribute('data-type', 'digits');
+      break;
+      case 'float':
+          $this->setAttribute('data-type', 'number');
+      break;
+      case 'alphanum':
+          $this->setAttribute('data-type', 'alphanum');
+      break;
+      case 'dateIso':
+          $this->setAtttribute('data-type', 'dateIso');
+      break;
       case 'compare':
       case 'email':
-      case 'size':
+          $this->setAttribute('data-type', 'email');
+      break;    
+      case 'minlength':
+          $this->setAttribute('data-minlength', $strValue);
+      break;
+      case 'maxlength':
+          $this->setAttribute('data-maxlength', $strValue);
+      break;
+      case 'min':
+          $this->setAttribute('data-min', $strValue);
+      break;
+      case 'max':
+          $this->setAttribute('data-max', $strValue);
+      break;
       case 'url':
+          $this->setAttribute('data-type', 'url');
+      break;    
+      case 'regexp':
+          $this->setAttribute('data-regexp', $strValue);
+      break;
+      case 'min':
+          $this->setAttribute('data-mincheck', $strValue);
+      break;
+      case 'maxcheck':
+          $this->setAttribute('data-maxcheck', $strValue);
+      break;
       case 'custom':
         $this->validations[$strKey] = $strValue;
         $this->arrElements[$this->id]['validation'] = $this->validations;
@@ -276,7 +331,14 @@ class getmformArray
     $this->validations = array();
     foreach ($arrValidations as $strKey => $strValue)
     {
-      $this->setValidation($strKey, $strValue);
+      if (is_numeric ($strKey) === true)
+      {
+        $this->setValidation($strValue, '');
+      }
+      else
+      {
+        $this->setValidation($strKey, $strValue);
+      }
     }
   }
   
@@ -290,7 +352,6 @@ class getmformArray
   public function setCustomValidations($arrCustomValidations)
   {
   }
-  
   
   /**/
   // set options, multiple and size
