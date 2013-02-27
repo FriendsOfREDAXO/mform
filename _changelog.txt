@@ -1,5 +1,8 @@
 Changelog:
 
+Version 2.1.4-rc.3
+  - Callback Methode integriert für callabel aufrufe
+
 Version 2.1.4-rc.2
   - Checkboxen und Radiobuttons verarbeiten nun auch Attribute
   - CSS wird über die index.php aufgerufen, was die .htaccess im Ordner templates einspart

@@ -96,6 +96,7 @@ class a967_getmformArray
   {
     return $this->addElement('description', $this->count++, $strValue);
   }
+  
   public function addFieldset($strValue, $arrAttributes = array())
   {
     return $this->addElement('fieldset', $this->count++, $strValue, $arrAttributes);
@@ -131,12 +132,12 @@ class a967_getmformArray
     return $this->addInputField('hidden', $intId, $strValue, $arrAttributes);
   }
   
-  public function addTextField($intId, $strValue = NULL, $arrAttributes = array(),$arrValidations = array())
+  public function addTextField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
   {
     return $this->addInputField('text', $intId, $strValue, $arrAttributes, $arrValidations);
   }
   
-  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array(),$arrValidations = array())
+  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
   {
     return $this->addInputField('textarea', $intId, $strValue, $arrAttributes,$arrValidations);
   }
@@ -245,7 +246,7 @@ class a967_getmformArray
   	    if (is_array($strValue))
   	    {
   	      $arrValidation = $strValue;
-  	      $this->setValidation($arrValidation);
+  	      $this->setValidations($arrValidation);
   	    }
   	    break;
   	    
