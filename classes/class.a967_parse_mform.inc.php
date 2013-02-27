@@ -70,7 +70,7 @@ EOT;
   }
   
   /*
-  html, headline, description
+  callback
   */
   public function getCallbackElement($arrElement)
   {
@@ -81,7 +81,6 @@ EOT;
       <mform:element>$strCallElement</mform:element>
       
 EOT;
-
     return $this->parseElementToTemplate($strElement,'html');
   }
   
