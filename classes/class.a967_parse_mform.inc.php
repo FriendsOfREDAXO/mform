@@ -74,6 +74,15 @@ EOT;
   */
   public function getCallbackElement($arrElement)
   {
+    $strCallElement = call_user_func($arrElement['callabel'], $arrElement['parameter']);
+
+    $strElement = <<<EOT
+      
+      <mform:element>$strCallElement</mform:element>
+      
+EOT;
+
+    return $this->parseElementToTemplate($strElement,'html');
   }
   
   /*
