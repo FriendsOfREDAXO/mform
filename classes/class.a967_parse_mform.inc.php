@@ -70,6 +70,13 @@ EOT;
   }
   
   /*
+  html, headline, description
+  */
+  public function getCallbackElement($arrElement)
+  {
+  }
+  
+  /*
   hidden, text, password
   */
   public function generateInputElement($arrElement)
@@ -323,6 +330,10 @@ EOT;
           case 'headline':
           case 'description':
             $this->generateLineElement($arrElement);
+            break;
+          
+          case 'callback':
+            $this->getCallbackElement($arrElement);
             break;
           
           case 'text':
