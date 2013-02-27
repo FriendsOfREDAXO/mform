@@ -102,6 +102,23 @@ class a967_getmformArray
   }
   
   /*
+  add callback
+  */
+  public function callback($callable = NULL, $arrParameter = array())
+  {
+    if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true)
+    {
+      $this->id = $this->count++;
+      $this->arrElements[$this->id] = array(
+        'type'       => 'callback',
+        'id'         => $this->id,
+        'callable'   => $callable,
+        'parameter'  => $arrParameter
+      );
+    }
+  }
+  
+  /*
   add input fields
   */
   public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
