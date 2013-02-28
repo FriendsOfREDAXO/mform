@@ -4,7 +4,7 @@ name: MForm
 author: 'Joachim Doerr'
 supportpage: www.redaxo.org/de/forum/
 
-navigation:
+page:
   title: 'translate:title'
   perm: admin
 requires:

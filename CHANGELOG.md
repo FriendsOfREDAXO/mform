@@ -2,6 +2,10 @@
 
 ### Version 3.1-rc.1
 
+* rex_extension für Output-Modifikation zum Initialisieren der Validierung integriert
+
+### Version 3.1-rc.1
+
 * callback Methode integriert
 * Validierung integriert
 * Attributes für Fieldsets hinzugefügt
