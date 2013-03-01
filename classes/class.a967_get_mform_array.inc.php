@@ -32,18 +32,20 @@ class a967_getmformArray
   /*
   add field
   */
-  public function addElement($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array(), $arrParameter = array(), $intCatId = NULL, $arrValidation = array())
+  public function addElement($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array(), $arrParameter = array(), $intCatId = NULL, $arrValidation = array(), $strDefaultValue = NULL)
   {
     $this->id = $intId;
     $this->arrElements[$this->id] = array(
-      'type'       => $strTyp,
-      'id'         => $intId,
-      'default'    => $strValue,
-      'cid'        => (is_numeric($intCatId) === true) ? $intCatId : 0,
-      'size'       => '',
-      'attributes' => array(),
-      'multi'      => '',
-      'validation' => array()
+      'type'          => $strTyp,
+      'id'            => $intId,
+      'value'         => $strValue,
+      'default-value' => $strDefaultValue,
+      'mode'          => rex_request('function', string),
+      'cid'           => (is_numeric($intCatId) === true) ? $intCatId : 0,
+      'size'          => '',
+      'attributes'    => array(),
+      'multi'         => '',
+      'validation'    => array()
     );
     
     // unset attributes
@@ -122,9 +124,9 @@ class a967_getmformArray
   /*
   add input fields
   */
-  public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
+  public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
-    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, NULL, NULL, NULL, $arrValidations);
+    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
   }
   
   public function addHiddenField($intId, $strValue = NULL, $arrAttributes = array())
@@ -132,14 +134,14 @@ class a967_getmformArray
     return $this->addInputField('hidden', $intId, $strValue, $arrAttributes);
   }
   
-  public function addTextField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
+  public function addTextField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
-    return $this->addInputField('text', $intId, $strValue, $arrAttributes, $arrValidations);
+    return $this->addInputField('text', $intId, $strValue, $arrAttributes, $arrValidations, $strDefaultValue);
   }
   
-  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array())
+  public function addTextAreaField($intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
-    return $this->addInputField('textarea', $intId, $strValue, $arrAttributes,$arrValidations);
+    return $this->addInputField('textarea', $intId, $strValue, $arrAttributes, $arrValidations, $strDefaultValue);
   }
   
   public function addTextReadOnlyField($intId, $strValue = NULL, $arrAttributes = array())
@@ -155,20 +157,20 @@ class a967_getmformArray
   /*
   add select fields
   */
-  public function addOptionField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array())
+  public function addOptionField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrOptions = array(), $strDefaultValue = NULL)
   {
-    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, $arrOptions);
+    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, $arrOptions, NULL, NULL, array(), $strDefaultValue);
   }
   
-  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 1)
+  public function addSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 1, $strDefaultValue = NULL)
   {
-    return $this->addOptionField('select', $intId, $strValue, $arrAttributes, $arrOptions);
+    return $this->addOptionField('select', $intId, $strValue, $arrAttributes, $arrOptions, $strDefaultValue);
     $this->setSize($strSize);
   }
   
-  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 3)
+  public function addMultiSelectField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strSize = 3, $strDefaultValue = NULL)
   {
-    $this->addOptionField('multiselect', $intId, $strValue, $arrAttributes, $arrOptions);
+    $this->addOptionField('multiselect', $intId, $strValue, $arrAttributes, $arrOptions, $strDefaultValue);
     $this->setMultiple(true);
     $this->setSize($strSize);
   }
@@ -176,17 +178,17 @@ class a967_getmformArray
   /*
   add checkboxes
   */
-  public function addCheckboxField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array())
+  public function addCheckboxField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strDefaultValue = NULL)
   {
-    return $this->addOptionField('checkbox', $intId, $strValue, $arrAttributes, $arrOptions);
+    return $this->addOptionField('checkbox', $intId, $strValue, $arrAttributes, $arrOptions, $strDefaultValue);
   }
   
   /*
   add radiobutton
   */
-  public function addRadioField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array())
+  public function addRadioField($intId, $strValue = NULL, $arrOptions = array(), $arrAttributes = array(), $strDefaultValue = NULL)
   {
-    return $this->addOptionField('radiobutton', $intId, $strValue, $arrAttributes, $arrOptions);
+    return $this->addOptionField('radiobutton', $intId, $strValue, $arrAttributes, $arrOptions, $strDefaultValue);
   }
     
   /*
@@ -248,6 +250,10 @@ class a967_getmformArray
   	      $arrValidation = $strValue;
   	      $this->setValidations($arrValidation);
   	    }
+  	    break;
+  	  
+  	  case 'default-value':
+  	    $this->setDefaultValue($strValue);
   	    break;
   	    
   	  default:
@@ -354,6 +360,17 @@ class a967_getmformArray
   {
   }
   
+  /**/
+  // set default value
+  /**/
+  
+  /*
+  set defaut value
+  */
+  public function setDefaultValue($strValue)
+  {
+    $this->arrElements[$this->id]['default-value'] = $strValue;
+  }
   
   /**/
   // set options, multiple and size

@@ -42,7 +42,7 @@ class a967_parsemform
     
     $strElement = <<<EOT
       
-      <mform:element>{$arrElement['close_fieldset']}<fieldset {$arrElement['attributes']}><legend>{$arrElement['default']}</legend></mform:element>
+      <mform:element>{$arrElement['close_fieldset']}<fieldset {$arrElement['attributes']}><legend>{$arrElement['value']}</legend></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -63,7 +63,7 @@ EOT;
     }
     $strElement = <<<EOT
       
-      <mform:element>{$arrElement['default']}</mform:element>
+      <mform:element>{$arrElement['value']}</mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -105,10 +105,16 @@ EOT;
         $strTemplate = 'default';
         break;
     }
+    
+    if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
+    {
+      $arrElement['value'] = $arrElement['default-value'];
+    }
+    
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><input id="rv{$arrElement['id']}" type="{$arrElement['type']}" name="VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" {$arrElement['attributes']} /></mform:element>
+      <mform:element><input id="rv{$arrElement['id']}" type="{$arrElement['type']}" name="VALUE[{$arrElement['id']}]" value="{$arrElement['value']}" {$arrElement['attributes']} /></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -124,10 +130,16 @@ EOT;
     {
       $arrElement['attributes'] .= ' readonly="readonly"';
     }
+    
+    if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
+    {
+      $arrElement['value'] = $arrElement['default-value'];
+    }
+    
     $strElement = <<<EOT
       
       <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><textarea id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['default']}</textarea></mform:element>
+      <mform:element><textarea id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['value']}</textarea></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
@@ -160,23 +172,23 @@ EOT;
         </script>
 EOT;
       $strMultiselectHidden = <<<EOT
-        <input id="hidden_rv{$arrElement['id']}" type="hidden" name="VALUE[{$arrElement['id']}]" value="{$arrElement['default']}" />
+        <input id="hidden_rv{$arrElement['id']}" type="hidden" name="VALUE[{$arrElement['id']}]" value="{$arrElement['value']}" />
 EOT;
-      if ($arrElement['default'] != '')
+      if ($arrElement['value'] != '')
       {
-        $arrHiddenValue = explode(',',$arrElement['default']);
+        $arrHiddenValue = explode(',',$arrElement['value']);
       }
     }
     else
     {
-      $arrHiddenValue = array($arrElement['default']);
+      $arrHiddenValue = array($arrElement['value']);
     }
     if (array_key_exists('options',$arrElement) === true)
     {
       foreach ($arrElement['options'] as $intKey => $strValue) {
         $strOptions .= '<option value="' . $intKey . '" ';
           foreach ($arrHiddenValue as $strHiddenValue) {
-            if ($intKey == $strHiddenValue)
+            if ($intKey == $strHiddenValue or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
             {
               $strOptions .= 'selected="selected" ';
             }
@@ -206,8 +218,7 @@ EOT;
         $intCount++;
         $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
         $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ' . $strRadioAttributes;
-        
-        if ($intKey == $arrElement['default'])
+        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
@@ -235,7 +246,7 @@ EOT;
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" '. $arrElement['attributes'];
-        if ($intKey == $arrElement['default'])
+        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
@@ -259,11 +270,11 @@ EOT;
     $arrID = explode('-', $arrElement['id']);
     if ($arrElement['type'] == 'link')
     {
-      $strOptions = rex_var_link::getLinkButton($arrID[1], $arrElement['default'], $arrElement['cid']);
+      $strOptions = rex_var_link::getLinkButton($arrID[1], $arrElement['value'], $arrElement['cid']);
     }
     if ($arrElement['type'] == 'linklist')
     {
-      $strOptions = rex_var_link::getLinkListButton($arrID[1], $arrElement['default'], $arrElement['cid']);
+      $strOptions = rex_var_link::getLinkListButton($arrID[1], $arrElement['value'], $arrElement['cid']);
     }
     $strElement = <<<EOT
       
@@ -283,11 +294,11 @@ EOT;
     if ($arrElement['type'] == 'media')
     {
       $strOptions = rex_var_media::getMediaButton($arrID[1], $arrElement['cid'], $arrElement['parameter']);
-      $strOptions = str_replace('REX_MEDIA['. $arrID[1] .']', $arrElement['default'], $strOptions);
+      $strOptions = str_replace('REX_MEDIA['. $arrID[1] .']', $arrElement['value'], $strOptions);
     }
     if ($arrElement['type'] == 'medialist')
     {
-      $strOptions = rex_var_media::getMediaListButton($arrID[1], $arrElement['default'], $arrElement['cid'], $arrElement['parameter']);        
+      $strOptions = rex_var_media::getMediaListButton($arrID[1], $arrElement['value'], $arrElement['cid'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
       

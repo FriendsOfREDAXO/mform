@@ -1,5 +1,9 @@
 Changelog:
 
+Version 2.1.4-rc.4
+  - $arrElement[default] in $arrElement[value] umbenannt
+  - default-value hinzugefügt
+
 Version 2.1.4-rc.3
   - Callback Methode integriert für callabel aufrufe
 
