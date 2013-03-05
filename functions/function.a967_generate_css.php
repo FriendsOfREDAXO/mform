@@ -44,9 +44,9 @@ EOT;
     }
     */
     
-    if (file_exists(rex_path::addon('mform') . '/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css') === true)
+    if (file_exists(rex_path::addon('mform') . '/templates/' . $strTemplateTheme . '_theme/theme.css') === true)
     {
-      echo file_get_contents(rex_path::addon('mform') . '/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css', FILE_USE_INCLUDE_PATH);
+      echo file_get_contents(rex_path::addon('mform') . '/templates/' . $strTemplateTheme . '_theme/theme.css', FILE_USE_INCLUDE_PATH);
     }
     else
     {
