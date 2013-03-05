@@ -15,7 +15,7 @@ if (rex::isBackend())
   
   if (rex_request('function', 'string') == 'edit' or rex_request('function', 'string') == 'add')
   {
-    rex_view::addCssFile('?&mform_theme=' . rex_addon::get('mform')->getConfig('mform_template'));
+    rex_view::addCssFile('?mform_theme=' . rex_addon::get('mform')->getConfig('mform_template'));
     rex_view::addJsFile($this->getAssetsUrl('parsley/i18n/messages.de.js'));
     rex_view::addJsFile($this->getAssetsUrl('parsley/parsley.js'));
     

@@ -23,7 +23,7 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label {
   font-size: 1.1em;
   display:table;
 }
-.markItUpContainer
+.mform-wrapper .markItUpContainer
 {
   display:table;
   clear:left;
