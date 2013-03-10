@@ -8,7 +8,7 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 
 MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt.
 
-Aktuell wird das Addon für Redaxo5 optimiert, momentan funktionieren alle Methoden des Addons mit dem neusten Redaxo5 Repo, ausgenommen der Link- und Linklist-Buttons diese wurden noch nicht getestet. MForm wird ab Version 3.0 für Redaxo5 lauffähig sein.
+Aktuell wird das Addon für Redaxo5 optimiert, momentan funktionieren alle Methoden des Addons mit dem neusten Redaxo5 Repo. MForm wird ab Version 3.0 für Redaxo5 lauffähig sein.
 
 ##### Hinweis
 
