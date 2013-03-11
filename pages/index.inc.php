@@ -2,11 +2,11 @@
 /*
 index.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.4
+@version 2.2.0
 */
 
 // ADDON IDENTIFIER
@@ -34,9 +34,9 @@ rex_title($I18N->msg($strAddonName.'_title'), $REX['ADDON']['pages'][$strAddonNa
 
 // INCLUDE SUBPAGE
 /////////////////////////////////////////////////////////////////////////////
-require_once( $strAddonPath . '/pages/site.demo.inc.php' );
-require_once( $strAddonPath . '/pages/site.form.inc.php' );
-require_once( $strAddonPath . '/pages/site.information.inc.php' );
+require_once( $strAddonPath . '/pages/site.demo.php' );
+require_once( $strAddonPath . '/pages/site.form.php' );
+require_once( $strAddonPath . '/pages/site.information.php' );
 
 
 // REX BACKEND LAYOUT BOTTOM

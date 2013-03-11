@@ -36,9 +36,9 @@ EOT;
 EOT;
     }
     
-    if (file_exists( $REX['HTDOCS_PATH'] . 'redaxo/include/addons/mform/templates/' . $strTemplateTheme . '_theme/theme.css') === true)
+    if (file_exists( $REX['HTDOCS_PATH'] . 'redaxo/include/addons/mform/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css') === true)
     {
-      echo file_get_contents('include/addons/mform/templates/' . $strTemplateTheme . '_theme/theme.css', FILE_USE_INCLUDE_PATH);
+      echo file_get_contents('include/addons/mform/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css', FILE_USE_INCLUDE_PATH);
     }
     else
     {

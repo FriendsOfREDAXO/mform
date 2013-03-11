@@ -1,17 +1,17 @@
 <?php
 /*
-class.a967_parse_mform.inc.php
+class.parse_mform.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.4
+@version 2.2.0
 */
 
 // MFROM PARSER CLASS
 ////////////////////////////////////////////////////////////////////////////////
-class a967_parsemform
+class parseMForm
 {
   /**/
   // define defaults
@@ -90,6 +90,8 @@ EOT;
   public function generateInputElement($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    $arrVarId = $this->getVarAndIds($arrElement);
+    
     switch ($arrElement['type'])
     {
       case 'hidden':
@@ -106,15 +108,10 @@ EOT;
         break;
     }
     
-    if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
-    {
-      $arrElement['value'] = $arrElement['default-value'];
-    }
-    
     $strElement = <<<EOT
       
-      <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><input id="rv{$arrElement['id']}" type="{$arrElement['type']}" name="VALUE[{$arrElement['id']}]" value="{$arrElement['value']}" {$arrElement['attributes']} /></mform:element>
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label></mform:label>
+      <mform:element><input id="rv{$arrVarId['id']}" type="{$arrElement['type']}" name="VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" value="{$arrVarId['value']}" {$arrElement['attributes']} /></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
@@ -126,20 +123,17 @@ EOT;
   public function generateAreaElement($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    $arrVarId = $this->getVarAndIds($arrElement);
+    
     if ($arrElement['type'] == 'area-readonly')
     {
       $arrElement['attributes'] .= ' readonly="readonly"';
     }
     
-    if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
-    {
-      $arrElement['value'] = $arrElement['default-value'];
-    }
-    
     $strElement = <<<EOT
       
-      <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
-      <mform:element><textarea id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} >{$arrElement['value']}</textarea></mform:element>
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label></mform:label>
+      <mform:element><textarea id="rv{$arrVarId['id']}" name="VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" {$arrElement['attributes']} >{$arrVarId['value']}</textarea></mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
@@ -153,6 +147,8 @@ EOT;
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     $strSelectAttributes = ''; $strMultiselectJavascript = ''; $strMultiselectHidden = ''; $arrHiddenValue = array(); $strOptions = '';
     $strSelectAttributes = (is_numeric($arrElement['size']) === true) ? 'size="' . $arrElement['size'] . '"' : '' ;
+    $arrVarId = $this->getVarAndIds($arrElement);
+    
     if ($arrElement['size'] == 'full')
     {
       $strSelectAttributes = 'size="' . sizeof($arrElement['options']) . '"';
@@ -164,15 +160,15 @@ EOT;
         <script type="text/javascript">
           /* <![CDATA[ */
             jQuery(document).ready(function($){
-              $("#rv{$arrElement['id']}").change(function() {
-                $("#hidden_rv{$arrElement['id']}").val($(this).val());
+              $("#rv{$arrVarId['id']}").change(function() {
+                $("#hidden_rv{$arrVarId['id']}").val($(this).val());
               });
             });
           /* ]]> */
         </script>
 EOT;
       $strMultiselectHidden = <<<EOT
-        <input id="hidden_rv{$arrElement['id']}" type="hidden" name="VALUE[{$arrElement['id']}]" value="{$arrElement['value']}" />
+        <input id="hidden_rv{$arrVarId['id']}" type="hidden" name="VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" value="{$arrElement['value']}" />
 EOT;
       if ($arrElement['value'] != '')
       {
@@ -198,8 +194,8 @@ EOT;
     }
     $strElement = <<<EOT
       
-      <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label>$strMultiselectJavascript</mform:label>
-      <mform:element><select id="rv{$arrElement['id']}" name="VALUE[{$arrElement['id']}]" {$arrElement['attributes']} $strSelectAttributes>$strOptions</select>$strMultiselectHidden</mform:element>
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label>$strMultiselectJavascript</mform:label>
+      <mform:element><select id="rv{$arrVarId['id']}" name="VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" {$arrElement['attributes']} $strSelectAttributes>$strOptions</select>$strMultiselectHidden</mform:element>
       
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
@@ -211,23 +207,25 @@ EOT;
   public function generateRadioElement($arrElement)
   {
     $intCount = 0; $strOptions = '';
+    $arrVarId = $this->getVarAndIds($arrElement);
+    
     if (array_key_exists('options',$arrElement) === true)
     {
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $intCount++;
         $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" ' . $strRadioAttributes;
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrVarId['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['var-id'] . ']' . $arrVarId['sub-var-id'] . '" value="' . $intKey . '" ' . $strRadioAttributes;
         if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
-        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . $intCount . '">' . $strValue . '</label></span></div>';
+        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrVarId['id'] . $intCount . '">' . $strValue . '</label></span></div>';
       }
     }
     $strElement = <<<EOT
       
-      <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label></mform:label>
       <mform:element>$strOptions</mform:element>
       
 EOT;
@@ -243,19 +241,21 @@ EOT;
     {
       $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
       $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
+      $arrVarId = $this->getVarAndIds($arrElement);
+      
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
-        $strOptions .= '<div class="radio_element"><input id="rv' . $arrElement['id'] . '" type="checkbox" name="VALUE[' . $arrElement['id'] . ']" value="' . $intKey . '" '. $arrElement['attributes'];
+        $strOptions .= '<div class="radio_element"><input id="rv' . $arrVarId['id'] . '" type="checkbox" name="VALUE[' . $arrElement['var-id'] . ']' . $arrVarId['sub-var-id'] . '" value="' . $intKey . '" '. $arrElement['attributes'];
         if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
-        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrElement['id'] . '">' . $strValue . '</label></span></div>';
+        $strOptions .= ' /><span class="radio_description"><label class="description" for="rv' . $arrVarId['id'] . '">' . $strValue . '</label></span></div>';
       }
     }
     $strElement = <<<EOT
       
-      <mform:label><label for="rv{$arrElement['id']}">{$arrElement['label']}</label></mform:label>
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label></mform:label>
       <mform:element>$strOptions</mform:element>
       
 EOT;
@@ -267,14 +267,13 @@ EOT;
   */
   public function generateLinkElement($arrElement)
   {
-    $arrID = explode('-', $arrElement['id']);
     if ($arrElement['type'] == 'link')
     {
-      $strOptions = rex_var_link::getLinkButton($arrID[1], $arrElement['value'], $arrElement['cid']);
+      $strOptions = rex_var_link::getLinkButton($arrElement['var-id'], $arrElement['value'], $arrElement['cat-id']);
     }
     if ($arrElement['type'] == 'linklist')
     {
-      $strOptions = rex_var_link::getLinkListButton($arrID[1], $arrElement['value'], $arrElement['cid']);
+      $strOptions = rex_var_link::getLinkListButton($arrElement['var-id'], $arrElement['value'], $arrElement['cat-id']);
     }
     $strElement = <<<EOT
       
@@ -288,17 +287,16 @@ EOT;
   /*
   media, medialist
   */
-  public function generateMediaElement($arrElement) 
+  public function generateMediaElement($arrElement)
   {
-    $arrID = explode('-', $arrElement['id']);
     if ($arrElement['type'] == 'media')
     {
-      $strOptions = rex_var_media::getMediaButton($arrID[1], $arrElement['cid'], $arrElement['parameter']);
-      $strOptions = str_replace('REX_MEDIA['. $arrID[1] .']', $arrElement['value'], $strOptions);
+      $strOptions = rex_var_media::getMediaButton($arrElement['var-id'], $arrElement['cat-id'], $arrElement['parameter']);
+      $strOptions = str_replace('REX_MEDIA['. $arrElement['var-id'] .']', $arrElement['value'], $strOptions);
     }
     if ($arrElement['type'] == 'medialist')
     {
-      $strOptions = rex_var_media::getMediaListButton($arrID[1], $arrElement['value'], $arrElement['cid'], $arrElement['parameter']);        
+      $strOptions = rex_var_media::getMediaListButton($arrElement['var-id'], $arrElement['value'], $arrElement['cat-id'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
       
@@ -308,6 +306,37 @@ EOT;
 EOT;
     return $this->parseElementToTemplate($strElement,'default');
   }
+  
+  /**/
+  // get varAndIds
+  /**/
+  
+  public function getVarAndIds($arrElement)
+  {
+    $arrResult = array();
+    
+    $arrResult['value'] = $arrElement['value'];
+    
+    if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
+    {
+      $arrResult['value'] = $arrElement['default-value'];
+    }
+    
+    $arrResult['id'] = $arrElement['id'] . $arrElement['var-id'];
+    
+    if ($arrElement['sub-var-id'] != false)
+    {
+      $arrResult['id'] = $arrResult['id'] . $arrElement['sub-var-id'];
+      $arrResult['sub-var-id'] = '['.$arrElement['sub-var-id'].']';
+    }
+    else
+    {
+      $arrResult['sub-var-id'] = '';
+    }
+    
+    return $arrResult;
+  }
+  
   
   /**/
   // get attributes

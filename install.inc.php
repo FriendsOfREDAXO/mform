@@ -2,11 +2,11 @@
 /*
 install.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.4
+@version 2.2.0
 */
 
 // ADDON IDENTIFIER AUS GET PARAMS
@@ -14,9 +14,14 @@ install.inc.php
 $strAddonName = rex_request('addonname','string');
 
 
+// LOAD I18N FILE
+////////////////////////////////////////////////////////////////////////////////
+$I18N->appendFile(dirname(__FILE__) . '/lang/');
+
+
 // INSTALL CONDITIONS
 ////////////////////////////////////////////////////////////////////////////////
-$requiered_REX = '4.3.1';
+$requiered_REX = '4.5.0';
 $requiered_PHP = 5;
 $requiered_addons = array('textile');
 $do_install = true;
@@ -27,7 +32,7 @@ $do_install = true;
 $this_REX = $REX['VERSION'].'.'.$REX['SUBVERSION'].'.'.$REX['MINORVERSION'] = "1";
 if(version_compare($this_REX, $requiered_REX, '<'))
 {
-	$REX['ADDON']['installmsg'][$strAddonName] = 'Dieses Addon ben&ouml;tigt Redaxo Version '.$requiered_REX.' oder h&ouml;her.';
+	$REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_rex'));
 	$REX['ADDON']['install'][$strAddonName] = 0;
 	$do_install = false;
 }
@@ -37,7 +42,7 @@ if(version_compare($this_REX, $requiered_REX, '<'))
 ////////////////////////////////////////////////////////////////////////////////
 if (intval(PHP_VERSION) < $requiered_PHP)
 {
-	$REX['ADDON']['installmsg'][$strAddonName] = 'Dieses Addon ben&ouml;tigt mind. PHP '.$requiered_PHP.'!';
+	$REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_php'));
 	$REX['ADDON']['install'][$strAddonName] = 0;
 	$do_install = false;
 }
@@ -49,14 +54,14 @@ foreach($requiered_addons as $a)
 {
   if (!OOAddon::isInstalled($a))
   {
-    $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" ist nicht installiert.  >>> <a href="index.php?page=addon&addonname='.$a.'&install=1">jetzt installieren</a> <<<';
+    $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" '.$I18N->msg($strAddonName.'_is_not_installed').'.  >>> <a href="index.php?page=addon&addonname='.$a.'&install=1">'.$I18N->msg($strAddonName.'_install_now').'</a> <<<';
     $do_install = false;
   }
   else
   {
     if (!OOAddon::isAvailable($a))
     {
-      $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" ist nicht aktiviert.  >>> <a href="index.php?page=addon&addonname='.$a.'&activate=1">jetzt aktivieren</a> <<<';
+      $REX['ADDON']['installmsg'][$strAddonName] = '<br />Addon "'.$a.'" '.$I18N->msg($strAddonName.'_is_not_activated').'.  >>> <a href="index.php?page=addon&addonname='.$a.'&activate=1">'.$I18N->msg($strAddonName.'_activate_now').'</a> <<<';
       $do_install = false;
     }
 

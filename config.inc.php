@@ -2,11 +2,11 @@
 /*
 config.inc.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.4
+@version 2.2.0
 */
 
 // ADDON IDENTIFIER
@@ -20,7 +20,7 @@ $strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName;
 $REX['ADDON']['rxid'][$strAddonName] = '967';
 $REX['ADDON']['page'][$strAddonName] = $strAddonName;
 $REX['ADDON']['name'][$strAddonName] = $strAddonName;
-$REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 1, 'SUBVERSION' => 2);
+$REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 2, 'SUBVERSION' => 0);
 
 $REX['ADDON']['version'][$strAddonName] = implode('.', $REX['ADDON'][$strAddonName]['VERSION']);
 $REX['ADDON']['author'][$strAddonName] = 'Joachim Doerr';
@@ -53,9 +53,8 @@ if ($REX['REDAXO'] === true)
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////  
-  array_walk(glob("$strAddonPath/classes/class.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob("$strAddonPath/functions/function.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob("$strAddonPath/extensions/extension.*.inc.php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$strAddonPath/lib/class.*php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$strAddonPath/functions/function.*php"),create_function('$v,$i', 'return require_once($v);')); 
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ if ($REX['REDAXO'] === true)
   ////////////////////////////////////////////////////////////////////////////////
   if ($strMode == 'edit')
   {
-    rex_register_extension('OUTPUT_FILTER', 'a967_backend_css');
-    rex_register_extension('OUTPUT_FILTER', 'a967_add_parsley');
+    rex_register_extension('OUTPUT_FILTER', 'backend_css');
+    rex_register_extension('OUTPUT_FILTER', 'add_parsley');
   }
 }

@@ -1,12 +1,12 @@
 <?php
 /*
-site.information.inc.php
+site.information.php
 
-@copyright Copyright (c) 2012 by Doerr Softwaredevelopment
+@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo4
-@version 2.1.4
+@version 2.2.0
 */
 
 // INFORMATION CONTENT
@@ -18,7 +18,7 @@ echo '
     <div class= "addon-template">
       <h3>'. $I18N->msg($strAddonName.'_help_subheadline_1') .'</h3>
       <p>'. $I18N->msg($strAddonName.'_help_infotext_1') .'</p>
-      <p>'. a967_textileparser($I18N->msg($strAddonName.'_help_infotext_2')) .'</p>
+      <p>'. mfrom_textileparser($I18N->msg($strAddonName.'_help_infotext_2')) .'</p>
       <h3>'. $I18N->msg($strAddonName.'_help_subheadline_2') .'</h3>
       <p>'. $I18N->msg($strAddonName.'_help_infotext_3') .'</p>
       <p>'. $I18N->msg($strAddonName.'_help_infotext_4') .'</p>
