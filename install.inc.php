@@ -21,7 +21,7 @@ $I18N->appendFile(dirname(__FILE__) . '/lang/');
 
 // INSTALL CONDITIONS
 ////////////////////////////////////////////////////////////////////////////////
-$requiered_REX = '4.5.0';
+$requiered_REX = '4.4.0';
 $requiered_PHP = 5;
 $requiered_addons = array('textile');
 $do_install = true;
@@ -30,11 +30,21 @@ $do_install = true;
 // CHECK REDAXO VERSION
 ////////////////////////////////////////////////////////////////////////////////
 $this_REX = $REX['VERSION'].'.'.$REX['SUBVERSION'].'.'.$REX['MINORVERSION'] = "1";
+if (version_compare($this_REX, '4.5.0', '<'))
+{
+  if (file_exists(dirname(__FILE__) . '/lang/de_de_utf8.lang') === false)
+  {
+    copy(dirname(__FILE__) . '/lang/de_de.lang', dirname(__FILE__) . '/lang/de_de_utf8.lang');
+    copy(dirname(__FILE__) . '/lang/en_gb.lang', dirname(__FILE__) . '/lang/en_gb_utf8.lang');
+    
+    $I18N->appendFile(dirname(__FILE__) . '/lang/');
+  }
+}
 if(version_compare($this_REX, $requiered_REX, '<'))
 {
-	$REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_rex'));
-	$REX['ADDON']['install'][$strAddonName] = 0;
-	$do_install = false;
+  $REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_rex'));
+  $REX['ADDON']['install'][$strAddonName] = 0;
+  $do_install = false;
 }
 
 
@@ -42,9 +52,9 @@ if(version_compare($this_REX, $requiered_REX, '<'))
 ////////////////////////////////////////////////////////////////////////////////
 if (intval(PHP_VERSION) < $requiered_PHP)
 {
-	$REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_php'));
-	$REX['ADDON']['install'][$strAddonName] = 0;
-	$do_install = false;
+  $REX['ADDON']['installmsg'][$strAddonName] = str_replace('###version###', $requiered_REX, $I18N->msg($strAddonName.'_install_need_php'));
+  $REX['ADDON']['install'][$strAddonName] = 0;
+  $do_install = false;
 }
 
 
@@ -73,5 +83,5 @@ foreach($requiered_addons as $a)
 ////////////////////////////////////////////////////////////////////////////////
 if ($do_install)
 {
-	$REX['ADDON']['install'][$strAddonName] = 1;
+  $REX['ADDON']['install'][$strAddonName] = 1;
 }

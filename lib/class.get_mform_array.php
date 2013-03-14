@@ -43,6 +43,11 @@ class getMFormArray
     {
       $intId = $arrId[0];
       $intSubId = $arrId[1];
+      
+      if (method_exists ('rex_var', 'toArray') === false)
+      {
+        $intSubId = '';
+      }
     }
     
     if (is_array($this->arrResult) === false && $strMode == 'edit')
@@ -560,11 +565,14 @@ class getMFormArray
             $this->arrResult['link'][$i] = $objSql->getValue('link' . $i);
           }
           
-          $result = rex_var::toArray($this->arrResult['value'][$i]);
-          
-          if (is_array($result) === true)
+          if (method_exists ('rex_var', 'toArray') === true)
           {
-            $this->arrResult['value'][$i] = $result;
+            $result = rex_var::toArray($this->arrResult['value'][$i]);
+            
+            if (is_array($result) === true)
+            {
+              $this->arrResult['value'][$i] = $result;
+            }
           }
         }
       }
