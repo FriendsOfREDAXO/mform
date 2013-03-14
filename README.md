@@ -6,16 +6,14 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 
 ## Redaxo Versionen
 
-MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt.
-
-Aktuell wird das Addon für Redaxo5 optimiert, momentan funktionieren alle Methoden des Addons mit dem neusten Redaxo5 Repo. MForm wird ab Version 3.0 für Redaxo5 lauffähig sein.
+MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt. Die aktuelle MForm-Version 2.2.0 benötigt zwingend Redaxo 4.5.x
 
 ##### Hinweis
 
 Die neue Version 3.0+< wird unter dem [Master Branch](https://github.com/joachimdoerr/mform) weiter entwickelt.
-Die Aktuelle Redaxo4 kompatible Version des Addons 2.1.4 wird künftig unter dem [Redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
+Die Aktuelle Redaxo4 kompatible Version des Addons 2.2.0 wird künftig unter dem [Redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
 
 ##### Downloads
 
-* [MForm Version 3.0 - Redaxo5](https://github.com/joachimdoerr/mform/archive/master.zip)
-* [MForm Version 2.1.4 - Redaxo4](https://github.com/joachimdoerr/mform/archive/redaxo4.zip)
+* [MForm Version 3.1.0 - Redaxo5](https://github.com/joachimdoerr/mform/archive/master.zip)
+* [MForm Version 2.2.0 - Redaxo4](https://github.com/joachimdoerr/mform/archive/redaxo4.zip)
