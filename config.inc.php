@@ -21,11 +21,10 @@ $REX['ADDON']['rxid'][$strAddonName] = '967';
 $REX['ADDON']['page'][$strAddonName] = $strAddonName;
 $REX['ADDON']['name'][$strAddonName] = $strAddonName;
 $REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 2, 'SUBVERSION' => 0);
-
+$REX['ADDON'][$strAddonName]['rc'] = '-rc.2';
 $REX['ADDON']['version'][$strAddonName] = implode('.', $REX['ADDON'][$strAddonName]['VERSION']);
 $REX['ADDON']['author'][$strAddonName] = 'Joachim Doerr';
 $REX['ADDON']['supportpage'][$strAddonName] = 'forum.redaxo.de';
-
 $REX['ADDON']['perm'][$strAddonName] = $strAddonName.'[]';  //Allows to add this addon as Startpage
 $REX['PERM'][] = $strAddonName.'[]';                        //Allows restriction for users
 $REX['EXTRAPERM'][] = $strAddonName.'[extra_perm]';         //Allows Addon specific restrictions (i.e. for Plugins)

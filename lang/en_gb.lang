@@ -7,6 +7,7 @@ mform_help_infotext_2 = Eine detailierte Beschreibung wie Modul-Input-Formulare 
 mform_help_subheadline_2 = Kurz Doku und Referenz
 mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formular Elemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen jeweils als Übergabe-Array verarbeiten, wodurch ein Element kurzgesagt “einzeilig” und mit wenig Aufwand angelegt werden können. In dem folgenden “Modul Input Demo” sind die Element Methoden weitestgehend mit allen möglichen Übergabe-Arrays versehen.
 mform_help_infotext_4 = Es können ohne weiteres beliebig viele Formulare erzeugt werden.
+mform_help_subheadline_3 = MForm stellt folgende Formular Elemente bereit
 mform_demo_modul = Demo Modul Input
 mform_settings_saved = Einstellungen wurden gespeichert.
 mform_default_templates = Template Theme

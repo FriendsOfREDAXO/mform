@@ -29,7 +29,7 @@ include_once( $REX['INCLUDE_PATH'].'/layout/top.php' );
 
 // TITLE & SUBPAGE NAVIGATION
 //////////////////////////////////////////////////////////////////////////////
-rex_title($I18N->msg($strAddonName.'_title'), $REX['ADDON']['pages'][$strAddonName]);
+rex_title($I18N->msg($strAddonName.'_title').' <span class="addonversion" style="font-size:10px;color:silver">'.$REX['ADDON']['version'][$strAddonName].$REX['ADDON'][$strAddonName]['rc'].'</span>', $REX['ADDON']['pages'][$strAddonName]);
 
 
 // INCLUDE SUBPAGE

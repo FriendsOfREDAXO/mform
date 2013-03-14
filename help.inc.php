@@ -40,16 +40,73 @@ require_once( $strAddonPath . '/pages/site.demo.php' );
 ////////////////////////////////////////////////////////////////////////////////
 ?>
 <h3 style="clear:both;padding:15px 0;display:block;"><?php echo $I18N->msg($strAddonName.'_help_subheadline_1'); ?></h3>
+
+<?php if (OOAddon::isAvailable($strAddonName)): ?>
+<h3 style="clear:both;padding:0 0 15px 0;display:block;">MForm v.<?php echo $REX['ADDON']['version'][$strAddonName].$REX['ADDON'][$strAddonName]['rc']; ?></h3>
+<?php endif; ?>
+
 <p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_1'); ?></p>
 <p style="margin-bottom:15px;"><?php echo mfrom_textileparser($I18N->msg($strAddonName.'_help_infotext_2')); ?></p>
 
 <h3 style="clear:both;padding:15px 0;display:block;"><?php echo $I18N->msg($strAddonName.'_help_subheadline_2'); ?></h3>
+
 <p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_3'); ?></p>
 <p style="margin-bottom:15px;"><?php echo $I18N->msg($strAddonName.'_help_infotext_4'); ?></p>
 
+<h3 style="clear:both;padding:15px 0;display:block;"><?php echo $I18N->msg($strAddonName.'_help_subheadline_3'); ?></h3>
 
-<h2><?php echo $I18N->msg($strAddonName.'_demo_modul'); ?></h2>
+<style>
+.mform-list {
+  margin-bottom: 15px;
+}
+.mform-list ul {
+  margin: 0 1.5em;
+}
+</style>
 
-<div class="rex-addon-content">
-  <div><?php echo rex_highlight_string($strModulInputDemo); ?></div>
+<div class="mform-list">
+  <ul>
+    <li>Text-Input- und Hidden-Elemente
+      <ul>
+        <li><code>addTextField</code></li>
+        <li><code>addHiddenField</code></li>
+        <li><code>addTextAreaField</code></li>
+        <li><code>addTextReadOnlyField</code></li>
+        <li><code>addTextAreaReadOnlyField</code></li>
+      </ul>
+    </li>
+    <li>Select-Elemente
+      <ul>
+        <li><code>addSelectField</code></li>
+        <li><code>addMultiSelectField</code></li>
+      </ul>
+    </li>
+    <li>Checkbox- und Radio-Elemente
+      <ul>
+        <li><code>addCheckboxField</code></li>
+        <li><code>addRadioField</code></li>
+      </ul>
+    </li>
+    <li>Strukturelle-Elemente
+      <ul>
+        <li><code>addHtml</code></li>
+        <li><code>addHeadline</code></li>
+        <li><code>addDescription</code></li>
+        <li><code>addFieldset</code></li>
+      </ul>
+    </li>
+    <li>System-Button-Elemente
+      <ul>
+        <li><code>addLinkField</code></li>
+        <li><code>addLinklistField</code></li>
+        <li><code>addMediaField</code></li>
+        <li><code>addMedialistField</code></li>
+      </ul>
+    </li>
+    <li>Callback-Element
+      <ul>
+        <li><code>callback</code></li>
+      </ul>
+    </li>
+  </ul>
 </div>

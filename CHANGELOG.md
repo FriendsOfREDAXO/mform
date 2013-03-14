@@ -1,5 +1,15 @@
 ## MForm Changelog
 
+### 2.2.0-rc.2
+
+* Versions-Nummer in Addon-Headline integriert
+
+### 2.2.0-rc.1
+
+* Wenn Rex < 4.5.0 `duplicate` Lang Dateien für _utf8.lang
+* Install nun ab Rex 4.4.0 möglich
+* `method_exists` für VALUE-Arrays nur ab Rex 4.5.0 bereitzustellen
+
 ### 2.2.0
 
 * `value[x][y]`-Array-Funktionalität integriert
