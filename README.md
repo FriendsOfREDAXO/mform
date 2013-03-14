@@ -16,4 +16,4 @@ Die Aktuelle Redaxo4 kompatible Version des Addons 2.2.0 wird künftig unter dem
 ##### Downloads
 
 * [MForm Version 3.1.0 - Redaxo5](https://github.com/joachimdoerr/mform/archive/master.zip)
-* [MForm Version 2.2.0 - Redaxo4.5](https://github.com/joachimdoerr/mform/archive/redaxo4.zip)
+* [MForm Version 2.2.0 - Redaxo4](https://github.com/joachimdoerr/mform/archive/redaxo4.zip)
