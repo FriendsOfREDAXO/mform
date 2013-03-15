@@ -1,5 +1,9 @@
 ## MForm Changelog
 
+### 2.2.0-rc.3
+
+* jQuery 1.8.3 für Rex v.4.4 hinzugefügt
+
 ### 2.2.0-rc.2
 
 * Versions-Nummer in Addon-Headline integriert

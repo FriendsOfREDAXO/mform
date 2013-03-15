@@ -11,8 +11,13 @@ if (!function_exists('add_parsley'))
     
     $init = 'data-validate="parsley" id="REX_FORM">';
     
-    $out = str_replace('id="REX_FORM">', $init, $out);
+    if($REX['VERSION'].$REX['SUBVERSION'] <= "44")
+    {
+      $jquery = '<script src="'.$REX['HTDOCS_PATH'].'files/addons/mform/jquery-1.8.3.min.js"';
+      $out = str_replace('<script src="media/jquery.min.js"', $jquery, $out);
+    }
     
+    $out = str_replace('id="REX_FORM">', $init, $out);
     $out = str_replace('</head>', $js, $out);
     
     return $out;
