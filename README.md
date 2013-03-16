@@ -6,7 +6,7 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 
 ## Redaxo Versionen
 
-MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt. Die aktuelle MForm-Version 2.2.0 benötigt zwingend Redaxo 4.5.x
+MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt. Die aktuelle MForm-Version 2.2.0 ist lauffähig ab Redaxo 4.4.0
 
 ##### Hinweis
 
