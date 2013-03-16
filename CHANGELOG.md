@@ -1,5 +1,11 @@
 ## MForm Changelog
 
+### 2.2.0-rc.4
+
+* Mehrsprachigkeit für Labels hinzugefügt
+* Mehrsprachigkeit für Default-Values hinzugefügt
+* Mehrsprachigkeit für Headlines, Description, Fieldsets und HTML hinzugefügt
+
 ### 2.2.0-rc.3
 
 * jQuery 1.8.3 für Rex v.4.4 hinzugefügt

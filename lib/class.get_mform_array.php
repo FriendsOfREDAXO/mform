@@ -25,6 +25,7 @@ class getMFormArray
   public $id = NULL;
   public $count = 0;
   public $validations = NULL;
+  public $REX;
   
   /**/
   // generate element array - add fields
@@ -79,19 +80,24 @@ class getMFormArray
           case 'media':
             $strValue = $this->arrResult['file'][$intId];
             break;
-          
           default:
-          
             $strValue = $this->arrResult['value'][$intId];
-            
             if (is_array($strValue) === true)
             {
               $strValue = $this->arrResult['value'][$intId][$intSubId];
             }
-            
             break;
         }
       }
+    }
+    else
+    {
+      $strValue = $this->getLangData($strValue);
+    }
+    
+    if ($strDefaultValue != NULL)
+    {
+      $strDefaultValue = $this->getLangData($strDefaultValue);
     }
     
     $this->arrElements[$this->id] = array(
@@ -287,7 +293,7 @@ class getMFormArray
   */
   public function setLabel($strLabel)
   {
-    $this->arrElements[$this->id]['label'] = $strLabel;
+    $this->arrElements[$this->id]['label'] = $this->getLangData($strLabel);
   }
   
   /*
@@ -430,7 +436,7 @@ class getMFormArray
   */
   public function setDefaultValue($strValue)
   {
-    $this->arrElements[$this->id]['default-value'] = $strValue;
+    $this->arrElements[$this->id]['default-value'] = $this->getLangData($strValue);
   }
   
   /**/
@@ -442,7 +448,7 @@ class getMFormArray
   */
   public function addOption($strValue,$intKey)
   {
-    $this->options[$intKey] = $strValue;
+    $this->options[$intKey] = $this->getLangData($strValue);
     $this->arrElements[$this->id]['options'] = $this->options;
   }
   
@@ -524,6 +530,47 @@ class getMFormArray
   }
   
   /**/
+  // get global REX
+  /**/
+  
+  public function getGlobalRex()
+  {
+    if (is_array($this->REX) === false)
+    {
+      global $REX;
+      $this->REX = $REX;
+    }
+  }
+  
+  /**/
+  // use user lang
+  /**/
+  
+  public function getLangData($arrLangData)
+  {
+    if (is_array($arrLangData) === true)
+    {
+      $this->getGlobalRex();
+      foreach ($arrLangData as $strKey => $strValue)
+      {
+        if ($strKey == $this->REX['LOGIN']->getLanguage() or $strKey . '_utf8' == $this->REX['LOGIN']->getLanguage())
+        {
+          $strLangData = $strValue;
+        }
+      }
+      if ($strLangData == '')
+      {
+        $strLangData = reset($arrLangData);
+      }
+    }
+    else
+    {
+      $strLangData = $arrLangData;
+    }
+    return $strLangData;
+  }
+  
+  /**/
   // get rex values and vars
   /**/
   
@@ -587,12 +634,14 @@ class getMFormArray
   /*
   generate Output
   */
-  public function arrFormElements() {
+  public function arrFormElements()
+  {
     $this->strOutput = $this->arrElements;
     return $this->strOutput;
   }
   
-  public function getArray() {
+  public function getArray()
+  {
     return $this->arrFormElements($this->arrElements);
   }
 
