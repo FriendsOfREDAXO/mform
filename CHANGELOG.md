@@ -6,6 +6,7 @@
 * Mehrsprachigkeit für Default-Values hinzugefügt
 * Mehrsprachigkeit für Headlines, Description, Fieldsets und HTML hinzugefügt
 * Parsley auch beim Hinzufügen eines Moduls aktivieren
+* Default-Values für Multiselect hinzugefügt
 
 ### 2.2.0-rc.3
 

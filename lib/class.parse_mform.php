@@ -145,7 +145,7 @@ EOT;
   public function generateOptionsElement($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
-    $strSelectAttributes = ''; $strMultiselectJavascript = ''; $strMultiselectHidden = ''; $arrHiddenValue = array(); $strOptions = '';
+    $strSelectAttributes = ''; $strMultiselectJavascript = ''; $strMultiselectHidden = ''; $arrHiddenValue = array(); $strOptions = ''; $arrDefaultValue = array(); $strHiddenValue = '';
     $strSelectAttributes = (is_numeric($arrElement['size']) === true) ? 'size="' . $arrElement['size'] . '"' : '' ;
     $arrVarId = $this->getVarAndIds($arrElement);
     
@@ -174,6 +174,11 @@ EOT;
       {
         $arrHiddenValue = explode(',',$arrElement['value']);
       }
+      if ($arrElement['default-value'] != '')
+      {
+        $arrDefaultValue = explode(',',$arrElement['default-value']);
+      }
+      print_r($arrDefaultValue);
     }
     else
     {
@@ -181,14 +186,27 @@ EOT;
     }
     if (array_key_exists('options',$arrElement) === true)
     {
-      foreach ($arrElement['options'] as $intKey => $strValue) {
+      foreach ($arrElement['options'] as $intKey => $strValue)
+      {
         $strOptions .= '<option value="' . $intKey . '" ';
-          foreach ($arrHiddenValue as $strHiddenValue) {
-            if ($intKey == $strHiddenValue or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
-            {
-              $strOptions .= 'selected="selected" ';
-            }
+        foreach ($arrDefaultValue as $strDefaultValue)
+        {
+          if ($intKey == $strDefaultValue)
+          {
+            $arrElement['default-value'] = $strDefaultValue;
           }
+        }
+        foreach ($arrHiddenValue as $strHdValue)
+        {
+          if ($intKey == $strHdValue)
+          {
+            $strHiddenValue = $strHdValue;
+          }
+        }
+        if ($intKey == $strHiddenValue or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
+        {
+          $strOptions .= 'selected="selected" ';
+        }
         $strOptions .= '>' . $strValue . '</option>';
       }
     }
