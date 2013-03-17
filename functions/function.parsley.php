@@ -32,10 +32,10 @@ if (!function_exists('add_parsley'))
         break;
     }
     
-    $init = 'data-validate="parsley" id="REX_FORM">';
+    $init = 'data-validate="parsley" id="REX_FORM"';
     $js = $langFile.'<script type="text/javascript" src="'.$REX['HTDOCS_PATH'].'files/addons/mform/parsley/parsley.js"></script></head>';
     
-    $out = str_replace('id="REX_FORM">', $init, $out);
+    $out = str_replace('id="REX_FORM"', $init, $out);
     $out = str_replace('</head>', $js, $out);
     
     return $out;

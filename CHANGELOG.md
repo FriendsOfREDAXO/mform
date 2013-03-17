@@ -5,6 +5,7 @@
 * Mehrsprachigkeit für Labels hinzugefügt
 * Mehrsprachigkeit für Default-Values hinzugefügt
 * Mehrsprachigkeit für Headlines, Description, Fieldsets und HTML hinzugefügt
+* Parsley auch beim Hinzufügen eines Moduls aktivieren
 
 ### 2.2.0-rc.3
 

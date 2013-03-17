@@ -11,7 +11,7 @@ MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt. Die aktuelle MFor
 ##### Hinweis
 
 Die neue Version 3.0+< wird unter dem [Master Branch](https://github.com/joachimdoerr/mform) weiter entwickelt.
-Die Aktuelle Redaxo4 kompatible Version des Addons 2.2.0 wird künftig unter dem [Redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
+Die Aktuelle Redaxo 4 kompatible Version des Addons 2.2.0 wird künftig unter dem [Redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
 
 ##### Downloads
 

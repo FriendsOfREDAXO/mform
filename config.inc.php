@@ -57,7 +57,7 @@ if ($REX['REDAXO'] === true)
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
-  $strMode = rex_request('mode', 'string', 'none');
+  $strMode = rex_request('function', 'string', 'none');
   
   // SETTINGS
   ////////////////////////////////////////////////////////////////////////////////  
@@ -71,7 +71,7 @@ if ($REX['REDAXO'] === true)
   
   // EXTENSION POINTS
   ////////////////////////////////////////////////////////////////////////////////
-  if ($strMode == 'edit')
+  if ($strMode == 'edit' or $strMode == 'add')
   {
     rex_register_extension('OUTPUT_FILTER', 'backend_css');
     rex_register_extension('OUTPUT_FILTER', 'add_parsley');
