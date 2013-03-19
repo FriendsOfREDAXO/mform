@@ -1,5 +1,10 @@
 ## MForm Changelog
 
+### 2.2.0-rc.5
+
+* Call `isAdmin()` error gefixt
+* `string` error gefixt
+
 ### 2.2.0-rc.4
 
 * Mehrsprachigkeit für Labels hinzugefügt

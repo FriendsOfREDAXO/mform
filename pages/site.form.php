@@ -9,7 +9,7 @@ site.form.php
 @version 2.2.0
 */
 
-$strNewThem = rex_request('default_template_theme_name', string, false);
+$strNewThem = rex_request('default_template_theme_name', 'string', false);
 
 if ($strFunc == 'savesettings') {
   $strContent = '';

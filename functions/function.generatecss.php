@@ -13,27 +13,26 @@ if (function_exists('mform_generate_css') !== true)
     
     header("Content-type: text/css");
     
-    if ($REX['USER']->isAdmin() === true)
+    if (isset($REX['USER']) === true)
     {
-      echo <<<EOT
-        
-        .admin-only,
-        .admin-only *:not(:link):not(:visited) {
-          display:block !important;
-          color:red !important;
-        }
-        
+      if ($REX['USER']->isAdmin() === true)
+      {
+        echo <<<EOT
+          .admin-only,
+          .admin-only *:not(:link):not(:visited) {
+            display:block !important;
+            color:red !important;
+          }
 EOT;
-    }
-    else
-    {
-      echo <<<EOT
-        
-        .admin-only {
-          display:none !important;
-        }
-        
+      }
+      else
+      {
+        echo <<<EOT
+          .admin-only {
+            display:none !important;
+          }
 EOT;
+      }
     }
     
     if (file_exists( $REX['HTDOCS_PATH'] . 'redaxo/include/addons/mform/templates/' . $strDefaultTemplateThemeName . '_theme/theme.css') === true)
