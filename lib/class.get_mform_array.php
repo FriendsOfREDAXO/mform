@@ -38,13 +38,16 @@ class getMFormArray
   {
     $this->id = $this->count++;
     $intSubId = false;
-    $strMode = rex_request('function', string);
+    $strMode = rex_request('function', 'string');
     
     if (is_array( $arrId = explode('.', str_replace(',','.',$intId) ) ) === true)
     {
       $intId = $arrId[0];
-      $intSubId = $arrId[1];
       
+      if (sizeof($arrId) > 1)
+      {
+        $intSubId = $arrId[1];
+      }
       if (method_exists ('rex_var', 'toArray') === false)
       {
         $intSubId = '';
@@ -579,7 +582,7 @@ class getMFormArray
   */
   public function getRexVars()
   {
-    $intSliceId = rex_request('slice_id', int, false);
+    $intSliceId = rex_request('slice_id', 'int', false);
     
     if ($intSliceId != false)
     {
@@ -614,17 +617,27 @@ class getMFormArray
           
           if (method_exists ('rex_var', 'toArray') === true)
           {
-            $result = rex_var::toArray($this->arrResult['value'][$i]);
-            
-            if (is_array($result) === true)
+            if ($this->isSerial($this->arrResult['value'][$i]))
             {
-              $this->arrResult['value'][$i] = $result;
+              $result = rex_var::toArray($this->arrResult['value'][$i]);
+              
+              if (is_array($result) === true)
+              {
+                $this->arrResult['value'][$i] = $result;
+              }
             }
           }
         }
       }
     }
     return $this->arrResult;
+  }
+  
+  /*
+  check serialize
+  */
+  public static function isSerial($string) {
+    return (@unserialize($string) !== false);
   }
   
   /**/

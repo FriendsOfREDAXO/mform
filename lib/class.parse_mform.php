@@ -519,7 +519,7 @@ EOT;
     }
     if ($boolParseFinal === true)
     {
-      if ($this->boolParseFinal === true)
+      if ($this->boolFieldset === true)
       {
         $strElement = $strElement.'</fieldset>';
       }

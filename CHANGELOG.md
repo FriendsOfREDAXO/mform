@@ -1,9 +1,17 @@
 ## MForm Changelog
 
+### 2.2.0-rc.6
+
+* `fieldset`-Bug in `class.parse_mform.php` behoben
+* `string`-error in `class.get_mform_array.php` gefixt
+* `Undefined offset`-error in `class.get_mform_array.php` gefixt
+* `Use of undefined constant int`-error in `class.get_mform_array.php` gefixt
+* `unserialize(): Error` gefixt durch `isSerial` Methode
+
 ### 2.2.0-rc.5
 
 * Call `isAdmin()` error gefixt
-* `string` error gefixt
+* `string`-error gefixt
 
 ### 2.2.0-rc.4
 
