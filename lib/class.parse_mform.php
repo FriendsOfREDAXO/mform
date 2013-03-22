@@ -203,7 +203,7 @@ EOT;
             $strHiddenValue = $strHdValue;
           }
         }
-        if ($intKey == $strHiddenValue or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
+        if ($intKey == $strHiddenValue or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
         {
           $strOptions .= 'selected="selected" ';
         }
@@ -234,7 +234,7 @@ EOT;
         $intCount++;
         $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
         $strOptions .= '<div class="radio_element"><input id="rv' . $arrVarId['id'] . $intCount . '" type="radio" name="VALUE[' . $arrElement['var-id'] . ']' . $arrVarId['sub-var-id'] . '" value="' . $intKey . '" ' . $strRadioAttributes;
-        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
+        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
@@ -264,7 +264,7 @@ EOT;
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $strOptions .= '<div class="radio_element"><input id="rv' . $arrVarId['id'] . '" type="checkbox" name="VALUE[' . $arrElement['var-id'] . ']' . $arrVarId['sub-var-id'] . '" value="' . $intKey . '" '. $arrElement['attributes'];
-        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == add && $intKey == $arrElement['default-value']))
+        if ($intKey == $arrElement['value'] or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
         {
           $strOptions .= ' checked="checked" ';
         }
