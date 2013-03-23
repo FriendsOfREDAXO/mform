@@ -8,6 +8,7 @@
 * `Use of undefined constant int`-error in `class.get_mform_array.php` gefixt
 * `unserialize(): Error` gefixt durch `isSerial` Methode
 * `Use of undefined constant add`-error gefixt
+* Korrekte RC-Version in `config.in.php` hinterlegt
 
 ### 2.2.0-rc.5
 
