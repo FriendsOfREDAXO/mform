@@ -2,8 +2,8 @@
 /*
 function.parsley.php
 
-@package redaxo4
-@version 2.2.0
+@package redaxo4.5
+@version 2.2.1
 */
 
 if (!function_exists('add_parsley'))

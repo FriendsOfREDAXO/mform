@@ -5,8 +5,8 @@ config.inc.php
 @copyright Copyright (c) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
-@package redaxo4
-@version 2.2.0
+@package redaxo4.5
+@version 2.2.1
 */
 
 // ADDON IDENTIFIER
@@ -20,8 +20,8 @@ $strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName;
 $REX['ADDON']['rxid'][$strAddonName] = '967';
 $REX['ADDON']['page'][$strAddonName] = $strAddonName;
 $REX['ADDON']['name'][$strAddonName] = $strAddonName;
-$REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 2, 'SUBVERSION' => 0);
-$REX['ADDON'][$strAddonName]['rc'] = '-rc.6';
+$REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 2, 'SUBVERSION' => 1);
+$REX['ADDON'][$strAddonName]['rc'] = '-rc.1';
 $REX['ADDON']['version'][$strAddonName] = implode('.', $REX['ADDON'][$strAddonName]['VERSION']);
 $REX['ADDON']['author'][$strAddonName] = 'Joachim Doerr';
 $REX['ADDON']['supportpage'][$strAddonName] = 'forum.redaxo.de';
@@ -65,6 +65,10 @@ if ($REX['REDAXO'] === true)
   
   if (rex_request('mform_theme', 'string', '') != '')
   {
+    if ($strDefaultTemplateThemeName == '')
+    {
+      $strDefaultTemplateThemeName = 'default';
+    }
     mform_generate_css(rex_request('mform_theme', 'string', $strDefaultTemplateThemeName));
     exit;
   }

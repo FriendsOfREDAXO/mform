@@ -1,5 +1,11 @@
 ## MForm Changelog
 
+### 2.2.1-rc.1
+
+* Ab dieser Version nur noch für Redaxo 4.5.x
+* duplizieren der Lang Files entfernt
+* `Undefined variable: strDefaultTemplateThemeName` Notice gefixt
+
 ### 2.2.0-rc.6
 
 * `fieldset`-Bug in `class.parse_mform.php` behoben
