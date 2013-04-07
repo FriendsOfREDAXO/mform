@@ -178,7 +178,6 @@ EOT;
       {
         $arrDefaultValue = explode(',',$arrElement['default-value']);
       }
-      print_r($arrDefaultValue);
     }
     else
     {

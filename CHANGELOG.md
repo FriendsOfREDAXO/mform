@@ -5,6 +5,7 @@
 * Ab dieser Version nur noch für Redaxo 4.5.x
 * duplizieren der Lang Files entfernt
 * `Undefined variable: strDefaultTemplateThemeName` Notice gefixt
+* remove print_r
 
 ### 2.2.0-rc.6
 
