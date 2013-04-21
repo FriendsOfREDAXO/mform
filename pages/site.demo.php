@@ -13,8 +13,6 @@ $strPageContent .= '
   <h2 class="rex-hl2">' . $this->i18n('demo_modul') . '</h2>
 ';
 
-$arrMarkitupSettings = '$arrMarkitupSettings';
-
 $strModulInputDemo = <<<EOT
 <?php
 /*
@@ -22,18 +20,12 @@ MODUL INPUT DEMO
 
 @copyright  Copyright (c) 2011 by Doerr Softwaredevelopment
 @author     Joachim Doerr <mail@doerr-softwaredevelopment.com>
-@version    2.1.3
+@version    3.2.0
 
 @rex_param  id     1
 @rex_param  name   001 - MODUL INPUT DEMO
 */
 
-/*
-if(OOAddon::isAvailable('markitup'))
-{
-  a287_markitup::markitup('textarea.markitup1');
-}
-*/
 EOT;
 
 $strModulInputDemo .= '
@@ -47,7 +39,7 @@ $objForm->addHtml(\'<b>HTML Code</b>\');
 $objForm->addHeadline(\'Text-Input und Hidden Elemente\');
 
 // text field
-$objForm->addTextField(1,\'REX_VALUE[1]\',array(\'label\'=>\'Input\',\'style\'=>\'width:200px\'));
+$objForm->addTextField(1,array(\'label\'=>\'Input\',\'style\'=>\'width:200px\'));
 
 // hidden field
 $objForm->addHiddenField(2,\'hidden feld string\',array(\'label\'=>\'Hidden\',\'style\'=>\'width:200px\'));
@@ -56,58 +48,58 @@ $objForm->addHiddenField(2,\'hidden feld string\',array(\'label\'=>\'Hidden\',\'
 $objForm->addTextReadOnlyField(3,\'readonly feld string\',array(\'label\'=>\'Readonly\',\'style\'=>\'width:200px\'));
 
 // textarea field
-$objForm->addTextAreaField(4,\'REX_VALUE[4]\',array(\'label\'=>\'Textarea\',\'style\'=>\'width:300px;height:180px\'));
+$objForm->addTextAreaField(4,array(\'label\'=>\'Textarea\',\'style\'=>\'width:300px;height:180px\'));
 
 // markitup
-$objForm->addTextAreaField(14,\'REX_VALUE[14]\',array(\'label\'=>\'Textarea\',\'class\'=>"markitup1"));
+$objForm->addTextAreaField(5,array(\'label\'=>\'Textarea\',\'class\'=>"markitup1"));
 
 // textarea readonly field
-$objForm->addTextReadOnlyField(5,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'width:300px;height:180px\'));
+$objForm->addTextReadOnlyField(6,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'width:300px;height:180px\'));
 
 
 // headline
 $objForm->addHeadline(\'Select und Multiselect Elemente\');
 
 // select
-$objForm->addSelectField(6,\'REX_VALUE[6]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Select\'));
+$objForm->addSelectField(7,array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Select\'));
 
 // select mit ausgelagerten Options, Size und Label
-$objForm->addSelectField(7,\'REX_VALUE[7]\');
+$objForm->addSelectField(8);
 $objForm->addOptions(array(1=>\'test-1\',2=>\'test-2\'));
 $objForm->setSize(5);
 $objForm->setLabel(\'Select\');
 
 // multiselect
-$objForm->addMultiSelectField(8,\'REX_VALUE[8]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Multiselect\',\'size\'=>\'8\'));
+$objForm->addMultiSelectField(9,array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Multiselect\',\'size\'=>\'8\'));
 
 // multiselect
-$objForm->addMultiSelectField(9,\'REX_VALUE[9]\',array(1=>\'test-1\',2=>\'test-2\',3=>\'test-3\',4=>\'test-4\'),array(\'label\'=>\'Multiselect\'), \'full\');
+$objForm->addMultiSelectField(10,array(1=>\'test-1\',2=>\'test-2\',3=>\'test-3\',4=>\'test-4\'),array(\'label\'=>\'Multiselect\'), \'full\');
 
 
 // headline
 $objForm->addHeadline(\'Radio und Checkbox Elemente\');
 
 // checkbox
-$objForm->addCheckboxField(10,\'REX_VALUE[10]\',array(1=>\'test-1\'),array(\'label\'=>\'Checkbox\',\'data\'=>\'test-data-checkbox\'));
+$objForm->addCheckboxField(11,array(1=>\'test-1\'),array(\'label\'=>\'Checkbox\'));
 
 // radiobox
-$objForm->addRadioField(11,\'REX_VALUE[11]\',array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Radio Buttons\',\'radio-attr\'=>array(1=>array(\'data\'=>\'text-data-radio-1\'),2=>array(\'data\'=>\'text-data-radio-2\'))));
+$objForm->addRadioField(12,array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Radio Buttons\'));
 
 
 // headline
 $objForm->addHeadline(\'System-Button Elemente\');
 
 // media button
-$objForm->addMediaField(1,\'REX_FILE[1]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bild\'));
+$objForm->addMediaField(1,array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bild\'));
 
 // medialist button
-$objForm->addMedialistField(2,\'REX_MEDIALIST[2]\',array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bildliste\'));
+$objForm->addMedialistField(1,array(\'types\'=>\'gif,jpg\',\'preview\'=>1,\'category\'=>4,\'label\'=>\'Bildliste\'));
 
 // link button
-$objForm->addLinkField(1,\'REX_LINK_ID[1]\',array(\'label\'=>\'Link\',\'category\'=>3));
+$objForm->addLinkField(1,array(\'label\'=>\'Link\',\'category\'=>3));
 
 // linklist button
-$objForm->addLinklistField(1,\'REX_LINKLIST[1]\',array(\'label\'=>\'Linkliste\',\'category\'=>3));
+$objForm->addLinklistField(1,array(\'label\'=>\'Linkliste\',\'category\'=>3));
 
 
 // headline
@@ -137,11 +129,17 @@ $objForm = new mform();
 $objForm->addHeadline(\'Neues Form\');
 
 // text field
-$objForm->addTextField(12,\'REX_VALUE[12]\',array(\'label\'=>\'Input\',\'style\'=>\'width:200px\'));
+$objForm->addTextField(13.1,array(\'label\'=>\'Input1\',\'style\'=>\'width:200px\'));
+
+// text field
+$objForm->addTextField(13.2,array(\'label\'=>\'Input2\',\'style\'=>\'width:200px\'));
+
+// text field
+$objForm->addTextField(13.3,array(\'label\'=>\'Input3\',\'style\'=>\'width:200px\'));
 
 
 // get formular
 echo $objForm->show_mform();
 
-?>  
+?>
 ';
