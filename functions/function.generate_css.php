@@ -1,12 +1,12 @@
 <?php 
 /*
-function.a967_generate_css.php
+function.generate_css.php
 
 @copyright Copyright (C) 2013 by Doerr Softwaredevelopment
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.1
+@version 3.2.0
 */
 
 if (!function_exists('mform_generate_css'))

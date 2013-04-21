@@ -6,7 +6,7 @@ boot.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.1
+@version 3.2.0
 */
 
 if (rex::isBackend())

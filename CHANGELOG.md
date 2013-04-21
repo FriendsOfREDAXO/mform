@@ -1,5 +1,11 @@
 ## MForm Master-Branch Changelog
 
+### Version 3.2
+
+* Erweiterungen von Version 2.2.0 integriert
+* Diverse Korrekturen um das Addon erneut an Redaxo 5 anzupassen
+* Lizenz hinzugefügt
+
 ### Version 3.1-rc.1
 
 * rex_extension für Output-Modifikation zum Initialisieren der Validierung integriert

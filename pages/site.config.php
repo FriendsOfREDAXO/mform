@@ -6,7 +6,7 @@ site.form.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.1
+@version 3.2.0
 */
 
 // set headline
@@ -79,7 +79,7 @@ $arrFormElements[] = $arrElements;
 // parse form content by fragment
 $objFragment = new rex_fragment();
 $objFragment->setVar('elements', $arrFormElements, false);
-$strPageContent .= $objFragment->parse('form.tpl');
+$strPageContent .= $objFragment->parse('form.php');
 
 // close form
 $strPageContent .= '
