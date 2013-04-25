@@ -52,8 +52,8 @@ if ($REX['REDAXO'] === true)
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////  
-  array_walk(glob("$strAddonPath/lib/class.*php"),create_function('$v,$i', 'return require_once($v);')); 
-  array_walk(glob("$strAddonPath/functions/function.*php"),create_function('$v,$i', 'return require_once($v);')); 
+  array_walk(glob("$strAddonPath/lib/class.*php"),create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;')); 
+  array_walk(glob("$strAddonPath/functions/function.*php"),create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;'));
   
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
