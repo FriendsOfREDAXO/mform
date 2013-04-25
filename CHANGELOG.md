@@ -6,6 +6,7 @@
 * duplizieren der Lang Files entfernt
 * `Undefined variable: strDefaultTemplateThemeName` Notice gefixt
 * remove print_r
+* Strict Standards: Only variables should be passed by reference gefixt
 
 ### 2.2.0-rc.6
 
