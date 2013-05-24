@@ -11,7 +11,8 @@ boot.php
 
 if (rex::isBackend())
 {
-  array_walk(glob(rex_path::addon('mform')."/functions/function.*.php"),create_function('$v,$i', 'return require_once($v);')); 
+  $files = glob(rex_path::addon('mform')."/functions/function.*.php");
+  array_walk($files,create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;'));
   
   if (rex_request('function', 'string') == 'edit' or rex_request('function', 'string') == 'add')
   {
