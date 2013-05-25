@@ -462,7 +462,7 @@ EOT;
       $this->strTemplateThemeName = $strNewTemplateThemeName;
       return 
         PHP_EOL.'<!-- mform -->'.
-        PHP_EOL.'  <link rel="stylesheet" type="text/css" href="include/addons/mform/templates/' . $this->strTemplateThemeName . '_theme/theme.css" media="all" />'.
+        PHP_EOL.'  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $this->strTemplateThemeName . '" media="all" />'.
         PHP_EOL.'<!-- mform -->'.PHP_EOL;
     }
   }
