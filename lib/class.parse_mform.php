@@ -128,10 +128,10 @@ EOT;
     $arrVarId = $this->getVarAndIds($arrElement);
     
     $arrI18N = array(
-      'add_internlink' => $I18N->msg($strAddonName.'_add_internlink'),
-      'add_externlink' => $I18N->msg($strAddonName.'_add_externlink'),
-      'add_medialink' => $I18N->msg($strAddonName.'_add_medialink'),
-      'remove' => $I18N->msg($strAddonName.'_remove_link')
+      'add_internlink' => $I18N->msg('mfrom_add_internlink'),
+      'add_externlink' => $I18N->msg('mfrom_add_externlink'),
+      'add_medialink' => $I18N->msg('mform_add_medialink'),
+      'remove' => $I18N->msg('mform_remove_link')
     );
     
     switch ($arrElement['type'])
