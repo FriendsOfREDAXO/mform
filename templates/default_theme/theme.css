@@ -87,6 +87,19 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label.de
   margin-left: 120px;
 }
 
+div.rex-widget p.rex-widget-icons a.mform-icon-internlink-open {
+  background-image: url(../files/addons/mform/icons/linkintern.png);
+}
+div.rex-widget p.rex-widget-icons a.mform-icon-externlink-open {
+  background-image: url(../files/addons/mform/icons/linkextern.png);
+}
+div.rex-widget p.rex-widget-icons a.mform-icon-media-open {
+  background-image: url(../files/addons/mform/icons/linkmedia.png);
+}
+div.rex-widget p.rex-widget-icons a.mform-remove-link {
+  background-image: url(../files/addons/mform/icons/linkbreak.png);
+}
+
 .parsley-validated {
     
 }

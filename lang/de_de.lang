@@ -19,3 +19,7 @@ mform_is_not_installed = ist nicht installiert
 mform_install_now = jetzt installieren
 mform_is_not_activated = ist nicht aktiviert
 mform_activate_now = jetzt aktivieren
+mfrom_add_internlink = Interner Link auswählen
+mfrom_add_externlink = Externer Link eingeben
+mform_add_medialink = Medium auswählen
+mform_remove_link = Link entfernen

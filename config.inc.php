@@ -43,7 +43,7 @@ if ($REX['REDAXO'] === true)
   
   // ADDON MENU
   ////////////////////////////////////////////////////////////////////////////////
-  $REX['ADDON']['name'][$strAddonName] = $I18N->msg($strAddonName.'_name');  
+  $REX['ADDON']['name'][$strAddonName] = $I18N->msg($strAddonName.'_name');
   $REX['ADDON'][$strAddonName]['SUBPAGES'] = array (
   //        subpage    ,label                         ,perm   ,params               ,attributes
   // array (''         ,'Einstellungen'               ,''     ,''                   ,''),

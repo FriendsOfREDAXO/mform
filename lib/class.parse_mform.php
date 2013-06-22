@@ -118,6 +118,115 @@ EOT;
   }
   
   /*
+  custum link
+  */
+  public function generateCustomInputElement($arrElement)
+  {
+    global $I18N;
+    
+    $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    $arrVarId = $this->getVarAndIds($arrElement);
+    
+    $arrI18N = array(
+      'add_internlink' => $I18N->msg($strAddonName.'_add_internlink'),
+      'add_externlink' => $I18N->msg($strAddonName.'_add_externlink'),
+      'add_medialink' => $I18N->msg($strAddonName.'_add_medialink'),
+      'remove' => $I18N->msg($strAddonName.'_remove_link')
+    );
+    
+    switch ($arrElement['type'])
+    {
+      case 'custom-link':
+      default:
+        $strTemplate = 'default';
+        $arrVarId['sub-var-id-value'] = $arrVarId['sub-var-id'];
+        $arrVarId['sub-var-id'] = str_replace(array('[',']'), '', $arrVarId['sub-var-id']);
+        $arrVarId['sub-var-id-for-id'] = ($arrElement['sub-var-id'] != '') ? '_'.$arrElement['sub-var-id'] : '';
+        if (is_numeric($arrVarId['value']))
+        {
+          $arrVarId['show_value'] = '';
+          $art = OOArticle :: getArticleById($arrVarId['value']);
+          if (OOArticle :: isValid($art))
+          {
+            $arrVarId['show_value'] = $art->getName();
+          }
+          $arrVarId['hidden_value'] = $arrVarId['value'];
+        }
+        else
+        {
+          $arrVarId['show_value'] = $arrVarId['value'];
+          $arrVarId['hidden_value'] = '';
+        }
+        break;
+    }
+    
+    $strElement = <<<EOT
+      
+      <mform:label><label for="rv{$arrVarId['id']}">{$arrElement['label']}</label></mform:label>
+      <mform:element>
+        <script>
+          /* <![CDATA[ */
+            jQuery(document).ready(function($) {
+              var this_hidden_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}'),
+                  this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_NAME'),
+                  this_media_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM'),
+                  this_link_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK'),
+                  this_extern_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN'),
+                  this_remove_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']} = $('#VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE');
+              
+              this_media_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.bind('click',function(){
+                this_hidden_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','').attr('id','');
+                this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}').attr('id','REX_MEDIA_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}');
+                openREXMedia({$arrElement['var-id']},'');return false;
+              });
+              
+              this_link_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.bind('click',function(){
+                this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','VALUE_NAME[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}').attr('id','VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_NAME');
+                this_hidden_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}').attr('id','VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}');
+                openLinkMap('VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}', '');return false;
+              });
+              
+              this_extern_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.bind('click',function(){
+                var extern_link = prompt('Link','http://');
+                this_hidden_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','').attr('id','');
+                this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('name','VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}').attr('id','VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}');
+                if (extern_link!="" && extern_link!=undefined) {
+                  this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('value',extern_link);
+                  return false;
+                }
+              });
+              this_remove_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.bind('click',function(){
+                this_hidden_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('value','');
+                this_show_element_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}.attr('value','');
+                return false;
+              });
+            });
+          /* ]]> */
+        </script>
+        
+        <div class="rex-widget">
+          <div class="rex-widget-custom-link">
+            <p class="rex-widget-field">
+              <input type="hidden" name="VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}" value="{$arrVarId['hidden_value']}">
+              <input type="text" size="30" name="VALUE_NAME[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_NAME" value="{$arrVarId['show_value']}" readonly="readonly">
+            </p>
+             <p class="rex-widget-icons rex-widget-1col">
+              <span class="rex-widget-column rex-widget-column-first">
+                <a href="#" class="mform-icon-internlink-open" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK"></a>
+                <a href="#" class="mform-icon-externlink-open" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN"></a>
+                <a href="#" class="mform-icon-media-open" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM"></a>
+                <a href="#" class="mform-remove-link" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE"></a>
+              </span>
+            </p>
+          </div>
+        </div>
+      </mform:element>
+      
+EOT;
+    return $this->parseElementToTemplate($strElement,$strTemplate);
+  }
+  
+  /*
   textarea, markitup
   */
   public function generateAreaElement($arrElement)

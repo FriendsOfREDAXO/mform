@@ -225,6 +225,14 @@ class getMFormArray
   }
   
   /*
+  add special link feld
+  */
+  public function addCustomLinkField($intId, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
+  {
+    return $this->addElement('custom-link', $intId, NULL, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
+  }
+  
+  /*
   add select fields
   */
   public function addOptionField($strTyp, $intId, $arrAttributes = array(), $arrOptions = array(), $strDefaultValue = NULL)
