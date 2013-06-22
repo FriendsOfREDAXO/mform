@@ -515,7 +515,11 @@ EOT;
           case 'text-readonly':
             $this->generateInputElement($arrElement);
             break;
-                    
+          
+          case 'custom-link':
+            $this->generateCustomInputElement($arrElement);
+            break;
+          
           case 'textarea':
           case 'markitup':
           case 'area-readonly':
