@@ -142,20 +142,22 @@ EOT;
         $arrVarId['sub-var-id-value'] = $arrVarId['sub-var-id'];
         $arrVarId['sub-var-id'] = str_replace(array('[',']'), '', $arrVarId['sub-var-id']);
         $arrVarId['sub-var-id-for-id'] = ($arrElement['sub-var-id'] != '') ? '_'.$arrElement['sub-var-id'] : '';
+        
+        $arrVarId['hidden_value'] = $arrVarId['value'];
+        $arrVarId['show_value'] = $arrVarId['value'];
+        
         if (is_numeric($arrVarId['value']))
         {
-          $arrVarId['show_value'] = '';
           $art = OOArticle :: getArticleById($arrVarId['value']);
           if (OOArticle :: isValid($art))
           {
             $arrVarId['show_value'] = $art->getName();
           }
-          $arrVarId['hidden_value'] = $arrVarId['value'];
-        }
-        else
-        {
-          $arrVarId['show_value'] = $arrVarId['value'];
-          $arrVarId['hidden_value'] = '';
+          else
+          {
+            $arrVarId['hidden_value'] = '';
+            $arrVarId['show_value'] = '';
+          }
         }
         break;
     }
