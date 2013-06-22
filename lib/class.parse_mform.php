@@ -126,10 +126,10 @@ EOT;
     $arrVarId = $this->getVarAndIds($arrElement);
     
     $arrI18N = array(
-      'add_internlink' => rex_i18n::msg($strAddonName.'_add_internlink'),
-      'add_externlink' => rex_i18n::msg($strAddonName.'_add_externlink'),
-      'add_medialink' => rex_i18n::msg($strAddonName.'_add_medialink'),
-      'remove' => rex_i18n::msg($strAddonName.'_remove_link')
+      'add_internlink' => rex_i18n::msg('mfrom_add_internlink'),
+      'add_externlink' => rex_i18n::msg('mfrom_add_externlink'),
+      'add_medialink' => rex_i18n::msg('mform_add_medialink'),
+      'remove' => rex_i18n::msg('mform_remove_link')
     );
     
     switch ($arrElement['type'])
