@@ -86,3 +86,20 @@ div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label.de
 .radio_element {
   margin-left: 120px;
 }
+
+.rex-button .rex-icon.mform-icon-internlink-open {
+  background-image: url(../assets/addons/mform/icons/linkintern.png);
+  vertical-align: -4px;
+}
+.rex-button .rex-icon.mform-icon-externlink-open {
+  background-image: url(../assets/addons/mform/icons/linkextern.png);
+  vertical-align: -4px;
+}
+.rex-button .rex-icon.mform-icon-media-open {
+  background-image: url(../assets/addons/mform/icons/linkmedia.png);
+  vertical-align: -4px;
+}
+.rex-button .rex-icon.mform-remove-link {
+  background-image: url(../assets/addons/mform/icons/linkbreak.png);
+  vertical-align: -4px;
+}
