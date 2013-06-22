@@ -214,10 +214,10 @@ EOT;
             </p>
              <p class="rex-widget-icons rex-widget-1col">
               <span class="rex-widget-column rex-widget-column-first">
-                <a href="#" class="mform-icon-internlink-open" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK"></a>
-                <a href="#" class="mform-icon-externlink-open" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN"></a>
-                <a href="#" class="mform-icon-media-open" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM"></a>
-                <a href="#" class="mform-remove-link" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE"></a>
+                <a href="#" class="mform-icon-internlink-open" title="{$arrI18N['add_internlink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK"></a>
+                <a href="#" class="mform-icon-externlink-open" title="{$arrI18N['add_externlink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN"></a>
+                <a href="#" class="mform-icon-media-open" title="{$arrI18N['add_medialink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM"></a>
+                <a href="#" class="mform-remove-link" title="{$arrI18N['remove']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE"></a>
               </span>
             </p>
           </div>
