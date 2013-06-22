@@ -1,5 +1,9 @@
 ## MForm Changelog
 
+### 2.2.1-rc.2
+
+* Custom Link Element hinzugefügt
+
 ### 2.2.1-rc.1
 
 * Ab dieser Version nur noch für Redaxo 4.5.x
