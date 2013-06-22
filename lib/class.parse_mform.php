@@ -122,17 +122,15 @@ EOT;
   */
   public function generateCustomInputElement($arrElement)
   {
-    global $I18N;
-    
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
     $arrVarId = $this->getVarAndIds($arrElement);
     
-    #$arrI18N = array(
-    #  'add_internlink' => $I18N->msg($strAddonName.'_add_internlink'),
-    #  'add_externlink' => $I18N->msg($strAddonName.'_add_externlink'),
-    #  'add_medialink' => $I18N->msg($strAddonName.'_add_medialink'),
-    #  'remove' => $I18N->msg($strAddonName.'_remove_link')
-    #);
+    $arrI18N = array(
+      'add_internlink' => rex_i18n::msg($strAddonName.'_add_internlink'),
+      'add_externlink' => rex_i18n::msg($strAddonName.'_add_externlink'),
+      'add_medialink' => rex_i18n::msg($strAddonName.'_add_medialink'),
+      'remove' => rex_i18n::msg($strAddonName.'_remove_link')
+    );
     
     switch ($arrElement['type'])
     {
@@ -204,16 +202,14 @@ EOT;
             });
           /* ]]> */
         </script>
-        
         <div id="rex-widget-custom-link-{$arrElement['var-id']}{$arrVarId['sub-var-id']}" class="rex-widget">
-              <input type="hidden" name="REX_INPUT_VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}" value="{$arrVarId['hidden_value']}">
-              <input type="text" size="30" name="VALUE_NAME[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_NAME" value="{$arrVarId['show_value']}" readonly="readonly">
-          
+          <input type="hidden" name="REX_INPUT_VALUE[{$arrElement['var-id']}]{$arrVarId['sub-var-id-value']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}" value="{$arrVarId['hidden_value']}">
+          <input type="text" size="30" name="VALUE_NAME[{$arrElement['var-id']}]{$arrVarId['sub-var-id']}" id="VALUE_{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_NAME" value="{$arrVarId['show_value']}" readonly="readonly">
           <span class="rex-button-group">
-            <a href="#" class="rex-button" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK"><span class="rex-icon mform-icon-internlink-open"></span></a>
-            <a href="#" class="rex-button" title="Link auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN"><span class="rex-icon mform-icon-externlink-open"></span></a>
-            <a href="#" class="rex-button" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM"><span class="rex-icon mform-icon-media-open"></span></a>
-            <a href="#" class="rex-button" title="Medium auswählen" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE"><span class="rex-icon mform-remove-link"></span></a>
+            <a href="#" class="rex-button" title="{$arrI18N['add_internlink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_LINK"><span class="rex-icon mform-icon-internlink-open"></span></a>
+            <a href="#" class="rex-button" title="{$arrI18N['add_externlink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_EXTERN"><span class="rex-icon mform-icon-externlink-open"></span></a>
+            <a href="#" class="rex-button" title="{$arrI18N['add_medialink']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_MEDIUM"><span class="rex-icon mform-icon-media-open"></span></a>
+            <a href="#" class="rex-button" title="{$arrI18N['remove']}" id="VALUE{$arrElement['var-id']}{$arrVarId['sub-var-id-for-id']}_REMOVE"><span class="rex-icon mform-remove-link"></span></a>
           </span>
         </div>
       </mform:element>
