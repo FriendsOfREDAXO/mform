@@ -71,6 +71,13 @@ $objForm->addOptions(array(1=>\'test-1\',2=>\'test-2\'));
 $objForm->setSize(5);
 $objForm->setLabel(\'Select\');
 
+// select sql
+$objForm->addSelectField(13);
+$objForm->addSqlOptions(\'SELECT name,id FROM \'.$REX[\'TABLE_PREFIX\'].\'article WHERE status=1 ORDER BY name\');
+$objForm->setSize(1);
+$objForm->setDefaultValue(\'REX_VALUE[13]\');
+$objForm->setLabel(\'Optionen via Sql\');
+
 // multiselect
 $objForm->addMultiSelectField(9,array(1=>\'test-1\',2=>\'test-2\'),array(\'label\'=>\'Multiselect\',\'size\'=>\'8\'));
 
