@@ -75,7 +75,6 @@ $objForm->setLabel(\'Select\');
 $objForm->addSelectField(13);
 $objForm->addSqlOptions(\'SELECT name,id FROM \'.$REX[\'TABLE_PREFIX\'].\'article WHERE status=1 ORDER BY name\');
 $objForm->setSize(1);
-$objForm->setDefaultValue(\'REX_VALUE[13]\');
 $objForm->setLabel(\'Optionen via Sql\');
 
 // multiselect
