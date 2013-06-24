@@ -26,11 +26,11 @@ class getMFormArray
   public $count = 0;
   public $validations = NULL;
   public $REX;
-  
+
   /**/
   // generate element array - add fields
   /**/
-  
+
   /*
   add field
   */
@@ -39,11 +39,11 @@ class getMFormArray
     $this->id = $this->count++;
     $intSubId = false;
     $strMode = rex_request('function', 'string');
-    
+
     if (is_array( $arrId = explode('.', str_replace(',','.',$intId) ) ) === true)
     {
       $intId = $arrId[0];
-      
+
       if (sizeof($arrId) > 1)
       {
         $intSubId = $arrId[1];
@@ -53,18 +53,18 @@ class getMFormArray
         $intSubId = '';
       }
     }
-    
+
     if (is_array($this->arrResult) === false && $strMode == 'edit')
     {
       $this->getRexVars();
-      
+
       /*
       echo '<pre>';
       print_r($this->arrResult);
       echo '</pre>';
       */
     }
-    
+
     if ($strValue === NULL)
     {
       if (is_array($this->arrResult) === true)
@@ -97,12 +97,12 @@ class getMFormArray
     {
       $strValue = $this->getLangData($strValue);
     }
-    
+
     if ($strDefaultValue != NULL)
     {
       $strDefaultValue = $this->getLangData($strDefaultValue);
     }
-    
+
     $this->arrElements[$this->id] = array(
       'type'          => $strTyp,
       'id'            => $this->id,
@@ -117,40 +117,40 @@ class getMFormArray
       'multi'         => '',
       'validation'    => array()
     );
-    
+
     // unset attributes
     $this->attributes = NULL;
-    
+
     if (sizeof($arrAttributes) > 0 )
     {
       $this->setAttributes($arrAttributes);
     }
-    
+
     // unset options
     $this->options = NULL;
-    
+
     if (sizeof($arrOptions) > 0 )
     {
       $this->addOptions($arrOptions);
     }
-    
+
     // unset parameters
     $this->parameter = NULL;
-    
+
     if (sizeof($arrParameter) > 0 )
     {
       $this->setParameters($arrParameter);
     }
-    
+
     // unset validations
     $this->validations = NULL;
-    
+
     if (sizeof($arrValidation) > 0 )
     {
       $this->setValidations($arrValidation);
     }
   }
-  
+
   /*
   add element
   */
@@ -158,22 +158,22 @@ class getMFormArray
   {
     return $this->addElement('html', NULL, $strValue);
   }
-  
+
   public function addHeadline($strValue)
   {
     return $this->addElement('headline', NULL, $strValue);
   }
-  
+
   public function addDescription($strValue)
   {
     return $this->addElement('description', NULL, $strValue);
   }
-  
+
   public function addFieldset($strValue, $arrAttributes = array())
   {
     return $this->addElement('fieldset', NULL, $strValue, $arrAttributes);
   }
-  
+
   /*
   add callback
   */
@@ -190,7 +190,7 @@ class getMFormArray
       );
     }
   }
-  
+
   /*
   add input fields
   */
@@ -198,32 +198,32 @@ class getMFormArray
   {
     return $this->addElement($strTyp, $intId, NULL, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
   }
-  
+
   public function addHiddenField($intId, $strValue = NULL, $arrAttributes = array())
   {
     return $this->addInputField('hidden', $intId, $strValue, $arrAttributes);
   }
-  
+
   public function addTextField($intId, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
     return $this->addInputField('text', $intId, NULL, $arrAttributes, $arrValidations, $strDefaultValue);
   }
-  
+
   public function addTextAreaField($intId, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
     return $this->addInputField('textarea', $intId, NULL, $arrAttributes, $arrValidations, $strDefaultValue);
   }
-  
+
   public function addTextReadOnlyField($intId, $strValue = NULL, $arrAttributes = array())
   {
     return $this->addInputField('text-readonly', $intId, $strValue, $arrAttributes);
   }
-  
+
   public function addTextAreaReadOnlyField($intId, $strValue = NULL, $arrAttributes = array())
   {
     return $this->addInputField('area-readonly', $intId, $strValue, $arrAttributes);
   }
-  
+
   /*
   add special link feld
   */
@@ -231,7 +231,7 @@ class getMFormArray
   {
     return $this->addElement('custom-link', $intId, NULL, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
   }
-  
+
   /*
   add select fields
   */
@@ -239,20 +239,20 @@ class getMFormArray
   {
     return $this->addElement($strTyp, $intId, NULL, $arrAttributes, $arrOptions, NULL, NULL, array(), $strDefaultValue);
   }
-  
+
   public function addSelectField($intId, $arrOptions = array(), $arrAttributes = array(), $strSize = 1, $strDefaultValue = NULL)
   {
     return $this->addOptionField('select', $intId, $arrAttributes, $arrOptions, $strDefaultValue);
     $this->setSize($strSize);
   }
-  
+
   public function addMultiSelectField($intId, $arrOptions = array(), $arrAttributes = array(), $strSize = 3, $strDefaultValue = NULL)
   {
     $this->addOptionField('multiselect', $intId, $arrAttributes, $arrOptions, $strDefaultValue);
     $this->setMultiple(true);
     $this->setSize($strSize);
   }
-  
+
   /*
   add checkboxes
   */
@@ -260,7 +260,7 @@ class getMFormArray
   {
     return $this->addOptionField('checkbox', $intId, $arrAttributes, $arrOptions, $strDefaultValue);
   }
-  
+
   /*
   add radiobutton
   */
@@ -268,7 +268,7 @@ class getMFormArray
   {
     return $this->addOptionField('radiobutton', $intId, $arrAttributes, $arrOptions, $strDefaultValue);
   }
-    
+
   /*
   add rex link fields
   */
@@ -276,12 +276,12 @@ class getMFormArray
   {
     return $this->addElement('link', $intId, NULL, $arrAttributes, array(), $arrParameter, $intCatId);
   }
-  
+
   public function addLinklistField($intId, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('linklist', $intId, NULL, $arrAttributes, array(), $arrParameter, $intCatId);
   }
-  
+
   /*
   add rex media fields
   */
@@ -289,16 +289,16 @@ class getMFormArray
   {
     return $this->addElement('media', $intId, NULL, $arrAttributes, array(), $arrParameter, $intCatId);
   }
-  
+
   public function addMedialistField($intId, $arrParameter = array(), $intCatId = NULL, $arrAttributes = array())
   {
     return $this->addElement('medialist', $intId, NULL, $arrAttributes, array(), $arrParameter, $intCatId);
   }
-  
+
   /**/
   // set label and attributes
   /**/
-  
+
   /*
   add label
   */
@@ -306,7 +306,7 @@ class getMFormArray
   {
     $this->arrElements[$this->id]['label'] = $this->getLangData($strLabel);
   }
-  
+
   /*
   add attribute s
   */
@@ -317,11 +317,11 @@ class getMFormArray
       case 'label':
         $this->setLabel($strValue);
         break;
-        
+
       case 'size':
         $this->setSize($strValue);
         break;
-        
+
       case 'validation':
         if (is_array($strValue))
         {
@@ -329,18 +329,18 @@ class getMFormArray
           $this->setValidations($arrValidation);
         }
         break;
-      
+
       case 'default-value':
         $this->setDefaultValue($strValue);
         break;
-        
+
       default:
         $this->attributes[$strName] = $strValue;
         $this->arrElements[$this->id]['attributes'] = $this->attributes;
         break;
     }
   }
-  
+
   public function setAttributes($arrAttributes)
   {
     $this->attributes = array();
@@ -349,11 +349,11 @@ class getMFormArray
       $this->setAttribute($strName, $strValue);
     }
   }
-  
+
   /**/
   // set validation
   /**/
-  
+
   /*
   add default validation
   */
@@ -379,7 +379,7 @@ class getMFormArray
       case 'compare':
       case 'email':
           $this->setAttribute('data-type', 'email');
-      break;    
+      break;
       case 'minlength':
           $this->setAttribute('data-minlength', $strValue);
       break;
@@ -394,7 +394,7 @@ class getMFormArray
       break;
       case 'url':
           $this->setAttribute('data-type', 'url');
-      break;    
+      break;
       case 'regexp':
           $this->setAttribute('data-regexp', $strValue);
       break;
@@ -410,7 +410,7 @@ class getMFormArray
         break;
     }
   }
-  
+
   public function setValidations($arrValidations)
   {
     $this->validations = array();
@@ -426,22 +426,22 @@ class getMFormArray
       }
     }
   }
-  
+
   /*
   add custom validation
   */
   public function setCustomValidation($arrCustomValidation)
   {
   }
-  
+
   public function setCustomValidations($arrCustomValidations)
   {
   }
-  
+
   /**/
   // set default value
   /**/
-  
+
   /*
   set defaut value
   */
@@ -449,11 +449,11 @@ class getMFormArray
   {
     $this->arrElements[$this->id]['default-value'] = $this->getLangData($strValue);
   }
-  
+
   /**/
   // set options, multiple and size
   /**/
-  
+
   /*
   add options
   */
@@ -462,7 +462,7 @@ class getMFormArray
     $this->options[$intKey] = $this->getLangData($strValue);
     $this->arrElements[$this->id]['options'] = $this->options;
   }
-  
+
   public function addOptions($arrOptions)
   {
     $this->options = array();
@@ -471,7 +471,19 @@ class getMFormArray
       $this->addOption($strValue, $intKey);
     }
   }
-  
+
+
+  public function addSqlOptions($strQuery)
+  {
+    $sql = rex_sql::factory();
+    $sql->setQuery($strQuery);
+    while ($sql->hasNext())
+    {
+      $this->addOption($sql->getValue('name'), $sql->getValue('id'));
+      $sql->next();
+    }
+  }
+
   /*
   add multiple
   */
@@ -482,7 +494,7 @@ class getMFormArray
       $this->arrElements[$this->id]['multi'] = true;
     }
   }
-  
+
   /*
   add size
   */
@@ -493,11 +505,11 @@ class getMFormArray
       $this->arrElements[$this->id]['size'] = $strSize;
     }
   }
-  
+
   /**/
   // set category and parameter
   /**/
-  
+
   /*
   add category id
   */
@@ -508,7 +520,7 @@ class getMFormArray
       $this->arrElements[$this->id]['cat-id'] = $intCatId;
     }
   }
-  
+
   /*
   add parameter
   */
@@ -519,18 +531,18 @@ class getMFormArray
       case 'category':
         $this->setCategory($strValue);
         break;
-      
+
       case 'label':
         $this->setLabel($strValue);
         break;
-        
+
       default:
         $this->parameter[$strName] = $strValue;
         $this->arrElements[$this->id]['parameter'] = $this->parameter;
-        break;  
+        break;
     }
   }
-  
+
   public function setParameters($arrParameter)
   {
     $this->parameter = array();
@@ -539,11 +551,11 @@ class getMFormArray
       $this->setParameter($strName, $strValue);
     }
   }
-  
+
   /**/
   // get global REX
   /**/
-  
+
   public function getGlobalRex()
   {
     if (is_array($this->REX) === false)
@@ -552,11 +564,11 @@ class getMFormArray
       $this->REX = $REX;
     }
   }
-  
+
   /**/
   // use user lang
   /**/
-  
+
   public function getLangData($arrLangData)
   {
     if (is_array($arrLangData) === true)
@@ -580,41 +592,41 @@ class getMFormArray
     }
     return $strLangData;
   }
-  
+
   /**/
   // get rex values and vars
   /**/
-  
+
   /*
   get rex var
   */
   public function getRexVars()
   {
     $intSliceId = rex_request('slice_id', 'int', false);
-    
+
     if ($intSliceId != false)
     {
       $strTable = 'rex_article_slice';
       $strFields = '*';
       $strWhere = 'id="'.$_REQUEST['slice_id'].'"';
-      
+
       $objSql = rex_sql::factory();
       $strQuery = '
         SELECT '. $strFields .'
         FROM '. $strTable .'
         WHERE '. $strWhere;
-      
+
       $objSql->setQuery($strQuery);
       $rows = $objSql->getRows();
-      
+
       if ($rows > 0)
       {
         $this->arrResult = array();
-        
+
         for ($i = 1; $i <= 20; $i++)
         {
           $this->arrResult['value'][$i] = $objSql->getValue('value' . $i);
-          
+
           if ($i <= 10)
           {
             $this->arrResult['filelist'][$i] = $objSql->getValue('filelist' . $i);
@@ -622,13 +634,13 @@ class getMFormArray
             $this->arrResult['file'][$i] = $objSql->getValue('file' . $i);
             $this->arrResult['link'][$i] = $objSql->getValue('link' . $i);
           }
-          
+
           if (method_exists ('rex_var', 'toArray') === true)
           {
             if ($this->isSerial($this->arrResult['value'][$i]))
             {
               $result = rex_var::toArray($this->arrResult['value'][$i]);
-              
+
               if (is_array($result) === true)
               {
                 $this->arrResult['value'][$i] = $result;
@@ -640,18 +652,18 @@ class getMFormArray
     }
     return $this->arrResult;
   }
-  
+
   /*
   check serialize
   */
   public static function isSerial($string) {
     return (@unserialize($string) !== false);
   }
-  
+
   /**/
   // final output
   /**/
-  
+
   /*
   generate Output
   */
@@ -660,7 +672,7 @@ class getMFormArray
     $this->strOutput = $this->arrElements;
     return $this->strOutput;
   }
-  
+
   public function getArray()
   {
     return $this->arrFormElements($this->arrElements);
