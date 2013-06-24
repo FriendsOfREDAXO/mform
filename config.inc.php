@@ -21,7 +21,7 @@ $REX['ADDON']['rxid'][$strAddonName] = '967';
 $REX['ADDON']['page'][$strAddonName] = $strAddonName;
 $REX['ADDON']['name'][$strAddonName] = $strAddonName;
 $REX['ADDON'][$strAddonName]['VERSION'] = array('VERSION' => 2, 'MINORVERSION' => 2, 'SUBVERSION' => 1);
-$REX['ADDON'][$strAddonName]['rc'] = '-rc.2';
+$REX['ADDON'][$strAddonName]['rc'] = '-rc.3';
 $REX['ADDON']['version'][$strAddonName] = implode('.', $REX['ADDON'][$strAddonName]['VERSION']);
 $REX['ADDON']['author'][$strAddonName] = 'Joachim Doerr';
 $REX['ADDON']['supportpage'][$strAddonName] = 'forum.redaxo.de';
@@ -52,7 +52,7 @@ if ($REX['REDAXO'] === true)
   
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
   ////////////////////////////////////////////////////////////////////////////////  
-  foreach (array(glob("$strAddonPath/lib/class.*php"),glob("$strAddonPath/functions/function.*php")) as $files)
+  foreach (array(glob("$strAddonPath/lib/classes/class.*php"),glob("$strAddonPath/lib/functions/function.*php")) as $files)
   {
     array_walk($files,create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;'));
   }

@@ -1,8 +1,11 @@
 ## MForm Changelog
 
-### 2.2.1-rc.2
+### 2.2.1-rc.3
 
 * Custom Link Element hinzugefügt
+* add `lib/classes/`, `lib/functions/`
+* sql Options integriert
+* `$objForm` ersetzt durch `$mform`
 
 ### 2.2.1-rc.1
 

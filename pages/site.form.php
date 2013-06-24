@@ -11,10 +11,13 @@ site.form.php
 
 $strNewThem = rex_request('default_template_theme_name', 'string', false);
 
-if ($strFunc == 'savesettings') {
+if ($strFunc == 'savesettings')
+{
   $strContent = '';
-  foreach ($_GET as $strKey => $strVal) {
-    if (!in_array($strKey,array('page','subpage','minorpage','func','submit','PHPSESSID'))) {
+  foreach ($_GET as $strKey => $strVal)
+  {
+    if (!in_array($strKey,array('page','subpage','minorpage','func','submit','PHPSESSID')))
+    {
       $REX['ADDON'][$mypage]['settings'][$strKey] = $strVal;
       if (is_numeric($strVal))
         $strContent .= '$REX["ADDON"]["'.$strAddonName.'"]["settings"]["'.$strKey.'"] = '.$strVal.';'."\n";
@@ -29,7 +32,8 @@ if ($strFunc == 'savesettings') {
 }
 
 $handle = opendir($strAddonPath.'/templates/');
-while ($strDir = readdir($handle)) {
+while ($strDir = readdir($handle))
+{
   if ($strDir == '.' or $strDir == '..')
   {
   	continue;
