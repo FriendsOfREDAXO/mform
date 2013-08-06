@@ -47,6 +47,20 @@ class parseMForm
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
   }
+
+  public function closeFieldset($arrElement)
+  {
+    if ($this->boolFieldset === true)
+    {
+      $this->boolFieldset = false;
+      $strElement = <<<EOT
+      
+        <mform:element></fieldset></mform:element>
+      
+EOT;
+      return $this->parseElementToTemplate($strElement,$strTemplate);
+    }
+  }
   
   /*
   html, headline, description
@@ -498,6 +512,10 @@ EOT;
       {
         switch ($arrElement['type'])
         {
+          case 'close-fieldset':
+            $this->closeFieldset($arrElement);
+            break;
+            
           case 'fieldset':
             $this->generateFieldset($arrElement);
             break;
@@ -562,17 +580,17 @@ EOT;
   
   public function setTheme($strNewTemplateThemeName)
   {
-  	global $strAddonPath;
+    global $strAddonPath;
     global $strDefaultTemplateThemeName;
     
-  	if (is_dir($strAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
-  	{
-  	  $this->strTemplateThemeName = $strNewTemplateThemeName;
-  	  return 
-		PHP_EOL.'<!-- mform -->'.
-		PHP_EOL.'  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $this->strTemplateThemeName . '" media="all" />'.
-		PHP_EOL.'<!-- mform -->'.PHP_EOL;
-  	}
+    if (is_dir($strAddonPath . "/templates/" . $strNewTemplateThemeName . "_theme/") === true && $strNewTemplateThemeName != $strDefaultTemplateThemeName)
+    {
+      $this->strTemplateThemeName = $strNewTemplateThemeName;
+      return 
+    PHP_EOL.'<!-- mform -->'.
+    PHP_EOL.'  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $this->strTemplateThemeName . '" media="all" />'.
+    PHP_EOL.'<!-- mform -->'.PHP_EOL;
+    }
   }
   
   /**/
@@ -633,11 +651,12 @@ EOT;
     }
     if ($boolParseFinal === true)
     {
+      $this->strOutput = $strElement;
+      
       if ($this->boolFieldset === true)
       {
         $strElement = $strElement.'</fieldset>';
       }
-      $this->strOutput = $strElement;
     }
     else
     {
@@ -650,10 +669,10 @@ EOT;
   */
   public function parse_mform($arrElements, $strNewTemplateThemeName = false)
   {
-  	if ($strNewTemplateThemeName != false)
-  	{
-  	  $this->strOutput .= $this->setTheme($strNewTemplateThemeName);
-  	}
+    if ($strNewTemplateThemeName != false)
+    {
+      $this->strOutput .= $this->setTheme($strNewTemplateThemeName);
+    }
     $this->parseFormFields($arrElements);
     $this->parseElementToTemplate($this->strOutput,'wrapper',true);
     return $this->strOutput;

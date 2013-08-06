@@ -174,6 +174,11 @@ class getMFormArray
     return $this->addElement('fieldset', NULL, $strValue, $arrAttributes);
   }
 
+  public function closeFieldset($strValue, $arrAttributes = array())
+  {
+    return $this->addElement('close-fieldset');
+  }
+
   /*
   add callback
   */

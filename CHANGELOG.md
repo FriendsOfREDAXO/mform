@@ -1,5 +1,10 @@
 ## MForm Changelog
 
+### 2.2.1-rc.4
+
+* `fieldset` error fixed 
+* add `closeFieldset` methode
+
 ### 2.2.1-rc.3
 
 * Custom Link Element hinzugefügt
