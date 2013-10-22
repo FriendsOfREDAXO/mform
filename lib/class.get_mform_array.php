@@ -6,7 +6,7 @@ class.get_mform_array.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.2.0
+@version 3.3.0
 */
 
 // MFROM ARRAY GENERATOR CLASS
@@ -172,6 +172,11 @@ class getMFormArray
   public function addFieldset($strValue, $arrAttributes = array())
   {
     return $this->addElement('fieldset', NULL, $strValue, $arrAttributes);
+  }
+  
+  public function closeFieldset()
+  {
+    return $this->addElement('close-fieldset', NULL, NULL, array());
   }
   
   /*
@@ -469,6 +474,20 @@ class getMFormArray
     foreach ($arrOptions as $intKey => $strValue)
     {
       $this->addOption($strValue, $intKey);
+    }
+  }
+  
+  /*
+  add sqloptions
+  */
+  public function addSqlOptions($strQuery)
+  {
+    $sql = rex_sql::factory();
+    $sql->setQuery($strQuery);
+    while ($sql->hasNext())
+    {
+      $this->addOption($sql->getValue('name'), $sql->getValue('id'));
+      $sql->next();
     }
   }
   

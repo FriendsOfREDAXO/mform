@@ -1,12 +1,18 @@
 package: mform
-version: '3.2.0'
+version: '3.3.0'
 name: MForm
 author: 'Joachim Doerr'
 supportpage: www.redaxo.org/de/forum/
 
+load: late
+
 page:
-  title: 'translate:title'
-  perm: admin
+    title: 'translate:title'
+    perm: admin[]
+    subpages:
+        info: { title: 'translate:info' }
+        config: { title: 'translate:config' }
+        demo: { title: 'translate:demo' }
 
 requires:
   packages:

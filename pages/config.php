@@ -6,11 +6,11 @@ site.form.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.2.0
+@version 3.3.0
 */
 
 // set headline
-$strPageContent .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
+$strForm .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
 
 // rex request
 $config = rex_post('config', array(
@@ -22,7 +22,7 @@ $config = rex_post('config', array(
 if ($config['submit'])
 {
   $this->setConfig('mform_template', $config['mform_template']);
-  $strPageContent .= rex_view::info($this->i18n('config_saved'));
+  $strForm .= rex_view::info($this->i18n('config_saved'));
 }
 
 // read dir
@@ -45,7 +45,7 @@ while ($strDir = readdir($handle))
 closedir($handle);
 
 // open form
-$strPageContent .= '
+$strForm .= '
   <form action="' . rex_url::currentBackendPage() . '" method="post">
     <fieldset>
 ';
@@ -79,10 +79,12 @@ $arrFormElements[] = $arrElements;
 // parse form content by fragment
 $objFragment = new rex_fragment();
 $objFragment->setVar('elements', $arrFormElements, false);
-$strPageContent .= $objFragment->parse('form.php');
+$strForm .= $objFragment->parse('core/form/form.php');
 
 // close form
-$strPageContent .= '
+$strForm .= '
     </fieldset>
   </form>
 ';
+
+echo rex_view::content('block', $strForm);

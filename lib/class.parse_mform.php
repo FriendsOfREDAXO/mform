@@ -6,7 +6,7 @@ class.parse_mform.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.2.0
+@version 3.3.0
 */
 
 // MFROM PARSER CLASS
@@ -31,6 +31,8 @@ class parseMForm
   public function generateFieldset($arrElement)
   {
     $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
+    $arrElement['close_fieldset'] = '';
+    
     if ($this->boolFieldset === true)
     {
       $arrElement['close_fieldset'] = '</fieldset>';
@@ -46,6 +48,20 @@ class parseMForm
       
 EOT;
     return $this->parseElementToTemplate($strElement,$strTemplate);
+  }
+
+  public function closeFieldset($arrElement = NULL)
+  {
+    if ($this->boolFieldset === true)
+    {
+      $this->boolFieldset = false;
+      $strElement = <<<EOT
+      
+        <mform:element></fieldset></mform:element>
+      
+EOT;
+      return $this->parseElementToTemplate($strElement,$strTemplate);
+    }
   }
   
   /*
@@ -303,7 +319,7 @@ EOT;
             $strHiddenValue = $strHdValue;
           }
         }
-        if ($intKey == $strHiddenValue or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
+        if ($intKey === $strHiddenValue or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
         {
           $strOptions .= 'selected="selected" ';
         }
@@ -358,7 +374,10 @@ EOT;
     if (array_key_exists('options',$arrElement) === true)
     {
       $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
-      $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
+      $array_key = array_keys($arrElement['options']);
+      $arrElement['options'] = array(end($array_key) => end($arrElement['options']));
+      $strOptions = '';
+      
       $arrVarId = $this->getVarAndIds($arrElement);
       
       foreach ($arrElement['options'] as $intKey => $strValue)
@@ -495,6 +514,10 @@ EOT;
       {
         switch ($arrElement['type'])
         {
+          case 'close-fieldset':
+            $this->closeFieldset($arrElement);
+            break;
+            
           case 'fieldset':
             $this->generateFieldset($arrElement);
             break;
@@ -630,11 +653,12 @@ EOT;
     }
     if ($boolParseFinal === true)
     {
+      $this->strOutput = $strElement;
+      
       if ($this->boolFieldset === true)
       {
         $strElement = $strElement.'</fieldset>';
       }
-      $this->strOutput = $strElement;
     }
     else
     {

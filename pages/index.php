@@ -6,17 +6,9 @@ index.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.2.0
+@version 3.3.0
 */
 
-// site content
-$content = '';
+echo rex_view::title(rex_i18n::msg('mform_title') . ' ' . rex_i18n::msg('mform_'.rex_be_controller::getCurrentPagePart(2)));
 
-// include subpages
-include rex_path::addon('mform', 'pages/site.config.php');
-include rex_path::addon('mform', 'pages/site.information.php');
-include rex_path::addon('mform', 'pages/site.demo.php');
-
-// echo content
-echo rex_view::title($this->i18n('title'));
-echo rex_view::contentBlock($strPageContent . rex_string::highlight($strModulInputDemo));
+include rex_be_controller::getCurrentPageObject()->getSubPath();

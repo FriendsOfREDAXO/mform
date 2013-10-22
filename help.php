@@ -6,11 +6,10 @@ help.inc.php
 @author mail[at]joachim-doerr[dot]com Joachim Doerr
 
 @package redaxo5
-@version 3.2.0
+@version 3.3.0
 */
 
 // include information site
-include rex_path::addon('mform', 'pages/site.information.php');
+include rex_path::addon('mform', 'pages/info.php');
 
-// echo help
-echo $strContent;
+echo $strPageContent;
