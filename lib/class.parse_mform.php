@@ -319,7 +319,7 @@ EOT;
             $strHiddenValue = $strHdValue;
           }
         }
-        if ($intKey === $strHiddenValue or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
+        if (strval($intKey) === strval($strHiddenValue) or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
         {
           $strOptions .= 'selected="selected" ';
         }
