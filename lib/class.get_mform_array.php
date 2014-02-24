@@ -201,7 +201,7 @@ class getMFormArray
   */
   public function addInputField($strTyp, $intId, $strValue = NULL, $arrAttributes = array(), $arrValidations = array(), $strDefaultValue = NULL)
   {
-    return $this->addElement($strTyp, $intId, NULL, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
+    return $this->addElement($strTyp, $intId, $strValue, $arrAttributes, NULL, NULL, NULL, $arrValidations, $strDefaultValue);
   }
   
   public function addHiddenField($intId, $strValue = NULL, $arrAttributes = array())
