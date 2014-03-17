@@ -440,6 +440,9 @@ EOT;
     }
     if ($arrElement['type'] == 'medialist')
     {
+        if(isset($arrElement['parameter']) === false) {
+            $arrElement['parameter'] = array();
+        }
       $strOptions = rex_var_medialist::getWidget($arrElement['var-id'], 'REX_INPUT_MEDIALIST[' . $arrElement['var-id'] . ']', $arrElement['value'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
