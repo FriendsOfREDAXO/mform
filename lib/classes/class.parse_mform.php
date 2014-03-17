@@ -443,6 +443,9 @@ EOT;
     }
     if ($arrElement['type'] == 'medialist')
     {
+        if(isset($arrElement['parameter']) === false) {
+            $arrElement['parameter'] = array();
+        }
       $strOptions = rex_var_media::getMediaListButton($arrElement['var-id'], $arrElement['value'], $arrElement['cat-id'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
