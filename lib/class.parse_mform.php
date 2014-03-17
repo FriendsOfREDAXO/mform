@@ -348,6 +348,10 @@ EOT;
       foreach ($arrElement['options'] as $intKey => $strValue)
       {
         $intCount++;
+        $strRadioAttributes = '';
+        if(isset($arrElement['attributes']['radio-attr'][$intKey]) === true) {
+            $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
+        }
         $strRadioAttributes = $this->getAttributes($arrElement['attributes']['radio-attr'][$intKey]);
         $strOptions .= '<div class="radio_element"><input id="rv' . $arrVarId['id'] . $intCount . '" type="radio" name="REX_INPUT_VALUE[' . $arrElement['var-id'] . ']' . $arrVarId['sub-var-id'] . '" value="' . $intKey . '" ' . $strRadioAttributes;
         if ($intKey == $arrElement['value'] or ($arrElement['mode'] == 'add' && $intKey == $arrElement['default-value']))
