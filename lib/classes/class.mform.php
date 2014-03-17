@@ -69,4 +69,13 @@ class mform extends getMFormArray
     */
     return $objOutput->parse_mform($this->getArray(), $this->strTemplateThemeName);
   }
+  
+  /**/
+  // show - call show_mform methode
+  /**/
+
+  public function show()
+  {
+      return $this->show_mform();
+  }
 }
