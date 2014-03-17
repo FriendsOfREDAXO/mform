@@ -382,7 +382,12 @@ EOT;
     if (array_key_exists('options',$arrElement) === true)
     {
       $arrElement['attributes'] = $this->getAttributes($arrElement['attributes']);
-      $arrElement['options'] = array(end(array_keys($arrElement['options'])) => end($arrElement['options'])); $strOptions = '';
+
+      $arrayKeys = array_keys($arrElement['options']);
+      $addEndArrayKeys = end($arrayKeys);
+      $addEnd = end($arrElement['options']);
+
+      $arrElement['options'] = array($addEndArrayKeys => $addEnd); $strOptions = '';
       $arrVarId = $this->getVarAndIds($arrElement);
       
       foreach ($arrElement['options'] as $intKey => $strValue)
