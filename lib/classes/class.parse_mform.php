@@ -440,6 +440,9 @@ EOT;
   */
   public function generateMediaElement($arrElement)
   {
+    if(isset($arrElement['parameter']) === false) {
+      $arrElement['parameter'] = array();
+    }
     if ($arrElement['type'] == 'media')
     {
       $strOptions = rex_var_media::getMediaButton($arrElement['var-id'], $arrElement['cat-id'], $arrElement['parameter']);
@@ -447,9 +450,6 @@ EOT;
     }
     if ($arrElement['type'] == 'medialist')
     {
-        if(isset($arrElement['parameter']) === false) {
-            $arrElement['parameter'] = array();
-        }
       $strOptions = rex_var_media::getMediaListButton($arrElement['var-id'], $arrElement['value'], $arrElement['cat-id'], $arrElement['parameter']);        
     }
     $strElement = <<<EOT
