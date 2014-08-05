@@ -349,10 +349,13 @@ class getMFormArray
   public function setAttributes($arrAttributes)
   {
     $this->attributes = array();
-    foreach ($arrAttributes as $strName => $strValue)
-    {
-      $this->setAttribute($strName, $strValue);
-    }
+      if(is_array($arrAttributes))
+      {
+          foreach ($arrAttributes as $strName => $strValue)
+          {
+              $this->setAttribute($strName, $strValue);
+          }
+      }
   }
 
   /**/
