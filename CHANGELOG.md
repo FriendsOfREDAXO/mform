@@ -11,7 +11,7 @@
 * add obj check to fix "Call to a member function getLanguage"-bug
 * use htmlspecialchars for values to fix " problem
 * fix textile padding problem
-* add getlabel method for label array key exist check
+* update demo file, add custom link to demo
 
 ### 2.2.1-rc.4
 
