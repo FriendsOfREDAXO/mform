@@ -34,6 +34,7 @@ class ParseMForm
     private function generateFieldset($element)
     {
         $element['attributes'] = $this->getAttributes($element['attributes']);
+
         if ($this->fieldset === true) {
             $element['close_fieldset'] = '</fieldset>';
         } else {
@@ -103,6 +104,7 @@ class ParseMForm
     private function generateInputElement($element)
     {
         $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
         $varId = $this->getVarAndIds($element);
 
         switch ($element['type']) {
@@ -142,6 +144,7 @@ EOT;
         global $I18N;
 
         $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
         $varId = $this->getVarAndIds($element);
 
         $messages = array(
@@ -158,7 +161,6 @@ EOT;
                 $varId['sub-var-id-value'] = $varId['sub-var-id'];
                 $varId['sub-var-id'] = str_replace(array('[', ']'), '', $varId['sub-var-id']);
                 $varId['sub-var-id-for-id'] = ($element['sub-var-id'] != '') ? '_' . $element['sub-var-id'] : '';
-
                 $varId['hidden_value'] = $varId['value'];
                 $varId['show_value'] = $varId['value'];
 
@@ -249,6 +251,7 @@ EOT;
     private function generateAreaElement($element)
     {
         $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
         $varId = $this->getVarAndIds($element);
 
         if ($element['type'] == 'area-readonly') {
@@ -279,6 +282,9 @@ EOT;
     private function generateOptionsElement($element)
     {
         $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
+        $varId = $this->getVarAndIds($element);
+
         $multiselectJavascript = '';
         $multiselectHidden = '';
         $hiddenValue = array();
@@ -286,7 +292,6 @@ EOT;
         $defaultValue = array();
         $hiddenValueOutput = '';
         $selectAttributes = (is_numeric($element['size']) === true) ? 'size="' . $element['size'] . '"' : '';
-        $varId = $this->getVarAndIds($element);
 
         if ($element['size'] == 'full') {
             $selectAttributes = 'size="' . sizeof($element['options']) . '"';
@@ -352,9 +357,11 @@ EOT;
      */
     private function generateRadioElement($element)
     {
-        $count = 0;
-        $options = '';
+        $element['label'] = $this->getLabel($element);
         $varId = $this->getVarAndIds($element);
+
+        $options = '';
+        $count = 0;
 
         if (array_key_exists('options', $element) === true) {
             foreach ($element['options'] as $key => $value) {
@@ -392,6 +399,7 @@ EOT;
         }
 
         $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
 
         $arrayKeys = array_keys($element['options']);
         $addEndArrayKeys = end($arrayKeys);
@@ -426,6 +434,8 @@ EOT;
      */
     private function generateLinkElement($element)
     {
+        $element['label'] = $this->getLabel($element);
+
         switch ($element['type']) {
             default:
             case 'link':
@@ -453,6 +463,8 @@ EOT;
      */
     private function generateMediaElement($element)
     {
+        $element['label'] = $this->getLabel($element);
+
         if (isset($element['parameter']) === false) {
             $element['parameter'] = array();
         }
@@ -502,6 +514,20 @@ EOT;
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $element
+     * @return mixed
+     * @author Joachim Doerr
+     */
+    public function getLabel($element) {
+
+        if(!array_key_exists('label',$element)) {
+            $element['label'] = '';
+        }
+
+        return $element['label'];
     }
 
     /**
