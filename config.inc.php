@@ -40,7 +40,7 @@ if ($REX['REDAXO'] === true)
   // LOAD I18N FILE
   ////////////////////////////////////////////////////////////////////////////////
   $I18N->appendFile(dirname(__FILE__) . '/lang/');
-  
+
   // ADDON MENU
   ////////////////////////////////////////////////////////////////////////////////
   $REX['ADDON']['name'][$strAddonName] = $I18N->msg($strAddonName.'_name');
@@ -49,22 +49,22 @@ if ($REX['REDAXO'] === true)
   // array (''         ,'Einstellungen'               ,''     ,''                   ,''),
   // array ('connector','Connector (faceless subpage)',''     ,array('faceless'=>1) ,'' /*array('class'=>'blafasel') can't di: rex_title bug*/),
   );
-  
+
   // AUTO INCLUDE FUNCTIONS & BASE CLASSES
-  ////////////////////////////////////////////////////////////////////////////////  
-  foreach (array(glob("$strAddonPath/lib/classes/class.*php"),glob("$strAddonPath/lib/functions/function.*php")) as $files)
+  ////////////////////////////////////////////////////////////////////////////////
+  foreach (array(glob("$strAddonPath/lib/classes/*.php"),glob("$strAddonPath/lib/functions/*.php")) as $files)
   {
     array_walk($files,create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;'));
   }
-  
+
   // GET PARAMS
   ////////////////////////////////////////////////////////////////////////////////
   $strMode = rex_request('function', 'string', 'none');
-  
+
   // SETTINGS
-  ////////////////////////////////////////////////////////////////////////////////  
+  ////////////////////////////////////////////////////////////////////////////////
   $strDefaultTemplateThemeName = $REX["ADDON"]["mform"]["settings"]["default_template_theme_name"];
-  
+
   if (rex_request('mform_theme', 'string', '') != '')
   {
     if ($strDefaultTemplateThemeName == '')
@@ -74,7 +74,7 @@ if ($REX['REDAXO'] === true)
     mform_generate_css(rex_request('mform_theme', 'string', $strDefaultTemplateThemeName));
     exit;
   }
-  
+
   // EXTENSION POINTS
   ////////////////////////////////////////////////////////////////////////////////
   if ($strMode == 'edit' or $strMode == 'add')
