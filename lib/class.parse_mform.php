@@ -465,11 +465,11 @@ EOT;
   {
     $arrResult = array();
     
-    $arrResult['value'] = $arrElement['value'];
+    $arrResult['value'] = htmlspecialchars($arrElement['value']);
     
     if ($arrElement['mode'] == 'add' && $arrElement['default-value'] != '')
     {
-      $arrResult['value'] = $arrElement['default-value'];
+      $arrResult['value'] = htmlspecialchars($arrElement['default-value']);
     }
     
     $arrResult['id'] = $arrElement['id'] . $arrElement['var-id'];
