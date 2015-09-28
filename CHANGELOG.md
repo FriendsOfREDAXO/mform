@@ -1,5 +1,17 @@
 ## MForm Changelog
 
+### 3.0.0-rc.1
+
+* rename mform classes from mform to MForm
+* remove the show_mform method
+* use abstract class for array creation
+* rename properties, remove type declarations in name
+* use constructor for debug mode and template theme name
+* use return this, getter and setter like sf coding standards
+* add obj check to fix "Call to a member function getLanguage"-bug
+* use htmlspecialchars for values to fix " problem
+* fix textile padding problem
+
 ### 2.2.1-rc.4
 
 * `fieldset` error fixed 
@@ -22,7 +34,7 @@
 
 ### 2.2.0-rc.6
 
-* `fieldset`-Bug in `class.parse_mform.php` behoben
+* `fieldset`-Bug in `class.parse.php` behoben
 * `string`-error in `class.get_mform_array.php` gefixt
 * `Undefined offset`-error in `class.get_mform_array.php` gefixt
 * `Use of undefined constant int`-error in `class.get_mform_array.php` gefixt
