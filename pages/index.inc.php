@@ -1,45 +1,33 @@
 <?php
-/*
-index.inc.php
+/**
+ * index.inc.php
+ * @copyright Copyright (c) 2015 by Doerr Softwaredevelopment
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ *
+ * @package redaxo4.5
+ * @version 3.0.0
+ */
 
-@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
-@author mail[at]joachim-doerr[dot]com Joachim Doerr
+// add identifier
+$name = 'mform';
+$path = $REX['INCLUDE_PATH'] . '/addons/' . $name . '/';
 
-@package redaxo4.5
-@version 2.2.1
-*/
+// get parameters
+$page = rex_request('page', 'string', $name);
+$func = rex_request('func', 'string');
+$id = rex_request('id', 'int');
 
-// ADDON IDENTIFIER
-////////////////////////////////////////////////////////////////////////////////
-$strAddonName = 'mform';
-$strAddonPath = $REX['INCLUDE_PATH'].'/addons/'.$strAddonName.'/';
+// layout top
+include_once($REX['INCLUDE_PATH'] . '/layout/top.php');
 
+// title nav
+rex_title($I18N->msg($name . '_title') . ' <span class="addonversion" style="font-size:10px;color:silver">' . $REX['ADDON']['version'][$name] . $REX['ADDON'][$name]['rc'] . '</span>', $REX['ADDON']['pages'][$name]);
 
-// GET PARAMS
-////////////////////////////////////////////////////////////////////////////////
-$strPage      = rex_request('page', 'string', $strAddonName);
-$strFunc      = rex_request('func', 'string');
-$id           = rex_request('id', 'int');
+// include sub pages
+require_once($path . '/pages/site.demo.php');
+require_once($path . '/pages/site.form.php');
+require_once($path . '/pages/site.information.php');
 
-
-// REX BACKEND LAYOUT TOP
-//////////////////////////////////////////////////////////////////////////////
-include_once( $REX['INCLUDE_PATH'].'/layout/top.php' );
-
-
-// TITLE & SUBPAGE NAVIGATION
-//////////////////////////////////////////////////////////////////////////////
-rex_title($I18N->msg($strAddonName.'_title').' <span class="addonversion" style="font-size:10px;color:silver">'.$REX['ADDON']['version'][$strAddonName].$REX['ADDON'][$strAddonName]['rc'].'</span>', $REX['ADDON']['pages'][$strAddonName]);
-
-
-// INCLUDE SUBPAGE
-/////////////////////////////////////////////////////////////////////////////
-require_once( $strAddonPath . '/pages/site.demo.php' );
-require_once( $strAddonPath . '/pages/site.form.php' );
-require_once( $strAddonPath . '/pages/site.information.php' );
-
-
-// REX BACKEND LAYOUT BOTTOM
-//////////////////////////////////////////////////////////////////////////////
-include_once( $REX['INCLUDE_PATH'].'/layout/bottom.php' );
+// layout bottom
+include_once($REX['INCLUDE_PATH'] . '/layout/bottom.php');
 

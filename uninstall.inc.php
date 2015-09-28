@@ -1,17 +1,14 @@
 <?php
-/*
-uninstall.inc.php
+/**
+ * uninstall.inc.php
+ * @copyright Copyright (c) 2015 by Doerr Softwaredevelopment
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ *
+ * @package redaxo4.5
+ * @version 3.0.0
+ */
 
-@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
-@author mail[at]joachim-doerr[dot]com Joachim Doerr
+// addon identifier
+$name = rex_request('addonname', 'string');
 
-@package redaxo4.5
-@version 2.2.1
-*/
-
-// ADDON IDENTIFIER AUS GET PARAMS
-////////////////////////////////////////////////////////////////////////////////
-$strAddonName = rex_request('addonname','string');
-
-
-$REX['ADDON']['install'][$strAddonName] = 0;
+$REX['ADDON']['install'][$name] = 0;

@@ -12,6 +12,8 @@
 * use htmlspecialchars for values to fix " problem
 * fix textile padding problem
 * update demo file, add custom link to demo
+* refactor code
+* readme updated, add install and usage
 
 ### 2.2.1-rc.4
 

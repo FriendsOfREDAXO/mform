@@ -628,10 +628,10 @@ EOT;
      */
     public function setTheme($template)
     {
-        global $strAddonPath;
-        global $strDefaultTemplateThemeName;
+        global $path;
+        global $defaultTemplate;
 
-        if (is_dir($strAddonPath . "/templates/" . $template . "_theme/") === true && $template != $strDefaultTemplateThemeName) {
+        if (is_dir($path . "/templates/" . $template . "_theme/") === true && $template != $defaultTemplate) {
             $this->template = $template;
             return
                 PHP_EOL . '<!-- mform -->' .
@@ -650,10 +650,10 @@ EOT;
      */
     private function parseElementToTemplate($element, $type, $parseFinal = false)
     {
-        global $strAddonPath;
-        global $strDefaultTemplateThemeName;
+        global $path;
+        global $defaultTemplate;
 
-        $template = $strDefaultTemplateThemeName;
+        $template = $defaultTemplate;
         if ($this->template != '') {
             $template = $this->template;
         }
@@ -661,7 +661,7 @@ EOT;
         $templateString = '';
 
         if ($type != '' && $type != 'html') {
-            $templateString = implode(file($strAddonPath . "/templates/" . $template . "_theme/mform_" . $type . ".ini", FILE_USE_INCLUDE_PATH));
+            $templateString = implode(file($path . "/templates/" . $template . "_theme/mform_" . $type . ".ini", FILE_USE_INCLUDE_PATH));
         }
 
         preg_match('|<mform:label>(.*?)</mform:label>|ism', $element, $arrLabel);

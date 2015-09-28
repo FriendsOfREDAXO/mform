@@ -11,11 +11,11 @@
 if (!function_exists('backend_css')) {
     function backend_css($params)
     {
-        global $strDefaultTemplateThemeName;
+        global $defaultTemplate;
 
         $header =
             PHP_EOL . '<!-- mform -->' .
-            PHP_EOL . '  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $strDefaultTemplateThemeName . '" media="all" />' .
+            PHP_EOL . '  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $defaultTemplate . '" media="all" />' .
             PHP_EOL . '<!-- mform -->' . PHP_EOL;
 
         return str_replace('</head>', $header . '</head>', $params['subject']);
