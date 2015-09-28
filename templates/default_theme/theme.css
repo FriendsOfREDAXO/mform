@@ -1,121 +1,130 @@
 .mform-cf:before,
 .mform-cf:after {
-  content:"";
-  display:table;
+    content: "";
+    display: table;
 }
+
 .mform-cf:after {
-  clear:both;
+    clear: both;
 }
+
 .mform-cf {
-  zoom:1;
+    zoom: 1;
 }
+
 .mform-row {
-  display: block;
-  clear: both;
+    display: block;
+    clear: both;
 }
-div.rex-form-content-editmode div.rex-form-row div.mform-row label, 
-div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label, 
+
+div.rex-form-content-editmode div.rex-form-row div.mform-row label,
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label,
 div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label {
-  width: 120px;
-  float: left;
-  text-align: left;
-  font-weight: bold;
-  font-size: 1.1em;
-  display:table;
+    width: 120px;
+    float: left;
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: table;
 }
-.mform-wrapper .markItUpContainer
-{
-  display:table;
-  clear:left;
-  position:relative;
-  top:-2.0em;
-  left:120px;
-  margin-bottom:-2.0em;
+
+.mform-wrapper .rex_markitup {
+    margin-left: 120px;
 }
+
 .mform-wrapper fieldset {
-  border: 1px solid #ccc;
+    border: 1px solid #ccc;
 }
-div.rex-form-content-editmode div.mform-wrapper legend, 
-div.rex-form-content-editmode-add-slice div.mform-wrapper legend, 
+
+div.rex-form-content-editmode div.mform-wrapper legend,
+div.rex-form-content-editmode-add-slice div.mform-wrapper legend,
 div.rex-form-content-editmode-edit-slice div.mform-wrapper legend {
-  display: block !important;
-  position: relative !important;
-  left: inherit !important;
-  top: inherit !important;
-  overflow: inherit !important;
-  clear: both;
-  float: none;
-  width: auto !important;
-  height: auto !important;
+    display: block !important;
+    position: relative !important;
+    left: inherit !important;
+    top: inherit !important;
+    overflow: inherit !important;
+    clear: both;
+    float: none;
+    width: auto !important;
+    height: auto !important;
 }
+
 .mform-description,
 .mform-headline,
 .mform-default {
-  display: block;
-  background-color: #F0F0F0;
-  border-bottom: 1px solid #fff;
-  vertical-align: top;
-  padding: 10px;
-}
-.mform-headline,
-.mform-default:hover {
-  background-color: #e7e7e7;
-}
-.mform-default:hover a {
-  color: #343434;
-}
-.mform-description {
-  padding-left: 130px;
+    display: block;
+    background-color: #F0F0F0;
+    border-bottom: 1px solid #fff;
+    vertical-align: top;
+    padding: 10px;
 }
 
-div.rex-form-content-editmode div.rex-form-row div.mform-row.mform-headline label, 
-div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row.mform-headline label, 
-div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row.mform-headline label {
-  width: auto;
-  float: none;
+.mform-headline,
+.mform-default:hover {
+    background-color: #e7e7e7;
 }
-div.rex-form-content-editmode div.rex-form-row div.mform-row label.description, 
-div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label.description, 
+
+.mform-default:hover a {
+    color: #343434;
+}
+
+.mform-description {
+    padding-left: 130px;
+}
+
+div.rex-form-content-editmode div.rex-form-row div.mform-row.mform-headline label,
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row.mform-headline label,
+div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row.mform-headline label {
+    width: auto;
+    float: none;
+}
+
+div.rex-form-content-editmode div.rex-form-row div.mform-row label.description,
+div.rex-form-content-editmode-add-slice div.rex-form-row div.mform-row label.description,
 div.rex-form-content-editmode-edit-slice div.rex-form-row div.mform-row label.description {
-  width: auto;
-  float: none;
-  margin-left: 5px;
-  display: inline;
+    width: auto;
+    float: none;
+    margin-left: 5px;
+    display: inline;
 }
 
 .radio_element {
-  margin-left: 120px;
+    margin-left: 120px;
 }
 
 div.rex-widget p.rex-widget-icons a.mform-icon-internlink-open {
-  background-image: url(../files/addons/mform/icons/linkintern.png);
+    background-image: url(../files/addons/mform/icons/linkintern.png);
 }
+
 div.rex-widget p.rex-widget-icons a.mform-icon-externlink-open {
-  background-image: url(../files/addons/mform/icons/linkextern.png);
+    background-image: url(../files/addons/mform/icons/linkextern.png);
 }
+
 div.rex-widget p.rex-widget-icons a.mform-icon-media-open {
-  background-image: url(../files/addons/mform/icons/linkmedia.png);
+    background-image: url(../files/addons/mform/icons/linkmedia.png);
 }
+
 div.rex-widget p.rex-widget-icons a.mform-remove-link {
-  background-image: url(../files/addons/mform/icons/linkbreak.png);
+    background-image: url(../files/addons/mform/icons/linkbreak.png);
 }
 
 .parsley-validated {
-    
+
 }
 
 .parsley-success {
-    
+
 }
 
 .parsley-error {
-    
+
 }
 
 ul.parsley-error-list {
-    color:#ff0000;
+    color: #ff0000;
 }
 
 li.parsley-error {
-    
+
 }
