@@ -1,5 +1,12 @@
 ## MForm Master-Branch Changelog
 
+### Version 4
+
+* add new mform lib
+* changes for r5.0.0-alpha7
+* readme updated
+* add composer.json
+
 ### Version 3.3
 
 * Erneut für neuste R5 alpha upgedatet

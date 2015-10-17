@@ -1,13 +1,12 @@
 <?php
-/*
-site.information.php
-
-@copyright Copyright (C) 2013 by Doerr Softwaredevelopment
-@author mail[at]joachim-doerr[dot]com Joachim Doerr
-
-@package redaxo5
-@version 3.3.0
-*/
+/**
+ * @copyright Copyright (c) 2015 by Joachim Doerr
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ *
+ * @package redaxo5
+ * @version 4.0.0
+ * @license MIT
+ */
 
 if (rex_addon::isInstalled('mform') !== true) {
     $strPageContent = '

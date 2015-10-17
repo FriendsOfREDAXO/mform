@@ -13,3 +13,7 @@ mform_config_saved = Einstellungen wurden gespeichert.
 mform_config = Settings
 mform_config_save = Einstellungen speichern
 mform_description = Informationen
+mfrom_add_internlink = Interner Link auswählen
+mfrom_add_externlink = Externer Link eingeben
+mform_add_medialink = Medium auswählen
+mform_remove_link = Link entfernen

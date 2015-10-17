@@ -1,0 +1,7 @@
+{
+    "name": "joachimdoerr/mform",
+    "type": "redaxo-addon",
+    "extra": {
+        "installer-name": "mform"
+    }
+}
