@@ -85,4 +85,13 @@ class MForm extends AbstractMForm
         }
         return $parser->parse($this->getArray(), $this->template);
     }
+
+    /**
+     * @return string
+     * @deprecated
+     * @author Joachim Doerr
+     */
+    public function show_mform() {
+        return $this->show();
+    }
 }
