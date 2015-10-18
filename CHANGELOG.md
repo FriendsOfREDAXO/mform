@@ -1,5 +1,9 @@
 ## MForm Changelog
 
+### 3.0.0
+
+* add show_mform as deprecated
+
 ### 3.0.0-rc.1
 
 * rename mform classes from mform to MForm
