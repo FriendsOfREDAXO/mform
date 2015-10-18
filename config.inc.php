@@ -17,7 +17,7 @@ $REX['ADDON']['rxid'][$name] = '967';
 $REX['ADDON']['page'][$name] = $name;
 $REX['ADDON']['name'][$name] = $name;
 $REX['ADDON'][$name]['VERSION'] = array('VERSION' => 3, 'MINORVERSION' => 0, 'SUBVERSION' => 0);
-$REX['ADDON'][$name]['rc'] = '-rc.1';
+$REX['ADDON'][$name]['rc'] = '';
 $REX['ADDON']['version'][$name] = implode('.', $REX['ADDON'][$name]['VERSION']);
 $REX['ADDON']['author'][$name] = 'Joachim Doerr';
 $REX['ADDON']['supportpage'][$name] = 'forum.redaxo.de';
