@@ -16,4 +16,4 @@ page:
 
 requires:
   packages:
-    textile: '~ 5.0 alpha'
+    textile: '~ 2.0.0-beta2'
