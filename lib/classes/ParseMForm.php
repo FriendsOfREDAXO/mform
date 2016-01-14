@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class ParseMForm
  * @copyright Copyright (c) 2015 by Joachim Doerr
@@ -8,7 +9,6 @@
  * @version 4.0.0
  * @license MIT
  */
-
 class ParseMForm
 {
     /**
@@ -126,8 +126,8 @@ class ParseMForm
 
         $strElement = <<<EOT
 
-      <mform:label><label for="rv{$varId['id']}">{$element['label']}</label></mform:label>
-      <mform:element><input id="rv{$varId['id']}" type="{$element['type']}" name="VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$varId['value']}" {$element['attributes']} /></mform:element>
+      <mform:label><label class="control-label" for="rv{$varId['id']}">{$element['label']}</label></mform:label>
+      <mform:element><input id="rv{$varId['id']}" type="{$element['type']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$varId['value']}" {$element['attributes']} /></mform:element>
 
 EOT;
         return $this->parseElementToTemplate($strElement, $type);
@@ -265,7 +265,7 @@ EOT;
         $elementOutput = <<<EOT
 
       <mform:label><label for="rv{$varId['id']}">{$element['label']}</label></mform:label>
-      <mform:element><textarea id="rv{$varId['id']}" name="VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
+      <mform:element><textarea id="rv{$varId['id']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
 
 EOT;
         return $this->parseElementToTemplate($elementOutput, 'default');
@@ -308,7 +308,7 @@ EOT;
         </script>
 EOT;
             $multiselectHidden = <<<EOT
-        <input id="hidden_rv{$varId['id']}" type="hidden" name="VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$element['value']}" />
+        <input id="hidden_rv{$varId['id']}" type="hidden" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$element['value']}" />
 EOT;
             if ($element['value'] != '') {
                 $hiddenValue = explode(',', $element['value']);
@@ -341,7 +341,7 @@ EOT;
         $elementOutput = <<<EOT
 
       <mform:label><label for="rv{$varId['id']}">{$element['label']}</label>$multiselectJavascript</mform:label>
-      <mform:element><select id="rv{$varId['id']}" name="VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} $selectAttributes>$options</select>$multiselectHidden</mform:element>
+      <mform:element><select id="rv{$varId['id']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} $selectAttributes>$options</select>$multiselectHidden</mform:element>
 
 EOT;
         return $this->parseElementToTemplate($elementOutput, 'default');
@@ -368,7 +368,7 @@ EOT;
                 if (isset($element['attributes']['radio-attr'][$key]) === true) {
                     $radioAttributes = $this->getAttributes($element['attributes']['radio-attr'][$key]);
                 }
-                $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . $count . '" type="radio" name="VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $radioAttributes;
+                $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . $count . '" type="radio" name="REX_INPUT_VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $radioAttributes;
                 if ($key == $element['value'] or ($element['mode'] == 'add' && $key == $element['default-value'])) {
                     $options .= ' checked="checked" ';
                 }
@@ -408,7 +408,7 @@ EOT;
         $varId = $this->getVarAndIds($element);
 
         foreach ($element['options'] as $key => $value) {
-            $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . '" type="checkbox" name="VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $element['attributes'];
+            $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . '" type="checkbox" name="REX_INPUT_VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $element['attributes'];
             if ($key == $element['value'] or ($element['mode'] == 'add' && $key == $element['default-value'])) {
                 $options .= ' checked="checked" ';
             }
@@ -434,7 +434,7 @@ EOT;
     {
         $element['label'] = $this->getLabel($element);
 
-        if(!array_key_exists('parameter', $element) or !is_array($element['parameter'])) {
+        if (!array_key_exists('parameter', $element) or !is_array($element['parameter'])) {
             $element['parameter'] = array();
         }
 
@@ -467,7 +467,7 @@ EOT;
     {
         $element['label'] = $this->getLabel($element);
 
-        if(!array_key_exists('parameter', $element) or !is_array($element['parameter'])) {
+        if (!array_key_exists('parameter', $element) or !is_array($element['parameter'])) {
             $element['parameter'] = array();
         }
 

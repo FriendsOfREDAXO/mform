@@ -1,10 +1,8 @@
 package: mform
-version: '4.0.1'
+version: '4.0.2'
 name: MForm
 author: 'Joachim Doerr'
 supportpage: www.redaxo.org/de/forum/
-
-load: late
 
 page:
     title: 'translate:title'

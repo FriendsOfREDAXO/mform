@@ -9,7 +9,7 @@
  */
 
 // set headline
-$strForm .= '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
+$strForm = '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
 
 // rex request
 $config = rex_post('config', array(
