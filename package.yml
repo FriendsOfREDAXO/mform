@@ -1,5 +1,5 @@
 package: mform
-version: '4.0.2'
+version: '4.1.0'
 name: MForm
 author: 'Joachim Doerr'
 supportpage: www.redaxo.org/de/forum/
@@ -11,7 +11,3 @@ page:
         info: { title: 'translate:info' }
         config: { title: 'translate:config' }
         demo: { title: 'translate:demo' }
-
-requires:
-  packages:
-    textile: '~ 2.0.0-beta2'

@@ -1,9 +1,11 @@
 mform_name = MForm
 mform_title = MForm
+mform_demo = Demo
+mform_info = Info
 mform_help_headline = Informationen
 mform_help_subheadline_1 = MForm – Redaxo Addon für Modul-Input-Formulare
 mform_help_infotext_1 = MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit welche sich recht einfach einbinden lassen.
-mform_help_infotext_2 = Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im "GitHub Wiki":http://github.com/joachimdoerr/mform/wiki finden.
+mform_help_infotext_2 = Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im GitHub Wiki http://github.com/joachimdoerr/mform/wiki finden.
 mform_help_subheadline_2 = Kurz Doku und Referenz
 mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formular Elemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen jeweils als Übergabe-Array verarbeiten, wodurch ein Element kurzgesagt “einzeilig” und mit wenig Aufwand angelegt werden können. In dem folgenden “Modul Input Demo” sind die Element Methoden weitestgehend mit allen möglichen Übergabe-Arrays versehen.
 mform_help_infotext_4 = Es können ohne weiteres beliebig viele Formulare erzeugt werden.
