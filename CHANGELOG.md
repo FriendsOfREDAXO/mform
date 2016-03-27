@@ -1,5 +1,12 @@
 ## MForm Master-Branch Changelog
 
+### Version 4.1
+
+* add default classes for rex5
+* add rex5 theme
+* remove textile requires
+* custom id for textarears and input fields
+
 ### Version 4
 
 * add new mform lib
