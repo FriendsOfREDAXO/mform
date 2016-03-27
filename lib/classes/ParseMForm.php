@@ -27,12 +27,28 @@ class ParseMForm
     private $template;
 
     /**
+     * @var array
+     */
+    private $defaultClass=array(
+        'select' => 'form-control',
+        'select-multiple' => 'form-control',
+        'fieldset' => 'form-horizontal',
+        'headline' => '',
+        'description' => '',
+        'input-hidden' => 'form-control',
+        'input-text-readonly' => 'form-control',
+        'input-default' => 'form-control',
+        'textarea' => 'form-control'
+    );
+
+    /**
      * @param $element
      * @author Joachim Doerr
      * @return ParseMForm
      */
     private function generateFieldset($element)
     {
+        $element['attributes'] = $this->getDefaultClass($element['attributes'], 'fieldset');
         $element['attributes'] = $this->getAttributes($element['attributes']);
 
         if ($this->fieldset === true) {
@@ -48,7 +64,7 @@ class ParseMForm
         $elementOutput .= (array_key_exists('attributes', $element)) ? '<fieldset ' . $element['attributes'] . '>' : '<fieldset>';
 
         // add value
-        $elementOutput .= (array_key_exists('attributes', $element)) ? '<legend>' . $element['value'] . '</legend>' : '';
+        $elementOutput .= (array_key_exists('value', $element) && !is_null($element['value'])) ? '<legend>' . $element['value'] . '</legend>' : '';
 
         return $this->parseElementToTemplate('<mform:element>' . $elementOutput . '</mform:element>', NULL);
     }
@@ -75,13 +91,14 @@ class ParseMForm
     {
         switch ($element['type']) {
             case 'headline':
+                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'headline');
+                break;
             case 'description':
-            default:
-                $type = $element['type'];
+                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'description');
                 break;
         }
 
-        return $this->parseElementToTemplate('<mform:element>' . $element['value'] . '</mform:element>', $type);
+        return $this->parseElementToTemplate('<mform:element>' . $element['value'] . '</mform:element>', $element['type']);
     }
 
     /**
@@ -103,31 +120,36 @@ class ParseMForm
      */
     private function generateInputElement($element)
     {
-        $element['attributes'] = $this->getAttributes($element['attributes']);
-        $element['label'] = $this->getLabel($element);
-        $varId = $this->getVarAndIds($element);
-
         switch ($element['type']) {
             case 'hidden':
+                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-hidden');
                 $type = 'hidden';
                 $element['label'] = '';
                 break;
 
             case 'text-readonly':
+                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-text-readonly');
                 $type = 'default';
                 $element['type'] = 'text';
-                $element['attributes'] .= ' readonly="readonly"';
+                $element['attributes']['readonly'] = 'readonly';
                 break;
 
             default:
+                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-default');
                 $type = 'default';
                 break;
         }
 
+        $varId = $this->getVarAndIds($element);
+        $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
+
+        $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['label'] = $this->getLabel($element);
+
         $strElement = <<<EOT
 
-      <mform:label><label class="control-label" for="rv{$varId['id']}">{$element['label']}</label></mform:label>
-      <mform:element><input id="rv{$varId['id']}" type="{$element['type']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$varId['value']}" {$element['attributes']} /></mform:element>
+      <mform:label><label for="$id">{$element['label']}</label></mform:label>
+      <mform:element><input id="$id" type="{$element['type']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$varId['value']}" {$element['attributes']} /></mform:element>
 
 EOT;
         return $this->parseElementToTemplate($strElement, $type);
@@ -141,103 +163,103 @@ EOT;
      */
     private function generateCustomInputElement($element)
     {
-        $element['attributes'] = $this->getAttributes($element['attributes']);
-        $element['label'] = $this->getLabel($element);
-        $varId = $this->getVarAndIds($element);
-
-        $messages = array(
-            'add_internlink' => rex_i18n::msg('mfrom_add_internlink'),
-            'add_externlink' => rex_i18n::msg('mfrom_add_externlink'),
-            'add_medialink' => rex_i18n::msg('mform_add_medialink'),
-            'remove' => rex_i18n::msg('mform_remove_link')
-        );
-
-        switch ($element['type']) {
-            case 'custom-link':
-            default:
-                $type = 'default';
-                $varId['sub-var-id-value'] = $varId['sub-var-id'];
-                $varId['sub-var-id'] = str_replace(array('[', ']'), '', $varId['sub-var-id']);
-                $varId['sub-var-id-for-id'] = ($element['sub-var-id'] != '') ? '_' . $element['sub-var-id'] : '';
-                $varId['hidden_value'] = $varId['value'];
-                $varId['show_value'] = $varId['value'];
-
-                if (is_numeric($varId['value'])) {
-                    $art = OOArticle:: getArticleById($varId['value']);
-                    if (OOArticle:: isValid($art)) {
-                        $varId['show_value'] = $art->getName();
-                    } else {
-                        $varId['hidden_value'] = '';
-                        $varId['show_value'] = '';
-                    }
-                }
-                break;
-        }
-
-        $elementOutput = <<<EOT
-
-      <mform:label><label for="rv{$varId['id']}">{$element['label']}</label></mform:label>
-      <mform:element>
-        <script>
-          /* <![CDATA[ */
-            jQuery(document).ready(function($) {
-              var this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}'),
-                  this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME'),
-                  this_media_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_MEDIUM'),
-                  this_link_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_LINK'),
-                  this_extern_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_EXTERN'),
-                  this_remove_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_REMOVE');
-
-              this_media_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
-                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','').attr('id','');
-                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','REX_MEDIA_{$element['var-id']}{$varId['sub-var-id-for-id']}');
-                openREXMedia({$element['var-id']},'');return false;
-              });
-
-              this_link_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
-                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE_NAME[{$element['var-id']}]{$varId['sub-var-id']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME');
-                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}');
-                openLinkMap('VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}', '');return false;
-              });
-
-              this_extern_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
-                var extern_link = prompt('Link','http://');
-                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','').attr('id','');
-                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}');
-                if (extern_link!="" && extern_link!=undefined) {
-                  this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value',extern_link);
-                  return false;
-                }
-              });
-              this_remove_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
-                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value','');
-                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value','');
-                return false;
-              });
-            });
-          /* ]]> */
-        </script>
-
-        <div class="rex-widget">
-          <div class="rex-widget-custom-link">
-            <p class="rex-widget-field">
-              <input type="hidden" name="VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}" id="VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}" value="{$varId['hidden_value']}">
-              <input type="text" size="30" name="VALUE_NAME[{$element['var-id']}]{$varId['sub-var-id']}" id="VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME" value="{$varId['show_value']}" readonly="readonly">
-            </p>
-             <p class="rex-widget-icons rex-widget-1col">
-              <span class="rex-widget-column rex-widget-column-first">
-                <a href="#" class="mform-icon-internlink-open" title="{$messages['add_internlink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_LINK"></a>
-                <a href="#" class="mform-icon-externlink-open" title="{$messages['add_externlink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_EXTERN"></a>
-                <a href="#" class="mform-icon-media-open" title="{$messages['add_medialink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_MEDIUM"></a>
-                <a href="#" class="mform-remove-link" title="{$messages['remove']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_REMOVE"></a>
-              </span>
-            </p>
-          </div>
-        </div>
-      </mform:element>
-
-EOT;
-        return $this->parseElementToTemplate($elementOutput, $type);
+//        $element['attributes'] = $this->getAttributes($element['attributes']);
+//        $element['label'] = $this->getLabel($element);
+//        $varId = $this->getVarAndIds($element);
+//
+//        $messages = array(
+//            'add_internlink' => rex_i18n::msg('mfrom_add_internlink'),
+//            'add_externlink' => rex_i18n::msg('mfrom_add_externlink'),
+//            'add_medialink' => rex_i18n::msg('mform_add_medialink'),
+//            'remove' => rex_i18n::msg('mform_remove_link')
+//        );
+//
+//        switch ($element['type']) {
+//            case 'custom-link':
+//            default:
+//                $type = 'default';
+//                $varId['sub-var-id-value'] = $varId['sub-var-id'];
+//                $varId['sub-var-id'] = str_replace(array('[', ']'), '', $varId['sub-var-id']);
+//                $varId['sub-var-id-for-id'] = ($element['sub-var-id'] != '') ? '_' . $element['sub-var-id'] : '';
+//                $varId['hidden_value'] = $varId['value'];
+//                $varId['show_value'] = $varId['value'];
+//
+//                if (is_numeric($varId['value'])) {
+//                    $art = OOArticle:: getArticleById($varId['value']);
+//                    if (OOArticle:: isValid($art)) {
+//                        $varId['show_value'] = $art->getName();
+//                    } else {
+//                        $varId['hidden_value'] = '';
+//                        $varId['show_value'] = '';
+//                    }
+//                }
+//                break;
+//        }
+//
+//        $elementOutput = <<<EOT
+//
+//      <mform:label><label for="rv{$varId['id']}">{$element['label']}</label></mform:label>
+//      <mform:element>
+//        <script>
+//          /* <![CDATA[ */
+//            jQuery(document).ready(function($) {
+//              var this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}'),
+//                  this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME'),
+//                  this_media_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_MEDIUM'),
+//                  this_link_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_LINK'),
+//                  this_extern_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_EXTERN'),
+//                  this_remove_{$element['var-id']}{$varId['sub-var-id-for-id']} = $('#VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_REMOVE');
+//
+//              this_media_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
+//                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','').attr('id','');
+//                this_show_element_{$element['var-id']}{$varId['sub-varCc-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','REX_MEDIA_{$element['var-id']}{$varId['sub-var-id-for-id']}');
+//                openREXMedia({$element['var-id']},'');return false;
+//              });
+//
+//              this_link_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
+//                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE_NAME[{$element['var-id']}]{$varId['sub-var-id']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME');
+//                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}');
+//                openLinkMap('VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}', '');return false;
+//              });
+//
+//              this_extern_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
+//                var extern_link = prompt('Link','http://');
+//                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','').attr('id','');
+//                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('name','VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}').attr('id','VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}');
+//                if (extern_link!="" && extern_link!=undefined) {
+//                  this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value',extern_link);
+//                  return false;
+//                }
+//              });
+//              this_remove_{$element['var-id']}{$varId['sub-var-id-for-id']}.bind('click',function(){
+//                this_hidden_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value','');
+//                this_show_element_{$element['var-id']}{$varId['sub-var-id-for-id']}.attr('value','');
+//                return false;
+//              });
+//            });
+//          /* ]]> */
+//        </script>
+//
+//        <div class="rex-widget">
+//          <div class="rex-widget-custom-link">
+//            <p class="rex-widget-field">
+//              <input type="hidden" name="VALUE[{$element['var-id']}]{$varId['sub-var-id-value']}" id="VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}" value="{$varId['hidden_value']}">
+//              <input type="text" size="30" name="VALUE_NAME[{$element['var-id']}]{$varId['sub-var-id']}" id="VALUE_{$element['var-id']}{$varId['sub-var-id-for-id']}_NAME" value="{$varId['show_value']}" readonly="readonly">
+//            </p>
+//             <p class="rex-widget-icons rex-widget-1col">
+//              <span class="rex-widget-column rex-widget-column-first">
+//                <a href="#" class="mform-icon-internlink-open" title="{$messages['add_internlink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_LINK"></a>
+//                <a href="#" class="mform-icon-externlink-open" title="{$messages['add_externlink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_EXTERN"></a>
+//                <a href="#" class="mform-icon-media-open" title="{$messages['add_medialink']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_MEDIUM"></a>
+//                <a href="#" class="mform-remove-link" title="{$messages['remove']}" id="VALUE{$element['var-id']}{$varId['sub-var-id-for-id']}_REMOVE"></a>
+//              </span>
+//            </p>
+//          </div>
+//        </div>
+//      </mform:element>
+//
+//EOT;
+//        return $this->parseElementToTemplate($elementOutput, $type);
     }
 
     /**
@@ -248,13 +270,18 @@ EOT;
      */
     private function generateAreaElement($element)
     {
+        if ($element['type'] == 'area-readonly') {
+            $element['attributes']['readonly'] = 'readonly';
+            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'textarea-readonly');
+        } else {
+            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'textarea');
+        }
+
+        $varId = $this->getVarAndIds($element);
+        $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
+
         $element['attributes'] = $this->getAttributes($element['attributes']);
         $element['label'] = $this->getLabel($element);
-        $varId = $this->getVarAndIds($element);
-
-        if ($element['type'] == 'area-readonly') {
-            $element['attributes'] .= ' readonly="readonly"';
-        }
 
         foreach (array('label') as $key) {
             if (!array_key_exists($key, $element)) {
@@ -264,8 +291,8 @@ EOT;
 
         $elementOutput = <<<EOT
 
-      <mform:label><label for="rv{$varId['id']}">{$element['label']}</label></mform:label>
-      <mform:element><textarea id="rv{$varId['id']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
+      <mform:label><label for="$id">{$element['label']}</label></mform:label>
+      <mform:element><textarea id="$id" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
 
 EOT;
         return $this->parseElementToTemplate($elementOutput, 'default');
@@ -279,6 +306,12 @@ EOT;
      */
     private function generateOptionsElement($element)
     {
+        if($element['multi']) {
+            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'select-multiple');
+        } else {
+            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'select');
+        }
+
         $element['attributes'] = $this->getAttributes($element['attributes']);
         $element['label'] = $this->getLabel($element);
         $varId = $this->getVarAndIds($element);
@@ -640,6 +673,55 @@ EOT;
                 PHP_EOL . '  <link rel="stylesheet" type="text/css" href="?&mform_theme=' . $this->template . '" media="all" />' .
                 PHP_EOL . '<!-- mform -->' . PHP_EOL;
         }
+    }
+
+    /**
+     * @param $attributes
+     * @param $type
+     * @return mixed
+     * @author Joachim Doerr
+     */
+    public function getDefaultClass($attributes, $type)
+    {
+        $notFound = true;
+
+        if (sizeof($attributes) > 0) {
+            foreach ($attributes as $key => $value) {
+                if ($key == 'class') {
+                    if (array_key_exists($type, $this->defaultClass)) {
+                        $attributes[$key] = $this->defaultClass[$type] . ' ' . $value;
+                    }
+                    $notFound = false;
+                }
+            }
+        }
+        if($notFound) {
+            if (array_key_exists($type, $this->defaultClass)) {
+                $attributes['class'] = $this->defaultClass[$type];
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param $attributes
+     * @return null
+     * @author Joachim Doerr
+     */
+    public function getCustomId($attributes)
+    {
+        $id = null;
+
+        if (sizeof($attributes) > 0) {
+            foreach ($attributes as $key => $value) {
+                if ($key == 'id') {
+                    return $value;
+                }
+            }
+        }
+
+        return $id;
     }
 
     /**
