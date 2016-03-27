@@ -111,9 +111,9 @@ abstract class AbstractMForm
                         $value = $this->result['file'][$id];
                         break;
                     default:
-                        $value = $this->result['value'][$id];
+                        $value = (array_key_exists($id, $this->result['value'])) ? $this->result['value'][$id] : '';
                         if (is_array($value) === true) {
-                            $value = $this->result['value'][$id][$subId];
+                            $value = (array_key_exists($subId, $this->result['value'][$id])) ? $this->result['value'][$id][$subId] : '';
                         }
                         break;
                 }
@@ -208,7 +208,7 @@ abstract class AbstractMForm
      * @return AbstractMForm
      * @author Joachim Doerr
      */
-    public function addFieldset($value, $attributes = array())
+    public function addFieldset($value = null, $attributes = array())
     {
         return $this->addElement('fieldset', NULL, $value, $attributes);
     }
