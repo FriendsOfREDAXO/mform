@@ -1,5 +1,9 @@
 ## MForm Master-Branch Changelog
 
+### Version 4.1.1
+
+* add full for textarears
+
 ### Version 4.1
 
 * add default classes for rex5

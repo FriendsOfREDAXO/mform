@@ -140,6 +140,10 @@ class ParseMForm
                 break;
         }
 
+        if (array_key_exists('full', $element) && $element['full'] == true) {
+            $type = $type . '_full';
+        }
+
         $varId = $this->getVarAndIds($element);
         $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
 
@@ -277,6 +281,12 @@ EOT;
             $element['attributes'] = $this->getDefaultClass($element['attributes'], 'textarea');
         }
 
+        $type = 'default';
+
+        if (array_key_exists('full', $element) && $element['full'] == true) {
+            $type = $type . '_full';
+        }
+
         $varId = $this->getVarAndIds($element);
         $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
 
@@ -289,13 +299,16 @@ EOT;
             }
         }
 
-        $elementOutput = <<<EOT
+        $elementOutput = '';
+        if (array_key_exists('label', $element) && $element['label'] != '') {
+            $elementOutput = "<mform:label><label for=\"$id\">" . $element['label'] . "</label></mform:label>";
+        }
+        $elementOutput .= <<<EOT
 
-      <mform:label><label for="$id">{$element['label']}</label></mform:label>
       <mform:element><textarea id="$id" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
 
 EOT;
-        return $this->parseElementToTemplate($elementOutput, 'default');
+        return $this->parseElementToTemplate($elementOutput, $type);
     }
 
     /**
@@ -753,6 +766,7 @@ EOT;
         preg_match('|<mform:element>(.*?)</mform:element>|ism', $element, $arrElement);
 
         switch ($type) {
+            case 'default_full':
             case 'default':
             case 'hidden':
                 if ($templateString != '') {

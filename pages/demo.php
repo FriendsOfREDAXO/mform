@@ -44,9 +44,9 @@ $mform->addFieldset(\'Textarears\');
 // textarea field
 $mform->addTextAreaField(4.1,array(\'label\'=>\'Textarea\',\'style\'=>\'height:280px\'));
 // markitup
-$mform->addTextAreaField(4.2,array(\'label\'=>\'Markitup\',\'class\'=>\'markitupEditor-markdown_full\', \'id\'=>\'markitup_markdown_1\'));
+$mform->addTextAreaField(4.2,array(\'label\'=>\'Markitup\',\'class\'=>\'markitupEditor-markdown_full\', \'id\'=>\'markitup_markdown_1\', \'full\'=>1));
 // markitup
-$mform->addTextAreaField(4.3,array(\'label\'=>\'Redactor\',\'class\'=>\'redactorEditor-full\', \'id\'=>\'redactor_1\'));
+$mform->addTextAreaField(4.3,array(\'label\'=>\'Redactor\',\'class\'=>\'redactorEditor-full\', \'id\'=>\'redactor_1\', \'full\'=>1));
 // textarea readonly field
 $mform->addTextReadOnlyField(4.4,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'height:80px\'));
 

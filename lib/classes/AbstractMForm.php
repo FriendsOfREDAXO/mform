@@ -473,6 +473,14 @@ abstract class AbstractMForm
     }
 
     /**
+     * @author Joachim Doerr
+     */
+    public function setFull()
+    {
+        $this->elements[$this->id]['full'] = true;
+    }
+
+    /**
      * @param $name
      * @param $value
      * @author Joachim Doerr
@@ -485,6 +493,9 @@ abstract class AbstractMForm
                 break;
             case 'size':
                 $this->setSize($value);
+                break;
+            case 'full':
+                $this->setFull();
                 break;
             case 'validation':
                 if (is_array($value)) {
@@ -693,11 +704,12 @@ abstract class AbstractMForm
             case 'category':
                 $this->setCategory($value);
                 break;
-
             case 'label':
                 $this->setLabel($value);
                 break;
-
+            case 'full':
+                $this->setFull();
+                break;
             default:
                 $this->parameter[$name] = $value;
                 $this->elements[$this->id]['parameter'] = $this->parameter;
