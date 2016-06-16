@@ -1,30 +1,32 @@
-# MForm - Redaxo Addon für Modul-Input-Formulare
+# MForm - REDAXO Addon für Modul-Input-Formulare
 
-MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit welche sich recht einfach einbinden lassen.
+MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit welche sich recht einfach einbinden lassen.
+
+![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mform/assets/mform.png)
 
 Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im [Wiki](https://github.com/joachimdoerr/mform/wiki) finden.
 
-## Redaxo Versionen
+## REDAXO Versionen
 
-MForm wird ab sofort für Redaxo4 und Redaxo5 bereit gestellt. Die aktuelle MForm-Version 3.0.x ist lauffähig ab Redaxo 4.5.0
+MForm wird ab sofort für REDAXO4 und REDAXO5 bereit gestellt. Die aktuelle MForm-Version 3.0.x ist lauffähig ab REDAXO 4.5.0
 
 ##### Hinweis
 
-* Die Redaxo 5 kompatible Version wird unter dem [master Branch](https://github.com/joachimdoerr/mform) weiter entwickelt.
-* Die Redaxo 4 kompatible Version wird künftig unter dem [redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
-* MForm ist ausschließlich dafür geeignet Redaxo Modul-Input-Formulare zu generieren!
+* Die REDAXO 5 kompatible Version wird unter dem [master Branch](https://github.com/joachimdoerr/mform) weiter entwickelt.
+* Die REDAXO 4 kompatible Version wird künftig unter dem [redaxo4 Branch](https://github.com/joachimdoerr/mform/tree/redaxo4) weiter entwickelt.
+* MForm ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
 
 ## Installation
 
 1. `master Branch` downloaden
 2. Zip Archiv entpacken
 3. Entpackten Folder in `mform` umbenennen
-4. MForm Ordner in den Redaxo Addon Ordner `redaxo/src/addons/` verschieben
-5. In Redaxo einloggen und Addon installieren und aktivieren
+4. MForm Ordner in den REDAXO Addon Ordner `redaxo/src/addons/` verschieben
+5. In REDAXO einloggen und Addon installieren und aktivieren
 
 ## Usage
 
-MForm muss im Modul-Input eines Redaxo Moduls als PHP Code notiert werden.
+MForm muss im Modul-Input eines REDAXO Moduls als PHP Code notiert werden.
 
 ### Instanziierung  
 
