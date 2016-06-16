@@ -1,8 +1,8 @@
 package: mform
 version: '4.1.1'
 name: MForm
-author: 'Joachim Doerr'
-supportpage: www.redaxo.org/de/forum/
+author: Friends Of REDAXO
+supportpage: https://github.com/FriendsOfREDAXO/mform
 
 page:
     title: 'translate:title'
