@@ -1,5 +1,11 @@
 ## MForm Master-Branch Changelog
 
+### Version 4.2.0
+
+* transfer repo to friends of REDAXO
+* add assets branch and add screenshot (thanks dirk)
+* create a release
+
 ### Version 4.1.1
 
 * add full for textarears
