@@ -8,8 +8,7 @@
  * @license MIT
  */
 
-// set headline
-$strForm = '<h2 class="rex-hl2">' . $this->i18n('config') . '</h2>';
+$strForm = '';
 
 // rex request
 $config = rex_post('config', array(
@@ -86,4 +85,4 @@ $strForm .= '
   </form>
 ';
 
-echo rex_view::content('block', $strForm);
+echo rex_view::content($strForm, $this->i18n('config'));
