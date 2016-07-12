@@ -8,10 +8,6 @@
  * @license MIT
  */
 
-$strModulInputHeadline = '
-  <h2 class="rex-hl2">' . $this->i18n('demo_modul') . '</h2>
-';
-
 $strModulInputDemo = '<?php
 // instanziieren
 $mform = new mform();
@@ -115,4 +111,4 @@ $mform->addTextField(7.3,array(\'label\'=>\'Input3\',\'style\'=>\'width:200px\')
 echo $mform->show();
 ?>';
 
-echo rex_view::content('block', $strModulInputHeadline . rex_string::highlight($strModulInputDemo));
+echo rex_view::content(rex_string::highlight($strModulInputDemo), $this->i18n('demo_modul'));
