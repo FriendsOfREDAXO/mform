@@ -11,6 +11,8 @@
  */
 class ParseMForm
 {
+    const THEME_PATH = 'mform/templates/%s_theme/';
+
     /**
      * @var string
      */
@@ -676,10 +678,7 @@ EOT;
      */
     public function setTheme($template)
     {
-        global $path;
-        global $defaultTemplate;
-
-        if (is_dir($path . "/templates/" . $template . "_theme/") === true && $template != $defaultTemplate) {
+        if (is_dir(rex_path::addonData(sprintf(self::THEME_PATH, $template))) === true) {
             $this->template = $template;
             return
                 PHP_EOL . '<!-- mform -->' .
@@ -747,19 +746,15 @@ EOT;
      */
     private function parseElementToTemplate($element, $type, $parseFinal = false)
     {
-        $path = rex_path::addon('mform');
-        $defaultTemplate = rex_addon::get('mform')->getConfig('mform_template');
-
-        $template = $defaultTemplate;
-
-        if ($this->template != '') {
-            $template = $this->template;
+        if (!$this->template) {
+            $this->template = rex_addon::get('mform')->getConfig('mform_template');
         }
 
+        $path = rex_path::addonData(sprintf(self::THEME_PATH, $this->template));
         $templateString = '';
 
         if ($type != '' && $type != 'html') {
-            $templateString = implode(file($path . "/templates/" . $template . "_theme/mform_" . $type . ".ini", FILE_USE_INCLUDE_PATH));
+            $templateString = implode(file($path . "mform_$type.ini", FILE_USE_INCLUDE_PATH));
         }
 
         preg_match('|<mform:label>(.*?)</mform:label>|ism', $element, $arrLabel);
