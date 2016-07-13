@@ -11,8 +11,6 @@
 if (function_exists('mform_generate_css') !== true) {
     function mform_generate_css($template)
     {
-        global $REX;
-
         while (ob_get_level()) {
             ob_end_clean();
         }
