@@ -9,7 +9,8 @@
  */
 
 // set default template
-if (!$this->hasConfig())
-{
-  $this->setConfig('mform_template', 'default');
+if (!$this->hasConfig()) {
+    $this->setConfig('mform_template', 'default');
 }
+
+rex_dir::copy($this->getPath('data'), $this->getDataPath());
