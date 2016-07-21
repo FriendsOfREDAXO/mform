@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class AbstractMForm
  * @copyright Copyright (c) 2015 by Joachim Doerr
@@ -8,57 +9,37 @@
  * @version 4.0.0
  * @license MIT
  */
-
 abstract class AbstractMForm
 {
     /**
-     * @var string
+     * @var MFormItem[]
      */
-    private $output;
+    private $items = array();
 
     /**
-     * @var null|array
+     * @var MFormItem
      */
-    private $attributes = NULL;
-
-    /**
-     * @var null
-     */
-    private $options = NULL;
-
-    /**
-     * @var null
-     */
-    private $parameter = NULL;
+    private $item;
 
     /**
      * @var array
      */
-    private $elements = array();
+    private $result;
 
     /**
-     * @var null|array
+     * AbstractMForm constructor.
      */
-    private $result = NULL;
-
-    /**
-     * @var null|integer|string
-     */
-    private $id = NULL;
-
-    /**
-     * @var int
-     */
-    private $count = 0;
-
-    /**
-     * @var null|array
-     */
-    private $validations = NULL;
+    public function __construct()
+    {
+        if (!$this->result && rex_request('function', 'string') == 'edit') {
+            // load rex vars
+            $this->result = MFormValueHandler::loadRexVars();
+        }
+    }
 
     /**
      * generate element array - add fields
-     * @param string $typ
+     * @param string $type
      * @param integer|float $id
      * @param null|string $value
      * @param array $attributes
@@ -70,101 +51,29 @@ abstract class AbstractMForm
      * @return $this
      * @author Joachim Doerr
      */
-    public function addElement($typ, $id = NULL, $value = NULL, $attributes = array(), $options = array(), $parameter = array(), $catId = NULL, $validation = array(), $defaultValue = NULL)
+    public function addElement($type, $id = NULL, $value = NULL, $attributes = array(), $options = array(), $parameter = array(), $catId = NULL, $validation = array(), $defaultValue = NULL)
     {
-        $this->id = $this->count++;
-        $subId = false;
-        $mode = rex_request('function', 'string');
+        // remove ,
+        $id = str_replace(',','.',$id);
 
-        if (is_array($splitId = explode('.', str_replace(',', '.', $id))) === true) {
-            $id = $splitId[0];
+        // create item element
+        $this->item = MFormElementHandler::createElement((sizeof($this->items) + 1), $type, $id);
+        $this->items[$this->item->getId()] = $this->item; // add item element to items array
 
-            if (sizeof($splitId) > 1) {
-                $subId = $splitId[1];
-            }
-            if (method_exists('rex_var', 'toArray') === false) {
-                $subId = '';
-            }
-        }
+        // execute to set default value and / or loaded value
+        MFormValueHandler::decorateItem($this->item, $this->result, $value, $defaultValue);
 
-        if (is_array($this->result) === false && $mode == 'edit') {
-            $this->getRexVars();
-
-//            echo '<pre>';
-//            print_r($this->arrResult);
-//            echo '</pre>';
-        }
-
-        if ($value === NULL) {
-            if (is_array($this->result) === true) {
-                switch ($typ) {
-                    case 'linklist':
-                        $value = $this->result['linklist'][$id];
-                        break;
-                    case 'medialist':
-                        $value = $this->result['filelist'][$id];
-                        break;
-                    case 'link':
-                        $value = $this->result['link'][$id];
-                        break;
-                    case 'media':
-                        $value = $this->result['file'][$id];
-                        break;
-                    default:
-                        $value = (array_key_exists($id, $this->result['value'])) ? $this->result['value'][$id] : '';
-                        if (is_array($value) === true) {
-                            $value = (array_key_exists($subId, $this->result['value'][$id])) ? $this->result['value'][$id][$subId] : '';
-                        }
-                        break;
-                }
-            }
-        } else {
-            $value = $this->getLangData($value);
-        }
-
-        if ($defaultValue != NULL) {
-            $defaultValue = $this->getLangData($defaultValue);
-        }
-
-        $this->elements[$this->id] = array(
-            'type' => $typ,
-            'id' => $this->id,
-            'var-id' => $id,
-            'sub-var-id' => $subId,
-            'value' => $value,
-            'default-value' => $defaultValue,
-            'mode' => $mode,
-            'cat-id' => (is_numeric($catId) === true) ? $catId : 0,
-            'size' => '',
-            'attributes' => array(),
-            'multi' => '',
-            'validation' => array()
-        );
-
-        // unset attributes
-        $this->attributes = NULL;
+        $this->setCategory($catId);
 
         if (sizeof($attributes) > 0) {
             $this->setAttributes($attributes);
         }
-
-        // unset options
-        $this->options = NULL;
-
         if (sizeof($options) > 0) {
-            $this->addOptions($options);
+            $this->setOptions($options);
         }
-
-        // unset parameters
-        $this->parameter = NULL;
-
         if (sizeof($parameter) > 0) {
             $this->setParameters($parameter);
         }
-
-        // unset validations
-        $this->validations = NULL;
-
         if (sizeof($validation) > 0) {
             $this->setValidations($validation);
         }
@@ -226,18 +135,21 @@ abstract class AbstractMForm
      * @param null $callable
      * @param array $parameter
      * @author Joachim Doerr
+     * TODO bring it to run
+     * @return $this
      */
     public function callback($callable = NULL, $parameter = array())
     {
-        if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true) {
-            $intId = $this->count++;
-            $this->elements[$intId] = array(
-                'type' => 'callback',
-                'id' => $intId,
-                'callable' => $callable,
-                'parameter' => $parameter
-            );
-        }
+        //if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true) {
+        //    $intId = $this->count++;
+        //    $this->elements[$intId] = array(
+        //        'type' => 'callback',
+        //        'id' => $intId,
+        //        'callable' => $callable,
+        //        'parameter' => $parameter
+        //    );
+        //}
+        return $this;
     }
 
     /**
@@ -314,21 +226,7 @@ abstract class AbstractMForm
      */
     public function addTextAreaReadOnlyField($id, $value = NULL, $attributes = array())
     {
-        return $this->addInputField('area-readonly', $id, $value, $attributes);
-    }
-
-    /**
-     * add special link feld
-     * @param $id
-     * @param array $attributes
-     * @param array $validations
-     * @param null $defaultValue
-     * @return AbstractMForm
-     * @author Joachim Doerr
-     */
-    public function addCustomLinkField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
-    {
-        return $this->addElement('custom-link', $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
+        return $this->addInputField('textarea-readonly', $id, $value, $attributes);
     }
 
     /**
@@ -337,17 +235,18 @@ abstract class AbstractMForm
      * @param $id
      * @param array $attributes
      * @param array $options
+     * @param array $validation
      * @param null $defaultValue
      * @return AbstractMForm
      * @author Joachim Doerr
      */
-    public function addOptionField($typ, $id, $attributes = array(), $options = array(), $defaultValue = NULL)
+    public function addOptionField($typ, $id, $attributes = array(), $options = array(), $validation = array(), $defaultValue = NULL)
     {
-        return $this->addElement($typ, $id, NULL, $attributes, $options, NULL, NULL, array(), $defaultValue);
+        return $this->addElement($typ, $id, NULL, $attributes, $options, NULL, NULL, $validation, $defaultValue);
     }
 
     /**
-     * @param $id
+     * @param float $id
      * @param array $options
      * @param array $attributes
      * @param int $size
@@ -355,10 +254,10 @@ abstract class AbstractMForm
      * @return $this
      * @author Joachim Doerr
      */
-    public function addSelectField($id, $options = array(), $attributes = array(), $size = 1, $defaultValue = NULL)
+    public function addSelectField($id, $options = array(), $attributes = array(), $size = 1, $validation = array(), $defaultValue = NULL)
     {
-        $this->addOptionField('select', $id, $attributes, $options, $defaultValue);
-        $this->setSize($size);
+        $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue)
+            ->setSize($size);
         return $this;
     }
 
@@ -367,48 +266,68 @@ abstract class AbstractMForm
      * @param array $options
      * @param array $attributes
      * @param int $size
+     * @param array $validation
      * @param null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMultiSelectField($id, $options = array(), $attributes = array(), $size = 3, $defaultValue = NULL)
+    public function addMultiSelectField($id, $options = array(), $attributes = array(), $size = 3, $validation = array(), $defaultValue = NULL)
     {
-        $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue);
-        $this->setMultiple(true);
-        $this->setSize($size);
+        $this->addOptionField('multiselect', $id, $attributes, $options, $validation, $defaultValue)
+            ->setMultiple()
+            ->setSize($size);
         return $this;
     }
 
     /**
-     * add checkboxes
+     * add checkboxe
      * @param $id
      * @param array $options
      * @param array $attributes
+     * @param array $validation
      * @param null $defaultValue
      * @return AbstractMForm
      * @author Joachim Doerr
      */
-    public function addCheckboxField($id, $options = array(), $attributes = array(), $defaultValue = NULL)
+    public function addCheckboxField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
     {
-        return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
+        return $this->addOptionField('checkbox', $id, $attributes, $options, $validation, $defaultValue);
     }
+
+    /**
+     * add multicheckboxe
+     * @param $id
+     * @param array $options
+     * @param array $attributes
+     * @param array $validation
+     * @param null $defaultValue
+     * @return AbstractMForm
+     * @author Joachim Doerr
+     */ /*
+    // TODO bring it to live
+    public function addMultiCheckboxField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
+    {
+        return $this->addOptionField('multicheckbox', $id, $attributes, $options, $validation, $defaultValue)
+            ->setMultiple();
+    } */
 
     /**
      * add radiobutton
      * @param $id
      * @param array $options
      * @param array $attributes
+     * @param array $validation
      * @param null $defaultValue
      * @return AbstractMForm
      * @author Joachim Doerr
      */
-    public function addRadioField($id, $options = array(), $attributes = array(), $defaultValue = NULL)
+    public function addRadioField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
     {
-        return $this->addOptionField('radiobutton', $id, $attributes, $options, $defaultValue);
+        return $this->addOptionField('radiobutton', $id, $attributes, $options, $validation, $defaultValue);
     }
 
     /**
-     * add rex link fields
+     * add rex link field
      * @param $id
      * @param array $parameter
      * @param null $catId
@@ -422,7 +341,7 @@ abstract class AbstractMForm
     }
 
     /**
-     * add rex link list fields
+     * add rex link list field
      * @param $id
      * @param array $parameter
      * @param null $catId
@@ -466,65 +385,45 @@ abstract class AbstractMForm
     /**
      * @param $label
      * @author Joachim Doerr
+     * @return $this
      */
     public function setLabel($label)
     {
-        $this->elements[$this->id]['label'] = $this->getLangData($label);
+        MFormAttributeHandler::setAttribute($this->item, 'label', $label);
+        return $this;
     }
 
     /**
+     * @return $this
      * @author Joachim Doerr
      */
     public function setFull()
     {
-        $this->elements[$this->id]['full'] = true;
+        MFormAttributeHandler::setAttribute($this->item, 'full', true);
+        return $this;
     }
 
     /**
      * @param $name
      * @param $value
      * @author Joachim Doerr
+     * @return $this
      */
     public function setAttribute($name, $value)
     {
-        switch ($name) {
-            case 'label':
-                $this->setLabel($value);
-                break;
-            case 'size':
-                $this->setSize($value);
-                break;
-            case 'full':
-                $this->setFull();
-                break;
-            case 'validation':
-                if (is_array($value)) {
-                    $arrValidation = $value;
-                    $this->setValidations($arrValidation);
-                }
-                break;
-            case 'default-value':
-                $this->setDefaultValue($value);
-                break;
-            default:
-                $this->attributes[$name] = $value;
-                $this->elements[$this->id]['attributes'] = $this->attributes;
-                break;
-        }
+        MFormAttributeHandler::setAttribute($this->item, $name, $value);
+        return $this;
     }
 
     /**
      * @param $attributes
      * @author Joachim Doerr
+     * @return $this
      */
     public function setAttributes($attributes)
     {
-        $this->attributes = array();
-        if (is_array($attributes)) {
-            foreach ($attributes as $strName => $strValue) {
-                $this->setAttribute($strName, $strValue);
-            }
-        }
+        MFormAttributeHandler::setAttributes($this->item, $attributes);
+        return $this;
     }
 
     /**
@@ -532,274 +431,161 @@ abstract class AbstractMForm
      * @param $key
      * @param $value
      * @author Joachim Doerr
+     * @return $this
      */
-    public function setValidation($key, $value)
+    public function setValidation($key, $value = null)
     {
-        switch ($key) {
-            case 'empty':
-                $this->setAttribute('data-required', 'true');
-                break;
-            case 'integer':
-                $this->setAttribute('data-type', 'digits');
-                break;
-            case 'float':
-                $this->setAttribute('data-type', 'number');
-                break;
-            case 'alphanum':
-                $this->setAttribute('data-type', 'alphanum');
-                break;
-            case 'dateIso':
-                $this->setAttribute('data-type', 'dateIso');
-                break;
-            case 'compare':
-            case 'email':
-                $this->setAttribute('data-type', 'email');
-                break;
-            case 'minlength':
-                $this->setAttribute('data-minlength', $value);
-                break;
-            case 'maxlength':
-                $this->setAttribute('data-maxlength', $value);
-                break;
-            case 'min':
-                $this->setAttribute('data-min', $value);
-                break;
-            case 'max':
-                $this->setAttribute('data-max', $value);
-                break;
-            case 'url':
-                $this->setAttribute('data-type', 'url');
-                break;
-            case 'regexp':
-                $this->setAttribute('data-regexp', $value);
-                break;
-            case 'mincheck':
-                $this->setAttribute('data-mincheck', $value);
-                break;
-            case 'maxcheck':
-                $this->setAttribute('data-maxcheck', $value);
-                break;
-            case 'custom':
-                $this->validations[$key] = $value;
-                $this->elements[$this->id]['validation'] = $this->validations;
-                break;
-        }
+        MFormValidationHandler::setValidation($this->item, $key, $value);
+        return $this;
     }
 
     /**
      * @param $validations
      * @author Joachim Doerr
+     * @return $this
      */
     public function setValidations($validations)
     {
-        $this->validations = array();
-        foreach ($validations as $key => $value) {
-            if (is_numeric($key) === true) {
-                $this->setValidation($value, '');
-            } else {
-                $this->setValidation($key, $value);
-            }
-        }
-    }
-
-    /*
-    add custom validation
-    */
-    public function setCustomValidation($arrCustomValidation)
-    {
-    }
-
-    public function setCustomValidations($arrCustomValidations)
-    {
+        MFormValidationHandler::setValidations($this->item, $validations);
+        return $this;
     }
 
     /**
      * @param $value
      * @author Joachim Doerr
+     * @return $this
      */
     public function setDefaultValue($value)
     {
-        $this->elements[$this->id]['default-value'] = $this->getLangData($value);
+        MFormAttributeHandler::setAttribute($this->item, 'default-value', $value);
+        return $this;
     }
 
     /**
      * @param $value
      * @param $key
      * @author Joachim Doerr
+     * @deprecated this method will be removed in v5 use setOption
+     * TODO remove it
+     * @return AbstractMForm
      */
     public function addOption($value, $key)
     {
-        $this->options[$key] = $this->getLangData($value);
-        $this->elements[$this->id]['options'] = $this->options;
+        return $this->setOption($value, $key);
+    }
+
+    /**
+     * @param $value
+     * @param $key
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setOption($value, $key)
+    {
+        MFormOptionHandler::setOption($this->item, $value, $key);
+        return $this;
     }
 
     /**
      * @param $options
      * @author Joachim Doerr
+     * @deprecated this method will be removed in v5 use setOptions
+     * TODO remove it
+     * @return AbstractMForm
      */
     public function addOptions($options)
     {
-        $this->options = array();
-        foreach ($options as $intKey => $strValue) {
-            $this->addOption($strValue, $intKey);
-        }
+        return $this->setOptions($options);
+    }
+
+    /**
+     * @param $options
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setOptions($options)
+    {
+        MFormOptionHandler::setOptions($this->item, $options);
+        return $this;
     }
 
     /**
      * @param $query
      * @author Joachim Doerr
+     * @deprecated this method will be removed in v5 use setSqlOptions
+     * TODO remove it
+     * @return AbstractMForm
      */
     public function addSqlOptions($query)
     {
-        $sql = rex_sql::factory();
-        $sql->setQuery($query);
-        while ($sql->hasNext()) {
-            $this->addOption($sql->getValue('name'), $sql->getValue('id'));
-            $sql->next();
-        }
+        return $this->setSqlOptions($query);
     }
 
     /**
-     * @param $multiple
+     * @param $query
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setSqlOptions($query)
+    {
+        MFormOptionHandler::setSqlOptions($this->item, $query);
+        return $this;
+    }
+
+    /**
+     * @return $this
      * @author Joachim Doerr
      */
-    public function setMultiple($multiple)
+    public function setMultiple()
     {
-        if ($multiple === true) {
-            $this->elements[$this->id]['multi'] = true;
-        }
+        MFormAttributeHandler::setAttribute($this->item, 'multiple', 'multiple');
+        return $this;
     }
 
     /**
      * @param $size
      * @author Joachim Doerr
+     * @return $this
      */
     public function setSize($size)
     {
-        if ((is_numeric($size) === true && $size > 0) or $size == 'full') {
-            $this->elements[$this->id]['size'] = $size;
-        }
+        MFormAttributeHandler::setAttribute($this->item, 'size', $size);
+        return $this;
     }
 
     /**
      * set category and parameter
      * @param $catId
      * @author Joachim Doerr
+     * @return $this
      */
     public function setCategory($catId)
     {
-        if ($catId > 0) {
-            $this->elements[$this->id]['cat-id'] = $catId;
-        }
+        MFormAttributeHandler::setAttribute($this->item, 'catId', $catId);
+        return $this;
     }
 
     /**
      * @param $name
      * @param $value
      * @author Joachim Doerr
+     * @return $this
      */
     public function setParameter($name, $value)
     {
-        switch ($name) {
-            case 'category':
-                $this->setCategory($value);
-                break;
-            case 'label':
-                $this->setLabel($value);
-                break;
-            case 'full':
-                $this->setFull();
-                break;
-            default:
-                $this->parameter[$name] = $value;
-                $this->elements[$this->id]['parameter'] = $this->parameter;
-                break;
-        }
+        MFormParameterHandler::setParameter($this->item, $name, $value);
+        return $this;
     }
 
     /**
      * @param $parameter
      * @author Joachim Doerr
+     * @return $this
      */
     public function setParameters($parameter)
     {
-        $this->parameter = array();
-        foreach ($parameter as $name => $value) {
-            $this->setParameter($name, $value);
-        }
-    }
-
-    /**
-     * use user lang
-     * @param $languageData
-     * @return mixed|string
-     * @author Joachim Doerr
-     */
-    private function getLangData($languageData)
-    {
-        if (is_array($languageData) === true) {
-            $langData = '';
-
-            foreach ($languageData as $key => $value) {
-                if ($key == rex::getUser()->getLanguage() or $key . '_utf8' == rex::getUser()->getLanguage()) {
-                    $langData = $value;
-                }
-            }
-            if ($langData == '') {
-                $langData = reset($languageData);
-            }
-        } else {
-            $langData = $languageData;
-        }
-        return $langData;
-    }
-
-    /**
-     * get rex var
-     * @return array|null
-     * @author Joachim Doerr
-     */
-    private function getRexVars()
-    {
-        $sliceId = rex_request('slice_id', 'int', false);
-
-        if ($sliceId != false) {
-            $table = rex::getTablePrefix() . 'article_slice';
-            $fields = '*';
-            $where = 'id="' . $_REQUEST['slice_id'] . '"';
-
-            $sql = rex_sql::factory();
-            $query = '
-                SELECT ' . $fields . '
-                FROM ' . $table . '
-                WHERE ' . $where;
-
-            $sql->setQuery($query);
-            $rows = $sql->getRows();
-
-            if ($rows > 0) {
-                $this->result = array();
-
-                for ($i = 1; $i <= 20; $i++) {
-                    $this->result['value'][$i] = $sql->getValue('value' . $i);
-
-                    if ($i <= 10) {
-                        $this->result['filelist'][$i] = $sql->getValue('medialist' . $i);
-                        $this->result['linklist'][$i] = $sql->getValue('linklist' . $i);
-                        $this->result['file'][$i] = $sql->getValue('media' . $i);
-                        $this->result['link'][$i] = $sql->getValue('link' . $i);
-                    }
-
-                    $result = json_decode(htmlspecialchars_decode($this->result['value'][$i]),true);
-
-                    if (is_array($result)) {
-                        $this->result['value'][$i] = $result;
-                    }
-                }
-            }
-        }
-
-        return $this->result;
+        MFormParameterHandler::setParameters($this->item, $parameter);
+        return $this;
     }
 
     /**
@@ -807,6 +593,7 @@ abstract class AbstractMForm
      * @param $string
      * @return bool
      * @author Joachim Doerr
+     * TODO check for what is it good
      */
     public static function isSerial($string)
     {
@@ -814,13 +601,11 @@ abstract class AbstractMForm
     }
 
     /**
-     * generate Output
-     * @return array|string
+     * @return MFormItem[]
      * @author Joachim Doerr
      */
-    protected function getArray()
+    protected function getItems()
     {
-        $this->output = $this->elements;
-        return $this->output;
+        return $this->items;
     }
 }

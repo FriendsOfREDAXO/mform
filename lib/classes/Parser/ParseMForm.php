@@ -9,157 +9,22 @@
  * @version 4.0.0
  * @license MIT
  */
-class ParseMForm
+class ParseMForm extends AbstractMFormParser
 {
-    const THEME_PATH = 'mform/templates/%s_theme/';
+    private $elements = array();
 
-    /**
-     * @var string
-     */
-    private $output;
-
-    /**
-     * @var bool
-     */
-    private $fieldset = false;
-
-    /**
-     * @var string
-     */
-    private $template;
-
-    /**
-     * @var array
-     */
-    private $defaultClass=array(
-        'select' => 'form-control',
-        'select-multiple' => 'form-control',
-        'fieldset' => 'form-horizontal',
-        'headline' => '',
-        'description' => '',
-        'input-hidden' => 'form-control',
-        'input-text-readonly' => 'form-control',
-        'input-default' => 'form-control',
-        'textarea' => 'form-control'
-    );
-
-    /**
-     * @param $element
-     * @author Joachim Doerr
-     * @return ParseMForm
-     */
-    private function generateFieldset($element)
-    {
-        $element['attributes'] = $this->getDefaultClass($element['attributes'], 'fieldset');
-        $element['attributes'] = $this->getAttributes($element['attributes']);
-
-        if ($this->fieldset === true) {
-            $element['close_fieldset'] = '</fieldset>';
-        } else {
-            $this->fieldset = true;
-        }
-
-        // add close tag
-        $elementOutput = (array_key_exists('close_fieldset', $element)) ? $element['close_fieldset'] : '';
-
-        // add open fieldset attributes
-        $elementOutput .= (array_key_exists('attributes', $element)) ? '<fieldset ' . $element['attributes'] . '>' : '<fieldset>';
-
-        // add value
-        $elementOutput .= (array_key_exists('value', $element) && !is_null($element['value'])) ? '<legend>' . $element['value'] . '</legend>' : '';
-
-        return $this->parseElementToTemplate('<mform:element>' . $elementOutput . '</mform:element>', NULL);
-    }
-
-    /**
-     * @return ParseMForm
-     * @author Joachim Doerr
-     */
-    private function closeFieldset()
-    {
-        if ($this->fieldset === true) {
-            $this->fieldset = false;
-            return $this->parseElementToTemplate('<mform:element></fieldset></mform:element>', NULL);
-        }
-    }
-
-    /**
-     * html, headline, description
-     * @param $element
-     * @return ParseMForm
-     * @author Joachim Doerr
-     */
-    private function generateLineElement($element)
-    {
-        switch ($element['type']) {
-            case 'headline':
-                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'headline');
-                break;
-            case 'description':
-                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'description');
-                break;
-        }
-
-        return $this->parseElementToTemplate('<mform:element>' . $element['value'] . '</mform:element>', $element['type']);
-    }
 
     /**
      * @param $element
      * @return ParseMForm
      * @author Joachim Doerr
      */
-    private function getCallbackElement($element)
+    private function getCallbackElement(MFormItem $element)
     {
-        $strCallElement = call_user_func($element['callabel'], $element['parameter']);
-        return $this->parseElementToTemplate('<mform:element>' . $strCallElement . '</mform:element>', 'html');
+//        $strCallElement = call_user_func($element['callabel'], $element['parameter']);
+//        return $this->parseElementToTemplate('<mform:element>' . $strCallElement . '</mform:element>', 'html');
     }
 
-    /**
-     * hidden, text, password
-     * @param $element
-     * @return ParseMForm
-     * @author Joachim Doerr
-     */
-    private function generateInputElement($element)
-    {
-        switch ($element['type']) {
-            case 'hidden':
-                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-hidden');
-                $type = 'hidden';
-                $element['label'] = '';
-                break;
-
-            case 'text-readonly':
-                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-text-readonly');
-                $type = 'default';
-                $element['type'] = 'text';
-                $element['attributes']['readonly'] = 'readonly';
-                break;
-
-            default:
-                $element['attributes'] = $this->getDefaultClass($element['attributes'], 'input-default');
-                $type = 'default';
-                break;
-        }
-
-        if (array_key_exists('full', $element) && $element['full'] == true) {
-            $type = $type . '_full';
-        }
-
-        $varId = $this->getVarAndIds($element);
-        $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
-
-        $element['attributes'] = $this->getAttributes($element['attributes']);
-        $element['label'] = $this->getLabel($element);
-
-        $strElement = <<<EOT
-
-      <mform:label><label for="$id">{$element['label']}</label></mform:label>
-      <mform:element><input id="$id" type="{$element['type']}" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" value="{$varId['value']}" {$element['attributes']} /></mform:element>
-
-EOT;
-        return $this->parseElementToTemplate($strElement, $type);
-    }
 
     /**
      * custom link
@@ -169,9 +34,9 @@ EOT;
      */
     private function generateCustomInputElement($element)
     {
-//        $element['attributes'] = $this->getAttributes($element['attributes']);
+//        $element['attributes'] = $this->parseAttributes($element['attributes']);
 //        $element['label'] = $this->getLabel($element);
-//        $varId = $this->getVarAndIds($element);
+//        $varId = $this->setVarAndIds($element);
 //
 //        $messages = array(
 //            'add_internlink' => rex_i18n::msg('mfrom_add_internlink'),
@@ -269,51 +134,6 @@ EOT;
     }
 
     /**
-     * textarea, markitup
-     * @param $element
-     * @return ParseMForm
-     * @author Joachim Doerr
-     */
-    private function generateAreaElement($element)
-    {
-        if ($element['type'] == 'area-readonly') {
-            $element['attributes']['readonly'] = 'readonly';
-            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'textarea-readonly');
-        } else {
-            $element['attributes'] = $this->getDefaultClass($element['attributes'], 'textarea');
-        }
-
-        $type = 'default';
-
-        if (array_key_exists('full', $element) && $element['full'] == true) {
-            $type = $type . '_full';
-        }
-
-        $varId = $this->getVarAndIds($element);
-        $id = ($this->getCustomId($element['attributes'])) ? $this->getCustomId($element['attributes']) : 'rv'.$varId['id'];
-
-        $element['attributes'] = $this->getAttributes($element['attributes']);
-        $element['label'] = $this->getLabel($element);
-
-        foreach (array('label') as $key) {
-            if (!array_key_exists($key, $element)) {
-                $element[$key] = null;
-            }
-        }
-
-        $elementOutput = '';
-        if (array_key_exists('label', $element) && $element['label'] != '') {
-            $elementOutput = "<mform:label><label for=\"$id\">" . $element['label'] . "</label></mform:label>";
-        }
-        $elementOutput .= <<<EOT
-
-      <mform:element><textarea id="$id" name="REX_INPUT_VALUE[{$element['var-id']}]{$varId['sub-var-id']}" {$element['attributes']} >{$varId['value']}</textarea></mform:element>
-
-EOT;
-        return $this->parseElementToTemplate($elementOutput, $type);
-    }
-
-    /**
      * select, multiselect
      * @param $element
      * @return ParseMForm
@@ -321,15 +141,15 @@ EOT;
      */
     private function generateOptionsElement($element)
     {
-        if($element['multi']) {
+        if ($element['multi']) {
             $element['attributes'] = $this->getDefaultClass($element['attributes'], 'select-multiple');
         } else {
             $element['attributes'] = $this->getDefaultClass($element['attributes'], 'select');
         }
 
-        $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['attributes'] = $this->parseAttributes($element['attributes']);
         $element['label'] = $this->getLabel($element);
-        $varId = $this->getVarAndIds($element);
+        $varId = $this->setVarAndIds($element);
 
         $multiselectJavascript = '';
         $multiselectHidden = '';
@@ -404,7 +224,7 @@ EOT;
     private function generateRadioElement($element)
     {
         $element['label'] = $this->getLabel($element);
-        $varId = $this->getVarAndIds($element);
+        $varId = $this->setVarAndIds($element);
 
         $options = '';
         $count = 0;
@@ -414,7 +234,7 @@ EOT;
                 $count++;
                 $radioAttributes = '';
                 if (isset($element['attributes']['radio-attr'][$key]) === true) {
-                    $radioAttributes = $this->getAttributes($element['attributes']['radio-attr'][$key]);
+                    $radioAttributes = $this->parseAttributes($element['attributes']['radio-attr'][$key]);
                 }
                 $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . $count . '" type="radio" name="REX_INPUT_VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $radioAttributes;
                 if ($key == $element['value'] or ($element['mode'] == 'add' && $key == $element['default-value'])) {
@@ -444,7 +264,7 @@ EOT;
             return $this;
         }
 
-        $element['attributes'] = $this->getAttributes($element['attributes']);
+        $element['attributes'] = $this->parseAttributes($element['attributes']);
         $element['label'] = $this->getLabel($element);
 
         $arrayKeys = array_keys($element['options']);
@@ -453,7 +273,7 @@ EOT;
 
         $element['options'] = array($addEndArrayKeys => $addEnd);
         $options = '';
-        $varId = $this->getVarAndIds($element);
+        $varId = $this->setVarAndIds($element);
 
         foreach ($element['options'] as $key => $value) {
             $options .= '<div class="radio_element"><input id="rv' . $varId['id'] . '" type="checkbox" name="REX_INPUT_VALUE[' . $element['var-id'] . ']' . $varId['sub-var-id'] . '" value="' . $key . '" ' . $element['attributes'];
@@ -535,35 +355,9 @@ EOT;
       <mform:element>$options</mform:element>
 
 EOT;
-        return $this->parseElementToTemplate($elementOutput, 'default');
+        return $this->parseElement($elementOutput, 'default');
     }
 
-    /**
-     * @param $element
-     * @return array
-     * @author Joachim Doerr
-     */
-    private function getVarAndIds($element)
-    {
-        $result = array();
-
-        $result['value'] = htmlspecialchars($element['value']);
-
-        if ($element['mode'] == 'add' && $element['default-value'] != '') {
-            $result['value'] = htmlspecialchars($element['default-value']);
-        }
-
-        $result['id'] = $element['id'] . $element['var-id'];
-
-        if ($element['sub-var-id'] != false) {
-            $result['id'] = $result['id'] . $element['sub-var-id'];
-            $result['sub-var-id'] = '[' . $element['sub-var-id'] . ']';
-        } else {
-            $result['sub-var-id'] = '';
-        }
-
-        return $result;
-    }
 
     /**
      * @param array $element
@@ -580,95 +374,69 @@ EOT;
         return $element['label'];
     }
 
-    /**
-     * @param $attributes
-     * @return null|string
-     * @author Joachim Doerr
-     */
-    private function getAttributes($attributes)
-    {
-        $inlineAttributes = NULL;
-
-        if (sizeof($attributes) > 0) {
-            foreach ($attributes as $key => $value) {
-                if (!in_array($key, array('id', 'name', 'type', 'value', 'checked', 'selected'))) {
-                    $inlineAttributes .= ' ' . $key . '="' . $value . '"';
-                }
-            }
-        }
-
-        return $inlineAttributes;
-    }
 
     /**
-     * @param $elements
+     * @param MFormItem[] $items
      * @author Joachim Doerr
+     * @return $this
      */
-    private function parseFormFields($elements)
+    private function parseFormFields(array $items)
     {
-        if (sizeof($elements) > 0) {
-            foreach ($elements as $key => $element) {
-                switch ($element['type']) {
+        if (sizeof($items) > 0) {
+            foreach ($items as $key => $item) {
+
+                // set default class
+//                $this->attributeHandler->setItem($item)
+//                    ->setDefaultClass();
+
+                switch ($item->getType()) {
                     case 'close-fieldset':
                         $this->closeFieldset();
                         break;
-
                     case 'fieldset':
-                        $this->generateFieldset($element);
+                        $this->generateFieldset($item);
                         break;
-
                     case 'html':
                     case 'headline':
                     case 'description':
-                        $this->generateLineElement($element);
+                        $this->generateLineElement($item);
                         break;
-
-                    case 'callback':
-                        $this->getCallbackElement($element);
-                        break;
-
+//                    case 'callback':
+//                        $this->getCallbackElement($item);
+//                        break;
                     case 'text':
                     case 'hidden':
                     case 'text-readonly':
-                        $this->generateInputElement($element);
+                        $this->generateInputElement($item);
                         break;
-
-                    case 'custom-link':
-                        $this->generateCustomInputElement($element);
-                        break;
-
                     case 'textarea':
                     case 'markitup':
                     case 'area-readonly':
-                        $this->generateAreaElement($element);
+                        $this->generateAreaElement($item);
                         break;
-
                     case 'select':
                     case 'multiselect':
-                        $this->generateOptionsElement($element);
+                        $this->generateOptionsElement($item);
                         break;
-
                     case 'radio':
                     case 'radiobutton':
-                        $this->generateRadioElement($element);
+                        $this->generateRadioElement($item);
                         break;
-
                     case 'checkbox':
-                        $this->generateCheckboxElement($element);
+                        $this->generateCheckboxElement($item);
                         break;
-
                     case 'link':
                     case 'linklist':
-                        $this->generateLinkElement($element);
+                        $this->generateLinkElement($item);
                         break;
-
                     case 'media':
                     case 'medialist':
-                        $this->generateMediaElement($element);
+                        $this->generateMediaElement($item);
                         break;
                 }
             }
         }
+        return $this;
     }
 
     /**
@@ -707,7 +475,7 @@ EOT;
                 }
             }
         }
-        if($notFound) {
+        if ($notFound) {
             if (array_key_exists($type, $this->defaultClass)) {
                 $attributes['class'] = $this->defaultClass[$type];
             }
@@ -721,7 +489,7 @@ EOT;
      * @return null
      * @author Joachim Doerr
      */
-    public function getCustomId($attributes)
+    private function getCustomId($attributes)
     {
         $id = null;
 
@@ -736,86 +504,23 @@ EOT;
         return $id;
     }
 
-    /**
-     * parse form to template
-     * @param $element
-     * @param $type
-     * @param bool|false $parseFinal
-     * @return $this
-     * @author Joachim Doerr
-     */
-    private function parseElementToTemplate($element, $type, $parseFinal = false)
-    {
-        if (!$this->template) {
-            $this->template = rex_addon::get('mform')->getConfig('mform_template');
-        }
-
-        $path = rex_path::addonData(sprintf(self::THEME_PATH, $this->template));
-        $templateString = '';
-
-        if ($type != '' && $type != 'html') {
-            $templateString = implode(file($path . "mform_$type.ini", FILE_USE_INCLUDE_PATH));
-        }
-
-        preg_match('|<mform:label>(.*?)</mform:label>|ism', $element, $arrLabel);
-        preg_match('|<mform:element>(.*?)</mform:element>|ism', $element, $arrElement);
-
-        switch ($type) {
-            case 'default_full':
-            case 'default':
-            case 'hidden':
-                if ($templateString != '') {
-                    $element = str_replace(array(' />', '<mform:label/>', '<mform:element/>'), array('/>', $arrLabel[1], $arrElement[1]), $templateString);
-                }
-                break;
-
-            case 'html':
-            case 'fieldset':
-                $templateString = '<mform:output/>';
-
-            case 'wrapper':
-            default:
-                if (isset($arrLabel[1]) === true or isset($arrElement[1]) === true) {
-                    if (sizeof($arrLabel) > 0 && sizeof($arrElement) > 0) {
-                        $element = $arrLabel[1] . $arrElement[1];
-                    }
-                }
-                if ($templateString != '') {
-                    $element = str_replace(array(' />', '<mform:output/>'), array('/>', $element), $templateString);
-                }
-                break;
-        }
-        if ($element != '') {
-            $element = str_replace(array('<mform:element>', '<mform:element/>', '<mform:element />', '</mform:element>', '</ mform:element>'), '', $element);
-        }
-        if ($parseFinal === true) {
-            if ($this->fieldset === true) {
-                $element = $element . '</fieldset>';
-            }
-            $this->output = $element;
-        } else {
-            $this->output .= $element;
-        }
-
-        return $this;
-    }
 
     /**
      * final parsing
-     * @param $elements
-     * @param bool|false $template
+     * @param MFormItem[] $items
+     * @param boolean $template
      * @return string
      * @author Joachim Doerr
      */
-    public function parse($elements, $template = false)
+    public function parse(array $items, $template = false)
     {
         if ($template != false) {
             $this->output .= $this->setTheme($template);
         }
+        $this->parseFormFields($items);
+//        $this->parseElementToTemplate($this->output, 'wrapper', true);
 
-        $this->parseFormFields($elements);
-        $this->parseElementToTemplate($this->output, 'wrapper', true);
-
-        return $this->output;
+//        return $this->output;
+        return implode($this->elements);
     }
 }

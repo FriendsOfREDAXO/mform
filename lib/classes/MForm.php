@@ -30,14 +30,8 @@ class MForm extends AbstractMForm
     {
         $this->template = $template;
         $this->debug = $debug;
-    }
 
-    /**
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
+        parent::__construct();
     }
 
     /**
@@ -48,14 +42,6 @@ class MForm extends AbstractMForm
     {
         $this->template = $template;
         return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isDebug()
-    {
-        return $this->debug;
     }
 
     /**
@@ -75,20 +61,14 @@ class MForm extends AbstractMForm
     public function show()
     {
         // init obj
-        $parser = new ParseMForm();
-
-        // debug output
-        if ($this->debug === true) {
-            echo PHP_EOL . '<pre>' . PHP_EOL;
-            print_r($this->getArray());
-            echo PHP_EOL . '</pre>' . PHP_EOL;
-        }
-        return $parser->parse($this->getArray(), $this->template);
+        $parser = new MFormParser();
+        // parse elements
+        return $parser->parse($this->getItems(), $this->template, $this->debug);
     }
 
     /**
      * @return string
-     * @deprecated
+     * @deprecated this method will be removed in v5
      * @author Joachim Doerr
      */
     public function show_mform() {
