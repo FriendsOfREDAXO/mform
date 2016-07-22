@@ -466,10 +466,6 @@ EOT;
      */
     private function generateMediaElement(MFormItem $item)
     {
-//        if (!array_key_exists('parameter', $element) or !is_array($element['parameter'])) {
-//            $element['parameter'] = array();
-//        }
-
         // create label element
         $label = new MFormElement();
         $label->setId($item->getId())
@@ -486,6 +482,39 @@ EOT;
                 break;
             case 'medialist':
                 $templateElement->setElement(rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                break;
+        }
+
+        // add to output element array
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+        return $this;
+    }
+
+    /**
+     * link, linklist
+     * @param MFormItem $item
+     * @return ParseMForm
+     * @internal param $element
+     * @author Joachim Doerr
+     */
+    private function generateLinkElement(MFormItem $item)
+    {
+        // create label element
+        $label = new MFormElement();
+        $label->setId($item->getId())
+            ->setValue($item->getLabel());
+
+        // create templateElement object
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($label, 'label', true));
+
+        switch ($item->getType()) {
+            default:
+            case 'link':
+                $templateElement->setElement(rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                break;
+            case 'linklist':
+                $templateElement->setElement(rex_var_linklist::getWidget($item->getVarId()[0], 'REX_INPUT_LINKLIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
                 break;
         }
 
@@ -575,7 +604,6 @@ EOT;
         if ($debug) {
             var_dump($items);
         }
-
         return implode($this->elements);
     }
 }
