@@ -11,4 +11,4 @@
 // include information site
 include rex_path::addon('mform', 'pages/info.php');
 
-echo $strPageContent;
+echo $content;

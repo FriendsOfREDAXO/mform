@@ -44,7 +44,7 @@ $mform->addTextAreaField(4.2,array(\'label\'=>\'Markitup\',\'class\'=>\'markitup
 // markitup
 $mform->addTextAreaField(4.3,array(\'label\'=>\'Redactor\',\'class\'=>\'redactorEditor-full\', \'id\'=>\'redactor_1\', \'full\'=>1));
 // textarea readonly field
-$mform->addTextReadOnlyField(4.4,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'height:80px\'));
+$mform->addTextAreaReadOnlyField(4.4,\'string readonly\',array(\'label\'=>\'Readonly\',\'style\'=>\'height:80px\'));
 
 // fieldset
 $mform->addFieldset(\'Select und Multiselects\');
@@ -110,5 +110,18 @@ $mform->addTextField(7.3,array(\'label\'=>\'Input3\',\'style\'=>\'width:200px\')
 // get formular
 echo $mform->show();
 ?>';
+
+
+$content = '
+        <p>'.  $this->i18n('help_infotext_4') .'</p>
+        <p>'.  $this->i18n('help_infotext_5') .'</p>
+    ';
+
+// parse info fragment
+$fragment = new rex_fragment();
+$fragment->setVar('class', 'info');
+$fragment->setVar('title', $this->i18n('help_subheadline_2'), false);
+$fragment->setVar('body', $content, false);
+echo $fragment->parse('core/page/section.php');
 
 echo rex_view::content(rex_string::highlight($strModulInputDemo), $this->i18n('demo_modul'));
