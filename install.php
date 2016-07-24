@@ -10,7 +10,10 @@
 
 // set default template
 if (!$this->hasConfig()) {
-    $this->setConfig('mform_template', 'default');
+    $this->setConfig('mform_template', 'default_theme');
 }
 
+// copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
+// copy all theme css files to assets folder
+MFormThemeHelper::copyThemeCssToAssets();
