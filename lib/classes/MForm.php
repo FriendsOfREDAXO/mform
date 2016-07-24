@@ -14,7 +14,7 @@ class MForm extends AbstractMForm
     /**
      * @var string
      */
-    private $template;
+    private $theme;
 
     /**
      * @var bool
@@ -26,32 +26,12 @@ class MForm extends AbstractMForm
      * @param string $template
      * @param bool $debug
      */
-    function __construct($template = 'default', $debug = false)
+    function __construct($template = null, $debug = false)
     {
-        $this->template = $template;
+        $this->theme = $template;
         $this->debug = $debug;
 
         parent::__construct();
-    }
-
-    /**
-     * @param string $template
-     * @return $this
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-        return $this;
-    }
-
-    /**
-     * @param boolean $debug
-     * @return $this
-     */
-    public function setDebug($debug)
-    {
-        $this->debug = $debug;
-        return $this;
     }
 
     /**
@@ -63,15 +43,6 @@ class MForm extends AbstractMForm
         // init obj
         $parser = new MFormParser();
         // parse elements
-        return $parser->parse($this->getItems(), $this->template, $this->debug);
-    }
-
-    /**
-     * @return string
-     * @deprecated this method will be removed in v5
-     * @author Joachim Doerr
-     */
-    public function show_mform() {
-        return $this->show();
+        return $parser->parse($this->getItems(), $this->theme, $this->debug);
     }
 }
