@@ -9,18 +9,22 @@
  */
 
 if (rex::isBackend()) {
-    $files = glob(rex_path::addon('mform') . "/lib/functions/*.php");
-    array_walk($files, create_function('$file', 'return (is_file ( $file )) ? require_once($file) : false;'));
+    // check theme css is exists
+    MFormThemeHelper::themeBootCheck(rex_addon::get('mform')->getConfig('mform_theme'));
 
-    rex_view::addCssFile('?mform_theme=' . rex_addon::get('mform')->getConfig('mform_template'));
+    // use theme helper class
+    if(sizeof(MFormThemeHelper::getCssAssets(rex_addon::get('mform')->getConfig('mform_theme'))) > 0) {
+        // foreach all css files
+        foreach (MFormThemeHelper::getCssAssets(rex_addon::get('mform')->getConfig('mform_theme')) as $css) {
+            // add assets css file
+            rex_view::addCssFile($this->getAssetsUrl($css));
+        }
+    }
+
+    // add all parsley mform files
     rex_view::addCssFile($this->getAssetsUrl('parsley/parsley.css'));
     rex_view::addJsFile($this->getAssetsUrl('parsley/parsley.min.js'));
     rex_view::addJsFile($this->getAssetsUrl('parsley/extra/validator/dateiso.js'));
     rex_view::addJsFile($this->getAssetsUrl('parsley/extra/validator/words.js'));
-    rex_view::addJsFile($this->getAssetsUrl('parsley/i18n/de.js'));
-
-    if (rex_request('mform_theme', 'string', '') != '') {
-        mform_generate_css(rex_request('mform_theme', 'string', rex_addon::get('mform')->getConfig('mform_template')));
-        exit;
-    }
+    rex_view::addJsFile($this->getAssetsUrl('parsley/i18n/de.js')); // TODO backend lang specific
 }
