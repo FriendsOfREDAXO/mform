@@ -250,6 +250,7 @@ abstract class AbstractMForm
      * @param array $options
      * @param array $attributes
      * @param int $size
+     * @param array $validation
      * @param null $defaultValue
      * @return $this
      * @author Joachim Doerr
