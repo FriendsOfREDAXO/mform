@@ -8,7 +8,7 @@
 class MFormTemplateFileProvider
 {
     const DEFAULT_THEME = 'default_theme';
-    const THEME_PATH = 'mform/templates/%s_theme/';
+    const THEME_PATH = 'mform/templates/%s/';
     const ELEMENTS_PATH = 'elements/';
 
     /**
@@ -21,10 +21,10 @@ class MFormTemplateFileProvider
      * @return string
      * @author Joachim Doerr
      */
-    static public function loadTemplate($templateType, $subPath = '', $theme = '', $stop = false)
+    static public function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
     {
-        if ($theme == '') {
-            $theme = rex_addon::get('mform')->getConfig('mform_template');
+        if (is_null($theme)) {
+            $theme = rex_addon::get('mform')->getConfig('mform_theme');
         }
 
         // set theme path to load type template file
