@@ -19,5 +19,7 @@ if (rex_addon::isInstalled('mform') !== true) {
         <p>'.  $this->i18n('help_infotext_1') .'</p>
         <p>'.  $this->i18n('help_infotext_2') .'</p>
         <p>'.  $this->i18n('help_infotext_3') .'</p>
+        <a href="https://github.com/FriendsOfREDAXO/mform/wiki" target="_blank">'. $this->i18n('mform_github') .'</a>
     ';
+    $content .= '<br><a href="https://github.com/FriendsOfREDAXO/mform/wiki" target="_blank">'. $this->i18n('wiki') .'</a>';
 }

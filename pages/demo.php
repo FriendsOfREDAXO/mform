@@ -10,7 +10,7 @@
 
 $strModulInputDemo = '<?php
 // instanziieren
-$mform = new mform();
+$mform = new MForm();
 
 // headline
 $mform->addHeadline(\'MForm Demo Formular\');
@@ -96,7 +96,7 @@ echo $mform->show();
 
 <?php
 // instanziieren
-$mform = new mform();
+$mform = new MForm();
 
 // fieldset
 $mform->addFieldset(\'Neues Form\');

@@ -21,3 +21,5 @@ mfrom_add_internlink = Interner Link auswählen
 mfrom_add_externlink = Externer Link eingeben
 mform_add_medialink = Medium auswählen
 mform_remove_link = Link entfernen
+mform_wiki = MForm Github Doku Wiki
+mform_github = MForm FOR Github Repository
