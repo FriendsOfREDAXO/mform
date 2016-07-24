@@ -32,7 +32,10 @@ abstract class AbstractMFormParser
      */
     protected function parseElement(MFormElement $element, $templateType, $subPath = false)
     {
-        return str_replace(array_merge(array(' />'), $element->getKeys()), array_merge(array('/>'), $element->getValues()), MFormTemplateFileProvider::loadTemplate($templateType, ($subPath) ? MFormTemplateFileProvider::ELEMENTS_PATH : ''));
+        return str_replace(
+            array_merge(array(' />'),$element->getKeys()),
+            array_merge(array('/>'), $element->getValues()),
+            MFormTemplateFileProvider::loadTemplate($templateType, ($subPath) ? MFormTemplateFileProvider::ELEMENTS_PATH : '', $this->theme));
     }
 
     /**
