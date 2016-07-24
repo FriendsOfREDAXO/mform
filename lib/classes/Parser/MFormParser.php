@@ -358,7 +358,7 @@ EOT;
         $checkboxElements = '';
 
         // options must te be given
-        if (sizeof($item->getOptions()) > 1) {
+        if (sizeof($item->getOptions()) > 0) {
             // is multiple flag true
             // if ($item->isMultiple()) {
                 // TODO add hidden field and javascript and so fare
@@ -590,6 +590,22 @@ EOT;
      */
     public function parse(array $items, $theme = NULL, $debug = false)
     {
+        $this->theme = rex_addon::get('mform')->getConfig('mform_theme');
+        if (!is_null($theme) && $theme != $this->theme) {
+            $this->theme = $theme;
+            // asset not exist? add via boot check
+            MFormThemeHelper::themeBootCheck($theme);
+            // add css
+            // use theme helper class
+            if(sizeof(MFormThemeHelper::getCssAssets($this->theme)) > 0) {
+                // foreach all css files
+                foreach (MFormThemeHelper::getCssAssets($this->theme) as $css) {
+                    // add assets css file
+                   $this->elements[] = '<link rel="stylesheet" type="text/css" media="all" href="' . rex_url::addonAssets('mform', $css) . '" />';
+                }
+            }
+        }
+
         $this->parseFormFields($items);
 
         // close fieldset
