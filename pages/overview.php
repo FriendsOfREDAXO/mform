@@ -57,6 +57,7 @@ $elements['label'] = '
 $select = new rex_select;
 $select->setId('rex-mform-config-template');
 $select->setSize(1);
+$select->setAttribute('class', 'form-control');
 $select->setName('config[mform_theme]');
 // add options
 foreach ($themes as $theme) {
