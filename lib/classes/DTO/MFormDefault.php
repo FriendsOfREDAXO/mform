@@ -20,6 +20,6 @@ class MFormDefault
         'textarea' => 'form-control',
         'textarea-readonly' => 'form-control',
         'checkbox' => '',
-        'radiobutton' => ''
+        'radio' => ''
     );
 }

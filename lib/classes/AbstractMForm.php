@@ -323,7 +323,7 @@ abstract class AbstractMForm
      */
     public function addRadioField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
     {
-        return $this->addOptionField('radiobutton', $id, $attributes, $options, $validation, $defaultValue);
+        return $this->addOptionField('radio', $id, $attributes, $options, $validation, $defaultValue);
     }
 
     /**

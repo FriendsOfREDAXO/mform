@@ -11,8 +11,8 @@ class MFormParser extends AbstractMFormParser
      * create the fieldset open element
      * fieldset open
      * @param MFormItem $item
+     * @return $this
      * @author Joachim Doerr
-     * @return ParseMForm
      */
     private function generateFieldset(MFormItem $item)
     {
@@ -51,7 +51,7 @@ class MFormParser extends AbstractMFormParser
      * create the fieldset close element
      * fieldset close
      * @param bool $fieldset
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function closeFieldset($fieldset = false)
@@ -74,7 +74,7 @@ class MFormParser extends AbstractMFormParser
      * create any no input inline element
      * html, headline, description
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateLineElement(MFormItem $item)
@@ -91,7 +91,7 @@ class MFormParser extends AbstractMFormParser
      * create input text element
      * hidden, text, password
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateInputElement(MFormItem $item)
@@ -149,7 +149,7 @@ class MFormParser extends AbstractMFormParser
      * create textarea element
      * textarea
      * @param $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateAreaElement(MFormItem $item)
@@ -204,7 +204,7 @@ class MFormParser extends AbstractMFormParser
      * create select or multiselect element
      * select, multiselect
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateOptionsElement(MFormItem $item)
@@ -345,7 +345,7 @@ EOT;
      * create checkbox element
      * checkbox
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateCheckboxElement(MFormItem $item)
@@ -365,7 +365,7 @@ EOT;
                 // TODO add text element
             // } else {
                 foreach ($item->getOptions() as $key => $value) {
-                    $checkboxElements .= $this->createCheckElement($item, $key, $value);
+                    $checkboxElements .= $this->createCheckElement($item, $key, $value); // create element by helper
                     break;
                 }
             //}
@@ -392,11 +392,10 @@ EOT;
      * @param $key
      * @param $value
      * @param null|int $count
-     * @param string $templateKey
      * @return mixed
      * @author Joachim Doerr
      */
-    private function createCheckElement(MFormItem $item, $key, $value, $count = null, $templateKey = 'ckeckbox')
+    private function createCheckElement(MFormItem $item, $key, $value, $count = null)
     {
         // create element
         $element = new MFormElement();
@@ -415,14 +414,14 @@ EOT;
             $element->setAttributes('checked="checked"');
         }
         // parse element
-        return $this->parseElement($element, $templateKey, true);
+        return $this->parseElement($element, $item->getType(), true);
     }
 
     /**
      * create radiobutton element
      * radiobutton
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateRadioElement(MFormItem $item)
@@ -433,13 +432,12 @@ EOT;
         MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
 
         $radioElements = '';
-
         // options must te be given
         if (sizeof($item->getOptions()) > 0) {
             $count = 0; // init count
             foreach ($item->getOptions() as $key => $value) {
                 $count++; // + count
-                $radioElements .= $this->createCheckElement($item, $key, $value, $count, 'radio'); // create element by helper
+                $radioElements .= $this->createCheckElement($item, $key, $value, $count); // create element by helper
             }
         }
 
@@ -461,7 +459,7 @@ EOT;
     /**
      * media, medialist
      * @param MFormItem $item
-     * @return ParseMForm
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateMediaElement(MFormItem $item)
@@ -493,8 +491,7 @@ EOT;
     /**
      * link, linklist
      * @param MFormItem $item
-     * @return ParseMForm
-     * @internal param $element
+     * @return $this
      * @author Joachim Doerr
      */
     private function generateLinkElement(MFormItem $item)
@@ -525,8 +522,8 @@ EOT;
 
     /**
      * @param MFormItem[] $items
-     * @author Joachim Doerr
      * @return $this
+     * @author Joachim Doerr
      */
     private function parseFormFields(array $items)
     {
@@ -563,7 +560,6 @@ EOT;
                         $this->generateOptionsElement($item);
                         break;
                     case 'radio':
-                    case 'radiobutton':
                         $this->generateRadioElement($item);
                         break;
                     case 'checkbox':
@@ -602,7 +598,9 @@ EOT;
         }
         // show for debug items
         if ($debug) {
-            var_dump($items);
+            echo '<pre>'.PHP_EOL;
+            print_r($items);
+            echo '</pre>'.PHP_EOL;
         }
         return implode($this->elements);
     }
