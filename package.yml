@@ -1,5 +1,5 @@
 package: mform
-version: '4.2.3'
+version: '5.0.0'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -8,6 +8,5 @@ page:
     title: 'translate:title'
     perm: admin[]
     subpages:
-        info: { title: 'translate:info' }
-        config: { title: 'translate:config' }
+        overview: { title: 'translate:overview' }
         demo: { title: 'translate:demo' }
