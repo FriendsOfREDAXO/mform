@@ -14,7 +14,7 @@ class MFormAttributeHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    static function setAttribute(MFormItem $item, $name, $value)
+    static function addAttribute(MFormItem $item, $name, $value)
     {
         switch ($name) {
             case 'label':
@@ -56,6 +56,9 @@ class MFormAttributeHandler
             case 'default-class': // i like set the r5 default classes
                 $item->setDefaultClass($value);
                 break;
+            case 'required':
+                MFormValidationHandler::addValidation($item, 'required');
+                break;
             default: // set any attributes
                 $item->attributes[$name] = $value;
         }
@@ -73,7 +76,7 @@ class MFormAttributeHandler
         if (is_array($attributes)) {
             foreach ($attributes as $strName => $strValue) {
                 // set attribute by setAttribute method
-                self::setAttribute($item, $strName, $strValue);
+                self::addAttribute($item, $strName, $strValue);
             }
         }
     }

@@ -14,7 +14,7 @@ class MFormOptionHandler
      * @param mixed $key
      * @author Joachim Doerr
      */
-    static public function setOption(MFormItem $item, $value, $key)
+    static public function addOption(MFormItem $item, $value, $key)
     {
         // add option to options array
         $item->options[$key] = MFormClang::getClangValue($value);
@@ -27,7 +27,7 @@ class MFormOptionHandler
      * @param mixed $options
      * @author Joachim Doerr
      */
-    static public function setOptGroup(MFormItem $item, $label, $options)
+    static public function addOptGroup(MFormItem $item, $label, $options)
     {
         $option = array();
         foreach ($options as $key => $value) {
@@ -51,10 +51,10 @@ class MFormOptionHandler
             foreach ($options as $key => $value) {
                 if(is_array($value)) { // and is value an array
                     // add opt group by setOptGroup method
-                    self::setOptGroup($item, $key, $value);
+                    self::addOptGroup($item, $key, $value);
                 } else {
                     // add default option by setOption method
-                    self::setOption($item, $value, $key);
+                    self::addOption($item, $value, $key);
                 }
             }
         }
@@ -72,7 +72,7 @@ class MFormOptionHandler
         $sql = rex_sql::factory();
         $sql->setQuery($query);
         while ($sql->hasNext()) {
-            self::setOption($item, $sql->getValue('name'), $sql->getValue('id'));
+            self::addOption($item, $sql->getValue('name'), $sql->getValue('id'));
             $sql->next();
         }
     }

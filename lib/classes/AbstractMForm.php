@@ -137,7 +137,7 @@ abstract class AbstractMForm
      * @author Joachim Doerr
      * TODO bring it to run
      * @return $this
-     */
+     *//*
     public function callback($callable = NULL, $parameter = array())
     {
         //if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true) {
@@ -150,21 +150,20 @@ abstract class AbstractMForm
         //    );
         //}
         return $this;
-    }
+    }*/
 
     /**
      * @param string $typ
      * @param integer|float $id
-     * @param null|string $value
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
      * @return AbstractMForm
      * @author Joachim Doerr
      */
-    public function addInputField($typ, $id, $value = NULL, $attributes = array(), $validations = array(), $defaultValue = NULL)
+    public function addInputField($typ, $id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {
-        return $this->addElement($typ, $id, $value, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
+        return $this->addElement($typ, $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
     }
 
     /**
@@ -176,11 +175,11 @@ abstract class AbstractMForm
      */
     public function addHiddenField($id, $value = NULL, $attributes = array())
     {
-        return $this->addInputField('hidden', $id, $value, $attributes);
+        return $this->addElement('hidden', $id, $value, $attributes, NULL, NULL, NULL, array(), array());
     }
 
     /**
-     * @param integer|float $id
+     * @param float $id
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
@@ -189,7 +188,7 @@ abstract class AbstractMForm
      */
     public function addTextField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {
-        return $this->addInputField('text', $id, NULL, $attributes, $validations, $defaultValue);
+        return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
     }
 
     /**
@@ -202,7 +201,7 @@ abstract class AbstractMForm
      */
     public function addTextAreaField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {
-        return $this->addInputField('textarea', $id, NULL, $attributes, $validations, $defaultValue);
+        return $this->addInputField('textarea', $id, $attributes, $validations, $defaultValue);
     }
 
     /**
@@ -214,7 +213,7 @@ abstract class AbstractMForm
      */
     public function addTextReadOnlyField($id, $value = NULL, $attributes = array())
     {
-        return $this->addInputField('text-readonly', $id, $value, $attributes);
+        return $this->addElement('text-readonly', $id, $value, $attributes, NULL, NULL, NULL, array(), array());
     }
 
     /**
@@ -226,7 +225,7 @@ abstract class AbstractMForm
      */
     public function addTextAreaReadOnlyField($id, $value = NULL, $attributes = array())
     {
-        return $this->addInputField('textarea-readonly', $id, $value, $attributes);
+        return $this->addElement('textarea-readonly', $id, $value, $attributes, NULL, NULL, NULL, array(), array());
     }
 
     /**
@@ -390,7 +389,18 @@ abstract class AbstractMForm
      */
     public function setLabel($label)
     {
-        MFormAttributeHandler::setAttribute($this->item, 'label', $label);
+        MFormAttributeHandler::addAttribute($this->item, 'label', $label);
+        return $this;
+    }
+
+    /**
+     * @param $placeholder
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setPlaceholder($placeholder)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'placeholder', $placeholder);
         return $this;
     }
 
@@ -400,7 +410,20 @@ abstract class AbstractMForm
      */
     public function setFull()
     {
-        MFormAttributeHandler::setAttribute($this->item, 'full', true);
+        MFormAttributeHandler::addAttribute($this->item, 'full', true);
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @author Joachim Doerr
+     * @deprecated This method will be removed in v5.2.0 use addAttribute
+     * @return $this
+     */
+    public function setAttribute($name, $value)
+    {
+        MFormAttributeHandler::addAttribute($this->item, $name, $value);
         return $this;
     }
 
@@ -410,9 +433,9 @@ abstract class AbstractMForm
      * @author Joachim Doerr
      * @return $this
      */
-    public function setAttribute($name, $value)
+    public function addAttribute($name, $value)
     {
-        MFormAttributeHandler::setAttribute($this->item, $name, $value);
+        MFormAttributeHandler::addAttribute($this->item, $name, $value);
         return $this;
     }
 
@@ -432,14 +455,28 @@ abstract class AbstractMForm
      * @param $key
      * @param $value
      * @author Joachim Doerr
+     * @deprecated This method will be removed in v5.2.0 use addValidation
      * @return $this
      */
     public function setValidation($key, $value = null)
     {
-        MFormValidationHandler::setValidation($this->item, $key, $value);
+        MFormValidationHandler::addValidation($this->item, $key, $value);
         return $this;
     }
 
+
+    /**
+     * add default validation
+     * @param $key
+     * @param $value
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function addValidation($key, $value = null)
+    {
+        MFormValidationHandler::addValidation($this->item, $key, $value);
+        return $this;
+    }
     /**
      * @param $validations
      * @author Joachim Doerr
@@ -458,21 +495,8 @@ abstract class AbstractMForm
      */
     public function setDefaultValue($value)
     {
-        MFormAttributeHandler::setAttribute($this->item, 'default-value', $value);
+        MFormAttributeHandler::addAttribute($this->item, 'default-value', $value);
         return $this;
-    }
-
-    /**
-     * @param $value
-     * @param $key
-     * @author Joachim Doerr
-     * @deprecated this method will be removed in v5 use setOption
-     * TODO remove it
-     * @return AbstractMForm
-     */
-    public function addOption($value, $key)
-    {
-        return $this->setOption($value, $key);
     }
 
     /**
@@ -481,22 +505,10 @@ abstract class AbstractMForm
      * @author Joachim Doerr
      * @return $this
      */
-    public function setOption($value, $key)
+    public function addOption($value, $key)
     {
-        MFormOptionHandler::setOption($this->item, $value, $key);
+        MFormOptionHandler::addOption($this->item, $value, $key);
         return $this;
-    }
-
-    /**
-     * @param $options
-     * @author Joachim Doerr
-     * @deprecated this method will be removed in v5 use setOptions
-     * TODO remove it
-     * @return AbstractMForm
-     */
-    public function addOptions($options)
-    {
-        return $this->setOptions($options);
     }
 
     /**
@@ -508,18 +520,6 @@ abstract class AbstractMForm
     {
         MFormOptionHandler::setOptions($this->item, $options);
         return $this;
-    }
-
-    /**
-     * @param $query
-     * @author Joachim Doerr
-     * @deprecated this method will be removed in v5 use setSqlOptions
-     * TODO remove it
-     * @return AbstractMForm
-     */
-    public function addSqlOptions($query)
-    {
-        return $this->setSqlOptions($query);
     }
 
     /**
@@ -539,7 +539,7 @@ abstract class AbstractMForm
      */
     public function setMultiple()
     {
-        MFormAttributeHandler::setAttribute($this->item, 'multiple', 'multiple');
+        MFormAttributeHandler::addAttribute($this->item, 'multiple', 'multiple');
         return $this;
     }
 
@@ -550,7 +550,7 @@ abstract class AbstractMForm
      */
     public function setSize($size)
     {
-        MFormAttributeHandler::setAttribute($this->item, 'size', $size);
+        MFormAttributeHandler::addAttribute($this->item, 'size', $size);
         return $this;
     }
 
@@ -562,7 +562,20 @@ abstract class AbstractMForm
      */
     public function setCategory($catId)
     {
-        MFormAttributeHandler::setAttribute($this->item, 'catId', $catId);
+        MFormAttributeHandler::addAttribute($this->item, 'catId', $catId);
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @author Joachim Doerr
+     * @deprecated This method will be removed in v5.2.0 use addParameter
+     * @return $this
+     */
+    public function setParameter($name, $value)
+    {
+        MFormParameterHandler::addParameter($this->item, $name, $value);
         return $this;
     }
 
@@ -572,9 +585,9 @@ abstract class AbstractMForm
      * @author Joachim Doerr
      * @return $this
      */
-    public function setParameter($name, $value)
+    public function addParameter($name, $value)
     {
-        MFormParameterHandler::setParameter($this->item, $name, $value);
+        MFormParameterHandler::addParameter($this->item, $name, $value);
         return $this;
     }
 

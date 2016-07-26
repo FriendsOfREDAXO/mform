@@ -86,6 +86,11 @@ class MFormElement
     public $output;
 
     /**
+     * @var string
+     */
+    public $datalist;
+
+    /**
      * @param string $id
      * @return $this
      */
@@ -233,6 +238,16 @@ class MFormElement
     public function setOutput($output)
     {
         $this->output = $output;
+        return $this;
+    }
+
+    /**
+     * @param string $datalist
+     * @return $this
+     */
+    public function setDatalist($datalist)
+    {
+        $this->datalist = $datalist;
         return $this;
     }
 

@@ -98,6 +98,7 @@ class MFormParser extends AbstractMFormParser
     {
         // define default template type
         $templateType = 'default';
+        $datalist = '';
 
         // set typ specific vars
         switch ($item->getType()) {
@@ -106,13 +107,27 @@ class MFormParser extends AbstractMFormParser
                 $item->setLabel(''); // and unset label
                 break;
             case 'text-readonly': // is readonly
-                MFormAttributeHandler::setAttribute($item, 'readonly', 'readonly'); // add attribute readonly
+                MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
                 break;
         }
 
         // is full flag true and template type default
         if ($item->isFull() && $templateType == 'default') {
             $templateType = $templateType . '_full'; // add _full to template type
+        }
+
+        // datalist?
+        if ($item->getOptions()) {
+            $item->setAttributes(array_merge($item->getAttributes(), array('list' => 'list'.$item->getId())));
+
+            $optionElements = '';
+            foreach ($item->getOptions() as $key => $value) {
+                $optionElements .= $this->createOptionElement($item, $value, (!is_integer($key))?"label=\"$key\"":'', 'datalist-option', false);
+            }
+            $element = new MFormElement();
+            $element->setOptions($optionElements)
+                ->setId('list'.$item->getId());
+            $datalist = $this->parseElement($element, 'datalist', true);
         }
 
         // default manipulations
@@ -128,6 +143,7 @@ class MFormParser extends AbstractMFormParser
             ->setValue($item->getValue())
             ->setType($item->getType())
             ->setClass($item->getClass())
+            ->setDatalist($datalist)
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
 
         // create label element
@@ -161,7 +177,7 @@ class MFormParser extends AbstractMFormParser
         switch ($item->getType()) {
             case 'textarea-readonly':
                 $item->setType('textarea'); // type is textarea
-                MFormAttributeHandler::setAttribute($item, 'readonly', 'readonly'); // add attribute readonly
+                MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
                 break;
         }
 
@@ -311,10 +327,12 @@ EOT;
      * @param MFormItem $item
      * @param $key
      * @param $value
+     * @param string $templateType
+     * @param bool $selected
      * @return mixed
      * @author Joachim Doerr
      */
-    private function createOptionElement(MFormItem $item, $key, $value)
+    private function createOptionElement(MFormItem $item, $key, $value, $templateType = 'option', $selected = true)
     {
         // create element
         $element = new MFormElement();
@@ -334,11 +352,11 @@ EOT;
         }
 
         // set default value or selected
-        if ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue())) {
+        if ($selected && ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue()))) {
             $element->setAttributes('selected'); // add attribute selected
         }
         // parse element
-        return $this->parseElement($element, 'option', true);
+        return $this->parseElement($element, $templateType, true);
     }
 
     /**
@@ -548,6 +566,7 @@ EOT;
                     case 'text':
                     case 'hidden':
                     case 'text-readonly':
+                    default:
                         $this->generateInputElement($item);
                         break;
                     case 'markitup':

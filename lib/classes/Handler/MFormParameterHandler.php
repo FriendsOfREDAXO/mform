@@ -13,7 +13,7 @@ class MFormParameterHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    static public function setParameter(MFormItem $item, $name, $value)
+    static public function addParameter(MFormItem $item, $name, $value)
     {
         switch ($name) {
             case 'category':
@@ -43,7 +43,7 @@ class MFormParameterHandler
         if (is_array($parameter)) {
             foreach ($parameter as $name => $value) {
                 // set parameter by setParameter method
-                self::setParameter($item, $name, $value);
+                self::addParameter($item, $name, $value);
             }
         }
     }
