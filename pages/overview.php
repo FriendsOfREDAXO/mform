@@ -20,8 +20,7 @@ include rex_path::addon('mform', 'pages/info.php');
 //////////////////////////////////////////////////////////
 // parse info fragment
 $fragment = new rex_fragment();
-$fragment->setVar('class', 'info');
-$fragment->setVar('title', $this->i18n('help_headline'), false);
+$fragment->setVar('title', $this->i18n('help_subheadline_1'), false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
 
@@ -75,7 +74,7 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['field'] = '
-  <input type="submit" name="config[submit]" value="' . $this->i18n('config_save') . '" ' . rex::getAccesskey($this->i18n('config_save'), 'save') . ' />
+  <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . $this->i18n('config_save') . '" ' . rex::getAccesskey($this->i18n('config_save'), 'save') . ' />
 ';
 $formElements[] = $elements;
 // parse submit element

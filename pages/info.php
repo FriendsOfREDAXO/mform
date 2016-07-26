@@ -14,8 +14,8 @@ if (rex_addon::isInstalled('mform') !== true) {
         <p>Dieses Addon erleichtert das Erstellen von Modul Input Formularen.</p>
     ';
 } else {
+    $headline = '<h3>'. $this->i18n('help_subheadline_1') .'</h3>';
     $content = '
-        <h3>'. $this->i18n('help_subheadline_1') .'</h3>
         <p>'.  $this->i18n('help_infotext_1') .'</p>
         <p>'.  $this->i18n('help_infotext_2') .'</p>
         <p>'.  $this->i18n('help_infotext_3') .'</p>
