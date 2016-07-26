@@ -13,7 +13,7 @@ if (rex::isBackend()) {
     MFormThemeHelper::themeBootCheck(rex_addon::get('mform')->getConfig('mform_theme'));
 
     // use theme helper class
-    if(sizeof(MFormThemeHelper::getCssAssets(rex_addon::get('mform')->getConfig('mform_theme'))) > 0) {
+    if(MFormThemeHelper::getCssAssets(rex_addon::get('mform')->getConfig('mform_theme'))) {
         // foreach all css files
         foreach (MFormThemeHelper::getCssAssets(rex_addon::get('mform')->getConfig('mform_theme')) as $css) {
             // add assets css file
