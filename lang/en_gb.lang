@@ -7,6 +7,8 @@ mform_demo_expert = Experten Beispiele
 mform_demo_community = FOS Beispiele
 mform_referenz_demo = Beispiel Sammlung
 mform_info = Info
+mform_module_input = Modul Eingabe
+mform_module_output = Modul Ausgabe
 mform_help_headline = Informationen
 mform_help_subheadline_1 = MForm – Redaxo Addon für Modul-Input-Formulare
 mform_help_infotext_1 = MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit, welche sich recht einfach einbinden lassen.
@@ -29,3 +31,8 @@ mform_example_extended_options_method = Options Method
 mform_example_expert_html_form_elements = Neue HTML5 Formular-Elemente
 mform_example_expert_datalist = Datalists für Input-Elemente
 mform_example_expert_placeholder = Placeholder
+
+mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
+mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.
+mform_example_description_expert = Die "Experten Beispiele" zeigen, dass MForm für mehr als nur für Standards genutzt werden kann.
+mform_example_description_community = Later
