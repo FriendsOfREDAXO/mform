@@ -14,7 +14,7 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 
 ## Installation
 
-1. Letzten `[release](https://github.com/FriendsOfREDAXO/mform/releases/latest)` downloaden
+1. Letzten [release](https://github.com/FriendsOfREDAXO/mform/releases/latest) downloaden
 2. Zip Archiv entpacken
 3. Entpackten Folder in `mform` umbenennen
 4. MForm Ordner in den REDAXO Addon Ordner `redaxo/src/addons/` verschieben
