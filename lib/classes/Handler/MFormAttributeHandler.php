@@ -39,9 +39,10 @@ class MFormAttributeHandler
                 $item->setMultiple(true);
                 $item->attributes[$name] = $value;
                 break;
+            case 'category':
             case 'catId': // set cat id as parameter for link or media fields
                 if ($value > 0)
-                    $item->setCatId($value);
+                    MFormParameterHandler::addParameter($item, 'category', $value);
                 break;
             case 'validation': // add validation by parsley
                 if (is_array($value))
