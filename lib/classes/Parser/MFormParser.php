@@ -637,6 +637,12 @@ EOT;
             print_r($items);
             echo '</pre>'.PHP_EOL;
         }
-        return implode($this->elements);
+
+        // wrap elements
+        $element = new MFormElement();
+        $element->setOutput(implode($this->elements));
+
+        // return output
+        return $this->parseElement($element, 'wrapper');
     }
 }
