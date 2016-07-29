@@ -34,12 +34,16 @@ mform_example_base_inline = Strukturelle Inline-Elemente
 mform_example_base_system = System-Button-Elemente
 mform_example_extended_attribute_method = Attributes Method
 mform_example_extended_options_method = Options Method
+mform_example_extended_parameter_method = Parameter Method
+mform_example_extended_full_json_support = Full JSON-Value-Support
+mform_example_extended_diverse_setter = Add und diverse Setter
 mform_example_expert_html_form_elements = Neue HTML5 Formular-Elemente
 mform_example_expert_datalist = Datalists für Input-Elemente
 mform_example_expert_placeholder = Placeholder
+mform_example_expert_validation = Parsley Validation
+mform_example_expert_debug_custom_theme = Debugmode und Custom-Theme
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
 mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.
 mform_example_description_expert = Die "Experten Beispiele" zeigen, dass MForm für mehr als nur für Standards genutzt werden kann.
 mform_example_description_community = Later
-mform_example_extended_full_json_support = Full JSON value support
