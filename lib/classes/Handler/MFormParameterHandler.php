@@ -16,10 +16,6 @@ class MFormParameterHandler
     static public function addParameter(MFormItem $item, $name, $value)
     {
         switch ($name) {
-            case 'category':
-                if ($value > 0)
-                    $item->setCatId($value);
-                break;
             case 'label':
                 $item->setLabel($value);
                 break;

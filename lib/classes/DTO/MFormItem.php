@@ -40,11 +40,6 @@ class MFormItem
     /**
      * @var integer
      */
-    public $catId;
-
-    /**
-     * @var integer
-     */
     public $size;
 
     /**
@@ -197,24 +192,6 @@ class MFormItem
     public function setMode($mode)
     {
         $this->mode = $mode;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCatId()
-    {
-        return $this->catId;
-    }
-
-    /**
-     * @param int $catId
-     * @return $this
-     */
-    public function setCatId($catId)
-    {
-        $this->catId = $catId;
         return $this;
     }
 
