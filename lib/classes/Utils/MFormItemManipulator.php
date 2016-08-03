@@ -13,7 +13,7 @@ class MFormItemManipulator
      * @param MFormItem $item
      * @author Joachim Doerr
      */
-    static public function setVarAndIds(MFormItem $item)
+    public static function setVarAndIds(MFormItem $item)
     {
         // set value for html out
         $item->setValue(htmlspecialchars($item->getValue()));
@@ -36,7 +36,7 @@ class MFormItemManipulator
      * @param MFormItem $item
      * @author Joachim Doerr
      */
-    static public function setCustomId(MFormItem $item)
+    public static function setCustomId(MFormItem $item)
     {
         // set default unique element id
         $item->setId('rv' . $item->getId()); // add alpha prefix for valid html syntax
@@ -53,7 +53,7 @@ class MFormItemManipulator
      * @param MFormItem $item
      * @author Joachim Doerr
      */
-    static public function setDefaultClass(MFormItem $item)
+    public static function setDefaultClass(MFormItem $item)
     {
         // is default class flag set
         if ($item->isDefaultClass()) {

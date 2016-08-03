@@ -15,7 +15,7 @@ class MFormElementHandler
      * @return MFormItem
      * @author Joachim Doerr
      */
-    static public function createElement($id, $type, $varId)
+    public static function createElement($id, $type, $varId)
     {
         // create item
         $item = new MFormItem();

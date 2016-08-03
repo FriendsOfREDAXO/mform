@@ -11,7 +11,7 @@ class MFormValueHandler
      * @return array
      * @author Joachim Doerr
      */
-    static public function loadRexVars()
+    public static function loadRexVars()
     {
         $sliceId = rex_request('slice_id', 'int', false);
         $result = array();
@@ -63,7 +63,7 @@ class MFormValueHandler
      * @param null|string $defaultValue
      * @author Joachim Doerr
      */
-    static public function decorateItem(MFormItem $item, $result, $value = null, $defaultValue = null)
+    public static function decorateItem(MFormItem $item, $result, $value = null, $defaultValue = null)
     {
 //        var_dump($item);
 //        die;

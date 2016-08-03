@@ -13,7 +13,7 @@ class MFormClang
      * @return mixed|string
      * @author Joachim Doerr
      */
-    static public function getClangValue($languageData)
+    public static function getClangValue($languageData)
     {
         // lang data must be array
         if (is_array($languageData)) {

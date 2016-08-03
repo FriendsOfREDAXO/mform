@@ -16,7 +16,7 @@ class MFormValidationHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    static public function addValidation(MFormItem $item, $key, $value = null)
+    public static function addValidation(MFormItem $item, $key, $value = null)
     {
         // set key by value
         switch($value) {
@@ -112,7 +112,7 @@ class MFormValidationHandler
      * @param $validations
      * @author Joachim Doerr
      */
-    static public function setValidations(MFormItem $item, $validations)
+    public static function setValidations(MFormItem $item, $validations)
     {
         // if validations an array
         if (is_array($validations)) {

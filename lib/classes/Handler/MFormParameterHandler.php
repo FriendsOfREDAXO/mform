@@ -13,7 +13,7 @@ class MFormParameterHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    static public function addParameter(MFormItem $item, $name, $value)
+    public static function addParameter(MFormItem $item, $name, $value)
     {
         switch ($name) {
             case 'label':
@@ -33,7 +33,7 @@ class MFormParameterHandler
      * @param array $parameter
      * @author Joachim Doerr
      */
-    static public function setParameters(MFormItem $item, $parameter)
+    public static function setParameters(MFormItem $item, $parameter)
     {
         // is parameter an array
         if (is_array($parameter)) {

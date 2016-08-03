@@ -21,7 +21,7 @@ class MFormTemplateFileProvider
      * @return string
      * @author Joachim Doerr
      */
-    static public function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
+    public static function loadTemplate($templateType, $subPath = '', $theme = NULL, $stop = false)
     {
         if (is_null($theme)) {
             $theme = rex_addon::get('mform')->getConfig('mform_theme');

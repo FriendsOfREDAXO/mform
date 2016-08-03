@@ -14,7 +14,7 @@ class MFormAttributeHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    static function addAttribute(MFormItem $item, $name, $value)
+    public static function addAttribute(MFormItem $item, $name, $value)
     {
         switch ($name) {
             case 'label':
@@ -71,7 +71,7 @@ class MFormAttributeHandler
      * @param array $attributes
      * @author Joachim Doerr
      */
-    static public function setAttributes(MFormItem $item, $attributes)
+    public static function setAttributes(MFormItem $item, $attributes)
     {
         // if attributes an array
         if (is_array($attributes)) {
