@@ -7,5 +7,3 @@
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());
-// copy all theme css files to assets folder
-MFormThemeHelper::copyThemeCssToAssets();
