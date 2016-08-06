@@ -1,13 +1,19 @@
 .mform-headline h3 {
   margin: 0;
 }
-.form-control.parsley-success:focus {
+.mform .form-control.parsley-success:focus {
   color: #468847;
   background-color: #DFF0D8;
   border: 1px solid #D6E9C6;
 }
-.form-control.parsley-error:focus {
+.mform .form-control.parsley-error:focus {
   color: #B94A48;
   background-color: #F2DEDE;
   border: 1px solid #EED3D7;
+}
+.mform select.form-control {
+  height: 34px;
+}
+.mform select[multiple], .mform select[size] {
+  height: auto;
 }
