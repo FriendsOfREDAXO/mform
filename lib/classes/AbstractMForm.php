@@ -256,8 +256,8 @@ abstract class AbstractMForm
      */
     public function addSelectField($id, $options = array(), $attributes = array(), $size = 1, $validation = array(), $defaultValue = NULL)
     {
-        $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue)
-            ->setSize($size);
+        $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue);
+        if ($size > 1) $this->setSize($size);
         return $this;
     }
 
