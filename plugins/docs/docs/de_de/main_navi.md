@@ -1,4 +1,4 @@
-# YForm-Dokumentation
+# MForm-Dokumentation
 
 - MForm
 	- [Einführung](main_intro.md)
