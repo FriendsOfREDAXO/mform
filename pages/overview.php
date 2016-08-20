@@ -1,10 +1,7 @@
 <?php
 /**
- * @copyright Copyright (c) 2015 by Joachim Doerr
  * @author mail[at]joachim-doerr[dot]com Joachim Doerr
- *
  * @package redaxo5
- * @version 4.0.0
  * @license MIT
  */
 
@@ -20,7 +17,7 @@ include rex_path::addon('mform', 'pages/info.php');
 //////////////////////////////////////////////////////////
 // parse info fragment
 $fragment = new rex_fragment();
-$fragment->setVar('title', $this->i18n('help_subheadline_1'), false);
+$fragment->setVar('title', rex_i18n::msg('mform_help_subheadline_1'), false);
 $fragment->setVar('body', $content, false);
 echo $fragment->parse('core/page/section.php');
 
@@ -33,7 +30,7 @@ $form = '';
 if ($config['submit']) {
     // show is saved field
     $this->setConfig('mform_theme', $config['mform_theme']);
-    $form .= rex_view::info($this->i18n('config_saved'));
+    $form .= rex_view::info(rex_i18n::msg('mform_config_saved'));
 }
 
 // read dir
@@ -49,7 +46,7 @@ $form .= '
 $formElements = array();
 $elements = array();
 $elements['label'] = '
-  <label for="rex-mform-config-template">' . $this->i18n('config_label_template') . '</label>
+  <label for="rex-mform-config-template">' . rex_i18n::msg('mform_config_label_template') . '</label>
 ';
 
 // create select
@@ -74,7 +71,7 @@ $form .= $fragment->parse('core/form/form.php');
 $formElements = array();
 $elements = array();
 $elements['field'] = '
-  <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . $this->i18n('config_save') . '" ' . rex::getAccesskey($this->i18n('config_save'), 'save') . ' />
+  <input type="submit" class="btn btn-save rex-form-aligned" name="config[submit]" value="' . rex_i18n::msg('mform_config_save') . '" ' . rex::getAccesskey(rex_i18n::msg('mform_config_save'), 'save') . ' />
 ';
 $formElements[] = $elements;
 // parse submit element
@@ -92,6 +89,6 @@ $form .= '
 // parse form fragment
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'edit', false);
-$fragment->setVar('title', $this->i18n('config'));
+$fragment->setVar('title', rex_i18n::msg('mform_config'));
 $fragment->setVar('body', $form, false);
 echo $fragment->parse('core/page/section.php');

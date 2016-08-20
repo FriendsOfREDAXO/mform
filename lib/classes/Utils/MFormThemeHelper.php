@@ -1,8 +1,8 @@
 <?php
 /**
- * User: joachimdoerr
- * Date: 24.07.16
- * Time: 13:38
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class MFormThemeHelper

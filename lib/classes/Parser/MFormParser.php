@@ -1,8 +1,8 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 16.07.16
- * Time: 22:50
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class MFormParser extends AbstractMFormParser

@@ -1,8 +1,8 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 15.07.16
- * Time: 23:36
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class MFormValueHandler
@@ -49,10 +49,6 @@ class MFormValueHandler
                 }
             }
         }
-//        echo '<pre>';
-//        print_r($result);
-//        echo '</pre>';
-//        die;
         return $result;
     }
 
@@ -65,8 +61,6 @@ class MFormValueHandler
      */
     public static function decorateItem(MFormItem $item, $result, $value = null, $defaultValue = null)
     {
-//        var_dump($item);
-//        die;
         if (!is_null($defaultValue)) {
             // set default value
             $item->setDefaultValue(MFormClang::getClangValue($defaultValue));

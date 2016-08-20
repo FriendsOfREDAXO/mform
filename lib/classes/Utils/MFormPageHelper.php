@@ -1,11 +1,10 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: joachimdoerr
- * Date: 26.07.16
- * Time: 22:26
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
+
 class MFormPageHelper
 {
     public static function exchangeExamples($type)

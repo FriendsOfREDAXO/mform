@@ -1,9 +1,14 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 13.07.16
- * Time: 18:32
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
+
+// set default template
+if (!$this->hasConfig()) {
+    $this->setConfig('mform_template', 'default_theme');
+}
 
 // copy data directory
 rex_dir::copy($this->getPath('data'), $this->getDataPath());

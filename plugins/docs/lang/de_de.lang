@@ -1,0 +1,4 @@
+mform_docs = Dokumentation
+mform_docs_filenotfound = Datei wurde nicht gefunden. Inhalt existiert (noch) nicht. <br />Wir freuen uns über Mithilfe: <a href="https://github.com/yakamara/redaxo_yform_docs/tree/master/de_de" target="_blank">https://github.com/yakamara/redaxo_yform_docs/tree/master/de_de</a>
+mform_docs_navigation = Navigation
+mform_docs_content = Inhalt

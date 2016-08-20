@@ -1,8 +1,8 @@
 <?php
 /**
- * Author: Joachim Doerr
- * Date: 18.07.16
- * Time: 23:15
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class MFormClang

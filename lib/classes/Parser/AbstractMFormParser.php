@@ -1,10 +1,10 @@
 <?php
-
 /**
- * Author: Joachim Doerr
- * Date: 16.07.16
- * Time: 17:15
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
+
 abstract class AbstractMFormParser
 {
     /**

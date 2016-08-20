@@ -1,10 +1,10 @@
 <?php
-
 /**
- * Author: Joachim Doerr
- * Date: 17.07.16
- * Time: 09:47
+ * @author mail[at]joachim-doerr[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
+
 class MFormValidationHandler
 {
     const PREFIX = 'data-parsley-';
