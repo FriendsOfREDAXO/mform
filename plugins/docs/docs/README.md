@@ -1,4 +1,4 @@
-# Dokumentation für das REDAXO-AddOn "YForm"
+# Dokumentation für das REDAXO-AddOn "mform"
 
 ## Deutsch
 

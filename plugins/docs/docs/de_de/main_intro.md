@@ -1,26 +1,36 @@
-# YForm: Einführung
+# MForm - Redaxo Addon für Modul-Input-Formulare
 
-## Formulare im Frontend
 
-Das AddOn YForm dient vor allem zur Generierung von Formularen im Frontend. Formulare sind oft komplex und ziehen meist umfangreiche Nacharbeit mit sich. YForm versucht, durch flexible Verzahnung verschiedener Komponenten möglichst viele dieser Aufgaben zu übernehmen.
+### Was ist MForm
 
-YForm enthält nicht nur alle gängigen Formular-Feldtypen, sondern stellt auch vielfältige Validierungen bereit, Funktionen zum Versand von E-Mails sowie Aktionen, die zum Beispiel Daten in eine Datenbank schreiben oder Weiterleitungen ausführen.
 
-Dazu installiert YFom ein Modul namens `YForm-Formbuilder`. Nach einer allgemeinen Einführung in den [Formbuilder](yform_modul_allgemein.md) werden die zahlreichen Optionen aller [Values](yform_modul_values.md), [Validates](yform_modul_validates.md) und [Actions](yform_modul_actions.md) erklärt. Auch [allgemeine Formular-Paramater](yform_modul_objparams.md) und die [Verzeichnisstruktur](yform_modul_struktur.md) werden behandelt.
+MForm ist ein Redaxo Addon, welches das Erstellen von **Modul-Input-Formularen** erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular-Elemente bereit welche sich durch die Methoden der MForm-Klasse recht einfach einbinden lassen. Dabei bietet MForm weitere Extras, welche sonst in den Modul-Input-Formularen von Redaxo nur mit erhöhtem Aufwand integriert werden können, wie Multiselect-Boxen oder Formular Validierungen.
 
-Das Erstellen von [E-Mail-Templates](email_templates.md) wird in einem eigenen Kapitel beschrieben.
 
-## Tabellenverwaltung im Backend
+### Wiki-Inhalt und Ziel
 
-YForm kann aber nicht nur Formulare für das Frontend generieren sowie Formulareingaben per E-Mail versenden oder in eine Datenbank speichern.
 
-Der Admin kann mit Hilfe des Table Managers auch Datenbank-Tabellen "zusammenklicken" und diese - ergänzt z.B. durch Validierungen - im Backend samt Eingabemaske zur Verfügung stellen. Diese automatisch erzeugten Daten-Verwaltungen können dann wiederum den Code für ein dazu passendes Frontend-Formular generieren.
+In diesem Wiki sind detaillierte Beschreibungen zur Nutzung von MForm und zur Erstellung von Modul-Input-Formulare mit den einzelnen Methoden der MForm-Klasse zu finden.
 
-Nach einer Einführung in das [Grundprinzip](table_manager_grundprinzip.md) werden die [Tabellenoptionen](table_manager_optionen.md) sowie [Feldtypen](table_manager_feldtypen.md) ausfürlich abgehandelt. Auch die [Feld-Validierung](table_manager_validierungen.md) und die [Verknüpfung von Tabellen](table_manager_feldtypen_be-relation.md) kommen zur Sprache.
+Dem erfahrenen Entwickler als auch dem Einsteiger soll dieses Wiki die Handhabung verdeutlichen und Hilfestellung bei allen zu Thema MForm anfallenden Fragen geben.
 
-> **Hinweis:**  
-> Die Dokumentation ist noch nicht ganz fertig, wird aber im Laufe der kommenden Wochen fertiggestellt.
-> 
-> Diese Dokumentation wird auf Github gepflegt:  
-> https://github.com/yakamara/redaxo_yform_docs
-> Ergänzungen oder Korrekturen bitte am besten direkt dort als Issue oder Pull request erstellen.
+
+### MForm für Redaxo 4 und 5
+
+
+MForm wird sowohl für Redaxo 4.5 & < als auch für Redaxo 5 bereitgestellt und entwickelt. Die hier im Wiki enthaltene Informationen sollten für beide Versionen Gültigkeit haben, unterschiede in der Handhabung zwischen diesen Versionen, welche es durch Neuerungen zwischen den Redaxo-Versionen gibt, werden sofern vorhanden entsprechend besprochen und gekennzeichnet.
+
+
+*** 
+
+
+##### Hinweis:
+
+
+MForm ist ausschließlich zum erstellen von **Modul-Input-Formularen** geeignet. Es ist nicht gedacht um damit Frontend- oder Addon-Formulare zu erzeugen.
+
+
+##### Wichtig:
+
+
+Ab Version 2.2.0 benötigt MForm keine `REX_VALUE[x]`-Übergabe mehr, diese Übergabepflicht wurde komplett entfernt. Da MForm ab der Version 2.2.0 die ab Redaxo 4.5 möglichen `REX_VALUE-ARRAYs` unterstütz gibt es praktisch keine `REX_VALUE`-Limitierung mehr.

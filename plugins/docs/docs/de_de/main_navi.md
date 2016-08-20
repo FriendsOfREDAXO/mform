@@ -1,31 +1,34 @@
 # YForm-Dokumentation
 
-- YForm
+- MForm
 	- [Einführung](main_intro.md)
-	- [Plugins](yform_plugins.md) <sup><b>offen</b></sup>
-- Table Manager (Verwaltung für das Backend)
-	- [Grundprinzip](table_manager_grundprinzip.md)
-	- [Optionen einer Tabelle](table_manager_optionen.md)
-	- [Feldtypen](table_manager_feldtypen.md)
-	- [Validierungen](table_manager_validierungen.md)
-	- [Anhang: be_manager_relation](table_manager_feldtypen_be-manager-relation.md) <sup><b>unvollständig</b></sup>  <sup><i>alexplusde</i></sup>
-- YForm-Formbuilder (Modul für das Frontend)
-	- [Allgemein](yform_modul_allgemein.md)
-	- [Verzeichnis-Struktur](yform_modul_struktur.md) <sup><b>offen</b></sup>
-	- [Objparams](yform_modul_objparams.md)
-	- [Values](yform_modul_values.md) <sup><b>in Bearbeitung</b></sup> <sup><i>goldfischpeter</i></sup>
-	- [Validates](yform_modul_validates.md)
-	- [Actions](yform_modul_actions.md)
-	- [YForm erweitern](yform_modul_erweitern.md) <sup><b>offen</b></sup>
-- E-Mail-Templates
-	- [E-Mail-Templates erstellen](email_templates.md)
-- Geo-Plugin
-	- [Geokoordinaten bestimmen](geo_plugin.md) <sup><b>unvollständig</b></sup>
+	- [Kurz Doku / Referenzen](intro_short.md)
+- Modul-Input Demos
+	- [Modul-Input Redaxp 5.x](modul_demo_r5.x.md)
+	- [Modul-Input Redaxp 4.5.x](modul_demo_r4.5.x.md)
+	- [Modul-Input Redaxp 4.4.x](modul_demo_r4.4.x.md)
+- Grundlagen
+	- [Formulare erzeugen](form_create.md)
+	- [Elementzuweisungen](elements_general.md)
+		- [Elementen Attribute zuweisen](elements_attributes.md)
+		- [Elementen Parameter zuweisen](elements_params.md)
+		- [Elementen Optionen zuweisen](elements_options.md)
+		- [Elementen Validierungen zuweisen](elements_validates.md)
+		- [Elemente mit Default-Value versehen](elements_default_values.md)
+		- [Sonstige Elementzuweisungen](elements_others.md)
+- Formular Elemente
+	- [Text-Input- und Hidden-Elemente](form_input_hidden.md)
+	- [Select und Multiselect Elemente](form_select_multiselect.md)
+	- [Radio und Checkbox Elemente](form_radio_checkbox.md)
+	- [System Button Elemente](form_system_button.md)
+	- [Text, HTML und Fieldset Elemente](form_text_html_fieldset.md)
+- Template System
+	- [Templates für Modul-Input-Style](template_modul_input.md)
 
 ---
 
 **Credits**
 
+joachimdoerr (Joachim Dörr)
 alexplusde (Alexander Walther)  
-goldfischpeter (Peter Wolfrum)  
-polarpixel (Peter Bickel)
+pixelfirma (Paul Götz)  

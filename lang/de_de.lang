@@ -13,10 +13,11 @@ mform_modul_input = Modul Eingabe
 mform_modul_output = Modul Ausgabe
 
 mform_help_headline = Informationen
-mform_help_subheadline_1 = MForm – Redaxo Addon für Modul-Input-Formulare
-mform_help_infotext_1 = MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit, welche sich recht einfach einbinden lassen.
-mform_help_infotext_2 = Zur Validierung von Modul-Formularen nutzt MForm den jQuery Validator Parsley und bietet so die Möglichkeit jedes mögliche Input-Feld mit standard Validierungen versehen zu können.
-mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formular Elemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen jeweils als Übergabe-Array verarbeiten, wodurch ein Element kurzgesagt “einzeilig” und mit wenig Aufwand angelegt werden können.
+mform_help_subheadline_1 = MForm – umfangreiche Modul-Input-Formulare erzeugen
+mform_help_infotext_1 = Mit MForm können umfangreiche Modul-Input-Formularen spielend einfach angelegt werden. MForm stellt von Input über Select bis Check- und Radioboxen alle wesentlichen Modul-Input-Formular Elemente bereit. Auch die Redaxo Link|Linklist- und Media|Medialist-Widgets lassen sich durch MForm einfach anlegen.
+mform_help_infotext_2 = MForm arbeitet zuverlässig mit Addons wie Redactor oder Markitup. Zusammen mit MBlock bietet MFrom Zur Validierung von Modul-Formularen nutzt MForm den jQuery Validator Parsley und bietet so die Möglichkeit jedes mögliche Input-Feld mit standard Validierungen versehen zu können.
+mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formularelemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element-Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen verarbeiten, wodurch ein Element kurzgesagt “einzeilig”, übersichtlich und mit wenig Aufwand angelegt werden kann.
+mform_help_infotext_4 = Da MForm Templates nutzt kann die Option der Fomrulare vom Entwickler seinen Vorstellungen angepasst werden.
 
 mform_config_label_template = Theme für Modul-Formulare
 mform_config_saved = Einstellungen wurden gespeichert.
