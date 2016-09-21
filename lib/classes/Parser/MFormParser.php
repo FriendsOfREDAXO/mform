@@ -281,22 +281,8 @@ class MFormParser extends AbstractMFormParser
             ->setOptions($optionElements);
 
         if ($item->isMultiple()) {
-            // javascript
-            $hiddenJavascript = <<<EOT
-                <script type="text/javascript">
-                  /* <![CDATA[ */
-                    $(function () {
-                      $("#{$item->getId()}").change(function() {
-                        $("#hidden_{$item->getId()}").val($(this).val());
-                      });
-                    });
-                  /* ]]> */
-                </script>
-EOT;
-
-            $element->setJavascript($hiddenJavascript);
-
             // hidden element
+            $element->setClass($element->class . ' multiple-select');
             $hiddenElement = new MFormElement();
             $hiddenElement->setId('hidden_' . $item->getId())
                 ->setVarId($item->getVarId())
@@ -512,6 +498,85 @@ EOT;
      * @return $this
      * @author Joachim Doerr
      */
+    private function generateCustomLinkElement(MFormItem $item)
+    {
+        // default manipulations
+        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+
+        $item->setId(str_replace(array('_',']','['),'', rand(100,999) . $item->getVarId()));
+
+        // create label element
+        $label = new MFormElement();
+        $label->setId($item->getId())
+            ->setValue($item->getLabel());
+
+        // create templateElement object
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($label, 'label', true));
+
+        $html = rex_var_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $item->getParameter());
+
+        $dom = new DOMDocument();
+        @$dom->loadHTML(utf8_decode($html));
+        $div = $dom->getElementsByTagName('div');
+
+        $mediaFragment = $dom->createDocumentFragment();
+        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-file\"></i></a>");
+        $linkFragment = $dom->createDocumentFragment();
+        $linkFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_extern_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-external-link\"></i></a>");
+
+        if ($div instanceof DOMNodeList) {
+            foreach ($div as $divItem) {
+                if ($divItem instanceof DOMElement && $divItem->hasChildNodes()) {
+                    $divItem->setAttribute('data-id', $item->getId());
+                    $divItem->setAttribute('data-clang', rex_clang::getCurrentId());
+                    $divItem->setAttribute('class', $divItem->getAttribute('class') . ' custom-link');
+                    /** @var DOMElement $childNode */
+                    foreach ($divItem->childNodes as $childNode) {
+                        if ($childNode->hasAttribute('class') && $childNode->getAttribute('class') == 'input-group-btn') {
+                            if ($childNode->hasChildNodes()) {
+                                foreach ($childNode->childNodes as $node) {
+                                    if ($node instanceof DOMElement) {
+                                        if (strpos($node->getAttribute('onclick'), 'openLinkMap') !== false) {
+                                            $node->setAttribute('id', 'mform_link_' . $item->getId());
+                                        }
+                                        if (strpos($node->getAttribute('onclick'), 'deleteREXLink') !== false) {
+                                            $node->setAttribute('id', 'mform_delete_' . $item->getId());
+                                        }
+                                        $node->removeAttribute('onclick');
+                                    }
+                                }
+                                $childNode->insertBefore($linkFragment, $childNode->firstChild);
+                                $childNode->insertBefore($mediaFragment, $childNode->firstChild);
+                            }
+                        }
+                        if (($childNode->hasAttribute('class')
+                            && $childNode->getAttribute('class') == 'form-control')
+                            && ($childNode->hasAttribute('value')
+                            && $childNode->getAttribute('value') == '')) {
+                            $childNode->setAttribute('value', $item->getValue());
+                        }
+                    }
+//                    $html = utf8_encode($divItem->C14N(false,true));
+                    $html = $divItem->C14N(false,true);
+                    break;
+                }
+            }
+        }
+
+        $templateElement->setElement($html);
+
+        // add to output element array
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+        return $this;
+    }
+
+    /**
+     * link, linklist
+     * @param MFormItem $item
+     * @return $this
+     * @author Joachim Doerr
+     */
     private function generateLinkElement(MFormItem $item)
     {
         // create label element
@@ -588,6 +653,9 @@ EOT;
                     case 'link':
                     case 'linklist':
                         $this->generateLinkElement($item);
+                        break;
+                    case 'custom-link':
+                        $this->generateCustomLinkElement($item);
                         break;
                     case 'media':
                     case 'medialist':

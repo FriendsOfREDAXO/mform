@@ -351,6 +351,20 @@ abstract class AbstractMForm
     }
 
     /**
+     * add special link feld
+     * @param $id
+     * @param array $attributes
+     * @param array $validations
+     * @param null $defaultValue
+     * @return AbstractMForm
+     * @author Joachim Doerr
+     */
+    public function addCustomLinkField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
+    {
+        return $this->addElement('custom-link', $id, NULL, $attributes, array(), NULL, NULL, $validations, $defaultValue);
+    }
+
+    /**
      * add rex media field
      * @param $id
      * @param array $parameter
