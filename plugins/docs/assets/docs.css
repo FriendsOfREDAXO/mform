@@ -25,7 +25,7 @@
 .rex-mform-docs blockquote h2 {
     margin: -10px -20px 20px;
     background: transparent;
-	border-top: 1px #ccc;
+    border-top: 1px #ccc;
 }
 
 .rex-mform-docs ol {
@@ -34,7 +34,7 @@
 
 .rex-mform-docs ul {
     margin-bottom: 10px;
-	padding-bottom: 5px;;
+    padding-bottom: 5px;;
     padding-left: 16px;
 }
 .rex-mform-docs ul li {
@@ -83,31 +83,31 @@
 }
 
 
-.rex-mform-docs .yform-docs-navi ul {
+.rex-mform-docs .mform-docs-navi ul {
     margin-bottom: 10px;
     padding-left: 0;
 }
-.rex-mform-docs .yform-docs-navi ul li {
+.rex-mform-docs .mform-docs-navi ul li {
     list-style-type: none;
     background: #eee;
     padding: 0 15px;
     line-height: 40px;
 }
-.rex-mform-docs .yform-docs-navi ul {
+.rex-mform-docs .mform-docs-navi ul {
     background: #fff;
     margin-left: -15px;
     margin-right: -15px;
 }
-.rex-mform-docs .yform-docs-navi ul li li {
+.rex-mform-docs .mform-docs-navi ul li li {
     list-style-type: none;
     background: #fff;
     line-height: 30px;
 }
-.rex-mform-docs .yform-docs-navi ul li li:before {
-font-family: FontAwesome;
+.rex-mform-docs .mform-docs-navi ul li li:before {
+    font-family: FontAwesome;
     content: '\f0a9';
     margin-right: 10px;
 }
-.rex-mform-docs .yform-docs-navi ul sup {
+.rex-mform-docs .mform-docs-navi ul sup {
     display: none;
 }
