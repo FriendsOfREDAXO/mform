@@ -13,8 +13,6 @@ function mform_init() {
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
 
-        mform.parsley();
-
         var custom_link = mform.find('.custom-link'),
             multiple_select = mform.find('.multiple-select');
 
