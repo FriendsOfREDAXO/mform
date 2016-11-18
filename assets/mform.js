@@ -27,9 +27,13 @@ function mform_init() {
 
 function mform_multiple_select(item) {
     item.each(function(){
-        $(this).change(function() {
-            item.next('input[type=hidden]').val($(this).val());
-        });
+        if ($(this).data('multiple-select') ==  $(this).attr('id'))
+        { } else  {
+            $(this).data('multiple-select', $(this).attr('id'));
+            $(this).change(function() {
+                $(this).next('input[type=hidden]').val($(this).val());
+            });
+        }
     });
 }
 
