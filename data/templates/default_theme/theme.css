@@ -17,3 +17,8 @@
 .mform select[multiple], .mform select[size] {
   height: auto;
 }
+.mform .form-horizontal .mform-headline,
+.mform .form-horizontal  .mform-description {
+  margin-left: 0;
+  margin-right: 0;
+}
