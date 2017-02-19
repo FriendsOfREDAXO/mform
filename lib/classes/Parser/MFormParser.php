@@ -18,52 +18,43 @@ class MFormParser extends AbstractMFormParser
     {
         // if it the first fieldset ? no close the parent
         if ($this->fieldset === true) {
-            $item->setCloseFieldset(true); // use item to transport the flag
-        } else {
-            // set flag for close is fieldset not closed by element input
-            $this->fieldset = true;
+            $this->closeFieldset();
         }
 
         // set default class for r5 mform default theme
         MFormItemManipulator::setDefaultClass($item);
 
-        // is close fieldset tag set
-        if ($item->isCloseFieldset()) {
-            $this->closeFieldset(true);
-        }
-
-        // create legend
-        $legendElement = new MFormElement();
-        $legendElement->setValue($item->getValue());
-
         // create fieldset open element
         $fieldsetElement = new MFormElement();
         $fieldsetElement->setClass($item->getClass()) // set fieldset default and custom class
-            ->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to fieldset element
-            ->setLegend($this->parseElement($legendElement, 'legend', true)); // add parsed legend to fieldset element
+            ->setAttributes($this->parseAttributes($item->getAttributes())); // add attributes to fieldset element
+
+        // create legend
+        if (!empty($item->getValue())) {
+            $legendElement = new MFormElement();
+            $legendElement->setValue($item->getValue());
+
+            $fieldsetElement
+                ->setLegend($this->parseElement($legendElement, 'legend', true)); // add parsed legend to fieldset element
+        }
 
         // add fieldset open element to elements list
         $this->elements[] = $this->parseElement($fieldsetElement, 'fieldset-open', true);
+        $this->fieldset = true; // fieldset is open
         return $this;
     }
 
     /**
      * create the fieldset close element
      * fieldset close
-     * @param bool $fieldset
      * @return $this
      * @author Joachim Doerr
      */
-    private function closeFieldset($fieldset = false)
+    private function closeFieldset()
     {
-        // is parameter flag true
-        if ($fieldset) {
-            // set it in fieldset property
-            $this->fieldset = $fieldset;
-        }
         // if fieldset property true
         if ($this->fieldset === true) {
-            $this->fieldset = false; // set it on false for the next
+            $this->fieldset = false; // fieldset is closed
             // add fieldset close element to elements list
             $this->elements[] = $this->parseElement(new MFormElement(), 'fieldset-close', true); // use parse element to load template file
         }
