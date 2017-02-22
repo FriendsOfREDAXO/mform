@@ -27,7 +27,7 @@ Generell sind die Element-Methoden so angelegt, dass Attribute, Parameter, Optio
 > * **Elemente für welche Attribute oder Parameter oder Optionen oder Validierungen nicht zulässig sind verarbeiten diese nicht.**
 > 
 > *Zudem:*
-> * **Die zuletzt übergebenen Zuweisungen überschreiben eventuell vorher eingesetzt Zuweisungen.**
+> * **Die zuletzt übergebenen Zuweisungen überschreiben eventuell vorher eingesetzte Zuweisungen.**
 
 
 <a name="set-Methoden"></a>
@@ -81,7 +81,7 @@ $mform->addAttribute('label', 'Headline');
 <a name="Element-Methoden"></a>
 ## Zuweisung durch Übergabe an die Element-Methoden
 
-Zuweisungen können auch direkt durch übergabe der Übergabe-Arrays als Parameter in die Element-Methoden getroffen werden. Es ist abhängig von der Element-Methode welche Übergabe-Arrays diese entgegen nehmen.
+Zuweisungen können auch direkt durch Übergabe der Übergabe-Arrays als Parameter in die Element-Methoden getroffen werden. Es ist abhängig von der Element-Methode welche Übergabe-Arrays diese entgegen nehmen.
 
 Die Interfaces für die unterschiedlichen Element-Methoden werden in den unten aufgeführten Doku-Seiten umfangreich beleuchtet.
 
@@ -105,14 +105,14 @@ $mform->addTextField(1, array('label' => 'Headline'));
 
 > **Hinweis**
 >
-> * Die Übergabe-Arrays müssen nicht befüllt werden sie können optional an die entsprechenden Parameter geliefert werden.
+> * Die Übergabe-Arrays müssen nicht befüllt werden - sie können optional an die entsprechenden Parameter geliefert werden.
 > * Die Element-Methoden haben unterschieldiche Interfaces abhängig davon ob sie Attribute, Optionen, Validierungen, etc. verarbeiten können.
 
 
 <a name="setter-Methoden"></a>
 ## Zuweisung durch speziale `setter`-Methoden
 
-Es gibt Standard-Eigenschaften von Elements welche generel durch speziell bereitgestellte `setter`-Methoden einem Element zugewiesen werden können.
+Es gibt Standard-Eigenschaften von Elementen welche generell durch speziell bereitgestellte `setter`-Methoden einem Element zugewiesen werden können.
 
 * Spezielle `setter`-Methoden
   * `setLabel`

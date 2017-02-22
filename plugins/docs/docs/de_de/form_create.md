@@ -6,7 +6,7 @@
 > - [MForm Formular-Parsing und Anzeige](#Formular-Parsing)
 > - [Beispiel Modul-Input](#Modul-Input)
 
-MForm-Formulare werden durch Verwendung der `MForm` Klasse erzeugt. Nach der Instanzierung eines Formular-Objekts können durch Aufruf der jeweiligen Element-Methoden Formular-Elemente angelegt werden. Letztlich wird dann das Formular durch Aufruf der `show` Methode geparst.
+MForm-Formulare werden durch Verwendung der `MForm` Klasse erzeugt. Nach der Instanzierung eines Formular-Objekts können, durch Aufruf der jeweiligen Element-Methoden, Formular-Elemente angelegt werden. Letztlich wird dann das Formular durch Aufruf der `show` Methode geparst.
 
 
 <a name="Objekt-Initialisierung"></a>
@@ -36,13 +36,13 @@ $mform->addTextField("1.0", array('label'=>'Label Name','style'=>'width:200px'))
 > **Hinweis**
 >
 > * Ab Version 2.2.0 benötigt MForm keine `REX_VALUE[x]`-Übergabe mehr.
-> * Da MForm ab der Version 2.2.0 die ab Redaxo 4.5 möglichen `REX_VALUE-ARRAYs` unterstütz gibt es praktisch keine `REX_VALUE`-Limitierung mehr. 
+> * Da MForm ab der Version 2.2.0 die ab Redaxo 4.5 möglichen `REX_VALUE-ARRAYs` unterstützt gibt es praktisch keine `REX_VALUE`-Limitierung mehr. 
 > * Wer ein `REX_VALUE` als Array nutzen möchte muss an die `REX_VALUE_ID` den Array-Key Punkt-getrennt anhängen.
 >
 > **Wichtig**
 >
 > * Integere Zahlenwerte > 0 müssen nicht zwingend mit Anführungszeichen umschlossen werden. 
-> * Findet sich als letzter Zahlenwert 0 im Punkt-getrennten Array-Key für das Json-Array an letzter stelle muss der gesamte Array-Key mit Anführungszeichen umschlossen werden. 
+> * Findet sich als letzter Zahlenwert 0 im Punkt-getrennten Array-Key für das JSON-Array an letzter Stelle muss der gesamte Array-Key mit Anführungszeichen umschlossen werden. 
 > * Auch alle nicht integeren Werte müssen umschlossen werden.
 
 
