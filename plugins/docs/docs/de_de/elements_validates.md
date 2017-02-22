@@ -1,9 +1,8 @@
 # Elementen Validierungen zuweisen
 
-
 > ## Inhalt
-> - [Methoden der Validierungszuweisung](#Validierung-zuweisen)
-> - [Beispiel für Validierungsübergaben](#Validierung-übergeben)
+> - [Methoden der Validierungs-Zuweisung](#Validierung-zuweisen)
+> - [Beispiele für Validierungs-Übergaben](#Validierung-übergeben)
 > - [Formular-Elemente welche validiert werden können](#Formular-Elemente)
 > - [Zulässige Validierungen](#Zulässige-Validierungen)
 
@@ -13,13 +12,13 @@ Mit der Methode `setValidations` können Formular-Elementen Validierungen zugewi
 
 
 <a name="Validierung-zuweisen"></a>
-## Methoden der Validierungszuweisung
+## Methoden der Validierungs-Zuweisung
 
-Es gibt 5 Wege eine Validierung zuzuweisen:
+Es gibt 4 Wege eine Validierung zuzuweisen:
 
 1. In einem Übergabe-Array als Parameter der Element-Methode.
 2. In einem Übergabe-Array als Parameter der `setValidations`-Methode.
-3. Als Name- und Wert-Parameter der `addValidation`-Methode 
+3. Als Name- und Wert-Parameter der `addValidation`-Methode.
 4. Als Wert über die `setAttributes`-Methode.
 
 > **Hinweis**
@@ -28,7 +27,7 @@ Es gibt 5 Wege eine Validierung zuzuweisen:
 
 
 <a name="Validierung-übergeben"></a>
-## Beispiel für Validierungsübergaben
+## Beispiele für Validierungs-Übergaben
 
 **Beispiel für Aufruf von Email- und Empty-Validierungen**
 
@@ -90,7 +89,7 @@ $mform->setAttributes(array('label'=>'E-Mail','validation'=>array('compare','emp
 <a name="Formular-Elemente"></a>
 ## Formular-Elemente welche validiert werden können 
 
-*Validierungen können Folenden Formular-Elementen zugewiesen werden:*
+Validierungen können Folenden Formular-Elementen zugewiesen werden:
 
 * Text-Input- und Hidden-Elemente
   * `addTextField`
@@ -110,7 +109,7 @@ $mform->setAttributes(array('label'=>'E-Mail','validation'=>array('compare','emp
 <a name="Zulässige-Validierungen"></a>
 ## Zulässige Validierungen
 
-*Folgende Validierungen sind zulässig:*
+Folgende Validierungen sind zulässig:
 
 * `empty`
 * `integer`

@@ -1,22 +1,22 @@
 # Elementen Parameter zuweisen
 
 > ## Inhalt
-> - [Methoden der Parameterzuweisung](#Parameter-zuweisen)
-> - [Beispiel für Parameterübergaben](#Parameter-übergeben)
+> - [Methoden der Parameter-Zuweisung](#Parameter-zuweisen)
+> - [Beispiele für Parameter-Übergaben](#Parameter-übergeben)
 > - [System-Button-Elemente die Parameter verarbeiten](#System-Button-Elemente)
 > - [Zulässige Parameter Typen](#Parameter-Typen)
 
 Mit der Methode `setParameters` können System-Button-Elementen diverse Parameter zugewiesen werden.
 
-
+   
 <a name="Parameter-zuweisen"></a>
-## Methoden der Parameterzuweisung
+## Methoden der Parameter-Zuweisung
 
 Es gibt 3 Wege System-Button-Elementen Parameter zuzuweisen:
 
 1. In einem Übergabe-Array als Parameter der Element-Methode.
 2. In einem Übergabe-Array als Parameter der `setParameters`-Methode.
-3. Als Name- und Wert-Parameter der `addParameter`-Methode 
+3. Als Name- und Wert-Parameter der `addParameter`-Methode. 
 
 > **Hinweis**
 > 
@@ -24,7 +24,7 @@ Es gibt 3 Wege System-Button-Elementen Parameter zuzuweisen:
 
 
 <a name="Parameter-übergeben"></a>
-## Beispiel für Parameterübergaben
+## Beispiele für Parameter-Übergaben
 
 *1. Beispiel für Zuweisung durch Element-Methode*
 
@@ -71,7 +71,7 @@ $mform->addParameter('category', 1);
 <a name="System-Button-Elemente"></a>
 ## System-Button-Elemente die Parameter verarbeiten
 
-*Folgende System-Button-Elemente reagieren auf Parameter:*
+Folgende System-Button-Elemente reagieren auf Parameter:
 
 * System-Button-Elemente
   * `addLinkField`
@@ -87,7 +87,7 @@ $mform->addParameter('category', 1);
 <a name="Parameter-Typen"></a>
 ## Zulässige Parameter Typen
 
-*Zulässige Parameter für Link-, und Linklisten-Buttons:*
+Zulässige Parameter für Link-, und Linklisten-Buttons:
 
 * `category`, `label`
 * Dem zulässigen `label` Attribut kann ein Array oder String übergeben werden.

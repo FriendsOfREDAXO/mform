@@ -1,8 +1,8 @@
 # Elementen Attribute zuweisen
 
 > ## Inhalt
-> - [Methoden der Attributzuweisung](#Attribute-zuweisen)
-> - [Beispiel für Attributübergaben](#Attribute-übergeben)
+> - [Methoden der Attribut-Uuweisung](#Attribute-zuweisen)
+> - [Beispiele für Attribut-Übergaben](#Attribute-übergeben)
 > - [Formular-Elemente die Attribute verarbeiten](#Formular-Elemente)
 > - [Zulässigen und unzulässige Attribut Typen](#Attribut-Typen)
 
@@ -10,13 +10,13 @@ Mit der `setAttributes` Methode können beliebigen Formular-Elementen Attribute 
 
 
 <a name="Attribute-zuweisen"></a>
-## Methoden der Attributzuweisung
+## Methoden der Attribut-Zuweisung
 
 Es gibt 3 Wege Elementen Attribute zuzuweisen:
 
 1. In einem Übergabe-Array als Parameter der Element-Methode.
 2. In einem Übergabe-Array als Parameter der `setAttributes`-Methode.
-3. Als Name- und Wert-Parameter der `addAttribute`-Methode 
+3. Als Name- und Wert-Parameter der `addAttribute`-Methode.
 
 > **Hinweis**
 > 
@@ -24,7 +24,7 @@ Es gibt 3 Wege Elementen Attribute zuzuweisen:
 
 
 <a name="Attribute-übergeben"></a>
-## Beispiel für Attributübergaben
+## Beispiele für Attribut-Übergaben
 
 *1. Beispiel für Zuweisung durch Element-Methode*
 
@@ -76,7 +76,7 @@ $mform->addAttribute('class', 'text_input_feld');
 <a name="Formular-Elemente"></a>
 ## Formular-Elemente die Attribute verarbeiten
 
-*Attribute können folgenden Formular-Elementen zugewiesen werden:*
+Attribute können folgenden Formular-Elementen zugewiesen werden:
 
 * Text-Input- und Hidden-Elemente
   * `addTextField`

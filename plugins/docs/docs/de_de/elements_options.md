@@ -1,21 +1,21 @@
 # Elementen Optionen zuweisen
 
 > ## Inhalt
-> - [Methoden der Optionszuweisung](#Optionen-zuweisen)
-> - [Beispiel für Optionenübergaben](#Optionen-übergeben)
+> - [Methoden der Options-Zuweisung](#Optionen-zuweisen)
+> - [Beispiele für Optionen-Übergaben](#Optionen-übergeben)
 > - [Formular-Elemente die Optionen verarbeiten](#Formular-Elemente)
 
 Mit der Methode `addOptions` können Formular-Elemente diverse Optionen zugewiesen werden.
 
 
 <a name="Optionen-zuweisen"></a>
-## Methoden der Optionszuweisung
+## Methoden der Options-Zuweisung
 
 Es gibt 3 Wege Select-, Radio- und Checkbox-Elementen Optionen zuzuweisen:
 
 1. In einem Übergabe-Array als Parameter der Element-Methode.
 2. In einem Übergabe-Array als Parameter der `setOptions`-Methode.
-3. Als Name- und Wert-Parameter der `addOption`-Methode 
+3. Als Name- und Wert-Parameter der `addOption`-Methode.
 
 > **Hinweis**
 >
@@ -24,7 +24,7 @@ Es gibt 3 Wege Select-, Radio- und Checkbox-Elementen Optionen zuzuweisen:
 
 
 <a name="Optionen-übergeben"></a>
-## Beispiel für Optionenübergaben
+## Beispiele für Optionen-Übergaben
 
 *1. Beispiel für Zuweisung durch Element-Methode*
 
@@ -71,7 +71,7 @@ $mform->addOption(2, 'test-2');
 <a name="Formular-Elemente"></a>
 ## Formular-Elemente die Optionen verarbeiten
 
-*Folgende Elemente benötigen zwingend Optionen:*
+Folgende Elemente benötigen zwingend Optionen:
 
 * Select-Elemente
   * `addSelectField`
