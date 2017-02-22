@@ -13,10 +13,10 @@ mform_modul_input = Module input
 mform_modul_output = Modul output
 
 mform_help_headline = Information
-mform_help_subheadline_1 = MForm – Redaxo AddOn for module-input-forms
-mform_help_infotext_1 = MForm is a Redaxo add-on that makes the creation of module forms much easier. MForm uses templates which allow the administrator to customize the module style. MForm provides all the essential module input form elements for easy to integration.
+mform_help_subheadline_1 = MForm – Redaxo add-on for module-input-forms
+mform_help_infotext_1 = MForm is a Redaxo add-on that makes the creation of module forms much easier. MForm uses templates which allow the administrator to customize the module style. MForm provides all the essential module input form elements for easy integration.
 mform_help_infotext_2 = For the validation of module forms, MForm uses the jQuery Validator Parsley which offers the possibility to assign standard validations to every possible input field.
-mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in such a way that their constructors each process all possible attributes, parameters and options as a transfer array, whereby an element can be called "one-line" and can be created with little effort.
+mform_help_infotext_3 =  MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 
 mform_config_label_template = Theme for module forms
 mform_config_saved = The settings have been saved.
@@ -25,7 +25,7 @@ mform_config = Configuration
 mform_overview = Overview
 mform_config_save = Save settings
 mform_wiki = MForm Github Doku Wiki
-mform_github = MForm FOR Github Repository
+mform_github = MForm FOR – Github Repository
 
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
