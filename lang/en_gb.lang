@@ -39,7 +39,7 @@ mform_example_expert_datalist = Datalists for input elements
 mform_example_expert_placeholder = Placeholder
 
 mform_example_description_base = The "basic examples" include the basic calls of the respective MForm element, without any "extras", extensions and validations.
-mform_example_description_extended = The "extended examples" show beyond the "basic examples" how to expand with MForm elements around attributes, options, parameters, labels, etc.
+mform_example_description_extended = The "extended examples" show beyond the "basic examples", how to expand elements around attributes, options, parameters, labels, etc.
 mform_example_description_expert = The "expert examples" show that MForm can be used for more than just standards.
 mform_example_description_community = Later
 mform_example_extended_full_json_support = Full JSON value support
