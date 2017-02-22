@@ -1,50 +1,82 @@
 # Elementen Attribute zuweisen
 
+> ## Inhalt
+> - [Methoden der Attributzuweisung](#Attribute-zuweisen)
+> - [Beispiel für Attributübergaben](#Attribute-übergeben)
+> - [Formular-Elemente die Attribute verarbeiten](#Formular-Elemente)
+> - [Zulässigen und unzulässige Attribut Typen](#Attribut-Typen)
 
 Mit der `setAttributes` Methode können beliebigen Formular-Elementen Attribute zugewiesen werden.
 
 
+<a name="Attribute-zuweisen"></a>
+## Methoden der Attributzuweisung
 
-##### Es gibt in der Regel 2 Wege Elementen Attribute zuzuweisen:
+Es gibt 3 Wege Elementen Attribute zuzuweisen:
 
-* Als Wert über den Konstruktor der Element-Methode.
-* Als Wert über den Konstruktor der `setAttributes` Methode.
+1. In einem Übergabe-Array als Parameter der Element-Methode.
+2. In einem Übergabe-Array als Parameter der `setAttributes`-Methode.
+3. Als Name- und Wert-Parameter der `addAttribute`-Methode 
 
-
-##### Hinweis:
-
-
-* Attribute werden als Array dem Konstruktor übergeben.
-* Das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+> **Hinweis**
+> 
+> * Das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
 
 
-###### Beispiel für Attributübergaben
+<a name="Attribute-übergeben"></a>
+## Beispiel für Attributübergaben
 
+*1. Beispiel für Zuweisung durch Element-Methode*
 
 ```php
-  $objForm->addTextField(1);
-  $objForm->setLabel('Label Name');
-  $objForm->setAttributes(array('style'=>'width:200px'));
-  $objForm->setAttributes(array('class'=>'text_input_feld'));
+// instance mform
+$mform = new MForm();
 
-  $objForm->addTextField(2);
-  $objForm->setAttributes(array('label'=>'Label Name','style'=>'width:200px','class'=>'text_input_feld'));
-
-  $objForm->addTextField(3,array('label'=>'Label Name','style'=>'width:200px','class'=>'text_input_feld'));
+// add textinput field
+$mform->addTextField(1, array('label' => 'Headline', 'style' => 'width:200px', 'class' => 'text_input_feld'));
 ```
 
+*2. Beispiel für Zuweisung durch `setAttributes`-Methode*
 
-##### Hinweis:
+```php
+// instance mform
+$mform = new MForm();
+
+// add textinput field
+$mform->addTextField(1);
+
+// add attribute 
+$mform->setAttributes(array('label' => 'Headline', 'style' => 'width:200px', 'class' => 'text_input_feld'));
+```
+
+*3. Beispiel für Zuweisung durch `addAttribute`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add textinput field
+$mform->addTextField(1);
+
+// add attribute 
+$mform->addAttribute('label', 'Headline');
+$mform->addAttribute('style', 'width:200px');
+$mform->addAttribute('class', 'text_input_feld');
+```
+
+> **Hinweis**
+> 
+> *Bei der Verwendung von Übergabe-Arrays*
+> * Der Array-Key `label` übergibt gibt der `setLabel`-Methode seinen Wert als Parameter.
+> * Der Array-Key `validation` ruft die `setValidiations`-Methode auf.
+> * Der Array-Key `size` übergibt der `setSize`-Methode seinen Wert als Parameter.
+> * Der Array-Key `default-value` übergibt der `setDefaultValue`-Methode seinen Wert als Parameter.
 
 
-* Das Attribut `label` ruft die `setLabel` Methode auf.
-* Das Attribut `validation` ruft die `setValidiations` Methode auf.
-* Das Attribut `size` ruft die `setSize` Methode auf.
-* Das Attribut `default-value` ruft die `setDefaultValue` Methode auf.
+<a name="Formular-Elemente"></a>
+## Formular-Elemente die Attribute verarbeiten
 
-
-##### Attribute können folgenden Formular-Elementen zugewiesen werden:
-
+*Attribute können folgenden Formular-Elementen zugewiesen werden:*
 
 * Text-Input- und Hidden-Elemente
   * `addTextField`
@@ -64,15 +96,13 @@ Mit der `setAttributes` Methode können beliebigen Formular-Elementen Attribute 
   * `addDescription`
   * `addFieldset`
 
-
-##### Hinweis:
-
-
-* Auch wenn Attribute Elementen zugewiesen werden können welche in der Liste nicht aufgeführt wurden, werden diese jedoch dann nicht im HTML dieser Elemente geschrieben.
+> **Hinweis**
+>
+> * Auch wenn Attribute Elementen zugewiesen werden können welche in der Liste nicht aufgeführt wurden, werden diese jedoch dann nicht in das HTML dieser Elemente geschrieben.
 
 
-###### Zulässigen und unzulässige Attribut Typen:
-
+<a name="Attribut-Typen"></a>
+## Zulässigen und unzulässige Attribut Typen:
 
 * Alle möglichen Attribute ausgenommen `id`, `name`, `type`, `value`, `checked` und `selected`.
 * Das zulässige `validation` Attribut muss ein Array übergeben.

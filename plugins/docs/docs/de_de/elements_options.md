@@ -1,49 +1,77 @@
 # Elementen Optionen zuweisen
 
+> ## Inhalt
+> - [Methoden der Optionszuweisung](#Optionen-zuweisen)
+> - [Beispiel für Optionenübergaben](#Optionen-übergeben)
+> - [Formular-Elemente die Optionen verarbeiten](#Formular-Elemente)
 
 Mit der Methode `addOptions` können Formular-Elemente diverse Optionen zugewiesen werden.
 
 
-##### Es gibt 2 Wege Select-, Radio- und Checkbox-Elemente Attribute zuzuweisen:
+<a name="Optionen-zuweisen"></a>
+## Methoden der Optionszuweisung
+
+Es gibt 3 Wege Select-, Radio- und Checkbox-Elementen Optionen zuzuweisen:
+
+1. In einem Übergabe-Array als Parameter der Element-Methode.
+2. In einem Übergabe-Array als Parameter der `setOptions`-Methode.
+3. Als Name- und Wert-Parameter der `addOption`-Methode 
+
+> **Hinweis**
+>
+> * Die Übergabe-Arrays müssen nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+> * Optionen sind für Select-, Radio- und Checkbox-Elementen erforderlich. 
 
 
-* Als Wert über den Konstruktor der Select-, Radio- und Checkbox-Elemente.
-* Als Wert über den Konstruktor der `addOptions` Methode.
+<a name="Optionen-übergeben"></a>
+## Beispiel für Optionenübergaben
 
-
-##### Hinweis:
-
-
-* Optionen werden als Array dem Konstruktor übergeben.
-* Die Übergabe-Arrays müssen nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
-* Optionen sind für Select-, Radio- und Checkbox-Elementen erforderlich. 
-
-
-###### Beispiel für Optionenübergaben
+*1. Beispiel für Zuweisung durch Element-Methode*
 
 ```php
-  $objForm->addSelectField(1);
-  $objForm->addOptions(array(1=>'test-1',2=>'test-2'));
-  $objForm->setLabel('Select Name');
+// instance mform
+$mform = new MForm();
 
-  $objForm->addSelectField(2,array(1=>'test-1',2=>'test-2'),array('label'=>'Select Name'));
-
-  $objForm->addCheckboxField(3);
-  $objForm->addOptions(array(1=>'test-1'));
-  $objForm->setLabel('Checkbox Name');
-
-  $objForm->addCheckboxField(4,array(1=>'test-1',2=>'test-2'),array('label'=>'Checkbox Name'));
+// add select field
+$mform->addSelectField(2, array(1 => 'test-1', 2 => 'test-2'));
 ```
 
+*2. Beispiel für Zuweisung durch `setOptions`-Methode*
 
-##### Hinweis:
+```php
+// instance mform
+$mform = new MForm();
+
+// add link button field
+$mform->addSelectField(1);
+
+// set parmaeter
+$mform->setOptions(array(1 => 'test-1', 2 => 'test-2'));
+```
+
+*3. Beispiel für Zuweisung durch `addOption`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add link button field
+$mform->addSelectField(1);
+
+// set parmaeter
+$mform->addOption(1, 'test-1');
+$mform->addOption(2, 'test-2');
+```
+
+> **Hinweis**
+>
+> * Die `setOptions`-Methode verarbeitet keine Fremdwerte wie beispielsweise die `setAttributes` Methode.
 
 
-* Die `addOptions` Methode verarbeitet keine Fremdwerte wie beispielsweise die `setAttributes` Methode.
+<a name="Formular-Elemente"></a>
+## Formular-Elemente die Optionen verarbeiten
 
-
-###### Folgende Select-, Radio- und Checkbox-Elemente benötigen zwingend Optionen:
-
+*Folgende Elemente benötigen zwingend Optionen:*
 
 * Select-Elemente
   * `addSelectField`
@@ -52,9 +80,7 @@ Mit der Methode `addOptions` können Formular-Elemente diverse Optionen zugewies
   * `addCheckboxField`
   * `addRadioField`
 
-
-##### Hinweis:
-
-
-* Auch wenn Optionen anderen Elementen zugewiesen werden können haben diese jedoch ausschließlich für Select-, Radio- und Checkbox-Elemente eine Bedeutung. 
-* Select-, Radio- und Checkbox-Elemente benötigen Optionen zwingend, werden keine zugewiesen, wird das Formular-Element nicht erzeugt.
+> **Hinweis**
+>
+> * Auch wenn Optionen anderen Elementen zugewiesen werden können haben diese jedoch ausschließlich für Select-, Radio- und Checkbox-Elemente eine Bedeutung. 
+> * Select-, Radio- und Checkbox-Elemente benötigen Optionen zwingend, werden keine zugewiesen, wird das Formular-Element nicht erzeugt.

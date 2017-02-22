@@ -1,46 +1,77 @@
 # Elementen Parameter zuweisen
 
+> ## Inhalt
+> - [Methoden der Parameterzuweisung](#Parameter-zuweisen)
+> - [Beispiel für Parameterübergaben](#Parameter-übergeben)
+> - [System-Button-Elemente die Parameter verarbeiten](#System-Button-Elemente)
+> - [Zulässige Parameter Typen](#Parameter-Typen)
 
 Mit der Methode `setParameters` können System-Button-Elementen diverse Parameter zugewiesen werden.
 
 
-##### Es gibt in der Regel 2 Wege System-Buttons mit Parametern zu versehen:
+<a name="Parameter-zuweisen"></a>
+## Methoden der Parameterzuweisung
+
+Es gibt 3 Wege System-Button-Elementen Parameter zuzuweisen:
+
+1. In einem Übergabe-Array als Parameter der Element-Methode.
+2. In einem Übergabe-Array als Parameter der `setParameters`-Methode.
+3. Als Name- und Wert-Parameter der `addParameter`-Methode 
+
+> **Hinweis**
+> 
+> * Das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
 
 
-* Als Wert über den Konstruktor der System-Button-Methode.
-* Als Wert über den Konstruktor der `setParameters` Methode.
+<a name="Parameter-übergeben"></a>
+## Beispiel für Parameterübergaben
 
-
-##### Hinweis:
-
-
-* Parameter werden als Array dem Konstruktor übergeben.
-* Das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
-
-
-###### Beispiel für Parameterübergaben
-
+*1. Beispiel für Zuweisung durch Element-Methode*
 
 ```php
-  $objForm->addLinkField(1);
-  $objForm->setParameters(array('category'=>1,'label'=>'Interner Link'));
+// instance mform
+$mform = new MForm();
 
-  $objForm->addLinkField(2,array('category'=>1,'label'=>'Interner Link'));
-  
-  $objForm->addMediaField(1);
-  $objForm->setParameters(array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Bild'));
-
-  $objForm->addMediaField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Bild'));
+// add link button field
+$mform->addLinkField(1,array('category'=>1,'label'=>'Interner Link'));
 ```
 
-##### Hinweis:
+*2. Beispiel für Zuweisung durch `setParameters`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add link button field
+$mform->addLinkField(1);
+
+// set parmaeter
+$mform->setParameters(array('category'=>1,'label'=>'Interner Link'));
+```
+
+*3. Beispiel für Zuweisung durch `addParameter`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add link button field
+$mform->addLinkField(1);
+
+// set parameter
+$mform->addParameter('label', 'Interner Link);
+$mform->addParameter('category', 1);
+```
+
+> **Hinweis**
+>
+> * Der Array-Key `label` übergibt gibt der `setLabel`-Methode seinen Wert als Parameter.
 
 
-* Das Attribut `Label` ruft die `setLabel` Methode auf.
+<a name="System-Button-Elemente"></a>
+## System-Button-Elemente die Parameter verarbeiten
 
-
-###### Folgende System-Button-Elemente reagieren auf Parameter:
-
+*Folgende System-Button-Elemente reagieren auf Parameter:*
 
 * System-Button-Elemente
   * `addLinkField`
@@ -48,21 +79,20 @@ Mit der Methode `setParameters` können System-Button-Elementen diverse Paramete
   * `addMediaField`
   * `addMedialistField`
 
-
-##### Hinweis: 
-
-
-* Auch wenn Parameter für alle anderen Elemente zugewiesen werden können haben diese jedoch ausschließlich für System-Button-Elemente eine Bedeutung.
+> **Hinweis**
+>
+> * Auch wenn Parameter für alle anderen Elemente zugewiesen werden können haben diese jedoch ausschließlich für System-Button-Elemente eine Bedeutung.
 
 
-###### Zulässige Parameter für Link-, und Linklisten-Buttons:
+<a name="Parameter-Typen"></a>
+## Zulässige Parameter Typen
 
+*Zulässige Parameter für Link-, und Linklisten-Buttons:*
 
 * `category`, `label`
 * Dem zulässigen `label` Attribut kann ein Array oder String übergeben werden.
 
-
-###### Zulässige Parameter für Media-, und Medialiste-Buttons:
+*Zulässige Parameter für Media-, und Medialiste-Buttons:*
 
 * `types`, `preview`, `category`, `label`
 * Dem zulässigen `label` Attribut kann ein Array oder String übergeben werden.

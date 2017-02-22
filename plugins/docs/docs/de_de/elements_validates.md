@@ -1,48 +1,96 @@
 # Elementen Validierungen zuweisen
 
 
+> ## Inhalt
+> - [Methoden der Validierungszuweisung](#Validierung-zuweisen)
+> - [Beispiel für Validierungsübergaben](#Validierung-übergeben)
+> - [Formular-Elemente welche validiert werden können](#Formular-Elemente)
+> - [Zulässige Validierungen](#Zulässige-Validierungen)
+
 Mit MForm ist es möglich ohne Actions Input-Formulare mit Validierungen zu versehen. Dabei greift MForm auf ein geläufiges jQuery Plugin [Parsley](http://parsleyjs.org/documentation.html) zurück. Die Validierungen lassen sich je nach Element als Attribut oder separiertes Übergabe-Array definieren.
 
-Mit der Methode `setValidations` können Formular-Elementen Validierungen zugewiesen werden. Validierungen können dem Konstruktor der Element-Methoden über das "Attribut-Array" übergeben werden.
+Mit der Methode `setValidations` können Formular-Elementen Validierungen zugewiesen werden.
 
 
-##### Es gibt also je nach Element bis zu 3 Wege eine Validierung zu definieren:
+<a name="Validierung-zuweisen"></a>
+## Methoden der Validierungszuweisung
+
+Es gibt 5 Wege eine Validierung zuzuweisen:
+
+1. In einem Übergabe-Array als Parameter der Element-Methode.
+2. In einem Übergabe-Array als Parameter der `setValidations`-Methode.
+3. Als Name- und Wert-Parameter der `addValidation`-Methode 
+4. Als Wert über die `setAttributes`-Methode.
+
+> **Hinweis**
+>
+> * Das Übergabe-Array muss nach folgendem Schema aufgebaut sein: `array('Validierungsbezeichnung_1', 'Validierungsbezeichnung_2')`
 
 
-* Als Wert über den Konstruktor der Element-Methode.
-* Als Wert über den Konstruktor der `setValidations` Methode.
-* Als Wert über die `setAttributes` Methode.
+<a name="Validierung-übergeben"></a>
+## Beispiel für Validierungsübergaben
 
+**Beispiel für Aufruf von Email- und Empty-Validierungen**
 
-##### Hinweis:
-
-
-* Validierungen werden als Array dem Konstruktor übergeben.
-* Das Übergabe-Array muss nach folgendem Schema aufgebaut sein: `array('Validierungsbezeichnung_1', 'Validierungsbezeichnung_2')`
-* Das Übergabe-Array von Validierungen welche ein Übergabewert erwarten muss nach folgendem Schema aufgebaut sein: `array('Validierungsbezeichnung'=>'Verarbeitungswert')`
-
-###### Beispiel für Aufruf von Email- und Empty-Validierungen:
+*1. Beispiel für Zuweisung durch Element-Methode*
 
 ```php
-  $objForm->addTextField(1);
-  $objForm->setLabel('Label Name');
-  $objForm->setAttributes(array('style'=>'width:200px'));
-  $objForm->setValidations(array('compare','empty'));
+// instance mform
+$mform = new MForm();
 
-  $objForm->addTextField(2);
-  $objForm->setAttributes(array('label'=>'Label Name','validation'=>array('compare','empty')));
-
-  $objForm->addTextField(3,array('label'=>'Label Name','style'=>'width:200px','validation'=>array('compare','empty')));
+// add text field
+$mform->addTextField(1, array('label' => 'E-Mail'), array('compare', 'empty'));
 ```
 
+*2. Beispiel für Zuweisung durch `setValidations`-Methode*
 
-##### Hinweis: 
+```php
+// instance mform
+$mform = new MForm();
+
+// add text field
+$mform->addTextField(1, array('label' => 'E-Mail'));
+
+// add validation
+$mform->setValidations(array('compare', 'empty'));
+```
+
+*3. Beispiel für Zuweisung durch `addValidation`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add text field
+$mform->addTextField(1, array('label' => 'E-Mail'));
+
+// add validation
+$mform->addValidation('compare');
+$mform->addValidation('empty');
+```
+
+*4. Beispiel für Zuweisung durch `setAttributes`-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add text field
+$mform->addTextField(1);
+
+// add attributes
+$mform->setAttributes(array('label'=>'E-Mail','validation'=>array('compare','empty')));
+```
+
+> **Hinweis** 
+>
+> * Validierungen werden als `data-attribut` in das entsprechenden Element geschrieben.
 
 
-* Validierungen werden als `data-attribut` in das entsprechenden Element geschrieben.
+<a name="Formular-Elemente"></a>
+## Formular-Elemente welche validiert werden können 
 
-
-###### Validierungen können Folenden Formular-Elementen zugewiesen werden:
+*Validierungen können Folenden Formular-Elementen zugewiesen werden:*
 
 * Text-Input- und Hidden-Elemente
   * `addTextField`
@@ -53,16 +101,16 @@ Mit der Methode `setValidations` können Formular-Elementen Validierungen zugewi
 * Checkbox-Elemente
   * `addCheckboxField`
 
-
-##### Hinweis:
-
-
-* Nicht alle Formular Elemente reagieren auf eingesetzt Validierungen.
-* Validierungen lassen sich ggf. kombinieren.
+> **Hinweis**
+>
+> * Nicht alle Formular Elemente reagieren auf eingesetzt Validierungen.
+> * Validierungen lassen sich ggf. kombinieren.
 
 
-###### Folgende Validierungen sind zulässig:
+<a name="Zulässige-Validierungen"></a>
+## Zulässige Validierungen
 
+*Folgende Validierungen sind zulässig:*
 
 * `empty`
 * `integer`
@@ -79,7 +127,8 @@ Mit der Methode `setValidations` können Formular-Elementen Validierungen zugewi
 * `data-mincheck` *
 * `data-maxcheck` *
 
-
-Die mit * gekennzeichneten Validierungen benötigen einen Verarbeitungswert. Die Validierungsbezeichnung wird hier als Array-Key genutzt. Im Array-Value wird dann der Verarbeitungswert erfasst:
-
-`array('Validierungsbezeichnung'=>'Verarbeitungswert')`
+> **Hinweis**
+>
+> * Die mit * gekennzeichneten Validierungen benötigen einen Verarbeitungswert.
+> * Die Validierungsbezeichnung wird hier als Array-Key genutzt. 
+> * Im Array-Value wird dann der Verarbeitungswert erfasst: `array('Validierungsbezeichnung'=>'Verarbeitungswert')`

@@ -32,15 +32,13 @@ MForm muss im Modul-Input eines REDAXO Moduls als PHP Code notiert werden.
 
 ### Instanziierung  
 
-    <?php
-        // instantiate
-        $MForm = new MForm();
+    // instantiate
+    $MForm = new MForm();
 
 Der MForm Classe kann im Konstruktor der Templatename übergeben werden. Dabei entspricht der Templatename dem Prefix des Templateordners.
 
-    <?php
-        // instantiate
-        $MForm = new MForm('table');
+    // instantiate
+    $MForm = new MForm('table');
 
 
 ### Formularelemente
@@ -81,9 +79,9 @@ Um das komponierte Formular erzeugen zu lassen muss muss die `show` Methode genu
     echo $MForm->show();
 
 
-### MForm-Elemente
+### Element-Methoden
 
-MForm stellt folgende Elemente bereit: 
+MForm stellt folgende Element-Methoden bereit: 
 
 * Text-Input- und Hidden-Elemente
   * `addTextField`
@@ -107,12 +105,18 @@ MForm stellt folgende Elemente bereit:
   * `addLinklistField`
   * `addMediaField`
   * `addMedialistField`
+* Custom-Elemente
+  * `addCustomLinkField`
+  * `addInputField`
 
 
 ##### Geplante Elemente
 
 * Callback-Element
   * `callback`
+* Struktur-Elemente
+  * `tabs`
+  * `columns`
 
 
 ## Lizenz

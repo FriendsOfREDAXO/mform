@@ -1,104 +1,86 @@
 # Modul-Input Demo Redaxo 5.x
 
-Für Redaxo 5 steht MForm ab der Version 3.0 zur Verfügung.
 
 ```php
 <?php
-/*
-MODUL INPUT DEMO
-
-@copyright Copyright (c) 2013 by Doerr Softwaredevelopment
-@author mail[at]joachim-doerr[dot]com Joachim Doerr
-
-@package redaxo4
-@version 2.2.0
-*/
-
 // instanziieren
-$objForm = new MForm();
+$mform = new MForm();
 
-// html
-$objForm->addHtml('<b>HTML Code</b>');
-
-// headline
-$objForm->addHeadline('Text-Input und Hidden Elemente');
+// fieldset
+$mform->addFieldset('Text inputs');
 
 // text field
-$objForm->addTextField(1,array('label'=>'Input','style'=>'width:200px'));
+$mform->addTextField(1.1,array('label'=>'Text','style'=>'width:200px'));
 
 // hidden field
-$objForm->addHiddenField(2,'hidden feld string',array('label'=>'Hidden','style'=>'width:200px'));
+$mform->addHiddenField(1.2,'hidden feld string',array('label'=>'Hidden'));
 
 // readonly field
-$objForm->addTextReadOnlyField(3,'readonly feld string',array('label'=>'Readonly','style'=>'width:200px'));
+$mform->addTextReadOnlyField(1.3,'readonly feld string',array('label'=>'Text readonly','style'=>'width:200px'));
 
 // textarea field
-$objForm->addTextAreaField(4,array('label'=>'Textarea','style'=>'width:300px;height:180px'));
-
-// markitup
-$objForm->addTextAreaField(5,array('label'=>'Textarea','class'=>"markitup1"));
+$mform->addTextAreaField(1.4,array('label'=>'Textarea','style'=>'height:180px'));
 
 // textarea readonly field
-$objForm->addTextReadOnlyField(6,'string readonly',array('label'=>'Readonly','style'=>'width:300px;height:180px'));
+$mform->addTextAreaReadOnlyField(1.5,'string readonly',array('label'=>'Textarea Readonly','style'=>'height:180px'));
 
 
-// headline
-$objForm->addHeadline('Select und Multiselect Elemente');
+// fieldset
+$mform->addFieldset('Select and multi-select elements');
 
 // select
-$objForm->addSelectField(7,array(1=>'test-1',2=>'test-2'),array('label'=>'Select'));
+$mform->addSelectField(2.1,array(1=>'test-1',2=>'test-2'),array('label'=>'Select'));
 
 // select mit ausgelagerten Options, Size und Label
-$objForm->addSelectField(8);
-$objForm->addOptions(array(1=>'test-1',2=>'test-2'));
-$objForm->setSize(5);
-$objForm->setLabel('Select');
+$mform->addSelectField(2.2);
+$mform->setOptions(array(1=>'test-1',2=>'test-2'));
+$mform->setSize(5);
+$mform->setLabel('Select size 5');
 
 // multiselect
-$objForm->addMultiSelectField(9,array(1=>'test-1',2=>'test-2'),array('label'=>'Multiselect','size'=>'8'));
+$mform->addMultiSelectField(2.3,array(1=>'test-1',2=>'test-2'),array('label'=>'Multiselect'));
 
 // multiselect
-$objForm->addMultiSelectField(10,array(1=>'test-1',2=>'test-2',3=>'test-3',4=>'test-4'),array('label'=>'Multiselect'), 'full');
+$mform->addMultiSelectField(2.4,array('group'=>array(1=>'test-1',2=>'test-2',3=>'test-3',4=>'test-4'),'group2'=>array(5=>'test-5',6=>'test-6')),array('label'=>'Select groups'), 'full');
 
 
-// headline
-$objForm->addHeadline('Radio und Checkbox Elemente');
+// fieldset
+$mform->addFieldset('Radio and checkbox elements');
 
 // checkbox
-$objForm->addCheckboxField(11,array(1=>'test-1'),array('label'=>'Checkbox'));
+$mform->addCheckboxField(3.1,array(1=>'test-1'),array('label'=>'Checkbox'));
 
 // radiobox
-$objForm->addRadioField(12,array(1=>'test-1',2=>'test-2'),array('label'=>'Radio Buttons'));
+$mform->addRadioField(3.2,array(1=>'test-1',2=>'test-2'),array('label'=>'Radio buttons'));
 
 
-// headline
-$objForm->addHeadline('System-Button Elemente');
+// fieldset
+$mform->addFieldset('System-button elements');
 
 // media button
-$objForm->addMediaField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Bild'));
+$mform->addMediaField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Media'));
 
 // medialist button
-$objForm->addMedialistField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Bildliste'));
+$mform->addMedialistField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>4,'label'=>'Medialist'));
 
 // link button
-$objForm->addLinkField(1,array('label'=>'Link','category'=>3));
+$mform->addLinkField(1,array('label'=>'Link','category'=>3));
 
 // linklist button
-$objForm->addLinklistField(1,array('label'=>'Linkliste','category'=>3));
+$mform->addLinklistField(1,array('label'=>'Linklist','category'=>3));
 
 
-// headline
-$objForm->addHeadline('Text Elemente');
+// fieldset
+$mform->addFieldset('Custom elements');
 
-// description
-$objForm->addDescription('Beschreibungstext auch Mehrzeilig');
+// custom link
+$mform->addCustomLinkField(5.1,array('label'=>'Customlink'));
 
-// HTML
-$objForm->addHtml('<b>HTML <i>Text</i></b>');
+// input field
+$mform->addInputField("range", 5.2, array('label'=>'Range field'));
 
 
 // get formular
-echo $objForm->show();
-
+echo $mform->show();
 ?>
 ```
