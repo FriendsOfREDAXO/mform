@@ -7,7 +7,7 @@ Die Gruppe Text-Input- und Hidden-Elemente umschließt alle Texteingabe-Formular
 ### Input-Typen als Formular-Element
 
 
-###### Unterschiedliche Input-Typen werden durch jeweils ihre eigene "Methoen" angesteuert, es gibt 5 Typen:
+###### Unterschiedliche Input-Typen werden durch jeweils ihre eigene "Methoden" angesteuert, es gibt 5 Typen:
 
 
 * `addTextField`
