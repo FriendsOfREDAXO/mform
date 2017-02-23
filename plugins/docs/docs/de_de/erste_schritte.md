@@ -18,7 +18,7 @@ Mit MForm ist es möglich Modul-Input-Formulare zu definieren und diese als HTML
 >
 > * MForm ist weder am Prozess der Datenerfassung noch am Prozess der Datenlieferung beteiligt.
 > * Durch MForm können Modul-Input-Formulare definiert und im Modul-Input geprintet werden. 
-> * MForm wurde grundlegend und ausschließlich zum erstellen von Modul-Input-Fomrularen konstruiert. 
+> * MForm wurde grundlegend und ausschließlich zum Erstellen von Modul-Input-Fomrularen konstruiert. 
 
 
 <a name="Das-Erste-MForm-Formular"></a>
@@ -96,12 +96,12 @@ echo $mform->show();
 ?>
 ```
 
-Im Modul-Input beispiel wurde dem Text-Input feld `addTextField` ein Attriubt-Array übergeben, über welches der Label definiert wurde. Hier durch ist der direkte Aufruf der `setLabel` Methode nicht mehr nötig.
+Im Modul-Input Beispiel wurde dem Text-Input Feld `addTextField` ein Attribut-Array übergeben, über welches das Label definiert wurde. Dadurch ist der direkte Aufruf der `setLabel` Methode nicht mehr nötig.
 
 > **Hinweis**
 >
-> * Allen Element-Methoden nehmen unterschiedliche Parameter entgegen, wodurch die "Short Schreibweise" überhaupt erst möglich wird. 
-> * Mit dem nachträgliche Aufrufen Settern werden als Parameter übergebene Attribute überschrieben.  
+> * Alle Element-Methoden nehmen unterschiedliche Parameter entgegen, wodurch die "Short Schreibweise" überhaupt erst möglich wird. 
+> * Mit dem nachträgliche Aufrufen von Settern werden, als Parameter übergebene Attribute, überschrieben.  
 
 
 <a name="Formular-Elemente"></a>
@@ -130,9 +130,9 @@ MForm stellt alle relevanten Formular-Elemente bereit. Zudem nutzt MForm die Red
 
 > **Hinweis**
 >
-> * Es können beliebt viele Formular-Input-Elemente definiert werden.
-> * Das schließen von Fieldsets ist nicht nötig.
-> * Es können ohne weiteres beliebig viele Formulare in einem Modul-Input durch MForm erzeugt werden, hierzu muss lediglich jeweils eine neue Instanz initiiert werden.
+> * Es können beliebig viele Formular-Input-Elemente definiert werden.
+> * Das Schließen von Fieldsets ist nicht nötig.
+> * Es können, ohne weiteres, beliebig viele Formulare in einem Modul-Input durch MForm erzeugt werden, hierzu muss lediglich jeweils eine neue Instanz initiiert werden.
 
 <a name="Element-Methoden"></a>
 ## Element-Methoden 

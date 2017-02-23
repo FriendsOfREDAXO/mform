@@ -18,14 +18,14 @@ Auch die Redaxo Link|Linklist- und Media|Medialist-Widgets lassen sich durch MFo
 <a name="Docu-Inhalt"></a>
 ## Docu-Inhalt und Ziel
 
-In dieser Doku sind detaillierte Beschreibungen zur Nutzung von MForm und zur Erstellung von Modul-Input-Formulare mit den einzelnen Methoden der MForm-Klasse zu finden.
+In dieser Doku sind detaillierte Beschreibungen zur Nutzung von MForm und zur Erstellung von Modul-Input-Formularen mit den einzelnen Methoden der MForm-Klasse zu finden.
 
 Dem erfahrenen Entwickler als auch dem Einsteiger soll die Doku die Handhabung von MForm verdeutlichen und Hilfestellung bei allen zu Thema MForm anfallenden Fragen geben.
 
 
 > **Wichtig**
 >
-> * MForm ist ausschließlich zum erstellen von **Modul-Input-Formularen** geeignet. Es ist nicht gedacht um damit Frontend- oder Addon-Formulare zu erzeugen.
+> * MForm ist ausschließlich zum Erstellen von **Modul-Input-Formularen** geeignet. Es ist nicht gedacht um damit Frontend- oder Addon-Formulare zu erzeugen.
 >
 > **Hinweis**
 >
