@@ -1,45 +1,45 @@
 mform_name = MForm
 mform_title = MForm
 
-mform_demo = Beispiel Sammlung
-mform_demo_base = Basis Beispiele
-mform_demo_extended = Erweiterte Beispiele
-mform_demo_expert = Experten Beispiele
-mform_demo_community = FOS Beispiele
-mform_referenz_demo = Beispiel Sammlung
+mform_demo = Sample collection
+mform_demo_base = Basic examples
+mform_demo_extended = Extended examples
+mform_demo_expert = Expert examples
+mform_demo_community = FOS examples
+mform_referenz_demo = Sample collection
 mform_info = Info
 
-mform_modul_input = Modul Eingabe
-mform_modul_output = Modul Ausgabe
+mform_modul_input = Module input
+mform_modul_output = Modul output
 
-mform_help_headline = Informationen
-mform_help_subheadline_1 = MForm – Redaxo Addon für Modul-Input-Formulare
-mform_help_infotext_1 = MForm ist ein Redaxo Addon, welches das Erstellen von Modul-Formularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle wesentlichen Modul-Input-Formular Elemente bereit, welche sich recht einfach einbinden lassen.
-mform_help_infotext_2 = Zur Validierung von Modul-Formularen nutzt MForm den jQuery Validator Parsley und bietet so die Möglichkeit jedes mögliche Input-Feld mit standard Validierungen versehen zu können.
-mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formular Elemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen jeweils als Übergabe-Array verarbeiten, wodurch ein Element kurzgesagt “einzeilig” und mit wenig Aufwand angelegt werden können.
+mform_help_headline = Information
+mform_help_subheadline_1 = MForm – Redaxo add-on for module-input-forms
+mform_help_infotext_1 = MForm is a Redaxo add-on that makes the creation of module forms much easier. MForm uses templates which allow the administrator to customize the module style. MForm provides all the essential module input form elements for easy integration.
+mform_help_infotext_2 = For the validation of module forms, MForm uses the jQuery Validator Parsley which offers the possibility to assign standard validations to every possible input field.
+mform_help_infotext_3 =  MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 
-mform_config_label_template = Theme für Modul-Formulare
-mform_config_saved = Einstellungen wurden gespeichert.
-mform_config = Konfiguration
+mform_config_label_template = Theme for module forms
+mform_config_saved = The settings have been saved.
+mform_config = Configuration
 
-mform_overview = Übersicht
-mform_config_save = Einstellungen speichern
+mform_overview = Overview
+mform_config_save = Save settings
 mform_wiki = MForm Github Doku Wiki
-mform_github = MForm FOR Github Repository
+mform_github = MForm FOR – Github Repository
 
-mform_example_base_text = Text-Input- und Hidden-Elemente
-mform_example_base_select = Select- und Multiselect-Elemente
-mform_example_base_checkbox = Checkbox und Radio-Elmente
-mform_example_base_inline = Strukturelle Inline-Elemente
-mform_example_base_system = System-Button-Elemente
-mform_example_extended_attribute_method = Attributes Method
-mform_example_extended_options_method = Options Method
-mform_example_expert_html_form_elements = Neue HTML5 Formular-Elemente
-mform_example_expert_datalist = Datalists für Input-Elemente
+mform_example_base_text = Text input and hidden elements
+mform_example_base_select = Select and multiselect elements
+mform_example_base_checkbox = Checkbox and radio elements
+mform_example_base_inline = Structured inline elements
+mform_example_base_system = System button elements
+mform_example_extended_attribute_method = Attributes method
+mform_example_extended_options_method = Options method
+mform_example_expert_html_form_elements = New HTML5 form elements
+mform_example_expert_datalist = Datalists for input elements
 mform_example_expert_placeholder = Placeholder
 
-mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
-mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.
-mform_example_description_expert = Die "Experten Beispiele" zeigen, dass MForm für mehr als nur für Standards genutzt werden kann.
+mform_example_description_base = The "basic examples" include the basic calls of the respective MForm element, without any "extras", extensions and validations.
+mform_example_description_extended = The "extended examples" show beyond the "basic examples", how to expand elements around attributes, options, parameters, labels, etc.
+mform_example_description_expert = The "expert examples" show that MForm can be used for more than just standards.
 mform_example_description_community = Later
 mform_example_extended_full_json_support = Full JSON value support
