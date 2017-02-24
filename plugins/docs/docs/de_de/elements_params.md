@@ -20,7 +20,7 @@ Es gibt 3 Wege System-Button-Elementen Parameter zuzuweisen:
 
 > **Hinweis**
 > 
-> * Das Übergabe-Array muss nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+> * Das Übergabe-Array muss nach folgendem Schema aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
 
 
 <a name="Parameter-übergeben"></a>

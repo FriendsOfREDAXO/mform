@@ -6,7 +6,7 @@
 > - [Beispiele für Placeholder-Zuweisungen](#Placeholder)
 > - [Formular-Elemente welchen Default-Value und/oder Placeholder erhalten können](#Formular-Elemente)
 
-Will man einem Formular-Element einen Default-Value vergeben kann man hierfür die `setDefaultValue` Methode nutzen. Um einen Placeholder zu setzen findet die `setPlaceholder`-Methode V    erwendung. 
+Will man einem Formular-Element einen Default-Value vergeben kann man hierfür die `setDefaultValue` Methode nutzen. Um einen Placeholder zu setzen findet die `setPlaceholder`-Methode Verwendung. 
 
 > **Hinweis**
 >
@@ -125,5 +125,5 @@ Die weiteren Elemente können nur Default-Values jedoch nicht mit Placeholdern v
 
 > **Hinweis**
 >
-> * Auch wenn Default-Values und Placeholder Elementen zugewiesen werden können welche in der Liste nicht aufgeführt wurden, werden diese jedoch dann nicht im HTML dieser Elemente geschrieben.
+> * Auch wenn Default-Values und Placeholder Elementen zugewiesen werden können, welche in der Liste nicht aufgeführt wurden, werden diese jedoch dann nicht im HTML dieser Elemente geschrieben.
 > * Default-Values von Select-, Radio- und Checkbox-Elemente dürfen nur deren "Key-Werten" entsprechen.

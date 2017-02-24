@@ -19,7 +19,7 @@ Es gibt 3 Wege Select-, Radio- und Checkbox-Elementen Optionen zuzuweisen:
 
 > **Hinweis**
 >
-> * Die Übergabe-Arrays müssen nach folgendem Schema Aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+> * Die Übergabe-Arrays müssen nach folgendem Schema aufgebaut sein: `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
 > * Optionen sind für Select-, Radio- und Checkbox-Elementen erforderlich. 
 
 

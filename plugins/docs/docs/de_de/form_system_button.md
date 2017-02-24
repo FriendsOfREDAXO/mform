@@ -171,7 +171,7 @@ Diese 4 Typen können als Formular Elemente eingesetzt werden. Dabei ist zu beac
 ### Kategorie durch die "setCategory" Methode festlegen
 
 
-h5. Hinweis:
+##### Hinweis:
 
 
 * Die `setCategory` Methode verarbeitet ausschließlich numerische Werte.

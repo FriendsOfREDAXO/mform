@@ -99,6 +99,6 @@ echo $mform->show();
 
 > **Hinweis**
 >
-> * Dieses Beispiel nutzt das MForm-"Default"-Thema. Es ist auch möglich eigene Themes anzulegen.
+> * Dieses Beispiel nutzt das MForm-"Default"-Thema. Es ist auch möglich eigene Themen anzulegen.
 > * In dem Beispiel wurde kein Fieldset eingesetzt, dies führt dazu, dass die Darstellung nicht optimal ist. 
 > * Unter Verwendung des Default-Themas sollte man immer nach der Initialisierung der MForm Klasse ein Fieldset anlegen. 
