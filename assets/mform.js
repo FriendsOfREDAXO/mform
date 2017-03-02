@@ -13,28 +13,12 @@ function mform_init() {
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
 
-        var custom_link = mform.find('.custom-link'),
-            multiple_select = mform.find('.multiple-select');
+        var custom_link = mform.find('.custom-link');
 
         if (custom_link.length) {
             mform_custom_link(custom_link);
         }
-        if (multiple_select.length) {
-            mform_multiple_select(multiple_select);
-        }
     }
-}
-
-function mform_multiple_select(item) {
-    item.each(function(){
-        if ($(this).data('multiple-select') ==  $(this).attr('id'))
-        { } else  {
-            $(this).data('multiple-select', $(this).attr('id'));
-            $(this).change(function() {
-                $(this).next('input[type=hidden]').val($(this).val());
-            });
-        }
-    });
 }
 
 function mform_custom_link(item) {

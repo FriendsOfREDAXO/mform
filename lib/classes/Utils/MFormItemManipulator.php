@@ -16,7 +16,9 @@ class MFormItemManipulator
     public static function setVarAndIds(MFormItem $item)
     {
         // set value for html out
-        $item->setValue(htmlspecialchars($item->getValue()));
+        if (!is_array($item->getValue())) {
+            $item->setValue(htmlspecialchars($item->getValue()));
+        }
 
         // is mode add and default value defined
         if ($item->getMode() == 'add' && $item->getDefaultValue()) {

@@ -87,7 +87,7 @@ class MFormValueHandler
                         if (is_array($value)) {
                             $value = (array_key_exists($item->getVarId()[1], $value)) ? $value[$item->getVarId()[1]] : '';
                         }
-                        if (is_array($value)) {
+                        if (is_array($value) && isset($item->getVarId()[2])) {
                             $value = (array_key_exists($item->getVarId()[2], $value)) ? $value[$item->getVarId()[2]] : '';
                         }
                     }

@@ -225,6 +225,10 @@ class MFormParser extends AbstractMFormParser
         $optionElements = '';
         $itemAttributes = $this->parseAttributes($item->getAttributes()); // parse attributes for output
 
+        if ($item->isMultiple() && is_array($item->getValue())) {
+            $item->setValue(implode(',', $item->getValue()));
+        }
+
         // options must te be given
         if (sizeof($item->getOptions()) > 0) {
             // size count
@@ -272,16 +276,7 @@ class MFormParser extends AbstractMFormParser
             ->setOptions($optionElements);
 
         if ($item->isMultiple()) {
-            // hidden element
-            $element->setClass($element->class . ' multiple-select');
-            $hiddenElement = new MFormElement();
-            $hiddenElement->setId('hidden_' . $item->getId())
-                ->setVarId($item->getVarId())
-                ->setValue($item->getValue())
-                ->setType('hidden');
-
-            // hidden input element
-            $element->setHidden($this->parseElement($hiddenElement, 'text', true));
+            $element->setVarId($item->getVarId() . '[]');
         }
 
         // create label element
