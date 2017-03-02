@@ -325,7 +325,7 @@ class MFormParser extends AbstractMFormParser
 
         // set default value or selected
         if ($selected && ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue()))) {
-            $element->setAttributes('selected'); // add attribute selected
+            $element->setAttributes(' selected'); // add attribute selected
         }
         // parse element
         return $this->parseElement($element, $templateType, true);
@@ -401,7 +401,7 @@ class MFormParser extends AbstractMFormParser
         }
         // set checked by value or default value
         if ($key == $item->getValue() or ($item->getMode() == 'add' && $key == $item->getDefaultValue())) {
-            $element->setAttributes('checked="checked"');
+            $element->setAttributes(' checked="checked"');
         }
         // parse element
         return $this->parseElement($element, $item->getType(), true);

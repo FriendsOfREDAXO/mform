@@ -82,9 +82,8 @@ class MFormValueHandler
                     break;
                 default:
                     if (array_key_exists('value', $result)) {
-
                         $value = (array_key_exists($item->getVarId()[0], $result['value'])) ? $result['value'][$item->getVarId()[0]] : '';
-                        if (is_array($value)) {
+                        if (is_array($value) && isset($item->getVarId()[1])) {
                             $value = (array_key_exists($item->getVarId()[1], $value)) ? $value[$item->getVarId()[1]] : '';
                         }
                         if (is_array($value) && isset($item->getVarId()[2])) {
