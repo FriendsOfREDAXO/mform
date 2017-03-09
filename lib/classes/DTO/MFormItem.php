@@ -83,9 +83,14 @@ class MFormItem
     public $full;
 
     /**
-     * @var boolean
+     * @var integer
      */
-    public $closeFieldset;
+    public $tabGroup;
+
+    /**
+     * @var integer
+     */
+    public $tabCount;
 
     /**
      * @return string
@@ -358,20 +363,40 @@ class MFormItem
     }
 
     /**
-     * @return boolean
+     * @return int
      */
-    public function isCloseFieldset()
+    public function getTabGroup()
     {
-        return $this->closeFieldset;
+        return $this->tabGroup;
     }
 
     /**
-     * @param boolean $closeFieldset
+     * @param int $tabGroup
      * @return $this
      */
-    public function setCloseFieldset($closeFieldset)
+    public function setTabGroup($tabGroup)
     {
-        $this->closeFieldset = $closeFieldset;
+        $this->tabGroup = $tabGroup;
+        return $this;
+    }
+
+    /**
+     * @return int
+     * @author Joachim Doerr
+     */
+    public function getTabCount()
+    {
+        return $this->tabCount;
+    }
+
+    /**
+     * @param int $tabCount
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setTabCount($tabCount)
+    {
+        $this->tabCount = $tabCount;
         return $this;
     }
 }

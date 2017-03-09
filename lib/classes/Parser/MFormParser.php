@@ -33,9 +33,7 @@ class MFormParser extends AbstractMFormParser
         if (!empty($item->getValue())) {
             $legendElement = new MFormElement();
             $legendElement->setValue($item->getValue());
-
-            $fieldsetElement
-                ->setLegend($this->parseElement($legendElement, 'legend', true)); // add parsed legend to fieldset element
+            $fieldsetElement->setLegend($this->parseElement($legendElement, 'legend', true)); // add parsed legend to fieldset element
         }
 
         // add fieldset open element to elements list
@@ -59,6 +57,83 @@ class MFormParser extends AbstractMFormParser
             $this->elements[] = $this->parseElement(new MFormElement(), 'fieldset-close', true); // use parse element to load template file
         }
         return $this;
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param $key
+     * @param MFormItem[] $items
+     * @author Joachim Doerr
+     */
+    private function generateTab($item, $key, $items)
+    {
+        // is flag tab true
+        if ($this->tab)
+            $this->closeTab(); // close open tab
+
+        if ($this->tabGroup == 0) {
+            // open tab group
+            $this->tabGroup = $item->getTabGroup();
+
+            $nav = array();
+            foreach ($items as $itm) {
+                if ($itm->getTabGroup() == $this->tabGroup && $itm->tabCount > 0) {
+                    $element = new MFormElement();
+                    $element->setId('tabg' . $itm->getTabGroup() . 'tabid' . $itm->getTabCount());
+                    $element->setValue($itm->getValue());
+
+                    if ($itm->getTabCount()==1)
+                        $element->setClass('active');
+
+                    $nav[] = $this->parseElement($element, 'tabnavli', true); // use parse element to load template file
+                }
+            }
+
+            $element = new MFormElement();
+            $element->setElement(implode('', $nav));
+            $this->elements[] = $this->parseElement($element, 'tabgroup-open', true); // use parse element to load template file
+        }
+
+        // open tab
+        $element = new MFormElement();
+        $element->setId('tabg' . $item->getTabGroup() . 'tabid' . $item->getTabCount());
+
+        if ($item->getTabCount() == 1)
+            $element->setClass('active');
+
+        $this->elements[] = $this->parseElement($element, 'tab-open', true); // use parse element to load template file
+        $this->tab = true;
+    }
+
+    /**
+     * @param MFormItem|null $item
+     * @param int|null $key
+     * @param MFormItem[]|array $items
+     * @param bool $finalClose
+     * @author Joachim Doerr
+     */
+    private function closeTab($item = null, $key = null, $items = array(), $finalClose = false)
+    {
+        // close open tab by flag
+        // next item is from our tab group
+        if ($this->tab) {
+            $this->tab = false;
+            $this->elements[] = $this->parseElement(new MFormElement(), 'tab-close', true); // use parse element to load template file
+        }
+
+        // final? by item?
+        if (!is_null($item) &&
+            (
+                (isset($items[$key+1]) && $items[$key+1]->tabGroup != $this->tabGroup)
+                or (!isset($items[$key+1])) // close tab is latest element
+            ))
+            $finalClose = true;
+
+        // final close wrapper
+        if ($finalClose) {
+            $this->tabGroup = 0;
+            $this->elements[] = $this->parseElement(new MFormElement(), 'tabgroup-close', true); // use parse element to load template file
+        }
     }
 
     /**
@@ -606,6 +681,12 @@ class MFormParser extends AbstractMFormParser
                     case 'fieldset':
                         $this->generateFieldset($item);
                         break;
+                    case 'close-tab':
+                        $this->closeTab($item, $key, $items);
+                        break;
+                    case 'tab':
+                        $this->generateTab($item, $key, $items);
+                        break;
                     case 'html':
                     case 'headline':
                     case 'description':
@@ -654,6 +735,42 @@ class MFormParser extends AbstractMFormParser
     }
 
     /**
+     * @param MFormItem[] $items
+     * @author Joachim Doerr
+     */
+    private function setTabExtensions($items){
+
+        $tabGroupCount = 0;
+        $tabCount = 0;
+        $tab = false;
+
+        // unset array keys
+        $items = array_values($items);
+
+        /** @var MFormItem $item */
+        foreach($items as $key => $item) { // key + 1 => count
+
+            if ($item->getType() == 'tab') {
+                if (!$tab) {
+                    $tabCount = 1;
+                    $tabGroupCount++;
+                    $tab = true;
+                }
+                // set tabgroup for tab
+                $item->setTabGroup($tabGroupCount);
+                $item->setTabCount($tabCount++);
+            }
+
+            // unset tab group is item tab close and next not tab open
+            if ($item->getType() == 'close-tab' && (count($items) >= ($key + 2) && $items[$key+1]->getType() != 'tab')) {
+                // set tabg roup for close element
+                $item->setTabGroup($tabGroupCount);
+                $tab = false;
+            }
+        }
+    }
+
+    /**
      * final parsing
      * @param MFormItem[] $items
      * @param null $theme
@@ -674,17 +791,24 @@ class MFormParser extends AbstractMFormParser
                 // foreach all css files
                 foreach (MFormThemeHelper::getCssAssets($this->theme) as $css) {
                     // add assets css file
-                   $this->elements[] = '<link rel="stylesheet" type="text/css" media="all" href="' . rex_url::addonAssets('mform', $css) . '" />';
+                   $this->elements[] = '<link rel="stylesheet" type="text/css" media="all" href="' . rex_url::addonAssets('mform', $css) . '?v=' . rex_addon::get('mform')->getVersion() . '" />';
                 }
             }
         }
 
+        $this->setTabExtensions($items);
         $this->parseFormFields($items);
 
         // close fieldset
         if ($this->fieldset) {
             $this->closeFieldset();
         }
+
+        // close tab
+        if ($this->tabGroup > 0 or $this->tab) {
+            $this->closeTab(null, null, array(), true);
+        }
+
         // show for debug items
         if ($debug) {
             echo '<pre>'.PHP_EOL;

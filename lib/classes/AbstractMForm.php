@@ -128,6 +128,26 @@ abstract class AbstractMForm
     }
 
     /**
+     * @param null|string $value
+     * @param array $attributes
+     * @return AbstractMForm
+     * @author Joachim Doerr
+     */
+    public function addTab($value = null, $attributes = array())
+    {
+        return $this->addElement('tab', NULL, $value, $attributes);
+    }
+
+    /**
+     * @return AbstractMForm
+     * @author Joachim Doerr
+     */
+    public function closeTab()
+    {
+        return $this->addElement('close-tab', NULL);
+    }
+
+    /**
      * @param null $callable
      * @param array $parameter
      * @author Joachim Doerr

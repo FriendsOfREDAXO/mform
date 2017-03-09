@@ -18,6 +18,16 @@ abstract class AbstractMFormParser
     protected $fieldset = false;
 
     /**
+     * @var bool
+     */
+    protected $tab = false;
+
+    /**
+     * @var int
+     */
+    protected $tabGroup = 0;
+
+    /**
      * @var string
      * TODO use it later for custom theme in new MForm()
      */
