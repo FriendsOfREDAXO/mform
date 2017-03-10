@@ -22,3 +22,56 @@
   margin-left: 0;
   margin-right: 0;
 }
+
+/* mform tab style by Thomas Skerbis */
+
+.mform .nav-tabs > li.active > a,
+.mform .nav-tabs > li.active > a:focus,
+.mform .nav-tabs > li.active > a:hover {
+  border-width: 0;
+}
+
+.mform .nav-tabs > li > a {
+  border: none;
+  color: #283541;
+  background: rgba(67, 182, 150, 0.37);
+}
+
+.mform .nav-tabs > li.active > a,
+.mform .nav-tabs > li > a:hover {
+  border: none;
+  color: #4285F4 !important;
+  background: #FFF;
+}
+
+.mform .nav-tabs > li > a::before {
+  content: "";
+  background: #4F9BD7;
+  height: 4px;
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  top: -2px;
+  transition: all 250ms ease 0s;
+  transform: scale(0);
+}
+
+.mform .nav-tabs > li.active > a::before,
+.mform .nav-tabs > li:hover > a::after {
+  transform: scale(1);
+}
+
+.mform .tab-nav > li > a::after {
+  background: #4285F4 none repeat scroll 0% 0%;
+  color: #fff;
+}
+
+.mform .tab-pane {
+  padding: 15px 0;
+}
+
+.mform.tab-content {
+  padding: 20px;
+  background: #fff;
+  margin-bottom: 20px;
+}
