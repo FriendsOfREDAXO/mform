@@ -67,7 +67,11 @@ class MFormParser extends AbstractMFormParser
      */
     private function generateTab($item, $key, $items)
     {
-        // is flag tab true
+        // close fieldset for open tab group
+        if ($this->fieldset)
+            $this->closeFieldset();
+
+            // is flag tab true
         if ($this->tab)
             $this->closeTab(); // close open tab
 
@@ -117,6 +121,9 @@ class MFormParser extends AbstractMFormParser
         // close open tab by flag
         // next item is from our tab group
         if ($this->tab) {
+            if ($this->fieldset)
+                $this->closeFieldset();
+
             $this->tab = false;
             $this->elements[] = $this->parseElement(new MFormElement(), 'tab-close', true); // use parse element to load template file
         }
@@ -799,14 +806,14 @@ class MFormParser extends AbstractMFormParser
         $this->setTabExtensions($items);
         $this->parseFormFields($items);
 
-        // close fieldset
-        if ($this->fieldset) {
-            $this->closeFieldset();
-        }
-
         // close tab
         if ($this->tabGroup > 0 or $this->tab) {
             $this->closeTab(null, null, array(), true);
+        }
+
+        // close fieldset
+        if ($this->fieldset) {
+            $this->closeFieldset();
         }
 
         // show for debug items
