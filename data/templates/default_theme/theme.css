@@ -73,13 +73,14 @@
 .mform .mform-tabs .nav-tabs > li.active > a,
 .mform .mform-tabs .nav-tabs > li > a:hover {
 	border: none;
-	color: #000 !important;
+	color: #000;
 	background: #FFF;
 }
 
 .mform .mform-tabs .nav-tabs > li > a::before {
 	content: "";
-	background: #4F9BD7;
+	background: #000;
+	background: rgba(0, 0, 0, 0.18);
 	height: 4px;
 	position: absolute;
 	width: 100%;
