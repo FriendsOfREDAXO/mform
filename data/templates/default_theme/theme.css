@@ -25,59 +25,59 @@
 
 /* mform tab style by Thomas Skerbis */
 
-.mform .nav-tabs {
+.mform .mform-tabs .nav-tabs {
 	border-bottom: 0!important;
 	margin: 0!important;
 }
 
-.mform .form-control.parsley-success:focus {
+.mform .mform-tabs .form-control.parsley-success:focus {
 	color: #468847;
 	background-color: #DFF0D8;
 	border: 1px solid #D6E9C6;
 }
 
-.mform .form-control.parsley-error:focus {
+.mform .mform-tabs .form-control.parsley-error:focus {
 	color: #B94A48;
 	background-color: #F2DEDE;
 	border: 1px solid #EED3D7;
 }
 
-.mform select.form-control {
+.mform .mform-tabs select.form-control {
 	height: 34px;
 }
 
-.mform select[multiple],
-.mform select[size] {
+.mform .mform-tabs select[multiple],
+.mform .mform-tabs select[size] {
 	height: auto;
 }
 
-.mform .form-horizontal .mform-headline,
-.mform .form-horizontal .mform-description {
+.mform .mform-tabs .form-horizontal .mform-headline,
+.mform .mform-tabs .form-horizontal .mform-description {
 	margin-left: 0;
 	margin-right: 0;
 }
 /* mform tab style by Thomas Skerbis */
 
-.mform .nav-tabs > li.active > a,
-.mform .nav-tabs > li.active > a:focus,
-.mform .nav-tabs > li.active > a:hover {
+.mform .mform-tabs .nav-tabs > li.active > a,
+.mform .mform-tabs .nav-tabs > li.active > a:focus,
+.mform .mform-tabs .nav-tabs > li.active > a:hover {
 	border-width: 0;
 }
 
-.mform .nav-tabs > li > a {
+.mform .mform-tabs .nav-tabs > li > a {
 	border: none;
 	color: #283541;
 	background: rgba(163, 163, 163, 0.22);
 }
 
-.mform .nav-tabs > li.active > a,
-.mform .nav-tabs > li > a:hover {
+.mform .mform-tabs .nav-tabs > li.active > a,
+.mform .mform-tabs .nav-tabs > li > a:hover {
 	border: none;
-	color: #4285F4 !important;
+	color: #000 !important;
 	background: #FFF;
 }
 
-.mform .nav-tabs > li > a::before {
+.mform .mform-tabs .nav-tabs > li > a::before {
 	content: "";
 	background: #4F9BD7;
 	height: 4px;
@@ -89,21 +89,21 @@
 	transform: scale(0);
 }
 
-.mform .nav-tabs > li.active > a::before,
-.mform .nav-tabs > li:hover > a::after {
+.mform .mform-tabs .nav-tabs > li.active > a::before,
+.mform .mform-tabs .nav-tabs > li:hover > a::after {
 	transform: scale(1);
 }
 
-.mform .tab-nav > li > a::after {
+.mform .mform-tabs .tab-nav > li > a::after {
 	background: #4285F4 none repeat scroll 0% 0%;
 	color: #fff;
 }
 
-.mform .tab-pane {
+.mform .mform-tabs .tab-pane {
 	padding: 15px 0;
 }
 
-.mform .tab-content {
+.mform .mform-tabs .tab-content {
 	padding: 20px;
 	background: #fff;
 	margin-bottom: 20px;
