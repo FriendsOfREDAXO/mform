@@ -7,7 +7,7 @@
 
 // set default template
 if (!$this->hasConfig()) {
-    $this->setConfig('mform_template', 'default_theme');
+    $this->setConfig('mform_theme', 'default_theme');
 }
 
 // copy data directory
