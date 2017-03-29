@@ -13,6 +13,11 @@
     padding: 13px 15px 10px;
     background: #eee;
 }
+
+.api-docs-addon .rex-mform-docs .panel h2 {
+    margin-bottom: 20px;
+}
+
 .rex-mform-docs h3 {
     margin-top: 40px;
     margin-bottom: 5px;

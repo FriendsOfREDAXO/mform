@@ -100,6 +100,7 @@ MForm stellt folgende Element-Methoden bereit:
   * `addHeadline`
   * `addDescription`
   * `addFieldset`
+  * `addTab`
 * System-Button-Elemente
   * `addLinkField`
   * `addLinklistField`
@@ -115,7 +116,6 @@ MForm stellt folgende Element-Methoden bereit:
 * Callback-Element
   * `callback`
 * Struktur-Elemente
-  * `tabs`
   * `columns`
 
 

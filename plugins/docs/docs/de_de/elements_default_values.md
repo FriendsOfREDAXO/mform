@@ -104,6 +104,16 @@ $mform->addTextField(2, array('label' => 'Label Name'));
 $mform->setAttributes('placeholder' => 'Placeholder');
 ```
 
+*3. Beispiel für Zuweisung durch Element-Methode*
+
+```php
+// instance mform
+$mform = new MForm();
+
+// add text field
+$mform->addTextField(2, array('label' => 'Label Name', 'placeholder' => 'Placeholder'));
+```
+
 <a name="Formular-Elemente"></a>
 ## Formular-Elemente welchen Default-Value und/oder Placeholder erhalten können
 

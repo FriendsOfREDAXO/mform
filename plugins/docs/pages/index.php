@@ -2,14 +2,12 @@
 
 $lang = 'de_de';
 
-//echo rex_view::title(rex_i18n::msg('mform_docs'));
-
 // refresh
 // Umbauen auf zipball... weil nur ein request
 // unauthorisiert sind maximal 60 requests die stunde erlaubt, daher dieser weg hier nicht sinnvoll
 if (rex_request("mform_docs_func","string") == "refresh") {
     try {
-        $files_socket = rex_socket::factoryURL('https://api.github.com/repos/yakamara/redaxo_mform_docs/git/trees/master?recursive=1');
+        $files_socket = rex_socket::factoryURL($this->getSupportPage().'/git/trees/master?recursive=1');
         $response = $files_socket->doGet();
         if($response->isOk()) {
             $files = json_decode($response->getBody(), true);
@@ -86,13 +84,13 @@ if (class_exists("rex_markdown")) {
 }
 
 $fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_docs_navigation').' [ <a href="https://github.com/yakamara/redaxo_mform_docs/tree/master/'.$lang.'/main_navi.md">main_navi.md</a> ] <!-- <span><a href="index.php?page=mform/docs&mform_docs_func=refresh">Refresh</a></span> -->', false);
+$fragment->setVar('title', rex_i18n::msg('mform_docs_navigation'), false);
 $fragment->setVar('body', $navi, false);
 $navi = $fragment->parse('core/page/section.php');
 
 
 $fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_docs_content').' [ <a href="https://github.com/yakamara/redaxo_mform_docs/tree/master/'.$lang.'/'.basename($file).'">'.basename($file).'</a> ]', false);
+$fragment->setVar('title', rex_i18n::msg('mform_docs_content'), false);
 $fragment->setVar('body', $content, false);
 $content = $fragment->parse('core/page/section.php');
 

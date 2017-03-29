@@ -121,6 +121,7 @@ MForm stellt alle relevanten Formular-Elemente bereit. Zudem nutzt MForm die Red
 * Checkboxen
 * Radioboxen
 * Fieldsets
+* Bootstrap-Tabs
 * Rex-Link-List
 * Rex-Link
 * Rex-Media-List
@@ -132,6 +133,7 @@ MForm stellt alle relevanten Formular-Elemente bereit. Zudem nutzt MForm die Red
 >
 > * Es können beliebig viele Formular-Input-Elemente definiert werden.
 > * Das Schließen von Fieldsets ist nicht nötig.
+> * Tabs können wie Fieldsets eingesetzt werden.
 > * Es können, ohne weiteres, beliebig viele Formulare in einem Modul-Input durch MForm erzeugt werden, hierzu muss lediglich jeweils eine neue Instanz initiiert werden.
 
 <a name="Element-Methoden"></a>
@@ -159,6 +161,7 @@ MForm stellt folgende Element-Methoden bereit:
   * `addHeadline`
   * `addDescription`
   * `addFieldset`
+  * `addTab`
 * System-Button-Elemente
   * `addLinkField`
   * `addLinklistField`
@@ -179,5 +182,4 @@ __Geplante Elemente__
 * Callback-Element
   * `callback`
 * Struktur-Elemente
-  * `tabs`
   * `columns`
