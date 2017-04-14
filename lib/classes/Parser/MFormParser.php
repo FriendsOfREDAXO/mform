@@ -590,6 +590,8 @@ class MFormParser extends AbstractMFormParser
         @$dom->loadHTML(utf8_decode($html));
         $div = $dom->getElementsByTagName('div');
 
+        $attributes = $item->getAttributes();
+
         $mediaFragment = $dom->createDocumentFragment();
         $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-file\"></i></a>");
         $linkFragment = $dom->createDocumentFragment();
@@ -616,8 +618,12 @@ class MFormParser extends AbstractMFormParser
                                         $node->removeAttribute('onclick');
                                     }
                                 }
-                                $childNode->insertBefore($linkFragment, $childNode->firstChild);
-                                $childNode->insertBefore($mediaFragment, $childNode->firstChild);
+                                if (array_key_exists('data-extern', $attributes) && $attributes['data-extern'] == 'disable') { } else {
+                                    $childNode->insertBefore($linkFragment, $childNode->firstChild);
+                                }
+                                if (array_key_exists('data-media', $attributes) && $attributes['data-media'] == 'disable') { } else {
+                                    $childNode->insertBefore($mediaFragment, $childNode->firstChild);
+                                }
                             }
                         }
                         if (($childNode->hasAttribute('class')
@@ -627,7 +633,7 @@ class MFormParser extends AbstractMFormParser
                             $childNode->setAttribute('value', $item->getValue());
                         }
                     }
-//                    $html = utf8_encode($divItem->C14N(false,true));
+                    // $html = utf8_encode($divItem->C14N(false,true));
                     $html = $divItem->C14N(false,true);
                     break;
                 }
