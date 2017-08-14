@@ -112,6 +112,8 @@ $mform->setLabel('Label Name');
 
 Es ist möglich direkt ein SQL Query über die Methode `setSqlOptions` abzusetzen. MForm kombiniert dann aus den Spalten der Select-Tabelle die entsprechenden Options.
 
+*Einfaches Select-Element mit SQL-Optionen und Label*
+
 ```
 // instance mform
 $mform = new MForm();
@@ -124,11 +126,27 @@ $mform->setLabel('Label Name');
 $mform->setSqlOptions('SELECT id, name FROM rex_table_name ORDER BY name');
 ```
 
+*Einfaches Select-Element mit SQL-Optionen, Leer-Option und Label*
+
+```
+// instance mform
+$mform = new MForm();
+
+// add select field
+$mform->addSelectField(1);
+$mform->setLabel('Label Name');
+// leeroption einsetzen
+$mform->addOption('--- Leer ---', '');
+// add sql options
+$mform->setSqlOptions('SELECT id, name FROM rex_table_name ORDER BY name');
+```
+
 > **Wichtig**
 >
 > * Die Spaltennamen der Select-Tabelle müssen zwingend `id` für den Options-Wert und `name` für den Options-Name lauten.
 > * Entspricht der Spaltenname der incrementelle Spalte der Select-Tabelle nicht dem Namen `id` kann man via `AS` das Select modifizieren `colum_id AS id`.
-> * Selben Workaround sollte für die namensgebende Spalte `name` genutzt werden sollte dieser entsprechend anders benamt sein.     
+> * Selben Workaround sollte für die namensgebende Spalte `name` genutzt werden sollte dieser entsprechend anders benamt sein.
+> * Options können beliebig kombiniert werden.
 
 
 <a name="Links"></a>
