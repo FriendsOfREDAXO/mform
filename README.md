@@ -4,10 +4,10 @@ MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Formularen erheblich
 
 ![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mform/assets/mform.png)
 
-Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im [Wiki](https://github.com/FriendsOfREDAXO/mform/wiki) finden.
+Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im [Doku-Plugin](https://github.com/FriendsOfREDAXO/mform/blob/master/plugins/docs/docs/de_de/main_navi.md) finden.
 
 
-##### Hinweis
+**Hinweis**
 
 * MForm ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
 
@@ -18,12 +18,16 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 2. Zip Archiv entpacken
 3. Entpackten Folder in `mform` umbenennen
 4. MForm Ordner in den REDAXO Addon Ordner `redaxo/src/addons/` verschieben
-5. In REDAXO einloggen und Addon installieren und aktivieren
+5. In REDAXO einloggen und unter "AddOns" MForm installieren und aktivieren
 
 ## Alternative Installationen
 
 MForm kann auch direkt über den Redaxo-Installer Installiert werden. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
 
+1. In REDAXO einloggen
+2. Im Backend unter "Installer > Neue herunterladen" "MForm" suche und unter "Funktion" "ansehen" klicken
+3. Bei der aktuelle Version in der Liste unter "Funktion" "herunterladen" klicken
+4. Unter "AddOns" MForm installieren und aktivieren
 
 ## Usage
 
@@ -83,6 +87,11 @@ Um das komponierte Formular erzeugen zu lassen muss muss die `show` Methode genu
 
 MForm stellt folgende Element-Methoden bereit: 
 
+* Strukturelle-Elemente
+  * `addFieldset`
+  * `closeFieldset`
+  * `addTab`
+  * `closeTab`
 * Text-Input- und Hidden-Elemente
   * `addTextField`
   * `addHiddenField`
@@ -95,12 +104,10 @@ MForm stellt folgende Element-Methoden bereit:
 * Checkbox- und Radio-Elemente
   * `addCheckboxField`
   * `addRadioField`
-* Strukturelle-Elemente
+* Informelle-Elemente
   * `addHtml`
   * `addHeadline`
   * `addDescription`
-  * `addFieldset`
-  * `addTab`
 * System-Button-Elemente
   * `addLinkField`
   * `addLinklistField`
@@ -109,15 +116,23 @@ MForm stellt folgende Element-Methoden bereit:
 * Custom-Elemente
   * `addCustomLinkField`
   * `addInputField`
+* Spezielle `setter`-Methoden
+  * `setLabel`
+  * `setPlaceholder`
+  * `setMultiple`
+  * `setSize`
 
 
 ##### Geplante Elemente
 
 * Callback-Element
   * `callback`
-* Struktur-Elemente
+* Strukturelle-Elemente
   * `columns`
-
+* Informelle-Elemente
+  * `addInfo`
+  * `addWarning`
+  * `addError`
 
 ## Lizenz
 
