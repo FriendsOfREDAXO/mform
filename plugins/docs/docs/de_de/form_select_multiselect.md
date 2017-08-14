@@ -102,9 +102,21 @@ $mform->setLabel('Label Name');
 <a name="Optionen"></a>
 ## Optionen in Select- und Multiselect-Elementen
 
+*Beispiel für Select-Option-Groups* 
+
+```
+// instance mform
+$mform = new MForm();
+
+// add aultipe select field with output groups
+$mform->addMultiSelectField(1, array('group 1' => array(1=>'test-1',2=>'test-2'), 'group 2' => array(3=>'test-3',4=>'test-4')), array('label'=>'Select optgroup'));
+```
+
 > **Hinweis**
 >
 > * Damit ein Select oder Multiselect-Feld mit Inhalt erscheint sind Optionen zwingend erforderlich!
+> * Es können Option-Groups aufgebaut werden.
+> * Options können beliebig kombiniert werden.
 
 
 <a name="SQL-Optionen"></a>
@@ -146,7 +158,6 @@ $mform->setSqlOptions('SELECT id, name FROM rex_table_name ORDER BY name');
 > * Die Spaltennamen der Select-Tabelle müssen zwingend `id` für den Options-Wert und `name` für den Options-Name lauten.
 > * Entspricht der Spaltenname der incrementelle Spalte der Select-Tabelle nicht dem Namen `id` kann man via `AS` das Select modifizieren `colum_id AS id`.
 > * Selben Workaround sollte für die namensgebende Spalte `name` genutzt werden sollte dieser entsprechend anders benamt sein.
-> * Options können beliebig kombiniert werden.
 
 
 <a name="Links"></a>
