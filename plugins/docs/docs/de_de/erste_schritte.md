@@ -128,7 +128,6 @@ MForm stellt alle relevanten Formular-Elemente bereit. Zudem nutzt MForm die Red
 * Rex-Media
 * Custom-Link
 
-
 > **Hinweis**
 >
 > * Es können beliebig viele Formular-Input-Elemente definiert werden.
@@ -139,11 +138,13 @@ MForm stellt alle relevanten Formular-Elemente bereit. Zudem nutzt MForm die Red
 <a name="Element-Methoden"></a>
 ## Element-Methoden 
 
-MForm stellt folgende Element-Methoden bereit:
+*MForm stellt folgende Element-Methoden bereit:*
 
-* Fieldset
+* Strukturelle-Elemente
   * `addFieldset`
   * `closeFieldset`
+  * `addTab`
+  * `closeTab`
 * Text-Input- und Hidden-Elemente
   * `addTextField`
   * `addHiddenField`
@@ -156,12 +157,10 @@ MForm stellt folgende Element-Methoden bereit:
 * Checkbox- und Radio-Elemente
   * `addCheckboxField`
   * `addRadioField`
-* Strukturelle-Elemente
+* Informelle-Elemente
   * `addHtml`
   * `addHeadline`
   * `addDescription`
-  * `addFieldset`
-  * `addTab`
 * System-Button-Elemente
   * `addLinkField`
   * `addLinklistField`
@@ -181,5 +180,9 @@ __Geplante Elemente__
 
 * Callback-Element
   * `callback`
-* Struktur-Elemente
+* Strukturelle-Elemente
   * `columns`
+* Informelle-Elemente
+  * `addInfo`
+  * `addWarning`
+  * `addError`

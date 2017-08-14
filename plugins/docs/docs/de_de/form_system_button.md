@@ -1,13 +1,22 @@
 # System Button Elemente
 
+> ## Inhalt
+> - [System-Buttons als Formular Elemente](#System-Buttons)
+> - [Link-Button Elemente](#Link-Button)
+> - [Linklisten-Button Elemente](#Linklisten-Button)
+> - [Media-Button Elemente](#Media-Button)
+> - [Medialisten-Button Elemente](#Medialisten-Button)
+> - [Parameter und Attribute in System-Button-Elementen](#Parameter)
+> - [Weiterführende Links](#Links)
 
-Die Gruppe der System-Button Elemente enthält alle Redaxo eigenen Link und Medien Buttons, dazu gehören Einzel Buttons und auch Listen Buttons.
+Die Gruppe der System-Button Elemente enthält alle Redaxo eigenen Link- und Medien-Buttons, dazu gehören Einzel-Buttons und auch Listen-Buttons.
 
 
-### System-Buttons als Formular Elemente
+<a name="System-Buttons"></a>
+## System-Buttons als Formular Elemente
 
 
-###### Die unterschiedlichen System-Buttons werden jeweils durch ihre eigene Methoden angesteuert, es stehen 4 System-Button Elemente zur Verfügung:
+Die unterschiedlichen System-Buttons werden jeweils durch ihre eigene Methoden angesteuert, es stehen 4 System-Button Elemente zur Verfügung:
 
 
 * `addLinkField`
@@ -16,111 +25,182 @@ Die Gruppe der System-Button Elemente enthält alle Redaxo eigenen Link und Medi
 * `addMedialistField`
 
 
-Diese 4 Typen können als Formular Elemente eingesetzt werden. Dabei ist zu beachten, dass der Konstruktor der jeweiligen Methode Parameter/Variablen nach folgendem Schema erwartet:
+> **Wichtig**
+>
+> * Diese 4 Typen können als Formular Elemente eingesetzt werden. 
+> * Die jeweiligen Typen-Methode nehmen als Parameter Parameter, Category_Id's, Attribute entgegen.
 
 
-###### Erwartete Übergabewerte der System-Button Methoden:
+*Exemplarische Übergabewerte, in den folgenden Beispiele nutzen wir diese Variablen:*
+
+* $id => `1`
+* $parameters => `array('types'=>'gif,jpg','preview'=>1)`
+* $category => `1`
+* $attributes => `array('label'=>'Label Name')`
 
 
-`(ID, $arrParameters, CAT_ID, $arrAttributes)`
+> **Hinweis**
+>
+> * Der erste Übergabewerte `$id` ist ein Pflichtwert.
+> * Die weiteren Übergabewerte sind optional.
+> * Optionen und Attribute können nur als Arrays übergeben werden.
+> * `label` ist das einzige zulässige Attribut für die System-Button-Elemente.
+> * Der Wert `$id` muss der `REX_LINK_ID`, `REX_LINKLIST_ID`, `REX_MEDIA_ID` oder `REX_MEDIALIST_ID` entsprechen.
+    
 
+<a name="Link-Button"></a>
+## Link-Button
 
-* ID => `1`
-* $arrParameters => `array('types'=>'gif,jpg','preview'=>1)`
-* CAT_ID => `1`
-* $arrAttributes => `array('label'=>'Label Name')`
+*Erwartete Übergabewerte der `addLinkField` Methoden:*
 
+`($id, $parameter, $catId, $attributes)`
 
-##### Hinweis:
+*Einfaches Link-Element mit Category Zuweisung und Label*
 
+```
+// instance mform
+$mform = new MForm();
 
-* Der erste Übergabewerte `id` ist ein Pflichtwert.
-* Die weiteren Übergabewerte sind optional.
-* Optionen und Attribute können nur als Arrays übergeben werden.
-* `label` ist das einzige zulässige Attribut für die System-Button-Elemente.
-* Der erste Wert `ID` muss der `REX_VALUE_ID` entsprechen.
-
-
-###### Link-Button
-
-
-```php
-  $objForm->addLinkField(1,array('label'=>'Link','category'=>2));
+// add link field
+$mform->addLinkField(1, array('label'=>'Label Name','category'=>1));
 ```
 
-```php
-  $objForm->addLinkField(2,array(), 2, array('label'=>'Link 2'));
+```
+// instance mform
+$mform = new MForm();
+
+// add link field
+$mform->addLinkField(1, array(), 1, array('label'=>'Label Name'));
 ```
 
-```php
-  $objForm->addLinkField(3);
-  $objForm->setCategory(2);
-  $objForm->setLabel('Link 3');
 ```
+// instance mform
+$mform = new MForm();
 
-###### Linklisten-Button
-
-
-```php
-  $objForm->addLinklistField(1,array('label'=>'Linkliste','category'=>2));
-```
-
-```php
-  $objForm->addLinklistField(2,array(), 2, array('label'=>'Linkliste 2'));
-```
-
-```php
-  $objForm->addLinklistField(3);
-  $objForm->setCategory(2);
-  $objForm->setLabel('Linkliste 3');
-```
-
-
-###### Media-Button
-
-
-```php
-  $objForm->addMediaField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>2,'label'=>'Bild'));
-```
-
-```php
-  $objForm->addMediaField(2,array('types'=>'gif,jpg','preview'=>1), 2, array('label'=>'Bild 2'));
-```
-
-```php
-  $objForm->addMediaField(3);
-  $objForm->setParameters(array('types'=>'gif,jpg','preview'=>1));
-  $objForm->setCategory(2);
-  $objForm->setLabel('Bild 3');
+// add link field
+$mform->addLinkField(1);
+$mform->setCategory(1);
+$mform->setLabel('Label Name');
 ```
 
 
-###### Medialisten-Button
+<a name="Linklisten-Button"></a>
+## Linklisten-Button Elemente
 
-```php
-  $objForm->addMedialistField(1,array('types'=>'gif,jpg','preview'=>1,'category'=>2,'label'=>'Bild'));
+*Erwartete Übergabewerte der `addLinklistField` Methoden:*
+
+`($id, $parameter, $catId, $attributes)`
+
+*Einfaches Linklisten-Element mit Category Zuweisung und Label*
+
+```
+// instance mform
+$mform = new MForm();
+
+// add link list field
+$mform->addLinklistField(1, array('label'=>'Label Name','category'=>1));
 ```
 
-```php
-  $objForm->addMedialistField(2,array('types'=>'gif,jpg','preview'=>1), 2, array('label'=>'Bild 2'));
+```
+// instance mform
+$mform = new MForm();
+
+// add link list field
+$mform->addLinklistField(1, array(), 1, array('label'=>'Label Name'));
 ```
 
-```php
-  $objForm->addMedialistField(3);
-  $objForm->setParameters(array('types'=>'gif,jpg','preview'=>1));
-  $objForm->setCategory(2);
-  $objForm->setLabel('Bild 3');
+```
+// instance mform
+$mform = new MForm();
+
+// add link list field
+$mform->addLinklistField(1);
+$mform->setCategory(1);
+$mform->setLabel('Label Name');
 ```
 
 
-***
+<a name="Media-Button"></a>
+## Media-Button Elemente
 
 
-### Parameter in System-Button-Elementen
+*Erwartete Übergabewerte der `addMediaField` Methoden:*
 
 
-###### Liste aller erlaubten Parameter für System-Button-Elemente:
+`($id, $parameter, $catId, $attributes)`
 
+*Einfaches Media-Element mit Category Zuweisung und Label*
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media filed
+$mform->addMediaField(1, array('types'=>'gif,jpg','preview'=>1,'category'=>2,'label'=>'Label Name'));
+```
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media field
+$mform->addMediaField(1, array('types'=>'gif,jpg','preview'=>1), 1, array('label'=>'Label Name'));
+```
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media field
+$mform->addMediaField(1);
+$mform->setParameters(array('types'=>'gif,jpg','preview'=>1));
+$mform->setCategory(1);
+$mform->setLabel('Label Name');
+```
+
+
+<a name="Medialisten-Button"></a>
+## Medialisten-Button Elemente
+
+*Erwartete Übergabewerte der `addMedialistField` Methoden:*
+
+
+`($id, $parameter, $catId, $attributes)`
+
+*Einfaches Medialisten-Element mit Category Zuweisung und Label*
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media list field
+$mform->addMedialistField(1, array('types'=>'gif,jpg','preview'=>1,'category'=>1,'label'=>'Label Name'));
+```
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media list field
+$mform->addMedialistField(1, array('types'=>'gif,jpg','preview'=>1), 1, array('label'=>'Label Name'));
+```
+
+```
+// instance mform
+$mform = new MForm();
+
+// add media list field
+$mform->addMedialistField(1);
+$mform->setParameters(array('types'=>'gif,jpg','preview'=>1));
+$mform->setCategory(1);
+$mform->setLabel('Label Name');
+```
+
+
+<a name="Parameter"></a>
+## Parameter und Attribute in System-Button-Elementen
+
+*Liste aller erlaubten Parameter und Attribute für System-Button-Elemente:*
 
 * Media-Button und Medialist-Button
   * `types`
@@ -131,55 +211,18 @@ Diese 4 Typen können als Formular Elemente eingesetzt werden. Dabei ist zu beac
   * `category`
   * `label`
 
-
-###### Hinweis:
-
-
-* Der Parameter "category" verarbeitet nur numerische Werte.
-
-
-##### Wiki-Links zum Thema:
+> **Hinweis**
+>
+> * Der Parameter `category` verarbeitet nur nummerische Werte.
+> * `label` ist das einzige zulässige Attribut für die System-Button-Elemente.
 
 
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-      * [Elementen Parameter zuweisen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementen-Parameter-zuweisen)
+<a name="Links"></a>
+## Weiterführende Links
 
+*Generell / Allgemein*
 
-***
-
-
-### Attribute in System-Button-Elementen
-
-
-##### Hinweis:
-
-* `label` ist das einzige zulässige Attribut für die System-Button-Elemente.
-
-
-##### Wiki-Links zum Thema:
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-      * [Elementen Attribute zuweisen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementen-Attribute-zuweisen)
-
-
-***
-
-
-### Kategorie durch die "setCategory" Methode festlegen
-
-
-##### Hinweis:
-
-
-* Die `setCategory` Methode verarbeitet ausschließlich numerische Werte.
-
-
-##### Wiki-Links zum Thema:
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-      * [Sonstige Zuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Sonstige-Zuweisungen)
+* [Elementzuweisungen](elements_general.md)
+* [Elementen Attribute zuweisen](elements_attributes.md)
+* [Elementen Parameter zuweisen](elements_params.md)
+* [Sonstige Zuweisungen](elements_others.md)

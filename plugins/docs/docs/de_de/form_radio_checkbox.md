@@ -28,7 +28,7 @@ Eine Radiobuttons-Gruppe oder Checkbox wird jeweils durch ihre eigene "Methode" 
 *Exemplarische Übergabewerte, in den folgenden Beispiele nutzen wir diese Variablen:*
 
 * $id => `1`
-* $options => `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+* $options => `array(1=>'test-1',2=>'test-2')`
 * $attributes => `array('label'=>'Label Name')`
 * $validation => `array('empty')`
 * $defaultValue => `1`  
@@ -56,7 +56,7 @@ Eine Radiobuttons-Gruppe oder Checkbox wird jeweils durch ihre eigene "Methode" 
 $mform = new MForm();
 
 // add radio field
-$mform->addRadioField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Radio Buttons'));
+$mform->addRadioField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Label Name'));
 ```
 
 ```
@@ -64,9 +64,9 @@ $mform->addRadioField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Radio B
 $mform = new MForm();
 
 // add radio field
-$mform->addRadioField(1.2);
+$mform->addRadioField(1);
 $mform->setOptions(array(1=>'test-1',2=>'test-2'));
-$mform->setLabel('Radio Buttons 2');
+$mform->setLabel('Label Name');
 ```
 
 <a name="Checkboxen"></a>
@@ -83,7 +83,7 @@ $mform->setLabel('Radio Buttons 2');
 $mform = new MForm();
 
 // add checkbox field
-$mform->addCheckboxField(2, array(1=>'test-1'), array('label'=>'Select'));
+$mform->addCheckboxField(1, array(1=>'test-1'), array('label'=>'Label Name'));
 ```
 
 ```
@@ -91,14 +91,14 @@ $mform->addCheckboxField(2, array(1=>'test-1'), array('label'=>'Select'));
 $mform = new MForm();
 
 // add checkbox field
-$mform->addCheckboxField(2.2);
+$mform->addCheckboxField(1);
 $mform->setOptions(array(1=>'test-1'));
-$mform->setLabel('Select 2');
+$mform->setLabel('Label Name');
 ```
 
 
 <a name="Optionen"></a>
-*Optionen in Radiobutton- und Checkbox-Elementen*
+## Optionen in Radiobutton- und Checkbox-Elementen
 
 > **Hinweis**
 >

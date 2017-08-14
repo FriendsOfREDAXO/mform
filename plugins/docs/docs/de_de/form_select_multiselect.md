@@ -5,6 +5,7 @@
 > - [Select-Elemente](#Select)
 > - [Multiselect-Element](#Multiselect)
 > - [Optionen in Select- und Multiselect-Elementen](#Optionen)
+> - [SQL-Optionen in Select- und Multiselect-Elementen](#SQL-Optionen)
 > - [Weiterführende Links](#Links)
 
 Die Gruppe Select und Multiselect Elemente umschließt alle Select Formular Elemente.
@@ -27,7 +28,7 @@ Es gibt 2 Select-Typen die bereit gestellt werden, diese werden durch ihre jewei
 *Exemplarische Übergabewerte, in den folgenden Beispiele nutzen wir diese Variablen:*
 
 * $id => `1`
-* $options => `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+* $options => `array(1=>'test-1',2=>'test-2')`
 * $attributes => `array('label'=>'Label Name')`
 * $size => `1` `full`
 * $defaultValue => `1`  
@@ -56,7 +57,7 @@ Es gibt 2 Select-Typen die bereit gestellt werden, diese werden durch ihre jewei
 $mform = new MForm();
 
 // add select field
-$mform->addSelectField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Select'));
+$mform->addSelectField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Label Name'));
 ```
 
 ```
@@ -64,7 +65,7 @@ $mform->addSelectField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Select
 $mform = new MForm();
 
 // add select field
-$mform->addSelectField(1.2);
+$mform->addSelectField(1);
 $mform->setOptions(array(1=>'test-1',2=>'test-2'));
 $mform->setLabel('Select 2');
 ```
@@ -84,7 +85,7 @@ $mform->setLabel('Select 2');
 $mform = new MForm();
 
 // add multi select field
-$mform->addMultiSelectField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Select'));
+$mform->addMultiSelectField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Label Name'));
 ```
 
 ```
@@ -94,16 +95,24 @@ $mform = new MForm();
 // add multi select field
 $mform->addMultiSelectField(1);
 $mform->setOptions(array(1=>'test-1',2=>'test-2'));
-$mform->setLabel('Select 2');
+$mform->setLabel('Label Name');
 ```
 
 
 <a name="Optionen"></a>
-*Optionen in Select- und Multiselect-Elementen*
+## Optionen in Select- und Multiselect-Elementen
 
 > **Hinweis**
 >
 > * Damit ein Select oder Multiselect-Feld mit Inhalt erscheint sind Optionen zwingend erforderlich!
+
+
+<a name="SQL-Optionen"></a>
+##SQL-Optionen in Select- und Multiselect-Elementen
+
+*TODO: Funktionale Beschreibung von setSqlOptions*
+
+`setSqlOptions`
 
 
 <a name="Links"></a>

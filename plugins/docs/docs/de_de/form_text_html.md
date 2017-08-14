@@ -1,4 +1,4 @@
-# Text, HTML und Fieldset Elemente
+# Text und HTML Elemente
 
 
 Mit der Gruppe Text- und HTML-Elemente wird die Möglichkeit bereitgestellt Beschreibungstexte und individuellen HTML-Code im Formular zu integrieren.
@@ -13,7 +13,6 @@ Mit der Gruppe Text- und HTML-Elemente wird die Möglichkeit bereitgestellt Besc
 * `addHtml`
 * `addHeadline`
 * `addDescription`
-* `addFieldset`
 
 
 Die Konstruktoren der informativen Element-Methoden `addHtml`, `addHeadline`, `addDescription` erwartet jeweils ein Übergabewert. Der Konstruktor des strukturellen Formular Elements `addFieldset` erwartet 2 Übergabewerte.
