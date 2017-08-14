@@ -1,119 +1,123 @@
 # Radio und Checkbox Elemente
 
+> ## Inhalt
+> - [Radio und Checkboxen als Formular-Elemente](#Radio)
+> - [Radiobutton-Elemente](#Radiobutton)
+> - [Checkboxen-Element](#Checkboxen)
+> - [Optionen in Radiobutton- und Checkbox-Elementen](#Optionen)
+> - [Weiterführende Links](#Links)
 
 Die Gruppe Radio- und Checkbox-Elemente stellt Checkbox-Formular-Elemente und Radio-Buttons zur Verfügung.
 
 
-### Radio und Checkboxen als Formular Elemente
+<a name="Radio"></a>
+## Radio und Checkboxen als Formular-Elemente
 
-
-###### Eine Radiobuttons-Gruppe oder Checkbox wird jeweils durch ihre eigene Methode aufgerufen:
-
+Eine Radiobuttons-Gruppe oder Checkbox wird jeweils durch ihre eigene "Methode" aufgerufen es gibt 2 Typen:
 
 * `addRadioField`
 * `addCheckboxField`
 
-
-##### Hinweis: 
-
-
-Zu beachten ist, dass die Checkboxen Methode sich signifikant von der Radiobutton Methode insofern unterscheidet, dass die Radiobuttons Methode alle im `$arrOptions`-Array enthaltenen Reihen-Elemente zu Radiobutton-Felder weiter verarbeitet wo hingegen die Checkbox Methode nur das letzte Reihen-Element zu einem Checkboxen-Feld verarbeitet. Will man mehrere Checkboxen anlegen muss entsprechend oft die Checkbox-Methode bemüht werden, was natürlich auch für Radiobutton-Gruppen gilt.
-
-Beide Typen können als Formular Elemente eingesetzt werden. Dabei ist zu beachten, dass der Konstruktor der jeweiligen Methode Parameter/Variablen nach folgendem Schema erwartet:
+> **Wichtig**
+>
+> * Diese 2 Typen können als Formular Elemente eingesetzt werden. 
+> * Zu beachten ist, dass die Checkboxen Methode sich signifikant von der Radiobutton-Methode insofern unterscheidet, dass die Radiobutton-Methode alle im `$options`-Array enthaltenen Reihen-Elemente zu Radiobutton-Felder weiter verarbeitet wo hingegen die Checkbox Methode nur das letzte Reihen-Element zu einem Checkboxen-Feld verarbeitet. Will man mehrere Checkboxen anlegen muss entsprechend oft die Checkbox-Methode bemüht werden, was natürlich auch für Radiobutton-Gruppen gilt. 
+> * Die jeweiligen Typen-Methode nehmen als Parameter Options, Attribute, Default-Values entgegen.
 
 
-###### Erwartete Übergabewerte der “addRadioField”, “addCheckboxField” Methoden:
+*Exemplarische Übergabewerte, in den folgenden Beispiele nutzen wir diese Variablen:*
+
+* $id => `1`
+* $options => `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
+* $attributes => `array('label'=>'Label Name')`
+* $validation => `array('empty')`
+* $defaultValue => `1`  
+
+> **Hinweis**
+>
+> * Der erste Übergabewerte `$id` ist immer obligatorisch.
+> * Optionen sind zwingend erforderlich.
+> * Die weiteren Übergabewerte sind optional.
+> * Optionen und Attribute können nur als Arrays übergeben werden.
+> * Der erste Wert `$id` muss der `REX_VALUE_ID` entsprechen.
 
 
-`(ID, $arrOptions, $arrAttributes, $strDefaultValue)`
+<a name="Radiobutton"></a>
+## Radiobutton-Elemente
 
+*Erwartete Übergabewerte der `addRadioField` Methode:*
 
-* ID => ` 1 `
-* $arrOptions => `array('1_name'=>'1_wert', '2_name'=>'2_wert')`
-* $arrAttributes => `array('label'=>'Label Name')`
-* $strDefaultValue => 
+`($id, $options, $attributes, $validation, $defaultValue)`
 
+*Beispiel einfachen Radiobutton mit Label und Optionen anlegen*
 
-##### Hinweis:
+```
+// instance mform
+$mform = new MForm();
 
-
-* Der erste Übergabewerte `id` ist ein Pflichtwert.
-* Die weiteren Übergabewerte sind optional.
-* Optionen und Attribute können nur als Arrays übergeben werden.
-* Der erste Wert `ID` muss der `REX_VALUE_ID` entsprechen.
-* Optionen sind zwingend erforderlich.
-
-
-###### Radiobutton-Elemente
-
-
-```php
-  $objForm->addRadioField(1.1,array(1=>'test-1',2=>'test-2'),array('label'=>'Radio Buttons'));
+// add radio field
+$mform->addRadioField(1, array(1=>'test-1',2=>'test-2'), array('label'=>'Radio Buttons'));
 ```
 
-```php
-  $objForm->addRadioField(1.2);
-  $objForm->setOptions(array(1=>'test-1',2=>'test-2'));
-  $objForm->setLabel('Radio Buttons 2');
+```
+// instance mform
+$mform = new MForm();
+
+// add radio field
+$mform->addRadioField(1.2);
+$mform->setOptions(array(1=>'test-1',2=>'test-2'));
+$mform->setLabel('Radio Buttons 2');
 ```
 
-###### Checkboxen-Element
+<a name="Checkboxen"></a>
+## Checkboxen-Element
 
+*Erwartete Übergabewerte der `addCheckboxField` Methode:*
 
-```php
-  $objForm->addCheckboxField(2.1,array(1=>'test-1'),array('label'=>'Select'));
+`($id, $options, $attributes, $validation, $defaultValue)`
+
+*Beispiel einfachen Radiobutton mit Label und Optionen anlegen*
+
+```
+// instance mform
+$mform = new MForm();
+
+// add checkbox field
+$mform->addCheckboxField(2, array(1=>'test-1'), array('label'=>'Select'));
 ```
 
-```php
-  $objForm->addCheckboxField(2.2);
-  $objForm->setOptions(array(1=>'test-1'));
-  $objForm->setLabel('Select 2');
+```
+// instance mform
+$mform = new MForm();
+
+// add checkbox field
+$mform->addCheckboxField(2.2);
+$mform->setOptions(array(1=>'test-1'));
+$mform->setLabel('Select 2');
 ```
 
 
-***
+<a name="Optionen"></a>
+*Optionen in Radiobutton- und Checkbox-Elementen*
+
+> **Hinweis**
+>
+> * Damit ein Radiobutton- oder Checkbox-Elementen mit Wert erscheint sind Optionen zwingend erforderlich!
 
 
-### Optionen dem Konstruktor der Radio- und Checkbox-Methoden übergeben
+<a name="Links"></a>
+## Weiterführende Links
 
+*Generell / Allgemein*
 
-##### Hinweis: 
+* [Elementzuweisungen](elements_general.md)
+* [Elementen Attribute zuweisen](elements_attributes.md)
+* [Elementen Optionen zuweisen](elements_options.md)
 
+*Validierungen Radiobutton- oder Checkbox-Elementen zuweisen*
 
-* Damit ein Radiobutton- oder Checkbox-Elementen mit Wert erscheint sind Optionen zwingend erforderlich.
+* [Elementen Validierungen zuweisen](elements_validates.md)
 
+*Default-Value Radiobutton- oder Checkbox-Elementen zuweisen*
 
-##### Wiki-Links zum Thema:
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-  	  * [Elementen Optionen zuweisen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementen-Optionen-zuweisen)
-
-
-*** 
-
-
-### Attribute in Radiobutton- oder Checkbox-Elementen
-
-
-##### Wiki-Links zum Thema:
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-  	  * [Elementen Attribute zuweisen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementen-Attribute-zuweisen)
-
-
-***
-
-
-### Default-Value in Radiobutton- oder Checkbox-Elementen
-
-
-##### Wiki-Links zum Thema:
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-  	  * [Default-Values definieren](https://github.com/FriendsOfREDAXO/mform/wiki/Default-Values-definieren)
+* [Default-Values definieren](elements_default_values.md)
