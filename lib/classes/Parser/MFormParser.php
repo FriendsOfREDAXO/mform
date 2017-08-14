@@ -619,9 +619,13 @@ class MFormParser
         $attributes = $item->getAttributes();
 
         $mediaFragment = $dom->createDocumentFragment();
-        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-file\"></i></a>");
+        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-file-o\"></i></a>");
         $linkFragment = $dom->createDocumentFragment();
         $linkFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_extern_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-external-link\"></i></a>");
+        $mailtoFragment = $dom->createDocumentFragment();
+        $mailtoFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_mailto_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-envelope-o\"></i></a>");
+        $telFragment = $dom->createDocumentFragment();
+        $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-phone\"></i></a>");
 
         if ($div instanceof DOMNodeList) {
             foreach ($div as $divItem) {
@@ -649,6 +653,12 @@ class MFormParser
                                 }
                                 if (array_key_exists('data-media', $attributes) && $attributes['data-media'] == 'disable') { } else {
                                     $childNode->insertBefore($mediaFragment, $childNode->firstChild);
+                                }
+                                if (array_key_exists('data-mailto', $attributes) && $attributes['data-mailto'] == 'disable') { } else {
+                                    $childNode->insertBefore($mailtoFragment, $childNode->firstChild);
+                                }
+                                if (array_key_exists('data-tel', $attributes) && $attributes['data-tel'] == 'disable') { } else {
+                                    $childNode->insertBefore($telFragment, $childNode->firstChild);
                                 }
                             }
                         }

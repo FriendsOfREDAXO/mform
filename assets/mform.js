@@ -47,6 +47,8 @@ function mform_custom_link(item) {
             link_button = $(this).find('a#mform_link_' + $id),
             delete_button = $(this).find('a#mform_delete_' + $id),
             extern_button = $(this).find('a#mform_extern_' + $id),
+            mailto_button = $(this).find('a#mform_mailto_' + $id),
+            tel_button = $(this).find('a#mform_tel_' + $id),
             hidden_input = $(this).find('input[type=hidden]').addClass('form-control').attr('readonly', true),
             showed_input = $(this).find('input[type=text]');
 
@@ -66,6 +68,24 @@ function mform_custom_link(item) {
             if (extern_link != 'http://' && extern_link != "" && extern_link != undefined) {
                 showed_input.val(extern_link);
                 hidden_input.val(extern_link);
+            }
+            return false;
+        });
+        mailto_button.unbind().bind('click', function () {
+            show_hidden_link(hidden_input, showed_input);
+            var mailto_link = prompt('Mail', 'mailto:');
+            if (mailto_link != 'mailto:' && mailto_link != "" && mailto_link != undefined) {
+                showed_input.val(mailto_link);
+                hidden_input.val(mailto_link);
+            }
+            return false;
+        });
+        tel_button.unbind().bind('click', function () {
+            show_hidden_link(hidden_input, showed_input);
+            var tel_link = prompt('Telephone', 'tel:');
+            if (tel_link != 'tel:' && tel_link != "" && tel_link != undefined) {
+                showed_input.val(tel_link);
+                hidden_input.val(tel_link);
             }
             return false;
         });
