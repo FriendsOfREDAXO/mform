@@ -8,6 +8,7 @@ page:
     title: 'translate:title'
     pjax: true
     perm: admin[]
+    icon: rex-icon fa-subway
     subpages:
         overview: { title: 'translate:overview' }
         demo:
