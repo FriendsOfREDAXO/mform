@@ -12,8 +12,6 @@
 Die Gruppe Textarea, Text-Input- und Hidden-Elemente umschließt alle Texteingabe-Formular-Elemente durch welche Text-Strings erfasst werden können.
 
 
-
-
 <a name="Typen"></a>
 ## Input-Typen als Formular-Element
 
@@ -33,17 +31,18 @@ Unterschiedliche Input-Typen werden durch jeweils ihre eigene "Methoden" angeste
 
 *Exemplarische Übergabewerte, in den folgenden Beispiele nutzen wir diese Variablen:*
 
-* ID => `1`
-* $arrAttributes => `array('label'=>'Label Name')`
-* $arrValidations => `array('empty')`
-* $strDefaultValue => `'Default-Value'`
+* $id => `1`
+* $attributes => `array('label'=>'Label Name')`
+* $value => `Value Text`
+* $validations => `array('empty')`
+* $defaultValue => `'Default-Value'`
 
 > **Hinweis**
 >
-> * Der erste Übergabewert `ID` ist immer obligatorische.
+> * Der erste Übergabewert `$id` ist immer obligatorisch.
 > * Die weiteren Übergabewerte sind optional.
 > * Attribute können nur als Array übergeben werden.
-> * Der erste Wert `ID` muss der `REX_INPUT_VALUE_ID` entsprechen.
+> * Der erste Wert `$id` muss der `REX_INPUT_VALUE_ID` entsprechen.
 
 
 <a name="Text-Input"></a>
@@ -51,7 +50,7 @@ Unterschiedliche Input-Typen werden durch jeweils ihre eigene "Methoden" angeste
 
 *Erwartete Übergabewerte der `addTextField` Methode:*
 
-`(ID, $arrAttributes, $arrValidations, $strDefaultValue)`
+`($id, $attributes, $validations, $defaultValue)`
 
 *Beispiel einfaches Textfeld anlegen*
  
@@ -73,12 +72,13 @@ $mform = new MForm();
 $mform->addTextField(1, array('label'=>'Label Name'), array('empty'), 'Default-Value');
 ```
 
+
 <a name="Text-Input-Readonly"></a>
 ## Readonly-Text-Input Elemente
 
 *Erwartete Übergabewerte der `addTextReadOnlyField` Methode:*
 
-`(ID, $strDefaultValue, $arrAttributes)`
+`($id, $value, $attributes)`
 
 *Beispiel einfaches readonly Textfeld anlegen*
  
@@ -87,15 +87,16 @@ $mform->addTextField(1, array('label'=>'Label Name'), array('empty'), 'Default-V
 $mform = new MForm();
 
 // add textinput field
-$mform->addTextReadOnlyField(1, 'Value Text', array('label'=>'Readonly Name');
+$mform->addTextReadOnlyField(1, 'Value Text', array('label'=>'Label Name');
 ```
+
 
 <a name="Textarea"></a>
 ## Textarea Elemente
 
 *Erwartete Übergabewerte der `addTextAreaField` Methode:*
 
-`(ID, $arrAttributes, $arrValidations, $strDefaultValue)`
+`($id, $attributes, $validations, $defaultValue)`
 
 *Beispiel einfache Textarea anlegen*
  
@@ -117,12 +118,13 @@ $mform = new MForm();
 $mform->addTextAreaField(1, array('label'=>'Label Name'), array('empty'), 'Default-Value');
 ```
 
+
 <a name="Textarea-Readonly"></a>
 ## Readonly-Textarea Elemente
 
 *Erwartete Übergabewerte der `addTextAreaReadOnlyField` Methode:*
 
-`(ID, $strDefaultValue, $arrAttributes)`
+`($id, $value, $attributes)`
 
 *Beispiel einfache readonly Textarea anlegen*
 
@@ -131,15 +133,16 @@ $mform->addTextAreaField(1, array('label'=>'Label Name'), array('empty'), 'Defau
 $mform = new MForm();
 
 // add textinput field
-$mform->addTextAreaReadOnlyField(1, 'Value Text', array('label'=>'Readonly Name');
+$mform->addTextAreaReadOnlyField(1, 'Value Text', array('label'=>'Label Name');
 ```
+
 
 <a name="Text-Input-Hidden"></a>
 ## Hidden-Text-Input Elemente
 
 *Erwartete Übergabewerte der `addHiddenField` Methode:*
 
-`(ID, $strDefaultValue, $arrAttributes)`
+`($id, $value, $attributes)`
 
 *Beispiel einfache Input-Hidden-Field anlegen*
 
@@ -150,6 +153,7 @@ $mform = new MForm();
 // add textinput field
 $mform->addHiddenField(1, 'Value Text', array('data-hidden'=>'hiddenfield');
 ```
+
 
 <a name="Links"></a>
 ## Weiterführende Links
