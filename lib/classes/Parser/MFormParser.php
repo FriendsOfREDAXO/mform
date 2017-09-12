@@ -637,10 +637,18 @@ class MFormParser
                     foreach ($divItem->childNodes as $childNode) {
                         if ($childNode->hasAttribute('class') && $childNode->getAttribute('class') == 'input-group-btn') {
                             if ($childNode->hasChildNodes()) {
+
+                                if (!array_key_exists('data-intern', $attributes)) {
+                                    $attributes['data-intern'] = 'enable';
+                                }
+
                                 foreach ($childNode->childNodes as $node) {
                                     if ($node instanceof DOMElement) {
                                         if (strpos($node->getAttribute('onclick'), 'openLinkMap') !== false) {
                                             $node->setAttribute('id', 'mform_link_' . $item->getId());
+                                            if ($attributes['data-intern'] == 'disable') {
+                                                $node->setAttribute('style', 'display:none');
+                                            }
                                         }
                                         if (strpos($node->getAttribute('onclick'), 'deleteREXLink') !== false) {
                                             $node->setAttribute('id', 'mform_delete_' . $item->getId());
@@ -648,16 +656,24 @@ class MFormParser
                                         $node->removeAttribute('onclick');
                                     }
                                 }
-                                if (array_key_exists('data-extern', $attributes) && $attributes['data-extern'] == 'disable') { } else {
+
+                                if (!array_key_exists('data-extern', $attributes)) {
+                                    $attributes['data-extern'] = 'enable';
+                                }
+                                if (!array_key_exists('data-media', $attributes)) {
+                                    $attributes['data-media'] = 'enable';
+                                }
+
+                                if ($attributes['data-extern'] == 'enable') {
                                     $childNode->insertBefore($linkFragment, $childNode->firstChild);
                                 }
-                                if (array_key_exists('data-media', $attributes) && $attributes['data-media'] == 'disable') { } else {
+                                if ($attributes['data-media'] == 'enable') {
                                     $childNode->insertBefore($mediaFragment, $childNode->firstChild);
                                 }
-                                if (array_key_exists('data-mailto', $attributes) && $attributes['data-mailto'] == 'disable') { } else {
+                                if (array_key_exists('data-mailto', $attributes) && $attributes['data-mailto'] == 'enable') {
                                     $childNode->insertBefore($mailtoFragment, $childNode->firstChild);
                                 }
-                                if (array_key_exists('data-tel', $attributes) && $attributes['data-tel'] == 'disable') { } else {
+                                if (array_key_exists('data-tel', $attributes) && $attributes['data-tel'] == 'enable') {
                                     $childNode->insertBefore($telFragment, $childNode->firstChild);
                                 }
                             }
@@ -824,7 +840,7 @@ class MFormParser
     /**
      * final parsing
      * @param MFormItem[] $items
-     * @param null $theme
+     * @param null|string $theme
      * @param bool $debug
      * @return string
      * @author Joachim Doerr
