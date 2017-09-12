@@ -51,7 +51,7 @@ Die unterschiedlichen System-Buttons werden jeweils durch ihre eigene Methoden a
 <a name="Link-Button"></a>
 ## Link-Button
 
-*Erwartete Übergabewerte der `addLinkField` Methoden:*
+*Erwartete Übergabewerte der `addLinkField` Methode:*
 
 `($id, $parameter, $catId, $attributes)`
 
@@ -87,7 +87,7 @@ $mform->setLabel('Label Name');
 <a name="Linklisten-Button"></a>
 ## Linklisten-Button Elemente
 
-*Erwartete Übergabewerte der `addLinklistField` Methoden:*
+*Erwartete Übergabewerte der `addLinklistField` Methode:*
 
 `($id, $parameter, $catId, $attributes)`
 
@@ -162,7 +162,7 @@ $mform->setLabel('Label Name');
 <a name="Medialisten-Button"></a>
 ## Medialisten-Button Elemente
 
-*Erwartete Übergabewerte der `addMedialistField` Methoden:*
+*Erwartete Übergabewerte der `addMedialistField` Methode:*
 
 
 `($id, $parameter, $catId, $attributes)`

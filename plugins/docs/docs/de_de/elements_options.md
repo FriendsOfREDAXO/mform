@@ -65,7 +65,7 @@ $mform->addOption(2, 'test-2');
 
 > **Hinweis**
 >
-> * Die `setOptions`-Methode verarbeitet keine Fremdwerte wie beispielsweise die `setAttributes` Methode.
+> * Die `setOptions`-Methode verarbeitet keine Fremdwerte wie beispielsweise die `setAttributes`-Methode.
 
 
 <a name="Formular-Elemente"></a>

@@ -22,7 +22,7 @@ Es ist durch die Methode `setSize` möglich einem Select-Feld eine feste Größe
 
 
 * Als Wert über den Konstruktor der Element-Methode.
-* Als Wert über den Konstruktor der `setSize` Methode.
+* Als Wert über den Konstruktor der `setSize`-Methode.
 
 
 ##### Hinweis:
@@ -68,13 +68,13 @@ Redaxo bietet die Möglichkeit Link-, Linklisten-Buttons oder Media- und Mediali
 
 
 * Als Wert über den Konstruktor der Element-Methode.
-* Als Wert über den Konstruktor der `setCategory` Methode.
+* Als Wert über den Konstruktor der `setCategory`-Methode.
 
 
 ##### Hinweis:
 
 
-* Die `setCategory` Methode verarbeitet ausschließlich numerische Werte.
+* Die `setCategory`-Methode verarbeitet ausschließlich numerische Werte.
 
 
 ###### Beispiele für "setCategory"

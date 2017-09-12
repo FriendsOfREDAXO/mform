@@ -28,6 +28,7 @@
 
 **Credits**
 
-joachimdoerr (Joachim Dörr)
-alexplusde (Alexander Walther)  
-pixelfirma (Paul Götz)  
+Joachim Dörr (joachimdoerr)
+Alexander Walther (alexplusde)  
+Paul Götz (pixelfirma)  
+Tim Filler (elricco)
