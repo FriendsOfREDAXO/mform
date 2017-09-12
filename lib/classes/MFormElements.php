@@ -23,7 +23,8 @@ class MFormElements
     private $result;
 
     /**
-     * AbstractMForm constructor.
+     * MFormElements constructor.
+     * @author Joachim Doerr
      */
     public function __construct()
     {
@@ -79,7 +80,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addHtml($value)
@@ -89,7 +90,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addHeadline($value)
@@ -99,7 +100,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addDescription($value)
@@ -110,7 +111,7 @@ class MFormElements
     /**
      * @param null|string $value
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addFieldset($value = null, $attributes = array())
@@ -119,7 +120,7 @@ class MFormElements
     }
 
     /**
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function closeFieldset()
@@ -130,7 +131,7 @@ class MFormElements
     /**
      * @param null|string $value
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addTab($value = null, $attributes = array())
@@ -139,7 +140,7 @@ class MFormElements
     }
 
     /**
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function closeTab()
@@ -174,7 +175,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addInputField($typ, $id, $attributes = array(), $validations = array(), $defaultValue = NULL)
@@ -186,7 +187,7 @@ class MFormElements
      * @param $id
      * @param null|string $value
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addHiddenField($id, $value = NULL, $attributes = array())
@@ -199,7 +200,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addTextField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
@@ -212,7 +213,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addTextAreaField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
@@ -224,7 +225,7 @@ class MFormElements
      * @param $id
      * @param null $value
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addTextReadOnlyField($id, $value = NULL, $attributes = array())
@@ -236,7 +237,7 @@ class MFormElements
      * @param $id
      * @param null $value
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addTextAreaReadOnlyField($id, $value = NULL, $attributes = array())
@@ -252,7 +253,7 @@ class MFormElements
      * @param array $options
      * @param array $validation
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addOptionField($typ, $id, $attributes = array(), $options = array(), $validation = array(), $defaultValue = NULL)
@@ -302,7 +303,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validation
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addCheckboxField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
@@ -317,7 +318,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validation
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */ /*
     // TODO bring it to live
@@ -334,7 +335,7 @@ class MFormElements
      * @param array $attributes
      * @param array $validation
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addRadioField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
@@ -348,7 +349,7 @@ class MFormElements
      * @param array $parameter
      * @param null $catId
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addLinkField($id, $parameter = array(), $catId = NULL, $attributes = array())
@@ -362,7 +363,7 @@ class MFormElements
      * @param array $parameter
      * @param null $catId
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addLinklistField($id, $parameter = array(), $catId = NULL, $attributes = array())
@@ -376,8 +377,9 @@ class MFormElements
      * @param array $attributes
      * @param array $validations
      * @param null $defaultValue
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
+     * @internal attributes array('data-intern'=>'disable','data-extern'=>'disable','data-media'=>'disable','data-mailto'=>'enable','data-tel'=>'enable');
      */
     public function addCustomLinkField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {
@@ -390,7 +392,7 @@ class MFormElements
      * @param array $parameter
      * @param null $catId
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addMediaField($id, $parameter = array(), $catId = NULL, $attributes = array())
@@ -404,7 +406,7 @@ class MFormElements
      * @param array $parameter
      * @param null $catId
      * @param array $attributes
-     * @return AbstractMForm
+     * @return $this
      * @author Joachim Doerr
      */
     public function addMedialistField($id, $parameter = array(), $catId = NULL, $attributes = array())
