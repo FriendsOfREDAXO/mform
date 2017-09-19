@@ -16,4 +16,5 @@ Jeder dieser Typen kann aktiviert oder deaktiviert werden. Per default sind folg
 * `data-intern`
 * `data-media`
 
-`data-mailto` und `data-tel` für 
+
+**Dieser Bereich der Doku muss noch ausgearbeitet werden.**

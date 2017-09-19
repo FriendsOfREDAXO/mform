@@ -14,10 +14,10 @@ Durch die Tabs- und Fieldset-Elemente wird die Möglichkeit geboten Formulare kl
 
 Die strukturellen Formular Elemente werden jeweils durch ihre eigene Methoden eingesetzt, es stehen 4 Methoden zur Verfügung:
 
-* `addTab`
-* `closeTab`
 * `addFieldset`
 * `closeFieldset`
+* `addTab`
+* `closeTab`
 
 > **Hinweis**
 > 
@@ -59,12 +59,16 @@ Die strukturellen Formular Elemente werden jeweils durch ihre eigene Methoden ei
 $objForm->addFieldset('Fieldset',array('class'=>'myfieldset'));
 ```
 
+```php
+$objForm->closeFieldset();
+```
+
+
 > **Hinweis** 
 >
 > * Wird ein Fieldset angelegt ist dieses:
 >	- a) bis zum Ende des Formulars geöffnet und schließt nach dem letzten Formular-Element oder 
 >	- b) geöffnet bis ein anderes Fieldset-Element angelegt wird und umschließt folglich alle Elemente von Fieldset-Element-Methode zu Fieldset-Element-Methode
-
 
 
 <a name="Tab-Element"></a>
@@ -80,6 +84,10 @@ $objForm->addFieldset('Fieldset',array('class'=>'myfieldset'));
 $objForm->addTab('Tab',array('class'=>'myfieldset'));
 ```
 
+```php
+$objForm->closeTab();
+```
+
 > **Hinweis** 
 >
 > * Wird ein Tab angelegt ist dieses:
@@ -90,10 +98,7 @@ $objForm->addTab('Tab',array('class'=>'myfieldset'));
 <a name="Links"></a>
 ## Weiterführende Links
 
+*Generell / Allgemein*
 
-### Attribute in strukturellen Elementen
-
-
-* Grundlagen
-  * [Elementzuweisungen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementzuweisungen)
-  	  * [Elementen Attribute zuweisen](https://github.com/FriendsOfREDAXO/mform/wiki/Elementen-Attribute-zuweisen)
+* [Elementzuweisungen](elements_general.md)
+* [Elementen Attribute zuweisen](elements_attributes.md)
