@@ -22,3 +22,6 @@ page:
 
 requires:
     redaxo: '^5.1.0'
+
+system_plugins:
+    - docs
