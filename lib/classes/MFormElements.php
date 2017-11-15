@@ -635,6 +635,27 @@ class MFormElements
     }
 
     /**
+     * @param string $icon
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setTabIcon($icon)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'tab-icon', $icon);
+        return $this;
+    }
+
+    /**
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function pullRight()
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'pull-right', 1);
+        return $this;
+    }
+
+    /**
      * check serialize
      * @param $string
      * @return bool

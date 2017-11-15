@@ -97,7 +97,7 @@ class MFormParser
         if ($this->fieldset)
             $this->closeFieldset();
 
-            // is flag tab true
+        // is flag tab true
         if ($this->tab)
             $this->closeTab(); // close open tab
 
@@ -108,12 +108,23 @@ class MFormParser
             $nav = array();
             foreach ($items as $itm) {
                 if ($itm->getTabGroup() == $this->tabGroup && $itm->tabCount > 0) {
+                    $class = '';
+                    $value = '';
                     $element = new MFormElement();
                     $element->setId('tabg' . $itm->getTabGroup() . 'tabid' . $itm->getTabCount());
-                    $element->setValue($itm->getValue());
+
+                    if (array_key_exists('tab-icon', $itm->getAttributes()))
+                        $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
+
+                    $element->setValue($value . $itm->getValue());
+
+                    if (array_key_exists('pull-right', $itm->getAttributes()))
+                        $class = 'pull-right';
 
                     if ($itm->getTabCount()==1)
-                        $element->setClass('active');
+                        $class .= ' active';
+
+                    $element->setClass($class);
 
                     $nav[] = $this->parseElement($element, 'tabnavli', true); // use parse element to load template file
                 }
