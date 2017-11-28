@@ -10,6 +10,8 @@ $(function () {
 
 function mform_init() {
     var mform = $('.mform');
+    // init toggle
+    initMFormToggle();
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
 
@@ -23,6 +25,10 @@ function mform_init() {
             mform_tabs();
         }
     }
+}
+
+function initMFormToggle() {
+    $('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle();
 }
 
 function mform_tabs() {

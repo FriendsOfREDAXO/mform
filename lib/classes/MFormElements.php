@@ -312,6 +312,22 @@ class MFormElements
     }
 
     /**
+     * add checkboxe
+     * @param $id
+     * @param array $options
+     * @param array $attributes
+     * @param array $validation
+     * @param null $defaultValue
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addToggleCheckboxField($id, $options = array(), $attributes = array(), $validation = array(), $defaultValue = NULL)
+    {
+        $attributes['data-mform-toggle'] = 'toggle';
+        return $this->addCheckboxField($id, $options, $attributes, $validation, $defaultValue);
+    }
+
+    /**
      * add multicheckboxe
      * @param $id
      * @param array $options
@@ -443,6 +459,16 @@ class MFormElements
     public function setFull()
     {
         MFormAttributeHandler::addAttribute($this->item, 'full', true);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setToggle()
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'data-mform-toggle', 'toggle');
         return $this;
     }
 
