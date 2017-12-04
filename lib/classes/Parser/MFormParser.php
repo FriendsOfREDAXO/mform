@@ -191,7 +191,8 @@ class MFormParser
     {
         // create templateElement object
         $element = new MFormElement();
-        $element->setOutput($item->getValue()); // set output to replace in template
+        $element->setOutput($item->getValue())
+            ->setClass($item->getClass()); // set output to replace in template
         // add to output element array
         $this->elements[] = $this->parseElement($element, $item->getType());
         return $this;
@@ -224,6 +225,11 @@ class MFormParser
         // is full flag true and template type default
         if ($item->isFull() && $templateType == 'default') {
             $templateType = $templateType . '_full'; // add _full to template type
+        }
+
+        // set custom template type
+        if (!empty($item->getLabelColClass()) && !empty($item->getFormItemColClass()) && $templateType == 'default') {
+            $templateType = $templateType . '_custom'; // add custom to template type
         }
 
         // datalist?
@@ -266,6 +272,9 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($this->parseElement($element, 'text', true));
 
+        // add classes for custom type
+        $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
@@ -296,6 +305,11 @@ class MFormParser
             $templateType = $templateType . '_full'; // add _full to template type
         }
 
+        // set custom template type
+        if (!empty($item->getLabelColClass()) && !empty($item->getFormItemColClass()) && $templateType == 'default') {
+            $templateType = $templateType . '_custom'; // add custom to template type
+        }
+
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
         MFormItemManipulator::setCustomId($item); // set optional custom id
@@ -320,6 +334,9 @@ class MFormParser
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($this->parseElement($element, 'textarea', true));
+
+        // add classes for custom type
+        $this->getDefaultTemplateType($item, $templateElement);
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, $templateType);
@@ -408,8 +425,11 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($this->parseElement($element, 'select', true));
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -489,8 +509,11 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($checkboxElements);
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -562,8 +585,11 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($radioElements);
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -594,8 +620,11 @@ class MFormParser
                 break;
         }
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -705,8 +734,11 @@ class MFormParser
 
         $templateElement->setElement($html);
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -737,8 +769,11 @@ class MFormParser
                 break;
         }
 
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+
         // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, 'default');
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
 
@@ -768,6 +803,7 @@ class MFormParser
                     case 'html':
                     case 'headline':
                     case 'description':
+                    case 'alert':
                         $this->generateLineElement($item);
                         break;
 //                    case 'callback':
@@ -900,6 +936,30 @@ class MFormParser
 
         // return output
         return $this->parseElement($element, 'wrapper');
+    }
+
+    /**
+     * @param MFormItem $item
+     * @return string
+     * @author Joachim Doerr
+     */
+    private function getDefaultTemplateType(MFormItem $item, $templateElement)
+    {
+        $templateType = 'default';
+
+        // set default template
+        if (!empty($item->getLabelColClass()) && !empty($item->getFormItemColClass())) {
+            $templateType = $templateType . '_custom'; // add _custom to template type
+            $templateElement->setLabelColClass($item->getLabelColClass())
+                ->setFormItemColClass($item->getFormItemColClass());
+        }
+
+        // is full flag true and template type default
+        if ($item->isFull()) {
+            $templateType = $templateType . '_full'; // add _full to template type
+        }
+
+        return $templateType;
     }
 
     /**

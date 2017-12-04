@@ -109,6 +109,65 @@ class MFormElements
     }
 
     /**
+     * @param string $key
+     * @param null|string $value
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addAlert($key, $value)
+    {
+        return $this->addElement('alert', NULL, $value, array('class'=>'alert-'.$key));
+    }
+
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addAlertInfo($value)
+    {
+        return $this->addAlert('info', $value);
+    }
+
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addAlertWarning($value)
+    {
+        return $this->addAlert('warning', $value);
+    }
+
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addAlertDanger($value)
+    {
+        return $this->addAlert('danger', $value);
+    }
+
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addAlertSuccess($value)
+    {
+        return $this->addAlert('success', $value);
+    }
+
+    /*
+<div class="alert alert-success" role="alert">...</div>
+<div class="alert alert-info" role="alert">...</div>
+<div class="alert alert-warning" role="alert">...</div>
+<div class="alert alert-danger" role="alert">...</div>
+     *
+     */
+
+    /**
      * @param null|string $value
      * @param array $attributes
      * @return $this
@@ -459,6 +518,28 @@ class MFormElements
     public function setFull()
     {
         MFormAttributeHandler::addAttribute($this->item, 'full', true);
+        return $this;
+    }
+
+    /**
+     * @param $class
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setFormItemColClass($class)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'form-item-col-class', $class);
+        return $this;
+    }
+
+    /**
+     * @param $class
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setLabelColClass($class)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'label-col-class', $class);
         return $this;
     }
 

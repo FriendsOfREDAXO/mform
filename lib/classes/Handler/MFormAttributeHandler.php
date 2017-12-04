@@ -35,6 +35,12 @@ class MFormAttributeHandler
             case 'full': // set full for markitup or redactor fields to use the default_full template
                 $item->setFull(true);
                 break;
+            case 'form-item-col-class':
+                $item->setFormItemColClass($value);
+                break;
+            case 'label-col-class':
+                $item->setLabelColClass($value);
+                break;
             case 'multiple': // flag the multiple fields
                 $item->setMultiple(true);
                 $item->attributes[$name] = $value;

@@ -91,6 +91,16 @@ class MFormElement
     public $datalist;
 
     /**
+     * @var string
+     */
+    public $labelColClass;
+
+    /**
+     * @var string
+     */
+    public $formItemColClass;
+
+    /**
      * @param string $id
      * @return $this
      */
@@ -248,6 +258,28 @@ class MFormElement
     public function setDatalist($datalist)
     {
         $this->datalist = $datalist;
+        return $this;
+    }
+
+    /**
+     * @param string $labelColClass
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setLabelColClass($labelColClass)
+    {
+        $this->labelColClass = $labelColClass;
+        return $this;
+    }
+
+    /**
+     * @param string $formItemColClass
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setFormItemColClass($formItemColClass)
+    {
+        $this->formItemColClass = $formItemColClass;
         return $this;
     }
 

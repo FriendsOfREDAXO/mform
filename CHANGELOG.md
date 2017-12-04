@@ -2,6 +2,25 @@
 
 ### Version 5.2.0
 
+* [Bootstrap Toggle Checkbox](http://www.bootstraptoggle.com) als neues Element `addToggleCheckboxField` hinzugefügt
+* `setLabelColClass` und `setFormItemColClass` hinzugefügt, ermöglicht das überschrieben der Standard "col-md-x" Classen
+
+```
+$mform->addTextField('2.0.title', ['label' => 'Titel'], ['empty']);
+$mform->setLabelColClass('col-md-3');
+$mform->setFormItemColClass('col-md-9');
+$mform->addToggleCheckboxField('1.show_icons', [1 => ''], ['label' => 'Icon verwenden', 'label-col-class' => 'col-md-3', 'form-item-col-class' => 'col-md-9'], null, 1);
+```
+* 4 Alert Message Elemente hinzugefügt
+```
+$mform->addAlertInfo('Heads up! This alert needs your attention, but it\'s not super important.');
+$mform->addAlertSuccess('Well done! You successfully read this important alert message.');
+$mform->addAlertDanger('Oh snap! Change a few things up and try submitting again.');
+$mform->addAlertWarning("<strong>Warning!</strong> Better check yourself, you're not looking too good.");
+```
+
+### Version 5.1.0
+
 * Javascript für Multipe Selects entfernt, dafür nötiges Hidden-Input ebenfalls entfernt. 
     * **Zu beachten bei Updates**:
         * Ein Hidden-Input Feld welches Komma-separiert die selected-options aufnimmt gibt es nicht mehr.

@@ -83,6 +83,16 @@ class MFormItem
     public $full;
 
     /**
+     * @var string
+     */
+    public $labelColClass;
+
+    /**
+     * @var string
+     */
+    public $formItemColClass;
+
+    /**
      * @var integer
      */
     public $tabGroup;
@@ -359,6 +369,46 @@ class MFormItem
     public function setFull($full)
     {
         $this->full = $full;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getLabelColClass()
+    {
+        return $this->labelColClass;
+    }
+
+    /**
+     * @param string $labelColClass
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setLabelColClass($labelColClass)
+    {
+        $this->labelColClass = $labelColClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getFormItemColClass()
+    {
+        return $this->formItemColClass;
+    }
+
+    /**
+     * @param string $formItemColClass
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setFormItemColClass($formItemColClass)
+    {
+        $this->formItemColClass = $formItemColClass;
         return $this;
     }
 
