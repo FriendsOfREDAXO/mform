@@ -103,6 +103,16 @@ class MFormItem
     public $tabCount;
 
     /**
+     * @var string
+     */
+    public $infoTooltip;
+
+    /**
+     * @var string
+     */
+    public $infoCollapse;
+
+    /**
      * @return string
      */
     public function getType()
@@ -447,6 +457,46 @@ class MFormItem
     public function setTabCount($tabCount)
     {
         $this->tabCount = $tabCount;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getInfoTooltip()
+    {
+        return $this->infoTooltip;
+    }
+
+    /**
+     * @param string $infoTooltip
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoTooltip($infoTooltip)
+    {
+        $this->infoTooltip = $infoTooltip;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getInfoCollapse()
+    {
+        return $this->infoCollapse;
+    }
+
+    /**
+     * @param string $infoCollapse
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoCollapse($infoCollapse)
+    {
+        $this->infoCollapse = $infoCollapse;
         return $this;
     }
 }

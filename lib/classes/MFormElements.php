@@ -90,12 +90,13 @@ class MFormElements
 
     /**
      * @param null|string $value
+     * @param array $attributes
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHeadline($value)
+    public function addHeadline($value, $attributes = array())
     {
-        return $this->addElement('headline', NULL, $value);
+        return $this->addElement('headline', NULL, $value, $attributes);
     }
 
     /**
@@ -159,13 +160,27 @@ class MFormElements
         return $this->addAlert('success', $value);
     }
 
-    /*
-<div class="alert alert-success" role="alert">...</div>
-<div class="alert alert-info" role="alert">...</div>
-<div class="alert alert-warning" role="alert">...</div>
-<div class="alert alert-danger" role="alert">...</div>
-     *
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
      */
+    public function addTooltipInfo($value)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip', $value);
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addCollapseInfo($value)
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'info-collapse', $value);
+        return $this;
+    }
 
     /**
      * @param null|string $value
@@ -205,6 +220,26 @@ class MFormElements
     public function closeTab()
     {
         return $this->addElement('close-tab', NULL);
+    }
+
+    /**
+     * @param null|string $value
+     * @param array $attributes
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addCollapse($value = null, $attributes = array())
+    {
+        return $this->addElement('collapse', NULL, $value, $attributes);
+    }
+
+    /**
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function closeCollapse()
+    {
+        return $this->addElement('close-collapse', NULL);
     }
 
     /**

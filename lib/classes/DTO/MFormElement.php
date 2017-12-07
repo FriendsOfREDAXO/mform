@@ -101,6 +101,22 @@ class MFormElement
     public $formItemColClass;
 
     /**
+     * @var string
+     */
+    public $infoTooltip;
+
+    /**
+     * @var string
+     */
+    public $infoCollapseButton;
+
+    /**
+     * @var string
+     */
+    public $infoCollapse;
+
+
+    /**
      * @param string $id
      * @return $this
      */
@@ -280,6 +296,39 @@ class MFormElement
     public function setFormItemColClass($formItemColClass)
     {
         $this->formItemColClass = $formItemColClass;
+        return $this;
+    }
+
+    /**
+     * @param string $infoTooltip
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoTooltip($infoTooltip)
+    {
+        $this->infoTooltip = $infoTooltip;
+        return $this;
+    }
+
+    /**
+     * @param string $infoCollapseButton
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoCollapseButton($infoCollapseButton)
+    {
+        $this->infoCollapseButton = $infoCollapseButton;
+        return $this;
+    }
+
+    /**
+     * @param string $infoCollapse
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoCollapse($infoCollapse)
+    {
+        $this->infoCollapse = $infoCollapse;
         return $this;
     }
 

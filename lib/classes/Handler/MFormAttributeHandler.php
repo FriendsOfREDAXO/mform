@@ -41,6 +41,12 @@ class MFormAttributeHandler
             case 'label-col-class':
                 $item->setLabelColClass($value);
                 break;
+            case 'info-collapse':
+                $item->setInfoCollapse($value);
+                break;
+            case 'info-tooltip':
+                $item->setInfoTooltip($value);
+                break;
             case 'multiple': // flag the multiple fields
                 $item->setMultiple(true);
                 $item->attributes[$name] = $value;

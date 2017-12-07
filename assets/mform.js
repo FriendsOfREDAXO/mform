@@ -14,7 +14,6 @@ function mform_init() {
     initMFormToggle();
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
-
         var custom_link = mform.find('.custom-link'),
             tabs = mform.find('a[data-toggle="tab"]');
 
@@ -25,24 +24,46 @@ function mform_init() {
             mform_tabs();
         }
     }
+    // init mform collapse
+    initMFormCollapseData();
+}
+
+function initMFormCollapseData() {
+    $('input[data-toggle=collapse]').each(function(){
+        // initial
+        mFormCollapseToggle($(this));
+        // on change
+        $(this).change(function(){
+            mFormCollapseToggle($(this));
+        });
+    });
+}
+
+function mFormCollapseToggle($element) {
+    var collapse_class = $element.attr('data-target');
+    collapse_class = collapse_class.replace('#','.');
+
+    if($element.prop('checked')) {
+        $(collapse_class).collapse('show');
+    } else {
+        $(collapse_class).collapse('hide')
+    }
 }
 
 function initMFormToggle() {
-    $('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle();
+    $('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle('destroy').bootstrapMFormToggle();
 }
 
 function mform_tabs() {
-
-    $('.mform a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
+    $('.mform-tabs a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
         var id = $(e.target).attr("href");
         localStorage.setItem('selectedTab', id)
     });
 
     var selectedTab = localStorage.getItem('selectedTab');
     if (selectedTab != null) {
-        $('.mform a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
+        $('.mform-tabs a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
     }
-
 }
 
 function mform_custom_link(item) {
@@ -111,6 +132,7 @@ function hidden_show_media(hidden_input, showed_input, id) {
         hidden_input.val('').attr('type','text');
     }
 }
+
 function show_hidden_link(hidden_input, showed_input) {
     if (hidden_input.attr('type') == 'text') {
         hidden_input.attr('id', hidden_input.data('link_id'));

@@ -20,6 +20,11 @@ class MFormParser
     /**
      * @var bool
      */
+    protected $collapse = false;
+
+    /**
+     * @var bool
+     */
     protected $tab = false;
 
     /**
@@ -32,6 +37,11 @@ class MFormParser
      * TODO use it later for custom theme in new MForm()
      */
     protected $theme;
+
+    /**
+     * @var int
+     */
+    protected $collapseCount = 0;
 
     /**
      * create the fieldset open element
@@ -86,6 +96,69 @@ class MFormParser
     }
 
     /**
+     * create the collapse open element
+     * fieldset open
+     * @param MFormItem $item
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function generateCollapse(MFormItem $item)
+    {
+        // if it the first collapse ? no close the parent
+        if ($this->collapse === true) {
+            $this->closeCollapse();
+        }
+
+        // is id in attr not set set an unique id
+        if (!isset($item->getAttributes()['id'])) {
+            $this->collapseCount++;
+            $item->attributes['id'] = 'collapse_' . $this->collapseCount . '_' . uniqid();
+        }
+
+        // create collapse open element
+        $collapseElement = new MFormElement();
+        $collapseElement->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to collapse element
+            ->setClass($item->getAttributes()['id'])
+            ->setId($item->getAttributes()['id']); // set collapse id
+
+        // not class given set default button class
+        if (empty($item->getClass())) {
+            $item->setClass('btn btn-white btn-block');
+        }
+
+        // create legend
+        if (!empty($item->getValue())) {
+            $collapseButton= new MFormElement();
+            $collapseButton->setClass($item->getClass())
+                ->setAttributes('data-toggle="collapse" data-target="#'.$item->getAttributes()['id'].'"')
+                ->setValue($item->getValue());
+            $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse-button', true)); // add parsed legend to collapse element
+        }
+
+        // add collapse open element to elements list
+        $this->elements[] = $this->parseElement($collapseElement, 'collapse-open', true);
+        $this->collapse = true; // collapse is open
+        return $this;
+    }
+
+    /**
+     * create the collapse close element
+     * collapse close
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function closeCollapse()
+    {
+        // if collapse property true
+        if ($this->collapse === true) {
+            $this->collapse = false; // collapse is closed
+            // add collapse close element to elements list
+            $this->elements[] = $this->parseElement(new MFormElement(), 'collapse-close', true); // use parse element to load template file
+        }
+        return $this;
+    }
+
+    /**
      * @param MFormItem $item
      * @param $key
      * @param MFormItem[] $items
@@ -94,12 +167,19 @@ class MFormParser
     private function generateTab($item, $key, $items)
     {
         // close fieldset for open tab group
-        if ($this->fieldset)
+        if ($this->fieldset) {
             $this->closeFieldset();
+        }
+
+        // close collapse for open tab group
+        if ($this->collapse) {
+            $this->closeCollapse();
+        }
 
         // is flag tab true
-        if ($this->tab)
+        if ($this->tab) {
             $this->closeTab(); // close open tab
+        }
 
         if ($this->tabGroup == 0) {
             // open tab group
@@ -131,7 +211,8 @@ class MFormParser
             }
 
             $element = new MFormElement();
-            $element->setElement(implode('', $nav));
+            $element->setElement(implode('', $nav))
+                ->setAttributes($this->parseAttributes($item->getAttributes()));
             $this->elements[] = $this->parseElement($element, 'tabgroup-open', true); // use parse element to load template file
         }
 
@@ -158,8 +239,13 @@ class MFormParser
         // close open tab by flag
         // next item is from our tab group
         if ($this->tab) {
-            if ($this->fieldset)
+            if ($this->fieldset) {
                 $this->closeFieldset();
+            }
+
+            if ($this->collapse) {
+                $this->closeCollapse();
+            }
 
             $this->tab = false;
             $this->elements[] = $this->parseElement(new MFormElement(), 'tab-close', true); // use parse element to load template file
@@ -192,6 +278,7 @@ class MFormParser
         // create templateElement object
         $element = new MFormElement();
         $element->setOutput($item->getValue())
+            ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setClass($item->getClass()); // set output to replace in template
         // add to output element array
         $this->elements[] = $this->parseElement($element, $item->getType());
@@ -271,6 +358,19 @@ class MFormParser
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($this->parseElement($element, 'text', true));
+
+        // TODO
+        if ($item->getInfoTooltip()) {
+            // parse tooltip
+            // set tooltip
+        }
+
+        // TODO
+        if ($item->getInfoCollapse()) {
+            // parse collpase button and collapse
+            // set button
+            // set collapse
+        }
 
         // add classes for custom type
         $this->getDefaultTemplateType($item, $templateElement);
@@ -800,6 +900,12 @@ class MFormParser
                     case 'tab':
                         $this->generateTab($item, $key, $items);
                         break;
+                    case 'close-collapse':
+                        $this->closeCollapse();
+                        break;
+                    case 'collapse':
+                        $this->generateCollapse($item);
+                        break;
                     case 'html':
                     case 'headline':
                     case 'description':
@@ -918,6 +1024,11 @@ class MFormParser
             $this->closeTab(null, null, array(), true);
         }
 
+        // close collapse
+        if ($this->collapse) {
+            $this->closeCollapse();
+        }
+
         // close fieldset
         if ($this->fieldset) {
             $this->closeFieldset();
@@ -925,9 +1036,7 @@ class MFormParser
 
         // show for debug items
         if ($debug) {
-            echo '<pre>'.PHP_EOL;
-            print_r($items);
-            echo '</pre>'.PHP_EOL;
+            dump($items);
         }
 
         // wrap elements
