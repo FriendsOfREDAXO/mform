@@ -1,111 +1,189 @@
 .mform-headline h3 {
-  margin: 0;
+    margin: 0;
 }
+
 .mform .form-control.parsley-success:focus {
-  color: #468847;
-  background-color: #DFF0D8;
-  border: 1px solid #D6E9C6;
+    color: #468847;
+    background-color: #DFF0D8;
+    border: 1px solid #D6E9C6;
 }
+
 .mform .form-control.parsley-error:focus {
-  color: #B94A48;
-  background-color: #F2DEDE;
-  border: 1px solid #EED3D7;
+    color: #B94A48;
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
 }
+
 .mform select.form-control {
-  height: 34px;
+    height: 34px;
 }
+
 .mform select[multiple], .mform select[size] {
-  height: auto;
+    height: auto;
 }
+
 .mform .form-horizontal .mform-headline,
-.mform .form-horizontal  .mform-description {
-  margin-left: 0;
-  margin-right: 0;
+.mform .form-horizontal .mform-description {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 /* mform tab style by Thomas Skerbis */
 
 .mform .mform-tabs .nav-tabs {
-	border-bottom: 0!important;
-	margin: 0!important;
+    border-bottom: 0 !important;
+    margin: 0 !important;
 }
 
 .mform .mform-tabs .form-control.parsley-success:focus {
-	color: #468847;
-	background-color: #DFF0D8;
-	border: 1px solid #D6E9C6;
+    color: #468847;
+    background-color: #DFF0D8;
+    border: 1px solid #D6E9C6;
 }
 
 .mform .mform-tabs .form-control.parsley-error:focus {
-	color: #B94A48;
-	background-color: #F2DEDE;
-	border: 1px solid #EED3D7;
+    color: #B94A48;
+    background-color: #F2DEDE;
+    border: 1px solid #EED3D7;
 }
 
 .mform .mform-tabs select.form-control {
-	height: 34px;
+    height: 34px;
 }
 
 .mform .mform-tabs select[multiple],
 .mform .mform-tabs select[size] {
-	height: auto;
+    height: auto;
 }
 
 .mform .mform-tabs .form-horizontal .mform-headline,
 .mform .mform-tabs .form-horizontal .mform-description {
-	margin-left: 0;
-	margin-right: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
+
 /* mform tab style by Thomas Skerbis */
 
 .mform .mform-tabs .nav-tabs > li.active > a,
 .mform .mform-tabs .nav-tabs > li.active > a:focus,
 .mform .mform-tabs .nav-tabs > li.active > a:hover {
-	border-width: 0;
+    border-width: 0;
 }
 
 .mform .mform-tabs .nav-tabs > li > a {
-	border: none;
-	color: #283541;
-	background: rgba(163, 163, 163, 0.22);
+    border: none;
+    color: #283541;
+    background: rgba(163, 163, 163, 0.22);
 }
 
 .mform .mform-tabs .nav-tabs > li.active > a,
 .mform .mform-tabs .nav-tabs > li > a:hover {
-	border: none;
-	color: #000;
-	background: #FFF;
+    border: none;
+    color: #000;
+    background: #FFF;
 }
 
 .mform .mform-tabs .nav-tabs > li > a::before {
-	content: "";
-	background: #000;
-	background: rgba(0, 0, 0, 0.18);
-	height: 4px;
-	position: absolute;
-	width: 100%;
-	left: 0px;
-	top: -2px;
-	transition: all 250ms ease 0s;
-	transform: scale(0);
+    content: "";
+    background: #000;
+    background: rgba(0, 0, 0, 0.18);
+    height: 4px;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    top: -2px;
+    transition: all 250ms ease 0s;
+    transform: scale(0);
 }
 
 .mform .mform-tabs .nav-tabs > li.active > a::before,
 .mform .mform-tabs .nav-tabs > li:hover > a::after {
-	transform: scale(1);
+    transform: scale(1);
 }
 
 .mform .mform-tabs .tab-nav > li > a::after {
-	background: #4285F4 none repeat scroll 0% 0%;
-	color: #fff;
+    background: #4285F4 none repeat scroll 0% 0%;
+    color: #fff;
 }
 
 .mform .mform-tabs .tab-pane {
-	padding: 15px 0;
+    padding: 15px 0;
 }
 
 .mform .mform-tabs .tab-content {
-	padding: 20px;
-	background: #fff;
-	margin-bottom: 20px;
+    padding: 20px;
+    background: #fff;
+    margin-bottom: 20px;
+}
+.mform .mform-headline.grey-legend-background h3,
+.sortitem .mform fieldset.grey-legend-background > legend,
+.mform fieldset.grey-legend-background > legend {
+    border-bottom: none;
+    padding: 8px 10px;
+    background: #d8d8d8;
+    font-size: 14px;
+    font-weight: bold;
+}
+.mform .tab-content .mform-headline.grey-legend-background h3,
+.mform .tab-content fieldset.grey-legend-background > legend,
+.mform .tab-content fieldset.grey-legend-background > legend {
+    background: #f3f3f3;
+}
+
+.sortitem .mform fieldset.grey-legend-background:first-child {
+    margin-top: 5px;
+}
+
+.sortitem .mform .mform-headline.grey-legend-background h3,
+.sortitem .mform fieldset.grey-legend-background > legend {
+    background: #ececec;
+}
+
+.tab-content .sortitem {
+    background: #f7f7f7;
+}
+
+.mform-alert + .mform-alert {
+    margin-top: -15px;
+}
+
+.mform .btn-white {
+    background-color: #fff;
+    color: #333;
+    border-radius: 0;
+    text-align: left;
+    font-size: 14px;
+    height: 50px;
+    line-height: 20px;
+    padding: 15px;
+    /*border-top: 2px solid #e8e8e8;*/
+    /*border-bottom: 2px solid #e8e8e8;*/
+    position: relative;
+}
+
+.mform .btn-white:hover {
+    background-color: #4b9ad9;
+    color: #ffffff;
+}
+
+.mform .btn-white:focus,
+.mform .btn-white:active {
+    background-color: #2a81c7;
+}
+
+.mform-tabs .btn-white {
+    background-color: #fafafa;
+}
+
+.mform .btn-white[aria-expanded=true]:after {
+
+}
+
+.mform .btn-white:after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    outline: 1px solid #0ea7f4;
+    display: inline-block;
+    margin-left: 15px;
 }
