@@ -1,6 +1,6 @@
 # Custom-Link Element
 
-Das Custom MForm Custom-Link-Element ermöglicht es durch den Einsatz eines Feldes mehere Link-Typen definieren zu können.    
+Das Custom MForm Custom-Link-Element ermöglicht es durch den Einsatz eines Feldes mehrere Link-Typen definieren zu können.    
 
 Die Link Typen des Custom-Link-Elements:
 
