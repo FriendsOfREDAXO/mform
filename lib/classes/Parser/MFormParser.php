@@ -349,6 +349,22 @@ class MFormParser
             ->setDatalist($datalist)
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
 
+        // TODO
+        if ($item->getInfoTooltip()) {
+            // parse tooltip
+            // set tooltip
+            $tooltip = new MFormElement();
+            $tooltip->setValue($item->getInfoTooltip());
+            $item->setLabel($item->getLabel() . $this->parseElement($tooltip, 'tooltip-info', true));
+        }
+
+        // TODO
+        if ($item->getInfoCollapse()) {
+            // parse collpase button and collapse
+            // set button
+            // set collapse
+        }
+
         // create label element
         $label = new MFormElement();
         $label->setId($item->getId())
@@ -358,19 +374,6 @@ class MFormParser
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($label, 'label', true))
             ->setElement($this->parseElement($element, 'text', true));
-
-        // TODO
-        if ($item->getInfoTooltip()) {
-            // parse tooltip
-            // set tooltip
-        }
-
-        // TODO
-        if ($item->getInfoCollapse()) {
-            // parse collpase button and collapse
-            // set button
-            // set collapse
-        }
 
         // add classes for custom type
         $this->getDefaultTemplateType($item, $templateElement);

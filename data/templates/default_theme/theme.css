@@ -187,3 +187,7 @@
     display: inline-block;
     margin-left: 15px;
 }
+
+.mform a.mblock-info-tooltip {
+    margin-left: 7px;
+}

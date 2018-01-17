@@ -1,15 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 5.2.0
+### Version 5.2.0 pre-release
 
+* Add Info Tooltip
 * [Bootstrap Toggle Checkbox](http://www.bootstraptoggle.com) als neues Element `addToggleCheckboxField` hinzugefügt
+```
+$mform->addToggleCheckboxField('1.show_icons', [1 => ''], ['label' => 'Icon verwenden', 'label-col-class' => 'col-md-3', 'form-item-col-class' => 'col-md-9'], null, 1);
+```
 * `setLabelColClass` und `setFormItemColClass` hinzugefügt, ermöglicht das überschrieben der Standard "col-md-x" Classen
-
 ```
 $mform->addTextField('2.0.title', ['label' => 'Titel'], ['empty']);
 $mform->setLabelColClass('col-md-3');
 $mform->setFormItemColClass('col-md-9');
-$mform->addToggleCheckboxField('1.show_icons', [1 => ''], ['label' => 'Icon verwenden', 'label-col-class' => 'col-md-3', 'form-item-col-class' => 'col-md-9'], null, 1);
 ```
 * 4 Alert Message Elemente hinzugefügt
 ```
@@ -18,6 +20,8 @@ $mform->addAlertSuccess('Well done! You successfully read this important alert m
 $mform->addAlertDanger('Oh snap! Change a few things up and try submitting again.');
 $mform->addAlertWarning("<strong>Warning!</strong> Better check yourself, you're not looking too good.");
 ```
+* Collapse Panel für Formular elemente hinzugefügt, das steuern der Collapse über Checkboxen ist möglich
+* Output helper class `MFormOutputHelper` bereit gestellt
 
 ### Version 5.1.0
 
