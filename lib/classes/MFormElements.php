@@ -162,23 +162,27 @@ class MFormElements
 
     /**
      * @param $value
+     * @param $icon
      * @return MFormElements
      * @author Joachim Doerr
      */
-    public function addTooltipInfo($value)
+    public function addTooltipInfo($value, $icon = '')
     {
         MFormAttributeHandler::addAttribute($this->item, 'info-tooltip', $value);
+        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip-icon', $icon);
         return $this;
     }
 
     /**
      * @param $value
+     * @param $icon
      * @return MFormElements
      * @author Joachim Doerr
      */
-    public function addCollapseInfo($value)
+    public function addCollapseInfo($value, $icon = '')
     {
         MFormAttributeHandler::addAttribute($this->item, 'info-collapse', $value);
+        MFormAttributeHandler::addAttribute($this->item, 'info-collapse-icon', $icon);
         return $this;
     }
 

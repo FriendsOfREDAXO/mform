@@ -349,30 +349,9 @@ class MFormParser
             ->setDatalist($datalist)
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
 
-        // TODO
-        if ($item->getInfoTooltip()) {
-            // parse tooltip
-            // set tooltip
-            $tooltip = new MFormElement();
-            $tooltip->setValue($item->getInfoTooltip());
-            $item->setLabel($item->getLabel() . $this->parseElement($tooltip, 'tooltip-info', true));
-        }
-
-        // TODO
-        if ($item->getInfoCollapse()) {
-            // parse collpase button and collapse
-            // set button
-            // set collapse
-        }
-
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true))
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true))
             ->setElement($this->parseElement($element, 'text', true));
 
         // add classes for custom type
@@ -428,14 +407,9 @@ class MFormParser
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes()));
 
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true))
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true))
             ->setElement($this->parseElement($element, 'textarea', true));
 
         // add classes for custom type
@@ -518,14 +492,9 @@ class MFormParser
             $element->setVarId($item->getVarId() . '[]');
         }
 
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true))
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true))
             ->setElement($this->parseElement($element, 'select', true));
 
         // add classes for custom type
@@ -602,14 +571,10 @@ class MFormParser
                 }
             //}
         }
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
 
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true))
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true))
             ->setElement($checkboxElements);
 
         // add classes for custom type
@@ -678,14 +643,9 @@ class MFormParser
             }
         }
 
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true))
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true))
             ->setElement($radioElements);
 
         // add classes for custom type
@@ -704,14 +664,9 @@ class MFormParser
      */
     private function generateMediaElement(MFormItem $item)
     {
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true));
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
 
         switch ($item->getType()) {
             default:
@@ -744,14 +699,9 @@ class MFormParser
 
         $item->setId(str_replace(array('_',']','['),'', rand(100,999) . $item->getVarId()));
 
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true));
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
 
         $html = rex_var_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $item->getParameter());
 
@@ -853,14 +803,9 @@ class MFormParser
      */
     private function generateLinkElement(MFormItem $item)
     {
-        // create label element
-        $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($item->getLabel());
-
         // create templateElement object
         $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($label, 'label', true));
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
 
         switch ($item->getType()) {
             default:
@@ -990,6 +935,36 @@ class MFormParser
                 $item->setTabGroup($tabGroupCount);
                 $tab = false;
             }
+        }
+    }
+
+    /**
+     * @param MFormItem $item
+     * @return MFormElement
+     * @author Joachim Doerr
+     */
+    private function createLabelElement(MFormItem $item)
+    {
+        $this->createTooltipElement($item);
+        $label = new MFormElement();
+        $label->setId($item->getId())
+            ->setValue($item->getLabel());
+        return $label;
+    }
+
+    /**
+     * @param $item
+     * @author Joachim Doerr
+     */
+    private function createTooltipElement(MFormItem $item)
+    {
+        // set tooltip
+        if ($item->getInfoTooltip()) {
+            // parse tooltip
+            $tooltip = new MFormElement();
+            $tooltip->setValue($item->getInfoTooltip())
+                ->setInfoTooltipIcon($item->getInfoTooltipIcon());
+            $item->setLabel($item->getLabel() . $this->parseElement($tooltip, 'tooltip-info', true));
         }
     }
 

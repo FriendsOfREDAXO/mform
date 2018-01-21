@@ -47,6 +47,12 @@ class MFormAttributeHandler
             case 'info-tooltip':
                 $item->setInfoTooltip($value);
                 break;
+            case 'info-collapse-icon':
+                $item->setInfoCollapseIcon($value);
+                break;
+            case 'info-tooltip-icon':
+                $item->setInfoTooltipIcon($value);
+                break;
             case 'multiple': // flag the multiple fields
                 $item->setMultiple(true);
                 $item->attributes[$name] = $value;

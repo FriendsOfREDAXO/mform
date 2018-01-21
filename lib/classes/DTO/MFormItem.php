@@ -113,6 +113,16 @@ class MFormItem
     public $infoCollapse;
 
     /**
+     * @var string
+     */
+    public $infoTooltipIcon;
+
+    /**
+     * @var string
+     */
+    public $infoCollapseIcon;
+
+    /**
      * @return string
      */
     public function getType()
@@ -497,6 +507,46 @@ class MFormItem
     public function setInfoCollapse($infoCollapse)
     {
         $this->infoCollapse = $infoCollapse;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getInfoTooltipIcon()
+    {
+        return $this->infoTooltipIcon;
+    }
+
+    /**
+     * @param string $infoTooltipIcon
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoTooltipIcon($infoTooltipIcon)
+    {
+        $this->infoTooltipIcon = $infoTooltipIcon;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getInfoCollapseIcon()
+    {
+        return $this->infoCollapseIcon;
+    }
+
+    /**
+     * @param string $infoCollapseIcon
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoCollapseIcon($infoCollapseIcon)
+    {
+        $this->infoCollapseIcon = $infoCollapseIcon;
         return $this;
     }
 }

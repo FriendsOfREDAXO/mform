@@ -103,6 +103,11 @@ class MFormElement
     /**
      * @var string
      */
+    public $infoTooltipIcon;
+
+    /**
+     * @var string
+     */
     public $infoTooltip;
 
     /**
@@ -296,6 +301,17 @@ class MFormElement
     public function setFormItemColClass($formItemColClass)
     {
         $this->formItemColClass = $formItemColClass;
+        return $this;
+    }
+
+    /**
+     * @param string $infoTooltipIcon
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInfoTooltipIcon($infoTooltipIcon)
+    {
+        $this->infoTooltipIcon = $infoTooltipIcon;
         return $this;
     }
 

@@ -10,10 +10,10 @@ $(function () {
 
 function mform_init() {
     var mform = $('.mform');
-    // init toggle
 
     mform.find('[data-toggle="tooltip"]').tooltip();
 
+    // init toggle
     initMFormToggle();
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
