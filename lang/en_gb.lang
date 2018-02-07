@@ -50,3 +50,5 @@ mform_example_description_expert = The "expert examples" show that MForm can be 
 mform_example_description_community = Later
 
 mform_github = MForm FOR – Github Repository
+
+mform_redactor_profile_create_success = Redactor profile "%s" was successful created, please reload!
