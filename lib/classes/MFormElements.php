@@ -218,54 +218,62 @@ class MFormElements
     }
 
     /**
+     * @param bool $tabGroupClose
      * @return $this
      * @author Joachim Doerr
      */
-    public function closeTab()
+    public function closeTab($tabGroupClose = false)
     {
-        return $this->addElement('close-tab', NULL);
+        $attributes = array('data-close-group-tab' => (int) $tabGroupClose);
+        return $this->addElement('close-tab', NULL, NULL, $attributes);
     }
 
     /**
      * @param null|string $value
      * @param array $attributes
+     * @param bool $accordion
+     * @param bool $selectAccordion
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapse($value = null, $attributes = array())
+    public function addCollapse($value = null, $attributes = array(), $accordion = false, $selectAccordion = false)
     {
+        $attributes = array_merge($attributes, array('data-group-accordion' => (int) $accordion, 'data-group-select-accordion' => (int) $selectAccordion));
         return $this->addElement('collapse', NULL, $value, $attributes);
     }
 
     /**
+     * @param bool $collapseGroupClose
      * @return $this
      * @author Joachim Doerr
      */
-    public function closeCollapse()
+    public function closeCollapse($collapseGroupClose = false)
     {
-        return $this->addElement('close-collapse', NULL);
+        $attributes = array('data-close-group-collapse' => (int) $collapseGroupClose);
+        return $this->addElement('close-collapse', NULL, NULL, $attributes);
     }
 
     /**
-     * @param null $callable
-     * @param array $parameter
-     * @author Joachim Doerr
-     * TODO bring it to run
+     * @param null|string $value
+     * @param array $attributes
+     * @param bool $selectAccordion
      * @return $this
-     *//*
-    public function callback($callable = NULL, $parameter = array())
+     * @author Joachim Doerr
+     */
+    public function addAccordion($value = null, $attributes = array(), $selectAccordion = false)
     {
-        //if ((is_string($callable) === true or is_array($callable) === true) && is_callable($callable, true) === true) {
-        //    $intId = $this->count++;
-        //    $this->elements[$intId] = array(
-        //        'type' => 'callback',
-        //        'id' => $intId,
-        //        'callable' => $callable,
-        //        'parameter' => $parameter
-        //    );
-        //}
-        return $this;
-    }*/
+        return $this->addCollapse($value, $attributes, true, $selectAccordion);
+    }
+
+    /**
+     * @param bool $accordionGroupClose
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function closeAccordion($accordionGroupClose = false)
+    {
+        return $this->closeCollapse($accordionGroupClose);
+    }
 
     /**
      * @param string $typ
