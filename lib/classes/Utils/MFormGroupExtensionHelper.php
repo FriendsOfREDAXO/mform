@@ -75,7 +75,7 @@ class MFormGroupExtensionHelper
                         $count = 1;
                         $groupCount++;
                         // open the new group before the group item will be add to the item list
-                        $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count);
+                        $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count, $item);
                     } else {
                         // close prev item
                         $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1));
@@ -125,7 +125,6 @@ class MFormGroupExtensionHelper
             // close final group after item close
             if ($closeGroup) {
                 $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
-                $groupCount++;
             }
         }
 
@@ -138,11 +137,30 @@ class MFormGroupExtensionHelper
         return $newItems;
     }
 
-    public static function createGroupItem($type, $tabGroup = 0, $tabCount = 0)
+    /**
+     * @param $type
+     * @param int $group
+     * @param int $groupCount
+     * @param MFormItem $item
+     * @return MFormItem
+     * @author Joachim Doerr
+     */
+    public static function createGroupItem($type, $group = 0, $groupCount = 0, MFormItem $item = null)
     {
         $newItem = new MFormItem();
+
+        if (!is_null($item) && is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+            $attributes = array();
+            foreach ($item->getAttributes() as $key => $value) {
+                if (strpos($key, "data-group-") !== false) {
+                    $attributes[$key] = $value;
+                }
+            }
+            $newItem->setAttributes($attributes);
+        }
+
         return $newItem->setType($type)
-            ->setGroupCount($tabCount)
-            ->setGroup($tabGroup);
+            ->setGroupCount($groupCount)
+            ->setGroup($group);
     }
 }
