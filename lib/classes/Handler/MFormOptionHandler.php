@@ -64,16 +64,19 @@ class MFormOptionHandler
      * set options form sql table as array to item
      * @param MFormItem $item
      * @param string $query
-     * @throws rex_sql_exception
      * @author Joachim Doerr
      */
     public static function setSqlOptions(MFormItem $item, $query)
     {
-        $sql = rex_sql::factory();
-        $sql->setQuery($query);
-        while ($sql->hasNext()) {
-            self::addOption($item, $sql->getValue('name'), $sql->getValue('id'));
-            $sql->next();
+        try {
+            $sql = rex_sql::factory();
+            $sql->setQuery($query);
+            while ($sql->hasNext()) {
+                self::addOption($item, $sql->getValue('name'), $sql->getValue('id'));
+                $sql->next();
+            }
+        } catch (\Exception $e) {
+            // TODO log error!
         }
     }
 }

@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.2.0
+
+
+
 ### Version 5.2.0 pre-release
 
 * Add Info Tooltip
