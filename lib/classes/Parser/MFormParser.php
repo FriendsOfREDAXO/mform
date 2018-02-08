@@ -13,50 +13,23 @@ class MFormParser
     protected $elements = array();
 
     /**
-     * @var bool
-     */
-    protected $fieldset = false;
-
-    /**
-     * @var bool
-     */
-    protected $collapse = false;
-
-    /**
-     * @var bool
-     */
-    protected $tab = false;
-
-    /**
-     * @var int
-     */
-    protected $tabGroup = 0;
-
-    /**
      * @var string
      * TODO use it later for custom theme in new MForm()
      */
     protected $theme;
 
     /**
-     * @var int
+     * @var bool
      */
-    protected $collapseCount = 0;
+    protected $acc = false;
 
     /**
-     * create the fieldset open element
-     * fieldset open
      * @param MFormItem $item
      * @return $this
      * @author Joachim Doerr
      */
     private function generateFieldset(MFormItem $item)
     {
-        // if it the first fieldset ? no close the parent
-        if ($this->fieldset === true) {
-            $this->closeFieldset();
-        }
-
         // set default class for r5 mform default theme
         MFormItemManipulator::setDefaultClass($item);
 
@@ -74,51 +47,136 @@ class MFormParser
 
         // add fieldset open element to elements list
         $this->elements[] = $this->parseElement($fieldsetElement, 'fieldset-open', true);
-        $this->fieldset = true; // fieldset is open
         return $this;
     }
 
     /**
-     * create the fieldset close element
-     * fieldset close
      * @return $this
      * @author Joachim Doerr
      */
     private function closeFieldset()
     {
-        // if fieldset property true
-        if ($this->fieldset === true) {
-            $this->fieldset = false; // fieldset is closed
-            // add fieldset close element to elements list
-            $this->elements[] = $this->parseElement(new MFormElement(), 'fieldset-close', true); // use parse element to load template file
+        $this->elements[] = $this->parseElement(new MFormElement(), 'fieldset-close', true); // use parse element to load template file
+        return $this;
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param int $key
+     * @param array $items
+     * @author Joachim Doerr
+     * @return MFormParser
+     */
+    private function generateTabGroup(MFormItem $item, $key, array $items)
+    {
+        $nav = array();
+
+        /** @var MFormItem $itm */
+        foreach ($items as $k => $itm) {
+            if ($k > $key && ($itm->getGroup() == $item->getGroup() && $itm->getType() == 'tab')) {
+                // add navigation item
+                $class = '';
+                $value = '';
+                $element = new MFormElement();
+                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount());
+
+                if (array_key_exists('tab-icon', $itm->getAttributes()))
+                    $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
+
+                $element->setValue($value . $itm->getValue());
+
+                if (array_key_exists('pull-right', $itm->getAttributes()))
+                    $class = 'pull-right';
+
+                if ($itm->getGroupCount()==1)
+                    $class .= ' active';
+
+                $element->setClass($class);
+
+                $nav[] = $this->parseElement($element, 'tabnavli', true); // use parse element to load template file
+            }
+        }
+
+        $element = new MFormElement();
+        $element->setElement(implode('', $nav))
+            ->setAttributes($this->parseAttributes($item->getAttributes()));
+
+        $this->elements[] = $this->parseElement($element, 'tabgroup-open', true); // use parse element to load template file
+        return $this;
+    }
+    /**
+     * @param MFormItem $item
+     * @author Joachim Doerr
+     * @return MFormParser
+     */
+    private function generateTab($item)
+    {
+        $element = new MFormElement();
+        $element->setId('tabg' . $item->getGroup() . 'tabid' . $item->getGroupCount());
+
+        if ($item->getGroupCount() == 1)
+            $element->setClass('active');
+
+        $this->elements[] = $this->parseElement($element, 'tab-open', true); // use parse element to load template file
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function closeTab()
+    {
+        $this->elements[] = $this->parseElement(new MFormElement(), 'tab-close', true); // use parse element to load template file
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function closeTabGroup()
+    {
+        $this->elements[] = $this->parseElement(new MFormElement(), 'tabgroup-close', true); // use parse element to load template file
+        return $this;
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param $key
+     * @param array $items
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function generateCollapseGroup(MFormItem $item, $key, array $items)
+    {
+        if (isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) {
+            $this->acc = true;
+            $element = new MFormElement();
+            $element->setAttributes($this->parseAttributes($item->getAttributes()))
+                ->setId('accgr' . $item->getGroup());
+            $this->elements[] = $this->parseElement($element, 'accordion-open', true); // use parse element to load template file
         }
         return $this;
     }
 
     /**
-     * create the collapse open element
-     * fieldset open
      * @param MFormItem $item
      * @return $this
      * @author Joachim Doerr
      */
     private function generateCollapse(MFormItem $item)
     {
-        // if it the first collapse ? no close the parent
-        if ($this->collapse === true) {
-            $this->closeCollapse();
-        }
-
         // is id in attr not set set an unique id
         if (!isset($item->getAttributes()['id'])) {
-            $this->collapseCount++;
-            $item->attributes['id'] = 'collapse_' . $this->collapseCount . '_' . uniqid();
+            $item->attributes['id'] = 'collapse_' . $item->groupCount . '_' . uniqid();
         }
 
         // create collapse open element
         $collapseElement = new MFormElement();
         $collapseElement->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to collapse element
-            ->setClass($item->getAttributes()['id'])
+        ->setClass($item->getAttributes()['id'])
             ->setId($item->getAttributes()['id']); // set collapse id
 
         // not class given set default button class
@@ -128,142 +186,46 @@ class MFormParser
 
         // create legend
         if (!empty($item->getValue())) {
+            $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '"' : '';
             $collapseButton= new MFormElement();
             $collapseButton->setClass($item->getClass())
-                ->setAttributes('data-toggle="collapse" data-target="#'.$item->getAttributes()['id'].'"')
+                ->setAttributes('data-toggle="collapse" data-target="#'.$item->getAttributes()['id'].'"' . $target)
                 ->setValue($item->getValue());
             $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse-button', true)); // add parsed legend to collapse element
         }
 
-        // add collapse open element to elements list
-        $this->elements[] = $this->parseElement($collapseElement, 'collapse-open', true);
-        $this->collapse = true; // collapse is open
-        return $this;
-    }
+        $collapseTemplate = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? 'accordion-collapse-open' : 'collapse-open';
 
-    /**
-     * create the collapse close element
-     * collapse close
-     * @return $this
-     * @author Joachim Doerr
-     */
-    private function closeCollapse()
-    {
-        // if collapse property true
-        if ($this->collapse === true) {
-            $this->collapse = false; // collapse is closed
-            // add collapse close element to elements list
-            $this->elements[] = $this->parseElement(new MFormElement(), 'collapse-close', true); // use parse element to load template file
-        }
+        // add collapse open element to elements list
+        $this->elements[] = $this->parseElement($collapseElement, $collapseTemplate, true);
         return $this;
     }
 
     /**
      * @param MFormItem $item
-     * @param $key
-     * @param MFormItem[] $items
+     * @return $this
      * @author Joachim Doerr
      */
-    private function generateTab($item, $key, $items)
+    private function closeCollapse(MFormItem $item)
     {
-        // close fieldset for open tab group
-        if ($this->fieldset) {
-            $this->closeFieldset();
-        }
-
-        // close collapse for open tab group
-        if ($this->collapse) {
-            $this->closeCollapse();
-        }
-
-        // is flag tab true
-        if ($this->tab) {
-            $this->closeTab(); // close open tab
-        }
-
-        if ($this->tabGroup == 0) {
-            // open tab group
-            $this->tabGroup = $item->getTabGroup();
-
-            $nav = array();
-            foreach ($items as $itm) {
-                if ($itm->getTabGroup() == $this->tabGroup && $itm->tabCount > 0) {
-                    $class = '';
-                    $value = '';
-                    $element = new MFormElement();
-                    $element->setId('tabg' . $itm->getTabGroup() . 'tabid' . $itm->getTabCount());
-
-                    if (array_key_exists('tab-icon', $itm->getAttributes()))
-                        $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
-
-                    $element->setValue($value . $itm->getValue());
-
-                    if (array_key_exists('pull-right', $itm->getAttributes()))
-                        $class = 'pull-right';
-
-                    if ($itm->getTabCount()==1)
-                        $class .= ' active';
-
-                    $element->setClass($class);
-
-                    $nav[] = $this->parseElement($element, 'tabnavli', true); // use parse element to load template file
-                }
-            }
-
-            $element = new MFormElement();
-            $element->setElement(implode('', $nav))
-                ->setAttributes($this->parseAttributes($item->getAttributes()));
-            $this->elements[] = $this->parseElement($element, 'tabgroup-open', true); // use parse element to load template file
-        }
-
-        // open tab
-        $element = new MFormElement();
-        $element->setId('tabg' . $item->getTabGroup() . 'tabid' . $item->getTabCount());
-
-        if ($item->getTabCount() == 1)
-            $element->setClass('active');
-
-        $this->elements[] = $this->parseElement($element, 'tab-open', true); // use parse element to load template file
-        $this->tab = true;
+        $collapseTemplate = ($this->acc) ? 'accordion-collapse-close' : 'collapse-close';
+        $this->elements[] = $this->parseElement(new MFormElement(), $collapseTemplate, true); // use parse element to load template file
+        return $this;
     }
 
     /**
-     * @param MFormItem|null $item
-     * @param int|null $key
-     * @param MFormItem[]|array $items
-     * @param bool $finalClose
+     * @param MFormItem $item
+     * @return $this
      * @author Joachim Doerr
      */
-    private function closeTab($item = null, $key = null, $items = array(), $finalClose = false)
+    private function closeCollapseGroup(MFormItem $item)
     {
-        // close open tab by flag
-        // next item is from our tab group
-        if ($this->tab) {
-            if ($this->fieldset) {
-                $this->closeFieldset();
-            }
-
-            if ($this->collapse) {
-                $this->closeCollapse();
-            }
-
-            $this->tab = false;
-            $this->elements[] = $this->parseElement(new MFormElement(), 'tab-close', true); // use parse element to load template file
+        if ($this->acc) {
+            $this->acc = false;
+            $this->elements[] = $this->parseElement(new MFormElement(), 'accordion-close', true); // use parse element to load template file
         }
 
-        // final? by item?
-        if (!is_null($item) &&
-            (
-                (isset($items[$key+1]) && $items[$key+1]->tabGroup != $this->tabGroup)
-                or (!isset($items[$key+1])) // close tab is latest element
-            ))
-            $finalClose = true;
-
-        // final close wrapper
-        if ($finalClose) {
-            $this->tabGroup = 0;
-            $this->elements[] = $this->parseElement(new MFormElement(), 'tabgroup-close', true); // use parse element to load template file
-        }
+        return $this;
     }
 
     /**
@@ -836,37 +798,52 @@ class MFormParser
             foreach ($items as $key => $item) {
 
                 switch ($item->getType()) {
-                    case 'close-fieldset':
-                        $this->closeFieldset();
-                        break;
+                    // FIELDSET
                     case 'fieldset':
                         $this->generateFieldset($item);
                         break;
-                    case 'close-tab':
-                        $this->closeTab($item, $key, $items);
+                    case 'close-fieldset':
+                        $this->closeFieldset();
+                        break;
+
+                    // TABS
+                    case 'start-group-tab':
+                        $this->generateTabGroup($item, $key, $items);
                         break;
                     case 'tab':
-                        $this->generateTab($item, $key, $items);
+                        $this->generateTab($item);
                         break;
-                    case 'close-collapse':
-                        $this->closeCollapse();
+                    case 'close-tab':
+                        $this->closeTab();
+                        break;
+                    case 'close-group-tab':
+                        $this->closeTabGroup();
+                        break;
+
+                    // COLLAPSE
+                    case 'start-group-collapse':
+                        $this->generateCollapseGroup($item, $key, $items);
                         break;
                     case 'collapse':
                         $this->generateCollapse($item);
                         break;
+                    case 'close-collapse':
+                        $this->closeCollapse($item);
+                        break;
+                    case 'close-group-collapse':
+                        $this->closeCollapseGroup($item);
+                        break;
+
+
                     case 'html':
                     case 'headline':
                     case 'description':
                     case 'alert':
                         $this->generateLineElement($item);
                         break;
-//                    case 'callback':
-//                        $this->getCallbackElement($item);
-//                        break;
                     case 'text':
                     case 'hidden':
                     case 'text-readonly':
-                    default:
                         $this->generateInputElement($item);
                         break;
                     case 'markitup':
@@ -900,42 +877,6 @@ class MFormParser
             }
         }
         return $this;
-    }
-
-    /**
-     * @param MFormItem[] $items
-     * @author Joachim Doerr
-     */
-    private function setTabExtensions($items){
-
-        $tabGroupCount = 0;
-        $tabCount = 0;
-        $tab = false;
-
-        // unset array keys
-        $items = array_values($items);
-
-        /** @var MFormItem $item */
-        foreach($items as $key => $item) { // key + 1 => count
-
-            if ($item->getType() == 'tab') {
-                if (!$tab) {
-                    $tabCount = 1;
-                    $tabGroupCount++;
-                    $tab = true;
-                }
-                // set tabgroup for tab
-                $item->setTabGroup($tabGroupCount);
-                $item->setTabCount($tabCount++);
-            }
-
-            // unset tab group is item tab close and next not tab open
-            if ($item->getType() == 'close-tab' && (count($items) >= ($key + 2) && $items[$key+1]->getType() != 'tab')) {
-                // set tabg roup for close element
-                $item->setTabGroup($tabGroupCount);
-                $tab = false;
-            }
-        }
     }
 
     /**
@@ -994,23 +935,14 @@ class MFormParser
             }
         }
 
-        $this->setTabExtensions($items);
+        $items = MFormGroupExtensionHelper::addTabGroupExtensionItems($items);
+        $items = MFormGroupExtensionHelper::addCollapseGroupExtensionItems($items);
+        $items = MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items);
+        $items = MFormGroupExtensionHelper::addFieldsetGroupExtensionItems($items);
+
+        dump($items);
+
         $this->parseFormFields($items);
-
-        // close tab
-        if ($this->tabGroup > 0 or $this->tab) {
-            $this->closeTab(null, null, array(), true);
-        }
-
-        // close collapse
-        if ($this->collapse) {
-            $this->closeCollapse();
-        }
-
-        // close fieldset
-        if ($this->fieldset) {
-            $this->closeFieldset();
-        }
 
         // show for debug items
         if ($debug) {
