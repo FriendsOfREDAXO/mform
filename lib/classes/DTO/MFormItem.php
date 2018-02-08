@@ -95,12 +95,12 @@ class MFormItem
     /**
      * @var integer
      */
-    public $tabGroup;
+    public $group;
 
     /**
      * @var integer
      */
-    public $tabCount;
+    public $groupCount;
 
     /**
      * @var string
@@ -435,18 +435,18 @@ class MFormItem
     /**
      * @return int
      */
-    public function getTabGroup()
+    public function getGroup()
     {
-        return $this->tabGroup;
+        return $this->group;
     }
 
     /**
-     * @param int $tabGroup
+     * @param int $group
      * @return $this
      */
-    public function setTabGroup($tabGroup)
+    public function setGroup($group)
     {
-        $this->tabGroup = $tabGroup;
+        $this->group = $group;
         return $this;
     }
 
@@ -454,19 +454,19 @@ class MFormItem
      * @return int
      * @author Joachim Doerr
      */
-    public function getTabCount()
+    public function getGroupCount()
     {
-        return $this->tabCount;
+        return $this->groupCount;
     }
 
     /**
-     * @param int $tabCount
+     * @param int $groupCount
      * @return $this
      * @author Joachim Doerr
      */
-    public function setTabCount($tabCount)
+    public function setGroupCount($groupCount)
     {
-        $this->tabCount = $tabCount;
+        $this->groupCount = $groupCount;
         return $this;
     }
 
