@@ -1,0 +1,148 @@
+<?php
+/**
+ * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @package redaxo5
+ * @license MIT
+ */
+
+class MFormGroupExtensionHelper
+{
+    /**
+     * @param MFormItem[] $items
+     * @return MFormItem[]
+     * @author Joachim Doerr
+     */
+    public static function addTabGroupExtensionItems(array $items)
+    {
+        return self::addGroupExtensionItems($items, 'tab');
+    }
+
+    /**
+     * @param MFormItem[] $items
+     * @return MFormItem[]
+     * @author Joachim Doerr
+     */
+    public static function addFieldsetGroupExtensionItems(array $items)
+    {
+        return self::addGroupExtensionItems($items, 'fieldset');
+    }
+
+    /**
+     * @param MFormItem[] $items
+     * @return MFormItem[]
+     * @author Joachim Doerr
+     */
+    public static function addCollapseGroupExtensionItems(array $items)
+    {
+        return self::addGroupExtensionItems($items, 'collapse');
+    }
+
+    /**
+     * @param MFormItem[] $items
+     * @return MFormItem[]
+     * @author Joachim Doerr
+     */
+    public static function addAccordionGroupExtensionItems(array $items)
+    {
+        return self::addGroupExtensionItems($items, 'accordion');
+    }
+
+    /**
+     * @param array $items
+     * @param string $type
+     * @return array
+     * @author Joachim Doerr
+     */
+    private static function addGroupExtensionItems(array $items, $type)
+    {
+        $newItems = array();
+        $groupCount = 0;
+        $count = 1;
+        $group = false;
+
+        /** @var MFormItem $item */
+        foreach ($items as $key => $item) {
+
+            $setItem = true;
+            $closeGroup = false;
+
+            switch ($item->getType()) {
+                case $type:
+                    $count++;
+
+                    if (!$group) {
+                        $group = true;
+                        $count = 1;
+                        $groupCount++;
+                        // open the new group before the group item will be add to the item list
+                        $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count);
+                    } else {
+                        // close prev item
+                        $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1));
+                    }
+
+                    // add group counts
+                    $item->setGroup($groupCount)
+                        ->setGroupCount($count);
+
+                    break;
+                case 'close-' . $type:
+
+                    // add group counts
+                    $item->setGroup($groupCount)
+                        ->setGroupCount($groupCount);
+
+                    if (!$group) {
+                        // is not group detected break and don't set the item
+                        $setItem = false;
+                        break;
+                    } else {
+                        // group is finish
+                        $group = false;
+
+                        if (isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1) {
+                            // group will be closed
+                            $closeGroup = true;
+                        }
+                    }
+
+                    break;
+            }
+
+            // in list is a close item that is not form the same type -> close before you ar in an other list
+            if ($group && strpos($item->getType(), "close-") !== false && $item->getType() != "close-$type") {
+                $group = false;
+                $closeGroup = false;
+                $newItems[] = self::createGroupItem("close-$type", $groupCount, $count);
+                $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
+            }
+
+            // set the item into the new item list
+            if ($setItem) {
+                $newItems[] = $item;
+            }
+
+            // close final group after item close
+            if ($closeGroup) {
+                $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
+                $groupCount++;
+            }
+        }
+
+        // group and item was not closed do it now
+        if ($group) {
+            $newItems[] = self::createGroupItem("close-$type", $groupCount, $count);
+            $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
+        }
+
+        return $newItems;
+    }
+
+    public static function createGroupItem($type, $tabGroup = 0, $tabCount = 0)
+    {
+        $newItem = new MFormItem();
+        return $newItem->setType($type)
+            ->setGroupCount($tabCount)
+            ->setGroup($tabGroup);
+    }
+}
