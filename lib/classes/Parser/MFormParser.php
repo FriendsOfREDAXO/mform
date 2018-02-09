@@ -940,8 +940,6 @@ class MFormParser
         $items = MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addFieldsetGroupExtensionItems($items);
 
-        dump($items);
-
         $this->parseFormFields($items);
 
         // show for debug items
