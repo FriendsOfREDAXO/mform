@@ -112,7 +112,7 @@ class MFormParser
     private function generateTab($item)
     {
         $element = new MFormElement();
-        $element->setId('tabg' . $item->getGroup() . 'tabid' . $item->getGroupCount());
+        $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount());
 
         if ($item->getGroupCount() == 1)
             $element->setClass('active');
