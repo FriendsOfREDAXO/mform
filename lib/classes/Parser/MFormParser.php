@@ -88,7 +88,7 @@ class MFormParser
                 if (array_key_exists('pull-right', $itm->getAttributes()))
                     $class = 'pull-right';
 
-                if ($itm->getGroupCount()==1)
+                if ($itm->getGroupCount() == 1)
                     $class .= ' active';
 
                 $element->setClass($class);
@@ -104,6 +104,7 @@ class MFormParser
         $this->elements[] = $this->parseElement($element, 'tabgroup-open', true); // use parse element to load template file
         return $this;
     }
+
     /**
      * @param MFormItem $item
      * @author Joachim Doerr
@@ -174,23 +175,28 @@ class MFormParser
         // create collapse open element
         $collapseElement = new MFormElement();
         $collapseElement->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to collapse element
-        ->setClass($item->getAttributes()['id'])
             ->setId($item->getAttributes()['id']); // set collapse id
+
+        if (array_key_exists('data-group-collapse', $item->getAttributes())) {
+            $collapseElement->setClass($item->getAttributes()['data-group-collapse']);
+        }
 
         // not class given set default button class
         if (empty($item->getClass())) {
             $item->setClass('btn btn-white btn-block');
         }
 
-        // create legend
-        if (!empty($item->getValue())) {
-            $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . $_SESSION['mform_count'] .  '"' : '';
-            $collapseButton= new MFormElement();
-            $collapseButton->setClass($item->getClass())
-                ->setAttributes('data-toggle="collapse" data-target="#'.$item->getAttributes()['id'].'"' . $target)
-                ->setValue($item->getValue());
-            $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse-button', true)); // add parsed legend to collapse element
+        if (empty($item->getValue())) {
+            $item->setClass($item->getClass() . ' hidden');
         }
+
+        $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . $_SESSION['mform_count'] . '"' : '';
+        $collapseButton = new MFormElement();
+        $collapseButton->setClass($item->getClass())
+            ->setAttributes('data-toggle="collapse" data-target="#' . $item->getAttributes()['id'] . '"' . $target)
+            ->setValue($item->getValue());
+
+        $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse-button', true)); // add parsed legend to collapse element
 
         $collapseTemplate = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? 'accordion-collapse-open' : 'collapse-open';
 
@@ -281,15 +287,15 @@ class MFormParser
 
         // datalist?
         if ($item->getOptions()) {
-            $item->setAttributes(array_merge($item->getAttributes(), array('list' => 'list'.$item->getId())));
+            $item->setAttributes(array_merge($item->getAttributes(), array('list' => 'list' . $item->getId())));
 
             $optionElements = '';
             foreach ($item->getOptions() as $key => $value) {
-                $optionElements .= $this->createOptionElement($item, $value, (!is_integer($key))?"label=\"$key\"":'', 'datalist-option', false);
+                $optionElements .= $this->createOptionElement($item, $value, (!is_integer($key)) ? "label=\"$key\"" : '', 'datalist-option', false);
             }
             $element = new MFormElement();
             $element->setOptions($optionElements)
-                ->setId('list'.$item->getId());
+                ->setId('list' . $item->getId());
             $datalist = $this->parseElement($element, 'datalist', true);
         }
 
@@ -479,8 +485,8 @@ class MFormParser
     {
         // create element
         $element = new MFormElement();
-        $element->setValue($key) // set option key
-            ->setLabel($value); // set option label
+        $element->setValue($key)// set option key
+        ->setLabel($value); // set option label
 
         $itemValue = $item->getValue();
 
@@ -522,13 +528,13 @@ class MFormParser
         if (sizeof($item->getOptions()) > 0) {
             // is multiple flag true
             // if ($item->isMultiple()) {
-                // TODO add hidden field and javascript and so fare
-                // TODO add text element
+            // TODO add hidden field and javascript and so fare
+            // TODO add text element
             // } else {
-                foreach ($item->getOptions() as $key => $value) {
-                    $checkboxElements .= $this->createCheckElement($item, $key, $value); // create element by helper
-                    break;
-                }
+            foreach ($item->getOptions() as $key => $value) {
+                $checkboxElements .= $this->createCheckElement($item, $key, $value); // create element by helper
+                break;
+            }
             //}
         }
 
@@ -657,7 +663,7 @@ class MFormParser
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
 
-        $item->setId(str_replace(array('_',']','['),'', rand(100,999) . $item->getVarId()));
+        $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));
 
         // create templateElement object
         $templateElement = new MFormElement();
@@ -732,14 +738,14 @@ class MFormParser
                             }
                         }
                         if (($childNode->hasAttribute('class')
-                            && $childNode->getAttribute('class') == 'form-control')
+                                && $childNode->getAttribute('class') == 'form-control')
                             && ($childNode->hasAttribute('value')
-                            && $childNode->getAttribute('value') == '')) {
+                                && $childNode->getAttribute('value') == '')) {
                             $childNode->setAttribute('value', $item->getValue());
                         }
                     }
                     // $html = utf8_encode($divItem->C14N(false,true));
-                    $html = $divItem->C14N(false,true);
+                    $html = $divItem->C14N(false, true);
                     break;
                 }
             }
@@ -930,11 +936,11 @@ class MFormParser
             MFormThemeHelper::themeBootCheck($theme);
             // add css
             // use theme helper class
-            if(sizeof(MFormThemeHelper::getCssAssets($this->theme)) > 0) {
+            if (sizeof(MFormThemeHelper::getCssAssets($this->theme)) > 0) {
                 // foreach all css files
                 foreach (MFormThemeHelper::getCssAssets($this->theme) as $css) {
                     // add assets css file
-                   $this->elements[] = '<link rel="stylesheet" type="text/css" media="all" href="' . rex_url::addonAssets('mform', $css) . '?v=' . rex_addon::get('mform')->getVersion() . '" />';
+                    $this->elements[] = '<link rel="stylesheet" type="text/css" media="all" href="' . rex_url::addonAssets('mform', $css) . '?v=' . rex_addon::get('mform')->getVersion() . '" />';
                 }
             }
         }
@@ -993,7 +999,7 @@ class MFormParser
     private function parseElement(MFormElement $element, $templateType, $subPath = false)
     {
         return str_replace(
-            array_merge(array(' />'),$element->getKeys()),
+            array_merge(array(' />'), $element->getKeys()),
             array_merge(array('/>'), $element->getValues()),
             MFormTemplateFileProvider::loadTemplate($templateType, ($subPath) ? MFormTemplateFileProvider::ELEMENTS_PATH : '', $this->theme));
     }
