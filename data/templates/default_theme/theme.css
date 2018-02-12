@@ -191,3 +191,7 @@
 .mform a.mblock-info-tooltip {
     margin-left: 7px;
 }
+
+.mform .panel-group[data-group-hide-toggle-links=true] .panel > a[data-toggle=collapse] {
+    display: none;
+}

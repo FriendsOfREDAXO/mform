@@ -36,6 +36,7 @@ class MForm extends MFormElements
      */
     public function show()
     {
+        $_SESSION['mform_count']++;
         // init obj
         $parser = new MFormParser();
         // parse elements

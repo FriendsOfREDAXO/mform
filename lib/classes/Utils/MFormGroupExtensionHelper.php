@@ -59,6 +59,7 @@ class MFormGroupExtensionHelper
         $groupCount = 0;
         $count = 1;
         $group = false;
+        $selectGroup = false;
 
         /** @var MFormItem $item */
         foreach ($items as $key => $item) {
@@ -67,6 +68,11 @@ class MFormGroupExtensionHelper
             $closeGroup = false;
 
             switch ($item->getType()) {
+                case 'select':
+                    if (array_key_exists('data-toggle', $item->getAttributes())) {
+                        $selectGroup = $item->getAttributes();
+                    }
+                    break;
                 case $type:
                     $count++;
 
@@ -75,7 +81,21 @@ class MFormGroupExtensionHelper
                         $count = 1;
                         $groupCount++;
                         // open the new group before the group item will be add to the item list
+
+                        if (is_array($selectGroup)) {
+
+                            $mergeArray = array('data-group-select-accordion' => ($selectGroup['data-toggle'] == 'accordion') ? 'true' : 'false');
+
+                            if (array_key_exists('hide-toggle-links', $selectGroup)) {
+                                $mergeArray['data-group-hide-toggle-links'] = ($selectGroup['hide-toggle-links']) ? 'true' : 'false';
+                            }
+
+                            $item->setAttributes(array_merge($item->getAttributes(), $selectGroup, $mergeArray));
+                            $selectGroup = false;
+                        }
+
                         $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count, $item);
+
                     } else {
                         // close prev item
                         $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1));

@@ -78,7 +78,7 @@ class MFormParser
                 $class = '';
                 $value = '';
                 $element = new MFormElement();
-                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount());
+                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . $_SESSION['mform_count']);
 
                 if (array_key_exists('tab-icon', $itm->getAttributes()))
                     $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
@@ -112,7 +112,7 @@ class MFormParser
     private function generateTab($item)
     {
         $element = new MFormElement();
-        $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount());
+        $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount() . '_' . $_SESSION['mform_count']);
 
         if ($item->getGroupCount() == 1)
             $element->setClass('active');
@@ -144,18 +144,16 @@ class MFormParser
 
     /**
      * @param MFormItem $item
-     * @param $key
-     * @param array $items
      * @return $this
      * @author Joachim Doerr
      */
-    private function generateCollapseGroup(MFormItem $item, $key, array $items)
+    private function generateCollapseGroup(MFormItem $item)
     {
         if (isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) {
             $this->acc = true;
             $element = new MFormElement();
             $element->setAttributes($this->parseAttributes($item->getAttributes()))
-                ->setId('accgr' . $item->getGroup());
+                ->setId('accgr' . $item->getGroup() . '_' . $_SESSION['mform_count']);
             $this->elements[] = $this->parseElement($element, 'accordion-open', true); // use parse element to load template file
         }
         return $this;
@@ -170,7 +168,7 @@ class MFormParser
     {
         // is id in attr not set set an unique id
         if (!isset($item->getAttributes()['id'])) {
-            $item->attributes['id'] = 'collapse_' . $item->groupCount . '_' . uniqid();
+            $item->attributes['id'] = 'colgr' . $item->getGroup() . 'colid' . $item->getGroupCount() . '_' . $_SESSION['mform_count'];
         }
 
         // create collapse open element
@@ -186,7 +184,7 @@ class MFormParser
 
         // create legend
         if (!empty($item->getValue())) {
-            $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '"' : '';
+            $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . $_SESSION['mform_count'] .  '"' : '';
             $collapseButton= new MFormElement();
             $collapseButton->setClass($item->getClass())
                 ->setAttributes('data-toggle="collapse" data-target="#'.$item->getAttributes()['id'].'"' . $target)
@@ -822,7 +820,7 @@ class MFormParser
 
                     // COLLAPSE
                     case 'start-group-collapse':
-                        $this->generateCollapseGroup($item, $key, $items);
+                        $this->generateCollapseGroup($item);
                         break;
                     case 'collapse':
                         $this->generateCollapse($item);
@@ -887,9 +885,11 @@ class MFormParser
     private function createLabelElement(MFormItem $item)
     {
         $this->createTooltipElement($item);
+
         $label = new MFormElement();
         $label->setId($item->getId())
             ->setValue($item->getLabel());
+
         return $label;
     }
 
@@ -902,9 +902,13 @@ class MFormParser
         // set tooltip
         if ($item->getInfoTooltip()) {
             // parse tooltip
+            if (empty($item->getInfoTooltipIcon()))
+                $item->setInfoTooltipIcon('fa-exclamation');
+
             $tooltip = new MFormElement();
             $tooltip->setValue($item->getInfoTooltip())
                 ->setInfoTooltipIcon($item->getInfoTooltipIcon());
+
             $item->setLabel($item->getLabel() . $this->parseElement($tooltip, 'tooltip-info', true));
         }
     }
@@ -940,12 +944,12 @@ class MFormParser
         $items = MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addFieldsetGroupExtensionItems($items);
 
-        $this->parseFormFields($items);
-
         // show for debug items
         if ($debug) {
             dump($items);
         }
+
+        $this->parseFormFields($items);
 
         // wrap elements
         $element = new MFormElement();

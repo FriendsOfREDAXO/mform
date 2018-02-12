@@ -232,13 +232,15 @@ class MFormElements
      * @param null|string $value
      * @param array $attributes
      * @param bool $accordion
-     * @param bool $selectAccordion
+     * @param bool $hideToggleLinks
+     * @param int $openCollapse
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapse($value = null, $attributes = array(), $accordion = false, $selectAccordion = false)
+    public function addCollapse($value = null, $attributes = array(), $accordion = false, $hideToggleLinks = false, $openCollapse = 0)
     {
-        $attributes = array_merge($attributes, array('data-group-accordion' => (int) $accordion, 'data-group-select-accordion' => (int) $selectAccordion));
+        $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
+        $attributes = array_merge($attributes, array('data-group-accordion' => (int) $accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse));
         return $this->addElement('collapse', NULL, $value, $attributes);
     }
 
@@ -255,14 +257,14 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param array $attributes
-     * @param bool $selectAccordion
+     * @param bool $hideToggleLinks
+     * @param int $openCollapse
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAccordion($value = null, $attributes = array(), $selectAccordion = false)
+    public function addAccordion($value = null, $hideToggleLinks = false, $openCollapse = 0)
     {
-        return $this->addCollapse($value, $attributes, true, $selectAccordion);
+        return $this->addCollapse($value, array(), true, $hideToggleLinks, $openCollapse);
     }
 
     /**
