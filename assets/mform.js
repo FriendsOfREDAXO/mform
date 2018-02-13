@@ -11,10 +11,11 @@ $(function () {
 function mform_init() {
     var mform = $('.mform');
 
-    mform.find('[data-toggle="tooltip"]').tooltip();
-
+    // init tooltip
+    initMFormTooltip(mform);
     // init toggle
-    initMFormToggle();
+    initMFormToggle(mform);
+
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
         var custom_link = mform.find('.custom-link'),
@@ -27,34 +28,148 @@ function mform_init() {
             mform_tabs();
         }
     }
+
     // init mform collapse
-    initMFormCollapseData();
-}
+    initMFormCollapseData(mform);
 
-function initMFormCollapseData() {
-    $('input[data-toggle=collapse]').each(function(){
-        // initial
-        mFormCollapseToggle($(this));
-        // on change
-        $(this).change(function(){
-            mFormCollapseToggle($(this));
+    if (typeof mblock_module !== 'undefined') {
+        mblock_module.registerCallback('reindex_end', function () {
+            initMForm4Mblock(mform);
         });
-    });
-}
-
-function mFormCollapseToggle($element) {
-    var collapse_class = $element.attr('data-target');
-    collapse_class = collapse_class.replace('#','.');
-
-    if($element.prop('checked')) {
-        $(collapse_class).collapse('show');
-    } else {
-        $(collapse_class).collapse('hide')
     }
 }
 
-function initMFormToggle() {
-    $('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle('destroy').bootstrapMFormToggle();
+function initMForm4Mblock(mform) {
+    // init tooltip
+    initMFormTooltip(mform);
+    // init toggle
+    initMFormToggle(mform);
+    // init collapse
+    initMFormCollapseData(mform, true);
+}
+
+function initMFormCollapseData(mform, reinit) {
+    mform.find('input[data-toggle=collapse]').each(function () {
+        // initial
+        initMFormCollapseToggle($(this), true);
+        // on change
+        $(this).unbind().bind("change", function () {
+            initMFormCollapseToggle($(this), false);
+        });
+    });
+
+    mform.find('select[data-toggle=accordion]').each(function () {
+        initMFormSelectAccordionToggle($(this), true, reinit);
+        // on change
+        $(this).unbind().bind("change", function () {
+            initMFormSelectAccordionToggle($(this), false, false);
+        });
+    });
+
+    mform.find('.panel-group[data-group-select-accordion=false]').each(function () {
+        initMFormAccordionToggle($(this), reinit);
+    });
+}
+
+function initMFormAccordionToggle($element, reinit) {
+    var opened = false;
+
+    $element.find('.collapse').each(function () {
+        if ($(this).hasClass('in')) {
+            opened = true;
+        }
+    });
+
+    if (!opened && $element.attr('data-group-open-collapse') > 0) {
+        $element.find('.collapse').each(function (index) {
+            if ((index+1) == $element.attr('data-group-open-collapse')) {
+                $(this).addClass('in');
+            }
+        });
+    }
+}
+
+function initMFormSelectAccordionToggle($element, init, reinit) {
+    var acc = $element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
+
+    if (init && acc.length) {
+        $element.find('option').remove();
+
+        if (!$.isNumeric($element.attr('data-selected')) && acc.attr('data-group-open-collapse') > 0) {
+            $element.attr('data-selected', (acc.attr('data-group-open-collapse')));
+        }
+
+        if (acc.attr('data-group-open-collapse') == 0) {
+            $element.append('<option value="" selected="selected">' + $element.attr('data-group-selected-text') + '</option>');
+        }
+
+        acc.find('a[data-toggle=collapse]').each(function (index) {
+            var togglecollapse = $(this),
+                indexId = (index + 1),
+                target = togglecollapse.attr('data-target');
+
+            $element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '">' + togglecollapse.text() + '</option>');
+            togglecollapse.attr('data-index', indexId);
+
+            if (reinit) {
+                $(target).removeClass('in');
+            }
+
+            if ($.isNumeric($element.attr('data-selected')) && $element.attr('data-selected') == indexId) {
+                $element.find('option[value=' + indexId + ']').attr('selected', 'selected');
+                $(target).addClass('in').css('height','');
+            }
+        });
+    }
+
+    if (acc.length) {
+
+        var selected = $element.find(':selected'),
+            target = selected.attr('data-target');
+
+        if (!selected.length) {
+            target = $('a[data-index="' + $element.attr('data-selected') + '"]').attr('data-target');
+        } else {
+            $element.attr('data-selected', selected.attr('value'));
+        }
+
+        if (!$(target).hasClass('in') && !init) {
+            $target_elem = $('a[data-target="' + target + '"]');
+            $target_elem.trigger('click');
+        }
+    }
+}
+
+function initMFormCollapseToggle($element, init) {
+    var collapse_class = $element.attr('data-target');
+    collapse_class = collapse_class.replace('#', '.');
+
+    if (init && collapse_class.length) {
+        $(collapse_class).addClass('in');
+    }
+
+    if (init) {
+        if ($element.prop('checked')) {
+            $(collapse_class).addClass('in');
+        } else {
+            $(collapse_class).removeClass('in');
+        }
+    } else {
+        if ($element.prop('checked')) {
+            $(collapse_class).collapse('show');
+        } else {
+            $(collapse_class).collapse('hide')
+        }
+    }
+}
+
+function initMFormTooltip(mform) {
+    mform.tooltip('destroy');
+    mform.find('[data-toggle="tooltip"]').tooltip();
+}
+
+function initMFormToggle(mform) {
+    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle('destroy').bootstrapMFormToggle();
 }
 
 function mform_tabs() {
@@ -70,7 +185,7 @@ function mform_tabs() {
 }
 
 function mform_custom_link(item) {
-    item.each(function(){
+    item.each(function () {
         var $id = $(this).data('id'),
             $clang = $(this).data('clang'),
             media_button = $(this).find('a#mform_media_' + $id),
@@ -84,7 +199,7 @@ function mform_custom_link(item) {
 
         media_button.unbind().bind('click', function () {
             hidden_show_media(hidden_input, showed_input, $id);
-            openREXMedia($id,'');
+            openREXMedia($id, '');
             return false;
         });
         link_button.unbind().bind('click', function () {
@@ -130,16 +245,16 @@ function mform_custom_link(item) {
 function hidden_show_media(hidden_input, showed_input, id) {
     if (hidden_input.attr('type') != 'text') {
         hidden_input.data('link_id', hidden_input.attr('id'));
-        hidden_input.attr('id','REX_MEDIA_' + id);
-        showed_input.val('').attr('type','hidden');
-        hidden_input.val('').attr('type','text');
+        hidden_input.attr('id', 'REX_MEDIA_' + id);
+        showed_input.val('').attr('type', 'hidden');
+        hidden_input.val('').attr('type', 'text');
     }
 }
 
 function show_hidden_link(hidden_input, showed_input) {
     if (hidden_input.attr('type') == 'text') {
         hidden_input.attr('id', hidden_input.data('link_id'));
-        showed_input.val('').attr('type','text');
-        hidden_input.val('').attr('type','hidden');
+        showed_input.val('').attr('type', 'text');
+        hidden_input.val('').attr('type', 'hidden');
     }
 }
