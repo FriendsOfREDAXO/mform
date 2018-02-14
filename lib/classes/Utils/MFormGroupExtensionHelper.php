@@ -59,7 +59,7 @@ class MFormGroupExtensionHelper
         $groupCount = 0;
         $count = 1;
         $group = false;
-        $selectGroup = false;
+        $toggleAttributes = false;
 
         /** @var MFormItem $item */
         foreach ($items as $key => $item) {
@@ -68,9 +68,15 @@ class MFormGroupExtensionHelper
             $closeGroup = false;
 
             switch ($item->getType()) {
+                case 'checkbox':
+                    if (array_key_exists('data-toggle', $item->getAttributes())) {
+                        $toggleAttributes = $item->getAttributes();
+                        unset($toggleAttributes['data-mform-toggle']);
+                    }
+                    break;
                 case 'select':
                     if (array_key_exists('data-toggle', $item->getAttributes())) {
-                        $selectGroup = $item->getAttributes();
+                        $toggleAttributes = $item->getAttributes();
                     }
                     break;
                 case $type:
@@ -82,16 +88,16 @@ class MFormGroupExtensionHelper
                         $groupCount++;
                         // open the new group before the group item will be add to the item list
 
-                        if (is_array($selectGroup)) {
+                        if (is_array($toggleAttributes)) {
 
-                            $mergeArray = array('data-group-select-accordion' => ($selectGroup['data-toggle'] == 'accordion') ? 'true' : 'false');
+                            $mergeArray = array('data-group-select-accordion' => ($toggleAttributes['data-toggle'] == 'accordion') ? 'true' : 'false');
 
-                            if (array_key_exists('hide-toggle-links', $selectGroup)) {
-                                $mergeArray['data-group-hide-toggle-links'] = ($selectGroup['hide-toggle-links']) ? 'true' : 'false';
+                            if (array_key_exists('hide-toggle-links', $toggleAttributes)) {
+                                $mergeArray['data-group-hide-toggle-links'] = ($toggleAttributes['hide-toggle-links']) ? 'true' : 'false';
                             }
 
-                            $item->setAttributes(array_merge($item->getAttributes(), $selectGroup, $mergeArray));
-                            $selectGroup = false;
+                            $item->setAttributes(array_merge($item->getAttributes(), $toggleAttributes, $mergeArray));
+                            $toggleAttributes = false;
                         }
 
                         $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count, $item);
