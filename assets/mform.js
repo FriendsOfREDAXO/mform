@@ -141,24 +141,32 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
 }
 
 function initMFormCollapseToggle($element, init) {
-    var collapse_class = $element.attr('data-target');
-    collapse_class = collapse_class.replace('#', '.');
+    var target = $element.attr('data-target');
 
-    if (init && collapse_class.length) {
-        $(collapse_class).addClass('in');
+    if (!$element.attr('data-target')) {
+        var form_group = $element.parents('.form-group'),
+            next_link = form_group.nextAll('a[data-toggle=collapse]');
+
+        if (next_link.attr('data-target')) {
+            target = next_link.attr('data-target');
+        }
+    }
+
+    if (init && target.length) {
+        $(target).addClass('in');
     }
 
     if (init) {
         if ($element.prop('checked')) {
-            $(collapse_class).addClass('in');
+            $(target).addClass('in');
         } else {
-            $(collapse_class).removeClass('in');
+            $(target).removeClass('in');
         }
     } else {
         if ($element.prop('checked')) {
-            $(collapse_class).collapse('show');
+            $(target).collapse('show');
         } else {
-            $(collapse_class).collapse('hide')
+            $(target).collapse('hide')
         }
     }
 }
@@ -169,6 +177,14 @@ function initMFormTooltip(mform) {
 }
 
 function initMFormToggle(mform) {
+    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').each(function(){
+        var parent = $(this).parent();
+        if (parent.hasClass('mform-toggle')) {
+            $(this).clone(false).insertBefore(parent);
+            parent.remove();
+        }
+    });
+
     mform.find('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle('destroy').bootstrapMFormToggle();
 }
 
