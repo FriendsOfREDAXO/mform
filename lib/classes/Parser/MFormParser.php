@@ -186,7 +186,7 @@ class MFormParser
             $item->setClass('btn btn-white btn-block');
         }
 
-        if (empty($item->getValue())) {
+        if (empty($item->getValue()) or (array_key_exists('data-group-hide-toggle-links', $item->getAttributes()) && $item->getAttributes()['data-group-hide-toggle-links'] == 'true')) {
             $item->setClass($item->getClass() . ' hidden');
         }
 
