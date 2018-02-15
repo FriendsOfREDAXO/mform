@@ -153,21 +153,49 @@ function initMFormCollapseToggle($element, init) {
     }
 
     if (init && target.length) {
-        $(target).addClass('in');
+        collapseClass(target, 'add');
     }
 
     if (init) {
         if ($element.prop('checked')) {
-            $(target).addClass('in');
+            collapseClass(target, 'add');
         } else {
-            $(target).removeClass('in');
+            collapseClass(target, 'remove');
         }
     } else {
         if ($element.prop('checked')) {
-            $(target).collapse('show');
+            collapseToogle(target, 'show');
         } else {
-            $(target).collapse('hide')
+            collapseToogle(target, 'hide');
         }
+    }
+}
+
+function collapseToogle(target, type) {
+    if (target.length) {
+        $(target).each(function(){
+            var element = $(this);
+            if ($(this).attr('data-target')) {
+                element = $(this).next();
+            }
+            element.collapse(type);
+        });
+    }
+}
+
+function collapseClass(target, type) {
+    if (target.length) {
+        $(target).each(function(){
+            var element = $(this);
+            if ($(this).attr('data-target')) {
+                element = $(this).next();
+            }
+            if (type == 'add') {
+                element.addClass('in');
+            } else {
+                element.removeClass('in');
+            }
+        });
     }
 }
 
