@@ -7,6 +7,12 @@
 
 class MFormPageHelper
 {
+    /**
+     * @param $type
+     * @return string
+     * @throws rex_exception
+     * @author Joachim Doerr
+     */
     public static function exchangeExamples($type)
     {
         $return = '';

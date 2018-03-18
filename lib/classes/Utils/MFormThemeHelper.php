@@ -9,6 +9,7 @@ class MFormThemeHelper
 {
     /**
      * @return array
+     * @author Joachim Doerr
      */
     public static function getThemesInformation()
     {
@@ -45,6 +46,9 @@ class MFormThemeHelper
         return $themeInfo;
     }
 
+    /**
+     * @author Joachim Doerr
+     */
     public static function copyThemeCssToAssets()
     {
         // copy all theme css files to assets folder
@@ -58,6 +62,11 @@ class MFormThemeHelper
         }
     }
 
+    /**
+     * @param $theme
+     * @return array
+     * @author Joachim Doerr
+     */
     public static function getCssAssets($theme)
     {
         $themeInfo = self::getThemesInformation();
@@ -70,6 +79,10 @@ class MFormThemeHelper
         return $cssList;
     }
 
+    /**
+     * @param $theme
+     * @author Joachim Doerr
+     */
     public static function themeBootCheck($theme)
     {
         $themeInfo = self::getThemesInformation();
