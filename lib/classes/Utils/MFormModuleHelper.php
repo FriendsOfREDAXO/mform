@@ -7,6 +7,9 @@
 
 class MFormModuleHelper
 {
+    /**
+     * @var array
+     */
     public static $msg = array();
 
     /**
@@ -16,24 +19,24 @@ class MFormModuleHelper
     public static function createDefaultRedactor2Profiles()
     {
         $msg = '';
-        $msg .= self::createRedactor2Profile('default_1', 'Accordion-Modul Text-config', 150, 250, 'relative',
+        $msg .= self::createRedactor2Profile('default_1', 'Default 1 Text-config', 150, 250, 'relative',
 
-            'paragraph,alignment,blockquote,bold,italic,underline,deleted,cleaner,fontsize[100%|120%|140%],grouplink[email|external|internal|media],orderedlist,unorderedlist'
-
-        );
-        $msg .= self::createRedactor2Profile('default_2', 'Accordion-Modul Text-config', 150, 250, 'relative',
-
-            'groupheading[2|3|4],paragraph,alignment,blockquote,bold,cleaner,fullscreen,grouplink[email|external|internal|media],media,grouplist[unorderedlist|orderedlist|indent|outdent],horizontalrule,source'
+            'paragraph,alignment,blockquote,bold,italic,underline,deleted,cleaner,fontsize[100%|120%|140%],grouplink[email|external|internal|media],orderedlist,unorderedlist,source'
 
         );
-        $msg .= self::createRedactor2Profile('default_limit_1', 'Lead-Text Text-config', 100, 200, 'relative',
+        $msg .= self::createRedactor2Profile('default_2', 'Default 2 Text-config', 150, 250, 'relative',
 
-            'paragraph,alignment,bold,italic,underline,deleted,cleaner,grouplink[email|external|internal|media]'
+            'groupheading[2|3|4],paragraph,alignment,blockquote,bold,italic,underline,deleted,cleaner,fontsize[100%|120%|140%],grouplink[email|external|internal|media],media,grouplist[unorderedlist|orderedlist|indent|outdent],horizontalrule,source,fullscreen'
 
         );
-        $msg .= self::createRedactor2Profile('default_limit_2', 'Default-Limit-2 Text-config', 150, 250, 'relative',
+        $msg .= self::createRedactor2Profile('default_limit_1', 'Default Limit 1 Text-config', 100, 200, 'relative',
 
-            'paragraph,alignment,bold,italic,underline,deleted,cleaner,fontsize[100%|120%|140%],grouplink[email|external|internal|media]'
+            'paragraph,alignment,bold,italic,underline,deleted,cleaner,grouplink[email|external|internal|media],source'
+
+        );
+        $msg .= self::createRedactor2Profile('default_limit_2', 'Default Limit 2 Text-config', 150, 250, 'relative',
+
+            'paragraph,alignment,bold,italic,underline,deleted,cleaner,fontsize[100%|120%|140%],grouplink[email|external|internal|media],source'
 
         );
         return $msg;
