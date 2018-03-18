@@ -103,7 +103,7 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
             $element.append('<option value="" selected="selected">' + $element.attr('data-group-selected-text') + '</option>');
         }
 
-        acc.find('a[data-toggle=collapse]').each(function (index) {
+        acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
             var togglecollapse = $(this),
                 indexId = (index + 1),
                 target = togglecollapse.attr('data-target');
