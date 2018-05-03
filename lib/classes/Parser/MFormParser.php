@@ -642,12 +642,50 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'media':
-                $templateElement->setElement(rex_var_media::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIA[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter));
+                $html = rex_var_media::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIA[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
+
+                $dom = new DOMDocument();
+                @$dom->loadHTML(utf8_decode($html));
+                $inputs = $dom->getElementsByTagName('input');
+
+                if ($inputs instanceof DOMNodeList) {
+                    foreach ($inputs as $input) {
+                        if ($input instanceof DOMElement) {
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $input->setAttribute($key, $value);
+                                }
+                            }
+                        }
+                    }
+                }
+                $html = $dom->C14N(false, true);
+
                 break;
             case 'medialist':
-                $templateElement->setElement(rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter));
+                $html = rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
+
+                $dom = new DOMDocument();
+                @$dom->loadHTML(utf8_decode($html));
+                $selects = $dom->getElementsByTagName('select');
+
+                if ($selects instanceof DOMNodeList) {
+                    foreach ($selects as $select) {
+                        if ($select instanceof DOMElement) {
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $select->setAttribute($key, $value);
+                                }
+                            }
+                        }
+                    }
+                }
+                $html = $dom->C14N(false, true);
+
                 break;
         }
+
+        $templateElement->setElement($html);
 
         // add classes for custom type
         $templateType = $this->getDefaultTemplateType($item, $templateElement);
@@ -743,10 +781,15 @@ class MFormParser
                             }
                         }
                         if (($childNode->hasAttribute('class')
-                                && $childNode->getAttribute('class') == 'form-control')
+                            && $childNode->getAttribute('class') == 'form-control')
                             && ($childNode->hasAttribute('value')
-                                && $childNode->getAttribute('value') == '')) {
+                            && $childNode->getAttribute('value') == '')) {
                             $childNode->setAttribute('value', $item->getValue());
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $childNode->setAttribute($key, $value);
+                                }
+                            }
                         }
                     }
                     // $html = utf8_encode($divItem->C14N(false,true));
@@ -781,12 +824,50 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'link':
-                $templateElement->setElement(rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                $html = rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+
+                $dom = new DOMDocument();
+                @$dom->loadHTML(utf8_decode($html));
+                $inputs = $dom->getElementsByTagName('input');
+
+                if ($inputs instanceof DOMNodeList) {
+                    foreach ($inputs as $input) {
+                        if ($input instanceof DOMElement) {
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $input->setAttribute($key, $value);
+                                }
+                            }
+                        }
+                    }
+                }
+                $html = $dom->C14N(false, true);
+
                 break;
             case 'linklist':
-                $templateElement->setElement(rex_var_linklist::getWidget($item->getVarId()[0], 'REX_INPUT_LINKLIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                $html = rex_var_linklist::getWidget($item->getVarId()[0], 'REX_INPUT_LINKLIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+
+                $dom = new DOMDocument();
+                @$dom->loadHTML(utf8_decode($html));
+                $selects = $dom->getElementsByTagName('select');
+
+                if ($selects instanceof DOMNodeList) {
+                    foreach ($selects as $select) {
+                        if ($select instanceof DOMElement) {
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $select->setAttribute($key, $value);
+                                }
+                            }
+                        }
+                    }
+                }
+                $html = $dom->C14N(false, true);
+
                 break;
         }
+
+        $templateElement->setElement($html);
 
         // add classes for custom type
         $templateType = $this->getDefaultTemplateType($item, $templateElement);

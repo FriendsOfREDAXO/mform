@@ -3,7 +3,8 @@
 ### Version 5.2.0
 
 * Media-Button Parameter type space Problem gefixt
-* Link-Title für Custom-Link Buttons hinzugefügt 
+* Link-Title für Custom-Link Buttons hinzugefügt
+* Attributes für Media- und Link-Elemente hinzugefügt, ermöglicht somit die Validierung via Parsley
 
 
 ### Version 5.2.0 pre-release
