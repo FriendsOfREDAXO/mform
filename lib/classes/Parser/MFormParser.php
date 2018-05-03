@@ -636,7 +636,7 @@ class MFormParser
         $parameter = $item->getParameter();
 
         if (is_array($parameter) && isset($parameter['types'])) {
-            $parameter['types'] = str_replace(' ', '', $parameter['types']);
+            $parameter['types'] = str_replace(' ', '', strtolower($parameter['types']));
         }
 
         switch ($item->getType()) {
@@ -683,13 +683,13 @@ class MFormParser
         $attributes = $item->getAttributes();
 
         $mediaFragment = $dom->createDocumentFragment();
-        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-file-o\"></i></a>");
+        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"" . rex_i18n::msg('var_media_open') . "\"><i class=\"rex-icon fa-file-o\"></i></a>");
         $linkFragment = $dom->createDocumentFragment();
-        $linkFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_extern_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-external-link\"></i></a>");
+        $linkFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_extern_{$item->getId()}\" title=\"" . rex_i18n::msg('var_extern_link') . "\"><i class=\"rex-icon fa-external-link\"></i></a>");
         $mailtoFragment = $dom->createDocumentFragment();
-        $mailtoFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_mailto_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-envelope-o\"></i></a>");
+        $mailtoFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_mailto_{$item->getId()}\" title=\"" . rex_i18n::msg('var_mailto_link') . "\"><i class=\"rex-icon fa-envelope-o\"></i></a>");
         $telFragment = $dom->createDocumentFragment();
-        $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"\"><i class=\"rex-icon fa-phone\"></i></a>");
+        $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"" . rex_i18n::msg('var_phone_link') . "\"><i class=\"rex-icon fa-phone\"></i></a>");
 
         if ($div instanceof DOMNodeList) {
             foreach ($div as $divItem) {
