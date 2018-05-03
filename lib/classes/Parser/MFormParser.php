@@ -633,14 +633,19 @@ class MFormParser
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
+        $parameter = $item->getParameter();
+
+        if (is_array($parameter) && isset($parameter['types'])) {
+            $parameter['types'] = str_replace(' ', '', $parameter['types']);
+        }
 
         switch ($item->getType()) {
             default:
             case 'media':
-                $templateElement->setElement(rex_var_media::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIA[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                $templateElement->setElement(rex_var_media::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIA[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter));
                 break;
             case 'medialist':
-                $templateElement->setElement(rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter()));
+                $templateElement->setElement(rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter));
                 break;
         }
 

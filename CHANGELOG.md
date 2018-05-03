@@ -2,6 +2,7 @@
 
 ### Version 5.2.0
 
+* Parameter type space Problem gefixt
 
 
 ### Version 5.2.0 pre-release
