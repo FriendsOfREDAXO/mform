@@ -1084,6 +1084,9 @@ class MFormParser
      */
     private function parseElement(MFormElement $element, $templateType, $subPath = false)
     {
+        if (is_array($element->value)) {
+            $element->value = '';
+        }
         return str_replace(
             array_merge(array(' />'), $element->getKeys()),
             array_merge(array('/>'), $element->getValues()),
