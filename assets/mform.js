@@ -1,11 +1,8 @@
 /**
  * Created by joachimdoerr on 19.09.16.
  */
-$(function () {
-    mform_init();
-    $(document).on('pjax:end', function () {
-        mform_init();
-    });
+$(document).on('rex:ready', function () {
+     mform_init();
 });
 
 function mform_init() {
