@@ -28,7 +28,7 @@ if (rex::isBackend()) {
     rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
     // add mform js
-    rex_view::addJsFile($this->getAssetsUrl('mform.js?v=' . $this->getVersion()));
+    rex_view::addJsFile($this->getAssetsUrl('mform.js'));
 
     // reset mblock page count
     $_SESSION['mform_count'] = 0;
