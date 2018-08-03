@@ -2,9 +2,15 @@
 
 ### Version 5.2.0
 
-* Media-Button Parameter type space Problem gefixt
-* Link-Title für Custom-Link Buttons hinzugefügt
-* Attributes für Media- und Link-Elemente hinzugefügt, ermöglicht somit die Validierung via Parsley
+* fixed: Media-Button Parameter type space
+* Link-Title for Custom-Link Buttons added
+* Attributes for media- and link-elements added, which allows validation via Parsley
+
+Changes: 
+
+* now uses includeCurrentPageSubPath to show pages @christophboecker
+* Cache buster will be added by rex core @staabm
+* init.js simplified @staabm
 
 
 ### Version 5.2.0 pre-release
