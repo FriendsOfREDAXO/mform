@@ -1,10 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 5.2.0
+### Version 5.2.1
 
 * fixed: Media-Button Parameter type space
 * Link-Title for Custom-Link Buttons added
 * Attributes for media- and link-elements added, which allows validation via Parsley
+* fixed: c14n html body wrapping removed
 
 Changes: 
 
