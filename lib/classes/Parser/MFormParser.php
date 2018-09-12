@@ -660,6 +660,12 @@ class MFormParser
                     }
                 }
                 $html = $dom->C14N(false, true);
+                if (strpos($html, '<body') !== false) {
+                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                    if (isset($matches[1])) {
+                        $html = $matches[1];
+                    }
+                }
 
                 break;
             case 'medialist':
@@ -681,6 +687,12 @@ class MFormParser
                     }
                 }
                 $html = $dom->C14N(false, true);
+                if (strpos($html, '<body') !== false) {
+                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                    if (isset($matches[1])) {
+                        $html = $matches[1];
+                    }
+                }
 
                 break;
         }
@@ -781,9 +793,9 @@ class MFormParser
                             }
                         }
                         if (($childNode->hasAttribute('class')
-                            && $childNode->getAttribute('class') == 'form-control')
+                                && $childNode->getAttribute('class') == 'form-control')
                             && ($childNode->hasAttribute('value')
-                            && $childNode->getAttribute('value') == '')) {
+                                && $childNode->getAttribute('value') == '')) {
                             $childNode->setAttribute('value', $item->getValue());
                             if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
                                 foreach ($item->getAttributes() as $key => $value) {
@@ -794,6 +806,12 @@ class MFormParser
                     }
                     // $html = utf8_encode($divItem->C14N(false,true));
                     $html = $divItem->C14N(false, true);
+                    if (strpos($html, '<body') !== false) {
+                        preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                        if (isset($matches[1])) {
+                            $html = $matches[1];
+                        }
+                    }
                     break;
                 }
             }
@@ -842,6 +860,12 @@ class MFormParser
                     }
                 }
                 $html = $dom->C14N(false, true);
+                if (strpos($html, '<body') !== false) {
+                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                    if (isset($matches[1])) {
+                        $html = $matches[1];
+                    }
+                }
 
                 break;
             case 'linklist':
@@ -863,6 +887,12 @@ class MFormParser
                     }
                 }
                 $html = $dom->C14N(false, true);
+                if (strpos($html, '<body') !== false) {
+                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                    if (isset($matches[1])) {
+                        $html = $matches[1];
+                    }
+                }
 
                 break;
         }
