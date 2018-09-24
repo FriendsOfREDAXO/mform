@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.2.2
+
+* Parameter must be an array warning fix
+
 ### Version 5.2.1
 
 * fixed: Media-Button Parameter type space
