@@ -62,16 +62,16 @@ class MFormElements
 
         $this->setCategory($catId);
 
-        if (sizeof($attributes) > 0) {
+        if (is_array($attributes) && sizeof($attributes) > 0) {
             $this->setAttributes($attributes);
         }
-        if (sizeof($options) > 0) {
+        if (is_array($options) && sizeof($options) > 0) {
             $this->setOptions($options);
         }
-        if (sizeof($parameter) > 0) {
+        if (is_array($parameter) && sizeof($parameter) > 0) {
             $this->setParameters($parameter);
         }
-        if (sizeof($validation) > 0) {
+        if (is_array($validation) && sizeof($validation) > 0) {
             $this->setValidations($validation);
         }
 
