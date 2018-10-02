@@ -15,14 +15,10 @@ function mform_init() {
 
     // init by siteload
     if ($('#REX_FORM').length && mform.length) {
-        var custom_link = mform.find('.custom-link'),
-            tabs = mform.find('a[data-toggle="tab"]');
+        var custom_link = mform.find('.custom-link');
 
         if (custom_link.length) {
             mform_custom_link(custom_link);
-        }
-        if (tabs.length) {
-            mform_tabs();
         }
     }
 
@@ -211,18 +207,6 @@ function initMFormToggle(mform) {
     });
 
     mform.find('input[type=checkbox][data-mform-toggle^=toggle]').bootstrapMFormToggle('destroy').bootstrapMFormToggle();
-}
-
-function mform_tabs() {
-    $('.mform-tabs a[data-toggle="tab"]').on("shown.bs.tab", function (e) {
-        var id = $(e.target).attr("href");
-        localStorage.setItem('selectedTab', id)
-    });
-
-    var selectedTab = localStorage.getItem('selectedTab');
-    if (selectedTab != null) {
-        $('.mform-tabs a[data-toggle="tab"][href="' + selectedTab + '"]').tab('show');
-    }
 }
 
 function mform_custom_link(item) {
