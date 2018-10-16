@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.2.4
+
+* re-add special input types support
+
 ### Version 5.2.3
 
 * removed tab history

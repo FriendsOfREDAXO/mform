@@ -26,6 +26,7 @@ class MFormDefault
         'month' => 'form-control',
         'week' => 'form-control',
         'range' => '',
+        'date' => 'form-control',
         'datetime' => 'form-control',
         'datetime-local' => 'form-control',
         'text-readonly' => 'form-control',

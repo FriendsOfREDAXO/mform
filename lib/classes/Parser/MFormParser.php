@@ -926,6 +926,11 @@ class MFormParser
                         $this->closeFieldset();
                         break;
 
+                    // TODO
+                    case 'start-group-fieldset':
+                    case 'close-group-fieldset':
+                        break;
+
                     // TABS
                     case 'start-group-tab':
                         $this->generateTabGroup($item, $key, $items);
@@ -954,13 +959,26 @@ class MFormParser
                         $this->closeCollapseGroup($item);
                         break;
 
-
+                    // FORM ELEMENTS
                     case 'html':
                     case 'headline':
                     case 'description':
                     case 'alert':
                         $this->generateLineElement($item);
                         break;
+                    case 'color':
+                    case 'email':
+                    case 'url':
+                    case 'tel':
+                    case 'search':
+                    case 'number':
+                    case 'range':
+                    case 'date':
+                    case 'time':
+                    case 'datetime':
+                    case 'datetime-local':
+                    case 'month':
+                    case 'week':
                     case 'text':
                     case 'hidden':
                     case 'text-readonly':
