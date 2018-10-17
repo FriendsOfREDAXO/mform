@@ -21,6 +21,18 @@ class MFormOptionHandler
     }
 
     /**
+     * set option to item
+     * @param MFormItem $item
+     * @param mixed $key
+     * @author Joachim Doerr
+     */
+    public static function disableOption(MFormItem $item, $key)
+    {
+        // add option to options array
+        $item->disabledOptions[$key] = $key;
+    }
+
+    /**
      * set opt group to item
      * @param MFormItem $item
      * @param string $label
@@ -57,6 +69,13 @@ class MFormOptionHandler
                     self::addOption($item, $value, $key);
                 }
             }
+        }
+    }
+
+    public static function disableOptions(MFormItem $item, $keys)
+    {
+        if (is_array($keys)) {
+            $item->disabledOptions = $keys;
         }
     }
 

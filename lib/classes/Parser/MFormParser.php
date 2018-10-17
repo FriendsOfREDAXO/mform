@@ -423,7 +423,11 @@ class MFormParser
                     // create options
                     foreach ($value as $vKey => $vValue) {
                         $count++;
-                        $optElements .= $this->createOptionElement($item, $vKey, $vValue);
+                        $disabled = false;
+                        if (in_array($vKey, $item->getDisabledOptions())) {
+                            $disabled = true;
+                        }
+                        $optElements .= $this->createOptionElement($item, $vKey, $vValue, 'option', true, $disabled);
                     }
 
                     // create opt group element
@@ -434,7 +438,11 @@ class MFormParser
                     $optionElements .= $this->parseElement($groupElement, 'optgroup', true);
                 } else {
                     $count++;
-                    $optionElements .= $this->createOptionElement($item, $key, $value);
+                    $disabled = false;
+                    if (in_array($key, $item->getDisabledOptions())) {
+                        $disabled = true;
+                    }
+                    $optionElements .= $this->createOptionElement($item, $key, $value, 'option', true, $disabled);
                 }
             }
             // is size full
@@ -478,10 +486,11 @@ class MFormParser
      * @param $value
      * @param string $templateType
      * @param bool $selected
+     * @param bool $disabled
      * @return mixed
      * @author Joachim Doerr
      */
-    private function createOptionElement(MFormItem $item, $key, $value, $templateType = 'option', $selected = true)
+    private function createOptionElement(MFormItem $item, $key, $value, $templateType = 'option', $selected = true, $disabled = false)
     {
         // create element
         $element = new MFormElement();
@@ -504,6 +513,11 @@ class MFormParser
         if ($selected && ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
         }
+
+        if ($disabled) {
+            $element->setAttributes($element->attributes . ' disabled');
+        }
+
         // parse element
         return $this->parseElement($element, $templateType, true);
     }

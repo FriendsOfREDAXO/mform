@@ -700,6 +700,17 @@ class MFormElements
     }
 
     /**
+     * @param $key
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function disableOption($key)
+    {
+        MFormOptionHandler::disableOption($this->item, $key);
+        return $this;
+    }
+
+    /**
      * @param $options
      * @return $this
      * @author Joachim Doerr
@@ -707,6 +718,17 @@ class MFormElements
     public function setOptions($options)
     {
         MFormOptionHandler::setOptions($this->item, $options);
+        return $this;
+    }
+
+    /**
+     * @param $keys
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function disableOptions($keys)
+    {
+        MFormOptionHandler::disableOptions($this->item, $keys);
         return $this;
     }
 

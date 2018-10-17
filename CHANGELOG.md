@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.2.5
+
+* add possibility to disable select options
+
 ### Version 5.2.4
 
 * re-add special input types support

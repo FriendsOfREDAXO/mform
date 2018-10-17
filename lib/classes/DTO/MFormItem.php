@@ -65,6 +65,11 @@ class MFormItem
     /**
      * @var array
      */
+    public $disabledOptions = array();
+
+    /**
+     * @var array
+     */
     public $parameter = array();
 
     /**
@@ -317,6 +322,26 @@ class MFormItem
     public function setOptions($options)
     {
         $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @return array
+     * @author Joachim Doerr
+     */
+    public function getDisabledOptions()
+    {
+        return $this->disabledOptions;
+    }
+
+    /**
+     * @param array $disabledOptions
+     * @return MFormItem
+     * @author Joachim Doerr
+     */
+    public function setDisabledOptions($disabledOptions)
+    {
+        $this->disabledOptions = $disabledOptions;
         return $this;
     }
 
