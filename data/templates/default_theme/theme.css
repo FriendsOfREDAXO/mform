@@ -115,6 +115,7 @@
     background: #fff;
     margin-bottom: 20px;
 }
+
 .mform .mform-headline.grey-legend-background h3,
 .sortitem .mform fieldset.grey-legend-background > legend,
 .mform fieldset.grey-legend-background > legend {
@@ -124,6 +125,7 @@
     font-size: 14px;
     font-weight: bold;
 }
+
 .mform .tab-content .mform-headline.grey-legend-background h3,
 .mform .tab-content fieldset.grey-legend-background > legend,
 .mform .tab-content fieldset.grey-legend-background > legend {
@@ -195,7 +197,6 @@
 .mform .panel-group[data-group-hide-toggle-links=true] .panel > a[data-toggle=collapse] {
     display: none;
 }
-
 
 .mform .panel-group[data-group-hide-toggle-links] {
     margin-bottom: 0;
