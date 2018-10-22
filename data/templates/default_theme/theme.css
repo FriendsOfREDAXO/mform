@@ -107,7 +107,7 @@
 }
 
 .mform .mform-tabs .tab-pane {
-    padding: 15px 0;
+    padding: 5px 0;
 }
 
 .mform .mform-tabs .tab-content {
@@ -194,4 +194,21 @@
 
 .mform .panel-group[data-group-hide-toggle-links=true] .panel > a[data-toggle=collapse] {
     display: none;
+}
+
+
+.mform .panel-group[data-group-hide-toggle-links] {
+    margin-bottom: 0;
+    background-color: transparent;
+}
+
+.mform .panel-group[data-group-hide-toggle-links] .panel {
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    border: none;
+}
+
+.mform .panel-group[data-group-hide-toggle-links] .panel + .panel {
+    margin-top: 0;
 }
