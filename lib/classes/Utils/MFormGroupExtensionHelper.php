@@ -113,23 +113,27 @@ class MFormGroupExtensionHelper
 
                     break;
                 case 'close-' . $type:
+                    if (isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1) {
+                        // add group counts
+                        $item->setGroup($groupCount)
+                            ->setGroupCount($groupCount);
 
-                    // add group counts
-                    $item->setGroup($groupCount)
-                        ->setGroupCount($groupCount);
-
-                    if (!$group) {
-                        // is not group detected break and don't set the item
-                        $setItem = false;
-                        break;
-                    } else {
-                        // group is finish
-                        $group = false;
-
-                        if (isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1) {
+                        if (!$group) {
+                            // is not group detected break and don't set the item
+                            $setItem = false;
+                            break;
+                        } else {
+                            // group is finish
+                            $group = false;
                             // group will be closed
                             $closeGroup = true;
                         }
+                    } else {
+                        $count++;
+                        // add group counts
+                        $item->setGroup($groupCount)
+                            ->setGroupCount($count);
+                        $setItem = false;
                     }
 
                     break;
