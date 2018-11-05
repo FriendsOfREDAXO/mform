@@ -110,6 +110,11 @@ class MFormItem
     /**
      * @var string
      */
+    public $groupKey;
+
+    /**
+     * @var string
+     */
     public $infoTooltip;
 
     /**
@@ -492,6 +497,26 @@ class MFormItem
     public function setGroupCount($groupCount)
     {
         $this->groupCount = $groupCount;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getGroupKey()
+    {
+        return $this->groupKey;
+    }
+
+    /**
+     * @param string $groupKey
+     * @return MFormItem
+     * @author Joachim Doerr
+     */
+    public function setGroupKey($groupKey)
+    {
+        $this->groupKey = $groupKey;
         return $this;
     }
 
