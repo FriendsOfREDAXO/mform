@@ -56,6 +56,8 @@ class MFormGroupExtensionHelper
     private static function addGroupExtensionItems(array $items, $type)
     {
         $newItems = array();
+        $key = 0;
+        $groupKey = 0;
         $groupCount = 0;
         $count = 1;
         $group = false;
@@ -64,10 +66,11 @@ class MFormGroupExtensionHelper
         /** @var MFormItem $item */
         foreach ($items as $key => $item) {
 
-            $setItem = true;
-            $closeGroup = false;
-
             switch ($item->getType()) {
+                default:
+                    // add default item
+                    $newItems[] = $item;
+                    break;
                 case 'checkbox':
                     if (array_key_exists('data-toggle', $item->getAttributes())) {
                         $toggleAttributes = $item->getAttributes();
@@ -80,88 +83,70 @@ class MFormGroupExtensionHelper
                     }
                     break;
                 case $type:
+                    // count by typ
                     $count++;
 
                     if (!$group) {
                         $group = true;
-                        $count = 1;
-                        $groupCount++;
+                        $count = 1; // reset count by type for group
+                        $groupCount++; // count by group
+                        $groupKey = uniqid($groupCount, true);
+
                         // open the new group before the group item will be add to the item list
 
                         if (is_array($toggleAttributes)) {
-
                             $mergeArray = array('data-group-select-accordion' => ($toggleAttributes['data-toggle'] == 'accordion') ? 'true' : 'false');
-
                             if (array_key_exists('hide-toggle-links', $toggleAttributes)) {
                                 $mergeArray['data-group-hide-toggle-links'] = ($toggleAttributes['hide-toggle-links']) ? 'true' : 'false';
                             }
-
                             $item->setAttributes(array_merge($item->getAttributes(), $toggleAttributes, $mergeArray));
                             $toggleAttributes = false;
                         }
-
-                        $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count, $item);
+                        // start group for type
+                        $newItems[] = self::createGroupItem("start-group-$type", $groupCount, $count, $groupKey, $item);
 
                     } else {
-                        // close prev item
-                        $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1));
+                        // close prev item by same type in group
+                        if ($items[$key - 1] instanceof MFormItem && $items[$key - 1]->type != "close-$type") { // is not closed by other item
+                            // close auto
+                            $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1), $groupKey, $item);
+                        }
                     }
 
-                    // add group counts
-                    $item->setGroup($groupCount)
-                        ->setGroupCount($count);
+                    // add group counts and id
+                    $item->setGroup($groupCount) // group id
+                        ->setGroupCount($count) // count of group icons
+                        ->setGroupKey($groupKey);
 
+                    // open type
+                    $newItems[] = $item;
                     break;
                 case 'close-' . $type:
-                    if (isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1) {
-                        // add group counts
-                        $item->setGroup($groupCount)
-                            ->setGroupCount($groupCount);
+                    // add group counts and id
+                    $item->setGroup($groupCount) // group id
+                        ->setGroupCount($count) // count of group icons
+                        ->setGroupKey($groupKey);
 
-                        if (!$group) {
-                            // is not group detected break and don't set the item
-                            $setItem = false;
-                            break;
-                        } else {
-                            // group is finish
-                            $group = false;
-                            // group will be closed
-                            $closeGroup = true;
-                        }
-                    } else {
-                        $count++;
-                        // add group counts
-                        $item->setGroup($groupCount)
-                            ->setGroupCount($count);
-                        $setItem = false;
+                    // close type in group
+                    $newItems[] = $item;
+
+                    if (isset($items[$key + 1]) && $items[$key + 1] instanceof MFormItem && $items[$key + 1]->type != $type or // next item is not from type close group
+                        isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1
+                    ) {
+                        // close group auto
+                        $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count, $groupKey, $item);
+                        $group = false;
                     }
-
                     break;
-            }
-
-            // in list is a close item that is not form the same type -> close before you ar in an other list
-            if ($group && strpos($item->getType(), "close-") !== false && $item->getType() != "close-$type") {
-                $group = false;
-                $closeGroup = false;
-                $newItems[] = self::createGroupItem("close-$type", $groupCount, $count);
-                $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
-            }
-
-            // set the item into the new item list
-            if ($setItem) {
-                $newItems[] = $item;
-            }
-
-            // close final group after item close
-            if ($closeGroup) {
-                $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
             }
         }
 
         // group and item was not closed do it now
         if ($group) {
-            $newItems[] = self::createGroupItem("close-$type", $groupCount, $count);
-            $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count);
+            if (isset($newItems[$key]) && $newItems[$key] instanceof MFormItem && $items[$key]->type != "close-$type") {
+                $newItems[] = self::createGroupItem("close-$type", $groupCount, $count, $groupKey, $item);
+            }
+            $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count, $groupKey, $item);
         }
 
         return $newItems;
@@ -171,11 +156,12 @@ class MFormGroupExtensionHelper
      * @param $type
      * @param int $group
      * @param int $groupCount
+     * @param int $groupKey
      * @param MFormItem $item
      * @return MFormItem
      * @author Joachim Doerr
      */
-    public static function createGroupItem($type, $group = 0, $groupCount = 0, MFormItem $item = null)
+    public static function createGroupItem($type, $group = 0, $groupCount = 0, $groupKey = 0, MFormItem $item = null)
     {
         $newItem = new MFormItem();
 
@@ -191,6 +177,7 @@ class MFormGroupExtensionHelper
 
         return $newItem->setType($type)
             ->setGroupCount($groupCount)
-            ->setGroup($group);
+            ->setGroup($group)
+            ->setGroupKey($groupKey);
     }
 }
