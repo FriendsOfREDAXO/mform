@@ -30,6 +30,7 @@ if (rex::isBackend()) {
     // add mform js
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
 
-    // reset mblock page count
-    $_SESSION['mform_count'] = 0;
+
+    // reset count per page init
+    rex_set_session('mform_count', 0);
 }

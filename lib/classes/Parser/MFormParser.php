@@ -78,7 +78,7 @@ class MFormParser
                 $class = '';
                 $value = '';
                 $element = new MFormElement();
-                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . $_SESSION['mform_count']);
+                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . rex_session('mform_count'));
 
                 if (array_key_exists('tab-icon', $itm->getAttributes()))
                     $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
@@ -113,7 +113,7 @@ class MFormParser
     private function generateTab($item)
     {
         $element = new MFormElement();
-        $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount() . '_' . $_SESSION['mform_count']);
+        $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount() . '_' . rex_session('mform_count'));
 
         if ($item->getGroupCount() == 1)
             $element->setClass('active');
@@ -154,7 +154,7 @@ class MFormParser
             $this->acc = true;
             $element = new MFormElement();
             $element->setAttributes($this->parseAttributes($item->getAttributes()))
-                ->setId('accgr' . $item->getGroup() . '_' . $_SESSION['mform_count']);
+                ->setId('accgr' . $item->getGroup() . '_' . rex_session('mform_count'));
             $this->elements[] = $this->parseElement($element, 'accordion-open', true); // use parse element to load template file
         }
         return $this;
@@ -169,7 +169,7 @@ class MFormParser
     {
         // is id in attr not set set an unique id
         if (!isset($item->getAttributes()['id'])) {
-            $item->attributes['id'] = 'colgr' . $item->getGroup() . 'colid' . $item->getGroupCount() . '_' . $_SESSION['mform_count'];
+            $item->attributes['id'] = 'colgr' . $item->getGroup() . 'colid' . $item->getGroupCount() . '_' . rex_session('mform_count');
         }
 
         // create collapse open element
@@ -190,7 +190,7 @@ class MFormParser
             $item->setClass($item->getClass() . ' hidden');
         }
 
-        $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . $_SESSION['mform_count'] . '"' : '';
+        $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . rex_session('mform_count') . '"' : '';
         $collapseButton = new MFormElement();
         $collapseButton->setClass($item->getClass())
             ->setAttributes('data-toggle="collapse" data-target="#' . $item->getAttributes()['id'] . '"' . $target)
