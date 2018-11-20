@@ -1,5 +1,12 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.0.0
+
+* use rex_factory_trait in MForm class
+* remove `closeCollapse`, `closeTab`, `closeAccordion`
+* change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
+* added `addForm` method
+
 ### Version 5.2.5
 
 * add possibility to disable select options

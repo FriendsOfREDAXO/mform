@@ -5,8 +5,14 @@
  * @license MIT
  */
 
+
+use MForm\MFormElements;
+use MForm\Parser\MFormParser;
+
 class MForm extends MFormElements
 {
+    use rex_factory_trait;
+
     /**
      * @var string
      */
@@ -38,10 +44,21 @@ class MForm extends MFormElements
     {
         // mfrom count++
         rex_set_session('mform_count', rex_session('mform_count') + 1);
-
         // init obj
         $parser = new MFormParser();
         // parse elements
         return $parser->parse($this->getItems(), $this->theme, $this->debug);
+    }
+
+    /**
+     * @param null $template
+     * @param bool $debug
+     * @return MForm
+     * @author Joachim Doerr
+     */
+    public static function factory($template = null, $debug = false)
+    {
+        $class = static::getFactoryClass();
+        return new $class($template, $debug);
     }
 }

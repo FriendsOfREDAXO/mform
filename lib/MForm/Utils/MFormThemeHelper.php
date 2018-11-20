@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MForm\Utils;
+
+
+use rex_file;
+use rex_path;
+
 class MFormThemeHelper
 {
     /**

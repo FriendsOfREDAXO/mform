@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+use MForm\Utils\MFormThemeHelper;
+
 if (rex::isBackend()) {
     // check theme css is exists
     MFormThemeHelper::themeBootCheck(rex_addon::get('mform')->getConfig('mform_theme'));

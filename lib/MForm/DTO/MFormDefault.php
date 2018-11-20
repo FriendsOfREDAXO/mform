@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+namespace MForm\DTO;
+
+
 class MFormDefault
 {
     // default classes for r5 bootstrap backend theme

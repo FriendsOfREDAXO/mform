@@ -5,6 +5,13 @@
  * @license MIT
  */
 
+namespace MForm\Handler;
+
+
+use MForm\DTO\MFormItem;
+use MForm\Utils\MFormClang;
+use rex_sql;
+
 class MFormOptionHandler
 {
     /**
@@ -95,7 +102,7 @@ class MFormOptionHandler
                 $sql->next();
             }
         } catch (\Exception $e) {
-            // TODO log error!
+            \rex_logger::logException($e);
         }
     }
 }

@@ -5,6 +5,28 @@
  * @license MIT
  */
 
+namespace MForm\Parser;
+
+
+use DOMDocument;
+use DOMElement;
+use DOMNodeList;
+use MForm\DTO\MFormElement;
+use MForm\DTO\MFormItem;
+use MForm\Handler\MFormAttributeHandler;
+use MForm\Provider\MFormTemplateFileProvider;
+use MForm\Utils\MFormGroupExtensionHelper;
+use MForm\Utils\MFormItemManipulator;
+use MForm\Utils\MFormThemeHelper;
+use rex_addon;
+use rex_clang;
+use rex_i18n;
+use rex_url;
+use rex_var_link;
+use rex_var_linklist;
+use rex_var_media;
+use rex_var_medialist;
+
 class MFormParser
 {
     /**
@@ -1115,10 +1137,11 @@ class MFormParser
 
     /**
      * @param MFormItem $item
+     * @param MFormElement $templateElement
      * @return string
      * @author Joachim Doerr
      */
-    private function getDefaultTemplateType(MFormItem $item, $templateElement)
+    private function getDefaultTemplateType(MFormItem $item, MFormElement $templateElement)
     {
         $templateType = 'default';
 

@@ -5,6 +5,15 @@
  * @license MIT
  */
 
+namespace MForm\Utils;
+
+
+use rex_article;
+use rex_article_slice;
+use rex_clang;
+use rex_path;
+use rex_url;
+
 class MFormOutputHelper
 {
     /**

@@ -5,6 +5,11 @@
  * @license MIT
  */
 
+namespace MForm\Utils;
+
+
+use rex;
+
 class MFormClang
 {
     /**

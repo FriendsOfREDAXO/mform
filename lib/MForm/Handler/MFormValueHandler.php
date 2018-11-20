@@ -5,6 +5,16 @@
  * @license MIT
  */
 
+namespace MForm\Handler;
+
+
+use MForm\DTO\MFormItem;
+use MForm\Utils\MFormClang;
+use rex;
+use rex_logger;
+use rex_sql;
+use rex_sql_exception;
+
 class MFormValueHandler
 {
     /**
@@ -21,32 +31,35 @@ class MFormValueHandler
             $fields = '*';
             $where = 'id="' . $_REQUEST['slice_id'] . '"';
 
-            $sql = rex_sql::factory();
             $query = '
                 SELECT ' . $fields . '
                 FROM ' . $table . '
                 WHERE ' . $where;
 
-            $sql->setQuery($query);
-            $rows = $sql->getRows();
+            try {
+                $sql = rex_sql::factory();
+                $sql->setQuery($query);
+                $rows = $sql->getRows();
+                if ($rows > 0) {
+                    for ($i = 1; $i <= 20; $i++) {
+                        $result['value'][$i] = $sql->getValue('value' . $i);
 
-            if ($rows > 0) {
-                for ($i = 1; $i <= 20; $i++) {
-                    $result['value'][$i] = $sql->getValue('value' . $i);
+                        if ($i <= 10) {
+                            $result['filelist'][$i] = $sql->getValue('medialist' . $i);
+                            $result['linklist'][$i] = $sql->getValue('linklist' . $i);
+                            $result['file'][$i] = $sql->getValue('media' . $i);
+                            $result['link'][$i] = $sql->getValue('link' . $i);
+                        }
 
-                    if ($i <= 10) {
-                        $result['filelist'][$i] = $sql->getValue('medialist' . $i);
-                        $result['linklist'][$i] = $sql->getValue('linklist' . $i);
-                        $result['file'][$i] = $sql->getValue('media' . $i);
-                        $result['link'][$i] = $sql->getValue('link' . $i);
-                    }
+                        $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]), true);
 
-                    $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]),true);
-
-                    if (is_array($jsonResult)) {
-                        $result['value'][$i] = $jsonResult;
+                        if (is_array($jsonResult)) {
+                            $result['value'][$i] = $jsonResult;
+                        }
                     }
                 }
+            } catch (rex_sql_exception $e) {
+                rex_logger::logException($e);
             }
         }
         return $result;

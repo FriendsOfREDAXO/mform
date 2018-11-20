@@ -5,6 +5,9 @@
  * @license MIT
  */
 
+namespace MForm\DTO;
+
+
 class MFormElement
 {
     const KEY = "<element:%s/>";

@@ -5,6 +5,11 @@
  * @license MIT
  */
 
+namespace MForm\Handler;
+
+
+use MForm\DTO\MFormItem;
+
 class MFormValidationHandler
 {
     const PREFIX = 'data-parsley-';

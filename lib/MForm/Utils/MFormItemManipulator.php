@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MForm\Utils;
+
+
+use MForm\DTO\MFormDefault;
+use MForm\DTO\MFormItem;
+
 class MFormItemManipulator
 {
     /**

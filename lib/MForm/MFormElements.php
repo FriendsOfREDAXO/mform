@@ -5,6 +5,18 @@
  * @license MIT
  */
 
+namespace MForm;
+
+
+use MForm;
+use MForm\DTO\MFormItem;
+use MForm\Handler\MFormAttributeHandler;
+use MForm\Handler\MFormElementHandler;
+use MForm\Handler\MFormOptionHandler;
+use MForm\Handler\MFormParameterHandler;
+use MForm\Handler\MFormValidationHandler;
+use MForm\Handler\MFormValueHandler;
+
 class MFormElements
 {
     /**
@@ -209,6 +221,7 @@ class MFormElements
     /**
      * @param null|string $value
      * @param array $attributes
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
@@ -219,6 +232,7 @@ class MFormElements
 
     /**
      * @param bool $tabGroupClose
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
@@ -234,6 +248,7 @@ class MFormElements
      * @param bool $accordion
      * @param bool $hideToggleLinks
      * @param int $openCollapse
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
@@ -246,6 +261,7 @@ class MFormElements
 
     /**
      * @param bool $collapseGroupClose
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
@@ -259,6 +275,7 @@ class MFormElements
      * @param null|string $value
      * @param bool $hideToggleLinks
      * @param int $openCollapse
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
@@ -269,12 +286,75 @@ class MFormElements
 
     /**
      * @param bool $accordionGroupClose
+     * @deprecated this method will be removed in MForm 7
      * @return $this
      * @author Joachim Doerr
      */
     public function closeAccordion($accordionGroupClose = false)
     {
         return $this->closeCollapse($accordionGroupClose);
+    }
+
+    /**
+     * @param null $form
+     * @return MFormElements
+     * @author Joachim Doerr
+     */
+    public function addForm($form = null)
+    {
+        $form = ($form instanceof MForm) ? $form->show() : $form;
+        return $this->addHtml($form);
+    }
+
+    /**
+     * @param null|string $value
+     * @param null|MForm|string $form
+     * @param array $attributes
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addTabField($value = null, $form = null, $attributes = array())
+    {
+        $this->addElement('tab', NULL, $value, $attributes)
+            ->addForm($form)
+            ->addElement('close-tab', NULL, NULL, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * @param null|string $value
+     * @param null|MForm|string $form
+     * @param array $attributes
+     * @param bool $accordion
+     * @param bool $hideToggleLinks
+     * @param int $openCollapse
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addCollapseField($value = null, $form = null, $attributes = array(), $accordion = false, $hideToggleLinks = false, $openCollapse = 0)
+    {
+        $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
+        $attributes = array_merge($attributes, array('data-group-accordion' => (int) $accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse));
+
+        $this->addElement('collapse', NULL, $value, $attributes)
+            ->addForm($form)
+            ->addElement('close-collapse', NULL, NULL, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * @param null|string $value
+     * @param null|MForm|string $form
+     * @param bool $hideToggleLinks
+     * @param int $openCollapse
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addAccordionField($value = null, $form = null, $hideToggleLinks = false, $openCollapse = 0)
+    {
+        return $this->addCollapseField($value, $form, array(), true, $hideToggleLinks, $openCollapse);
     }
 
     /**

@@ -5,6 +5,11 @@
  * @license MIT
  */
 
+namespace MForm\Utils;
+
+
+use MForm\DTO\MFormItem;
+
 class MFormGroupExtensionHelper
 {
     /**
@@ -67,20 +72,18 @@ class MFormGroupExtensionHelper
         foreach ($items as $key => $item) {
 
             switch ($item->getType()) {
-                default:
-                    // add default item
-                    $newItems[] = $item;
-                    break;
                 case 'checkbox':
                     if (array_key_exists('data-toggle', $item->getAttributes())) {
                         $toggleAttributes = $item->getAttributes();
                         unset($toggleAttributes['data-mform-toggle']);
                     }
-                    break;
                 case 'select':
                     if (array_key_exists('data-toggle', $item->getAttributes())) {
                         $toggleAttributes = $item->getAttributes();
                     }
+                default:
+                    // add default item
+                    $newItems[] = $item;
                     break;
                 case $type:
                     // count by typ

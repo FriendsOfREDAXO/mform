@@ -5,6 +5,12 @@
  * @license MIT
  */
 
+namespace MForm\Provider;
+
+
+use rex_addon;
+use rex_path;
+
 class MFormTemplateFileProvider
 {
     const DEFAULT_THEME = 'default_theme';

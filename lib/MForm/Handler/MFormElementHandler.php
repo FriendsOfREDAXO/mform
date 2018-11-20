@@ -5,6 +5,11 @@
  * @license MIT
  */
 
+namespace MForm\Handler;
+
+
+use MForm\DTO\MFormItem;
+
 class MFormElementHandler
 {
     /**
@@ -24,9 +29,6 @@ class MFormElementHandler
             ->setType($type) // set item type
             ->setMode(rex_request('function', 'string')); // set mode add or edit
 
-        if(sizeof($item->varId) > 3) {
-            // TODO exception
-        }
         return $item;
     }
 }
