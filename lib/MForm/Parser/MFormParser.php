@@ -871,6 +871,12 @@ class MFormParser
      */
     private function generateLinkElement(MFormItem $item)
     {
+        $inputValue = false;
+        if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
+            MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+            $inputValue = true;
+        }
+
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
@@ -878,11 +884,15 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'link':
-                $html = rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
+
+                $item->setVarId(substr($item->getVarId(), 1, -1));
+                $html = rex_var_link::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $item->getParameter());
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
+                $links = $dom->getElementsByTagName('a');
 
                 if ($inputs instanceof DOMNodeList) {
                     foreach ($inputs as $input) {
@@ -892,9 +902,19 @@ class MFormParser
                                     $input->setAttribute($key, $value);
                                 }
                             }
+                            $input->setAttribute('id', str_replace(['][','[',']'], ['_','',''], $input->getAttribute('id')));
                         }
                     }
                 }
+
+                if ($links instanceof DOMNodeList) {
+                    foreach($links as $link) {
+                        if ($link instanceof DOMElement) {
+                            $link->setAttribute('onclick', str_replace(['][','[',']'], ['_','',''], $link->getAttribute('onclick')));
+                        }
+                    }
+                }
+
                 $html = $dom->C14N(false, true);
                 if (strpos($html, '<body') !== false) {
                     preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
