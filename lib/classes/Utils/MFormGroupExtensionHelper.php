@@ -76,11 +76,13 @@ class MFormGroupExtensionHelper
                         $toggleAttributes = $item->getAttributes();
                         unset($toggleAttributes['data-mform-toggle']);
                     }
+                    $newItems[] = $item;
                     break;
                 case 'select':
                     if (array_key_exists('data-toggle', $item->getAttributes())) {
                         $toggleAttributes = $item->getAttributes();
                     }
+                    $newItems[] = $item;
                     break;
                 case $type:
                     // count by typ

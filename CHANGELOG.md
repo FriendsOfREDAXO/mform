@@ -3,6 +3,7 @@
 ### Version 5.2.5
 
 * add possibility to disable select options
+* fix fieldset and grouping issues
 
 ### Version 5.2.4
 
