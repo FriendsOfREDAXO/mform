@@ -120,7 +120,7 @@ $mform->addMultiSelectField(1, array('group 1' => array(1=>'test-1',2=>'test-2')
 
 
 <a name="SQL-Optionen"></a>
-##SQL-Optionen in Select- und Multiselect-Elementen
+## SQL-Optionen in Select- und Multiselect-Elementen
 
 Es ist möglich direkt ein SQL Query über die Methode `setSqlOptions` abzusetzen. MForm kombiniert dann aus den Spalten der Select-Tabelle die entsprechenden Options.
 
