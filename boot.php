@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+rex_yform::addTemplatePath(rex_path::addon('mform', 'data/ytemplates'));
+
 if (rex::isBackend()) {
     // check theme css is exists
     MFormThemeHelper::themeBootCheck(rex_addon::get('mform')->getConfig('mform_theme'));
