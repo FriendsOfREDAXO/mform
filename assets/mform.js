@@ -22,6 +22,14 @@ function mform_init() {
         }
     }
 
+    if ($('form.rex-yform').length) {
+        var yform_custom_link = $('div.custom-link');
+
+        if (yform_custom_link.length) {
+            mform_custom_link(yform_custom_link);
+        }
+    }
+
     // init mform collapse
     initMFormCollapseData(mform);
 
