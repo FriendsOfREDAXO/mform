@@ -32,7 +32,7 @@ class rex_var_custom_link extends rex_var
             return false;
         }
 
-        $value = $this->getContextData()->getValue('link' . $id);
+        $value = $this->getContextData()->getValue('linklist' . $id);
 
         if ($this->hasArg('isset') && $this->getArg('isset')) {
             return $value ? 'true' : 'false';
