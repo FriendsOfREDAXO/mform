@@ -58,6 +58,6 @@ var_mailto_link = Email verlinken
 var_phone_link = Telefonnummer verlinken
 
 yform_values_custom_link_media = Media-Link Button
-yform_values_custom_link_extern = Extern-Link Button
+yform_values_custom_link_external = Extern-Link Button
 yform_values_custom_link_mailto = Mailto-Link button
 yform_values_custom_link_intern = Redaxo Interner-Link Button
