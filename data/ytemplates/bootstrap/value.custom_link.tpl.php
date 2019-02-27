@@ -4,12 +4,14 @@ $buttonId = $counter;
 $categoryId = 0;
 $name = $this->getFieldName();
 $value = htmlspecialchars($this->getValue());
+$parameters = array(
+    'media' => ($this->getElement('media') == 1),
+    'mailto' => ($this->getElement('mailto') == 1),
+    'extern' => ($this->getElement('extern') == 1),
+    'intern' => ($this->getElement('intern') == 1),
+);
 
-if ($this->getElement('multiple') == 1) {
-    $widget = rex_var_linklist::getWidget($buttonId, $name, $value, []);
-} else {
-    $widget = rex_var_custom_link::getWidget($buttonId, $name, $value, []);
-}
+$widget = rex_var_custom_link::getWidget($buttonId, $name, $value, $parameters);
 
 $class_group = trim('form-group ' . $this->getHTMLClass() . ' ' . $this->getWarningClass());
 
