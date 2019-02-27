@@ -2,7 +2,7 @@
  * Created by joachimdoerr on 19.09.16.
  */
 $(document).on('rex:ready', function () {
-     mform_init();
+    mform_init();
 });
 
 function mform_init() {
@@ -14,19 +14,10 @@ function mform_init() {
     initMFormToggle(mform);
 
     // init by siteload
-    if ($('#REX_FORM').length && mform.length) {
-        var custom_link = mform.find('.custom-link');
-
+    if ($('#REX_FORM').length || mform.length || $('form.rex-yform').length) {
+        var custom_link = $('div.custom-link');
         if (custom_link.length) {
             mform_custom_link(custom_link);
-        }
-    }
-
-    if ($('form.rex-yform').length) {
-        var yform_custom_link = $('div.custom-link');
-
-        if (yform_custom_link.length) {
-            mform_custom_link(yform_custom_link);
         }
     }
 
@@ -83,7 +74,7 @@ function initMFormAccordionToggle($element, reinit) {
 
     if (!opened && $element.attr('data-group-open-collapse') > 0) {
         $element.find('.collapse').each(function (index) {
-            if ((index+1) == $element.attr('data-group-open-collapse')) {
+            if ((index + 1) == $element.attr('data-group-open-collapse')) {
                 $(this).addClass('in');
             }
         });
@@ -118,7 +109,7 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
 
             if ($.isNumeric($element.attr('data-selected')) && $element.attr('data-selected') == indexId) {
                 $element.find('option[value=' + indexId + ']').attr('selected', 'selected');
-                $(target).addClass('in').css('height','');
+                $(target).addClass('in').css('height', '');
             }
         });
     }
@@ -174,7 +165,7 @@ function initMFormCollapseToggle($element, init) {
 
 function collapseToogle(target, type) {
     if (target.length) {
-        $(target).each(function(){
+        $(target).each(function () {
             var element = $(this);
             if ($(this).attr('data-target')) {
                 element = $(this).next();
@@ -186,7 +177,7 @@ function collapseToogle(target, type) {
 
 function collapseClass(target, type) {
     if (target.length) {
-        $(target).each(function(){
+        $(target).each(function () {
             var element = $(this);
             if ($(this).attr('data-target')) {
                 element = $(this).next();
@@ -206,7 +197,7 @@ function initMFormTooltip(mform) {
 }
 
 function initMFormToggle(mform) {
-    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').each(function(){
+    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').each(function () {
         var parent = $(this).parent();
         if (parent.hasClass('mform-toggle')) {
             $(this).clone(false).insertBefore(parent);
