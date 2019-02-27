@@ -28,13 +28,15 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
             'values' => [
                 'name' => ['type' => 'name',   'label' => rex_i18n::msg('yform_values_defaults_name')],
                 'label' => ['type' => 'text',   'label' => rex_i18n::msg('yform_values_defaults_label')],
-                'multiple' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_multiple')],
+                'media' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_media')],
+                'extern' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_extern')],
+                'mailto' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_mailto')],
+                'intern' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_intern')],
                 'notice' => ['type' => 'text',    'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('yform_values_custom_link_description'),
             'formbuilder' => false,
-            'db_type' => ['text'],
-            'famous' => true
+            'db_type' => ['text']
         ];
     }
 
@@ -43,23 +45,6 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
         if ($params['value'] == '') {
             return '-';
         }
-        $ids = explode(',', $params['value']);
-
-        foreach ($ids as $article_id) {
-            $article = $article = rex_article::get($article_id);
-            if ($article) {
-                $names[] = $article->getValue('name');
-            }
-        }
-
-        if ($names) {
-            if (count($names) > 4) {
-                $names = array_slice($names, 0, 4);
-                $names[] = '...';
-            }
-            return implode('<br />', $names);
-        }
-
-        return '-';
+        return rex_var_custom_link::getCustomLinkText($params['value']);
     }
 }

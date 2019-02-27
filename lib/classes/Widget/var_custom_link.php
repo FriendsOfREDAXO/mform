@@ -10,6 +10,21 @@
  */
 class rex_var_custom_link extends rex_var
 {
+    public static function getCustomLinkText($value)
+    {
+        $valueName = $value;
+        if (file_exists(rex_path::media($value)) === true) {
+            // do nothing
+        } else if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
+            // article!
+            $art = rex_article::get((int) $value);
+            if ($art instanceof rex_article) {
+                $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
+            }
+        }
+        return $valueName;
+    }
+
     protected function getOutput()
     {
         $id = $this->getArg('id', 0, true);
@@ -33,7 +48,7 @@ class rex_var_custom_link extends rex_var
                     $args[$key] = $this->getArg($key);
                 }
             }
-            $value = self::getWidget($id, 'REX_INPUT_LINKLIST[' . $id . ']', $value, $args);
+            $value = self::getWidget($id, 'REX_INPUT_LINK[' . $id . ']', $value, $args);
         } else {
             if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
                 $value = rex_getUrl($value);
@@ -45,18 +60,16 @@ class rex_var_custom_link extends rex_var
 
     public static function getWidget($id, $name, $value, array $args = [])
     {
-        $valueName = $value;
+        $valueName = self::getCustomLinkText($value);
         $category = '';
-        if (is_int($value)) {
-            $art = rex_article::get($value);
-
+        if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
+            $art = rex_article::get((int) $value);
             if ($art instanceof rex_article) {
-                $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
                 $category = $art->getCategoryId();
             }
         }
 
-        if (is_int($category) || isset($args['category']) && ($category = (int)$args['category'])) {
+        if (is_numeric($category) || isset($args['category']) && ($category = (int)$args['category'])) {
             $category = 'data-category=' . $category;
         }
 
@@ -64,10 +77,10 @@ class rex_var_custom_link extends rex_var
         $mediaClass = (isset($args['media']) && $args['media'] == 0) ? ' hidden' : $class;
         $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
-        $linkClass = (isset($args['link']) && $args['link'] == 0) ? ' hidden' : $class;
+        $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
 
         $e = [];
-        $e['field'] = '<input class="form-control" type="text" name="REX_LINKLIST_SELECT[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_CUSTOM_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_CUSTOM_LINK_' . $id . '" value="' . $value . '" />';
+        $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
         $e['functionButtons'] = '
         <a href="#" class="btn btn-popup' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
         <a href="#" class="btn btn-popup' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
