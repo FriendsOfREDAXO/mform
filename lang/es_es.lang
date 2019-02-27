@@ -56,3 +56,8 @@ mform_redactor_profile_create_success = El perfil Redactor "%s" fue creado con Ã
 var_extern_link = URL externo
 var_mailto_link = Enlace de Email
 var_phone_link = Enlace a phonenumber
+
+yform_values_custom_link_media = Media-link button
+yform_values_custom_link_extern = Extern-link button
+yform_values_custom_link_mailto = Mailto-link button
+yform_values_custom_link_intern = Redaxo internal-link button
