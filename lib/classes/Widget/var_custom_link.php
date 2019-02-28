@@ -82,7 +82,8 @@ class rex_var_custom_link extends rex_var
             $types = ' data-types="' . $types . '"';
         }
 
-        $class = (rex::getUser()->getComplexPerm('structure')->hasStructurePerm()) ? '' : ' rex-disabled';
+//        $class = (rex::getUser()->getComplexPerm('structure')->hasStructurePerm()) ? '' : ' rex-disabled';
+        $class = '';
         $mediaClass = (isset($args['media']) && $args['media'] == 0) ? ' hidden' : $class;
         $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
