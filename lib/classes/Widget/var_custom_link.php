@@ -17,7 +17,7 @@ class rex_var_custom_link extends rex_var
             // do nothing
         } else if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
             // article!
-            $art = rex_article::get((int) $value);
+            $art = rex_article::get((int)$value);
             if ($art instanceof rex_article) {
                 $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
             }
@@ -43,7 +43,7 @@ class rex_var_custom_link extends rex_var
                 return false;
             }
             $args = [];
-            foreach (['category', 'media', 'external', 'mailto', 'intern'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
@@ -60,17 +60,27 @@ class rex_var_custom_link extends rex_var
 
     public static function getWidget($id, $name, $value, array $args = [])
     {
+        dump($args);
         $valueName = self::getCustomLinkText($value);
         $category = '';
+        $mediaCategory = '';
+        $types = '';
+
         if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
-            $art = rex_article::get((int) $value);
+            $art = rex_article::get((int)$value);
             if ($art instanceof rex_article) {
                 $category = $art->getCategoryId();
             }
         }
 
         if (is_numeric($category) || isset($args['category']) && ($category = (int)$args['category'])) {
-            $category = 'data-category=' . $category;
+            $category = ' data-category="' . $category . '"';
+        }
+        if (isset($args['media_category']) && ($mediaCategory = (int)$args['media_category'])) {
+            $mediaCategory = ' data-media_category="' . $mediaCategory . '"';
+        }
+        if (isset($args['types']) && ($types = $args['types'])) {
+            $types = ' data-types="' . $types . '"';
         }
 
         $class = (rex::getUser()->getComplexPerm('structure')->hasStructurePerm()) ? '' : ' rex-disabled';
@@ -93,7 +103,7 @@ class rex_var_custom_link extends rex_var
         $fragment->setVar('elements', [$e], false);
         return str_replace(
             '<div class="input-group">',
-            '<div class="input-group custom-link" ' . $category . ' data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
+            '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . ' data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
             $fragment->parse('core/form/widget.php')
         );
     }

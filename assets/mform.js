@@ -6,7 +6,7 @@ $(document).on('rex:ready', function () {
 });
 
 function mform_init() {
-    var mform = $('.mform');
+    let mform = $('.mform');
 
     // init tooltip
     initMFormTooltip(mform);
@@ -15,7 +15,7 @@ function mform_init() {
 
     // init by siteload
     if ($('#REX_FORM').length || mform.length || $('form.rex-yform').length) {
-        var custom_link = $('div.custom-link');
+        let custom_link = $('div.custom-link');
         if (custom_link.length) {
             mform_custom_link(custom_link);
         }
@@ -64,7 +64,7 @@ function initMFormCollapseData(mform, reinit) {
 }
 
 function initMFormAccordionToggle($element, reinit) {
-    var opened = false;
+    let opened = false;
 
     $element.find('.collapse').each(function () {
         if ($(this).hasClass('in')) {
@@ -74,7 +74,7 @@ function initMFormAccordionToggle($element, reinit) {
 
     if (!opened && $element.attr('data-group-open-collapse') > 0) {
         $element.find('.collapse').each(function (index) {
-            if ((index + 1) == $element.attr('data-group-open-collapse')) {
+            if ((index+1) == $element.attr('data-group-open-collapse')) {
                 $(this).addClass('in');
             }
         });
@@ -82,7 +82,7 @@ function initMFormAccordionToggle($element, reinit) {
 }
 
 function initMFormSelectAccordionToggle($element, init, reinit) {
-    var acc = $element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
+    let acc = $element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
 
     if (init && acc.length) {
         $element.find('option').remove();
@@ -96,7 +96,7 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
         }
 
         acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
-            var togglecollapse = $(this),
+            let togglecollapse = $(this),
                 indexId = (index + 1),
                 target = togglecollapse.attr('data-target');
 
@@ -109,14 +109,14 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
 
             if ($.isNumeric($element.attr('data-selected')) && $element.attr('data-selected') == indexId) {
                 $element.find('option[value=' + indexId + ']').attr('selected', 'selected');
-                $(target).addClass('in').css('height', '');
+                $(target).addClass('in').css('height','');
             }
         });
     }
 
     if (acc.length) {
 
-        var selected = $element.find(':selected'),
+        let selected = $element.find(':selected'),
             target = selected.attr('data-target');
 
         if (!selected.length) {
@@ -133,10 +133,10 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
 }
 
 function initMFormCollapseToggle($element, init) {
-    var target = $element.attr('data-target');
+    let target = $element.attr('data-target');
 
     if (!$element.attr('data-target')) {
-        var form_group = $element.parents('.form-group'),
+        let form_group = $element.parents('.form-group'),
             next_link = form_group.nextAll('a[data-toggle=collapse]');
 
         if (next_link.attr('data-target')) {
@@ -165,8 +165,8 @@ function initMFormCollapseToggle($element, init) {
 
 function collapseToogle(target, type) {
     if (target.length) {
-        $(target).each(function () {
-            var element = $(this);
+        $(target).each(function(){
+            let element = $(this);
             if ($(this).attr('data-target')) {
                 element = $(this).next();
             }
@@ -177,8 +177,8 @@ function collapseToogle(target, type) {
 
 function collapseClass(target, type) {
     if (target.length) {
-        $(target).each(function () {
-            var element = $(this);
+        $(target).each(function(){
+            let element = $(this);
             if ($(this).attr('data-target')) {
                 element = $(this).next();
             }
@@ -197,8 +197,8 @@ function initMFormTooltip(mform) {
 }
 
 function initMFormToggle(mform) {
-    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').each(function () {
-        var parent = $(this).parent();
+    mform.find('input[type=checkbox][data-mform-toggle^=toggle]').each(function(){
+        let parent = $(this).parent();
         if (parent.hasClass('mform-toggle')) {
             $(this).clone(false).insertBefore(parent);
             parent.remove();
@@ -210,8 +210,11 @@ function initMFormToggle(mform) {
 
 function mform_custom_link(item) {
     item.each(function () {
-        var $id = $(this).data('id'),
+        let $id = $(this).data('id'),
             $clang = $(this).data('clang'),
+            $mediaTypes = $(this).data('types'),
+            $mediaCategory = $(this).data('media_category'),
+            $linkCategory = $(this).data('category'),
             media_button = $(this).find('a#mform_media_' + $id),
             link_button = $(this).find('a#mform_link_' + $id),
             delete_button = $(this).find('a#mform_delete_' + $id),
@@ -221,19 +224,32 @@ function mform_custom_link(item) {
             hidden_input = $(this).find('input[type=hidden]').addClass('form-control').attr('readonly', true),
             showed_input = $(this).find('input[type=text]');
 
+
         media_button.unbind().bind('click', function () {
             hidden_show_media(hidden_input, showed_input, $id);
-            openREXMedia($id, '');
+            let args = '';
+            if ($mediaTypes !== undefined) {
+                args = '&args[types]=' + $mediaTypes;
+            }
+            if ($mediaCategory !== undefined) {
+                args = args + '&args[category]=' + $mediaCategory;
+            }
+            console.log(args);
+            openREXMedia($id, args); // &args[preview]=1&args[types]=jpg%2Cpng
             return false;
         });
         link_button.unbind().bind('click', function () {
             show_hidden_link(hidden_input, showed_input);
-            openLinkMap('REX_LINK_' + $id, '&clang=' + $clang);
+            let query = '&clang=' + $clang;
+            if ($linkCategory !== undefined) {
+                query = query + '&category_id=' + $linkCategory;
+            }
+            openLinkMap('REX_LINK_' + $id, query);
             return false;
         });
         extern_button.unbind().bind('click', function () {
             show_hidden_link(hidden_input, showed_input);
-            var extern_link = prompt('Link', 'http://');
+            let extern_link = prompt('Link', 'http://');
             if (extern_link != 'http://' && extern_link != "" && extern_link != undefined) {
                 showed_input.val(extern_link);
                 hidden_input.val(extern_link);
@@ -242,7 +258,7 @@ function mform_custom_link(item) {
         });
         mailto_button.unbind().bind('click', function () {
             show_hidden_link(hidden_input, showed_input);
-            var mailto_link = prompt('Mail', 'mailto:');
+            let mailto_link = prompt('Mail', 'mailto:');
             if (mailto_link != 'mailto:' && mailto_link != "" && mailto_link != undefined) {
                 showed_input.val(mailto_link);
                 hidden_input.val(mailto_link);
@@ -251,7 +267,7 @@ function mform_custom_link(item) {
         });
         tel_button.unbind().bind('click', function () {
             show_hidden_link(hidden_input, showed_input);
-            var tel_link = prompt('Telephone', 'tel:');
+            let tel_link = prompt('Telephone', 'tel:');
             if (tel_link != 'tel:' && tel_link != "" && tel_link != undefined) {
                 showed_input.val(tel_link);
                 hidden_input.val(tel_link);
