@@ -88,6 +88,8 @@ class rex_var_custom_link extends rex_var
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
 
+        $id = uniqid($id);
+
         $e = [];
         $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
         $e['functionButtons'] = '
