@@ -60,7 +60,6 @@ class rex_var_custom_link extends rex_var
 
     public static function getWidget($id, $name, $value, array $args = [])
     {
-        dump($args);
         $valueName = self::getCustomLinkText($value);
         $category = '';
         $mediaCategory = '';
