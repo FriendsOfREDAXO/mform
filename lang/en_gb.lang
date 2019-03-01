@@ -57,7 +57,11 @@ var_extern_link = Link to extern url
 var_mailto_link = Link to email
 var_phone_link = Link to phonenumber
 
+yform_values_custom_link_description = CustomLink widget from mform. Provides a link widget for multiple link types. Media, external, internal and email links
 yform_values_custom_link_media = Media-link button
+yform_values_custom_link_media_types = Media types (comma-separated)
+yform_values_custom_link_media_category = Media category (ID)
 yform_values_custom_link_external = Extern-link button
 yform_values_custom_link_mailto = Mailto-link button
 yform_values_custom_link_intern = Redaxo internal-link button
+yform_values_custom_link_link_category = Link category
