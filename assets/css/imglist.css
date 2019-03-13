@@ -1,0 +1,58 @@
+.rex-js-widget-imglist select.form-control {
+    display: none;
+}
+
+.rex-js-widget-imglist ul {
+    list-style: none;
+    margin: 0;
+    height: 160px;
+    padding: 5px;
+    overflow-y: scroll;
+}
+
+.rex-js-widget-imglist ul li {
+    margin: 0 0 5px 0;
+    padding: 0 5px 0 0;
+    float: left;
+    width: 100px;
+    height: 100px;
+    box-sizing: border-box;
+}
+.rex-js-widget-imglist ul li img {
+    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+}
+
+.rex-js-widget-imglist ul li.selected img {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.085), 0 0 8px rgba(102, 175, 233, 0.8);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.085), 0 0 8px rgba(102, 175, 233, 0.8)
+}
+
+.rex-js-widget-imglist ul li.li-placeholder {
+    background: rgba(243, 246, 251, .6);
+    border: 1px solid rgba(221, 221, 221, .6);
+}
+
+.rex-js-widget-imglist ul li .thumbnail {
+    object-fit: cover;
+    object-position: center;
+    height: 100px;
+    width: 100px;
+}
+
+.rex-js-widget-imglist ul:before, /* for modern browsers */
+.rex-js-widget-imglist ul:after {
+    content: "";
+    display: table;
+}
+
+.rex-js-widget-imglist ul:after {
+    clear: both;
+}
+
+.rex-js-widget-imglist ul { /* for IE6,7 */
+    zoom: 1;
+}

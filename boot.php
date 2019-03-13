@@ -29,6 +29,9 @@ if (rex::isBackend()) {
     // add toggle files
     rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
+    // widgets
+    rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
+    rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
     // add mform js
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
 
