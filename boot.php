@@ -5,7 +5,11 @@
  * @license MIT
  */
 
-rex_yform::addTemplatePath(rex_path::addon('mform', 'data/ytemplates'));
+if (rex_addon::exists('yform') &&
+    rex_addon::get('yform')->isAvailable() &&
+    rex_plugin::get('yform', 'manager')->isAvailable()) {
+    rex_yform::addTemplatePath(rex_path::addon('mform', 'data/ytemplates'));
+}
 
 if (rex::isBackend()) {
     // check theme css is exists
