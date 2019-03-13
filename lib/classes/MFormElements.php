@@ -539,6 +539,20 @@ class MFormElements
     }
 
     /**
+     * add rex media list field
+     * @param $id
+     * @param array $parameter
+     * @param null $catId
+     * @param array $attributes
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addImagelistField($id, $parameter = array(), $catId = NULL, $attributes = array())
+    {
+        return $this->addElement('imglist', $id, NULL, $attributes, array(), $parameter, $catId);
+    }
+
+    /**
      * @param $label
      * @author Joachim Doerr
      * @return $this

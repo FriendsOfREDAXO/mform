@@ -71,6 +71,7 @@ class MFormValueHandler
                 case 'linklist':
                     $value = $result['linklist'][$item->getVarId()[0]];
                     break;
+                case 'imglist':
                 case 'medialist':
                     $value = $result['filelist'][$item->getVarId()[0]];
                     break;
