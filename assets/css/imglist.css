@@ -11,8 +11,8 @@
 }
 
 .rex-js-widget-imglist ul li {
-    margin: 0 0 5px 0;
-    padding: 0 5px 0 0;
+    margin: 0 5px 5px 0;
+    padding: 0;
     float: left;
     width: 100px;
     height: 100px;
