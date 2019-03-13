@@ -195,9 +195,6 @@ function imglist_write_input(id, i_list, i_select) {
     let source_elements = $('#' + i_select + id + ' li'),
         new_value = '';
 
-    console.log('#' + i_select + id + ' li');
-    console.log(source_elements.length);
-
     for (let i = 0; i < source_elements.length; i++) {
         new_value = new_value + $(source_elements[i]).attr('value');
         if (source_elements.length > (i + 1)) new_value = new_value + ',';
