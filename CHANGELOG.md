@@ -1,15 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 5.3
-
-* add customer link as widget
-
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
 * remove `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
+
+### Version 5.3
+
+* added customer link as widget
+* exchange custom link for yform and rex_form
+* added image list widget for mfrom, rex_form and yform 
 
 ### Version 5.2.5
 
