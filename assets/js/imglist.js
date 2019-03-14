@@ -1,9 +1,9 @@
-let img_list = '.rex-js-widget-imglist';
+let mform_img_list = '.rex-js-widget-imglist';
 
 $(document).on('rex:ready', function (e, container) {
     setTimeout(function () {
-        if (container.find(img_list).length) {
-            container.find(img_list).each(function () {
+        if (container.find(mform_img_list).length) {
+            container.find(mform_img_list).each(function () {
                 imglist_init_widget($(this));
                 imglist_list_items_action($(this));
                 imglist_widget_actions($(this));
@@ -42,7 +42,7 @@ function writeREXMedialist(id) {
     let letitgo = true,
         element;
 
-    $(img_list).each(function () {
+    $(mform_img_list).each(function () {
         // if the the widget id a imglist?
         if ($(this).attr('data-widget-id') == id) {
             // yes don't let it go ;)

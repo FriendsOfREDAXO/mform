@@ -43,7 +43,6 @@ class rex_var_imglist extends rex_var
 
     public static function getWidget($id, $name, $value, array $args = [])
     {
-//        dump($id, $name, $value);
         $open_params = '';
         if (isset($args['category']) && ($category = (int) $args['category'])) {
             $open_params .= '&amp;rex_file_category=' . $category;
@@ -60,6 +59,9 @@ class rex_var_imglist extends rex_var
                 $wdgtClass .= ' rex-js-widget-preview-media-manager';
             }
         }
+
+        // todo tooltip option
+        // add to $wdgtClass class rex-js-widget-tooltip
 
         $thumbnails = '';
         $options = '';
