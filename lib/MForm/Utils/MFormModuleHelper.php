@@ -8,6 +8,7 @@
 namespace MForm\Utils;
 
 
+use rex;
 use rex_view;
 
 class MFormModuleHelper
@@ -66,12 +67,12 @@ class MFormModuleHelper
     /**
      * @param $headline
      * @param string $viewType
-     * @return mixed
      * @author Joachim Doerr
+     * @return string
      */
     public static function exchangeBackendInfo($headline = 'Settings', $viewType = 'content')
     {
-        if (sizeof(self::$msg) > 0) {
+        if (sizeof(self::$msg) > 0 && rex::isBackend()) {
             $output = '<div class="mform-module-settings">' . rex_view::$viewType(implode('', self::$msg), $headline) . '</div>';
             self::$msg = array();
             return $output;
