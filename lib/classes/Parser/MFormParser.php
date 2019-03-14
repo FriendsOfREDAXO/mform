@@ -722,126 +722,6 @@ class MFormParser
      * @return $this
      * @author Joachim Doerr
      */
-    private function generateCustomLinkElement(MFormItem $item)
-    {
-        // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-
-        $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));
-
-        // create templateElement object
-        $templateElement = new MFormElement();
-        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
-
-        $html = rex_var_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $item->getParameter());
-
-        $dom = new DOMDocument();
-        @$dom->loadHTML(utf8_decode($html));
-        $div = $dom->getElementsByTagName('div');
-
-        $attributes = $item->getAttributes();
-
-        $mediaFragment = $dom->createDocumentFragment();
-        $mediaFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_media_{$item->getId()}\" title=\"" . rex_i18n::msg('var_media_open') . "\"><i class=\"rex-icon fa-file-o\"></i></a>");
-        $linkFragment = $dom->createDocumentFragment();
-        $linkFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_extern_{$item->getId()}\" title=\"" . rex_i18n::msg('var_extern_link') . "\"><i class=\"rex-icon fa-external-link\"></i></a>");
-        $mailtoFragment = $dom->createDocumentFragment();
-        $mailtoFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_mailto_{$item->getId()}\" title=\"" . rex_i18n::msg('var_mailto_link') . "\"><i class=\"rex-icon fa-envelope-o\"></i></a>");
-        $telFragment = $dom->createDocumentFragment();
-        $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"" . rex_i18n::msg('var_phone_link') . "\"><i class=\"rex-icon fa-phone\"></i></a>");
-
-        if ($div instanceof DOMNodeList) {
-            foreach ($div as $divItem) {
-                if ($divItem instanceof DOMElement && $divItem->hasChildNodes()) {
-                    $divItem->setAttribute('data-id', $item->getId());
-                    $divItem->setAttribute('data-clang', rex_clang::getCurrentId());
-                    $divItem->setAttribute('class', $divItem->getAttribute('class') . ' custom-link');
-                    /** @var DOMElement $childNode */
-                    foreach ($divItem->childNodes as $childNode) {
-                        if ($childNode->hasAttribute('class') && $childNode->getAttribute('class') == 'input-group-btn') {
-                            if ($childNode->hasChildNodes()) {
-
-                                if (!array_key_exists('data-intern', $attributes)) {
-                                    $attributes['data-intern'] = 'enable';
-                                }
-
-                                foreach ($childNode->childNodes as $node) {
-                                    if ($node instanceof DOMElement) {
-                                        if (strpos($node->getAttribute('onclick'), 'openLinkMap') !== false) {
-                                            $node->setAttribute('id', 'mform_link_' . $item->getId());
-                                            if ($attributes['data-intern'] == 'disable') {
-                                                $node->setAttribute('style', 'display:none');
-                                            }
-                                        }
-                                        if (strpos($node->getAttribute('onclick'), 'deleteREXLink') !== false) {
-                                            $node->setAttribute('id', 'mform_delete_' . $item->getId());
-                                        }
-                                        $node->removeAttribute('onclick');
-                                    }
-                                }
-
-                                if (!array_key_exists('data-extern', $attributes)) {
-                                    $attributes['data-extern'] = 'enable';
-                                }
-                                if (!array_key_exists('data-media', $attributes)) {
-                                    $attributes['data-media'] = 'enable';
-                                }
-
-                                if ($attributes['data-extern'] == 'enable') {
-                                    $childNode->insertBefore($linkFragment, $childNode->firstChild);
-                                }
-                                if ($attributes['data-media'] == 'enable') {
-                                    $childNode->insertBefore($mediaFragment, $childNode->firstChild);
-                                }
-                                if (array_key_exists('data-mailto', $attributes) && $attributes['data-mailto'] == 'enable') {
-                                    $childNode->insertBefore($mailtoFragment, $childNode->firstChild);
-                                }
-                                if (array_key_exists('data-tel', $attributes) && $attributes['data-tel'] == 'enable') {
-                                    $childNode->insertBefore($telFragment, $childNode->firstChild);
-                                }
-                            }
-                        }
-                        if (($childNode->hasAttribute('class')
-                                && $childNode->getAttribute('class') == 'form-control')
-                            && ($childNode->hasAttribute('value')
-                                && $childNode->getAttribute('value') == '')) {
-                            $childNode->setAttribute('value', $item->getValue());
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-                                foreach ($item->getAttributes() as $key => $value) {
-                                    $childNode->setAttribute($key, $value);
-                                }
-                            }
-                        }
-                    }
-                    // $html = utf8_encode($divItem->C14N(false,true));
-                    $html = $divItem->C14N(false, true);
-                    if (strpos($html, '<body') !== false) {
-                        preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                        if (isset($matches[1])) {
-                            $html = $matches[1];
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        $templateElement->setElement($html);
-
-        // add classes for custom type
-        $templateType = $this->getDefaultTemplateType($item, $templateElement);
-
-        // add to output element array
-        $this->elements[] = $this->parseElement($templateElement, $templateType);
-        return $this;
-    }
-
-    /**
-     * link, linklist
-     * @param MFormItem $item
-     * @return $this
-     * @author Joachim Doerr
-     */
     private function generateLinkElement(MFormItem $item)
     {
         // create templateElement object
@@ -850,8 +730,12 @@ class MFormParser
 
         switch ($item->getType()) {
             default:
+            case 'custom-link':
             case 'link':
-                $html = rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+                /** @var rex_var_link|rex_var_custom_link $class */
+                $class = 'rex_var_' . str_replace('-', '_', $item->getType());
+                $name = ($item->getType() == 'link') ? 'REX_INPUT_LINK' : 'REX_INPUT_VALUE';
+                $html = $class::getWidget($item->getVarId()[0], $name . '[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -868,14 +752,6 @@ class MFormParser
                         }
                     }
                 }
-                $html = $dom->C14N(false, true);
-                if (strpos($html, '<body') !== false) {
-                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                    if (isset($matches[1])) {
-                        $html = $matches[1];
-                    }
-                }
-
                 break;
             case 'linklist':
                 $html = rex_var_linklist::getWidget($item->getVarId()[0], 'REX_INPUT_LINKLIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
@@ -895,15 +771,15 @@ class MFormParser
                         }
                     }
                 }
-                $html = $dom->C14N(false, true);
-                if (strpos($html, '<body') !== false) {
-                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                    if (isset($matches[1])) {
-                        $html = $matches[1];
-                    }
-                }
-
                 break;
+        }
+
+        $html = $dom->C14N(false, true);
+        if (strpos($html, '<body') !== false) {
+            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+            if (isset($matches[1])) {
+                $html = $matches[1];
+            }
         }
 
         $templateElement->setElement($html);
@@ -1011,10 +887,8 @@ class MFormParser
                         break;
                     case 'link':
                     case 'linklist':
-                        $this->generateLinkElement($item);
-                        break;
                     case 'custom-link':
-                        $this->generateCustomLinkElement($item);
+                        $this->generateLinkElement($item);
                         break;
                     case 'media':
                     case 'medialist':
