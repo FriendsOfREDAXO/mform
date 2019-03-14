@@ -2,6 +2,8 @@
 
 /**
  * @package redaxo\mediapool
+ * usage:
+ *  $field = $form->addField('', 'image_list', null, ['internal::fieldClass' => 'rex_form_widget_imglist_element'], true);
  */
 class rex_form_widget_imglist_element extends rex_form_element
 {

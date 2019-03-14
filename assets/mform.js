@@ -14,7 +14,7 @@ function mform_init() {
     initMFormToggle(mform);
 
     // init by siteload
-    if ($('#REX_FORM').length || mform.length || $('form.rex-yform').length) {
+    if ($('#REX_FORM').length || mform.length || $('form.rex-yform').length || $($('form div.custom-link').length)) {
         let custom_link = $('div.custom-link');
         if (custom_link.length) {
             mform_custom_link(custom_link);
