@@ -56,3 +56,12 @@ mform_redactor_profile_create_success = El perfil Redactor "%s" fue creado con �
 var_extern_link = URL externo
 var_mailto_link = Enlace de Email
 var_phone_link = Enlace a phonenumber
+
+yform_values_custom_link_description = Widget CustomLink de mform. Proporciona un widget de enlace para múltiples tipos de enlaces. Medios, enlaces externos, internos y de email.
+yform_values_custom_link_media = Media-link button
+yform_values_custom_link_media_types = Tipos de medios (separados por comas)
+yform_values_custom_link_media_category = Categoría de medios (ID)
+yform_values_custom_link_external = Extern-link button
+yform_values_custom_link_mailto = Mailto-link button
+yform_values_custom_link_intern = Redaxo internal-link button
+yform_values_custom_link_link_category = Categoría de enlace

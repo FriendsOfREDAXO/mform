@@ -56,3 +56,12 @@ mform_redactor_profile_create_success = Redactor Profile "%s" wurde erfolgreich 
 var_extern_link = Externe URL verlinken
 var_mailto_link = Email verlinken
 var_phone_link = Telefonnummer verlinken
+
+yform_values_custom_link_description = CustomLink-Widget aus mform. Stellt ein Link-Widget für mehrere Link-Typen bereit. Medien-, externe, interne und E-Mail- Links
+yform_values_custom_link_media = Media-Link Button
+yform_values_custom_link_media_types = Medien-Typen (komma-getrennt)
+yform_values_custom_link_media_category = Medien-Kategorie (ID)
+yform_values_custom_link_external = Extern-Link Button
+yform_values_custom_link_mailto = Mailto-Link button
+yform_values_custom_link_intern = Interner-Link Button
+yform_values_custom_link_link_category = Link-Kategorie

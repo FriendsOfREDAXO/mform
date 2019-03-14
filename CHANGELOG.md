@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.3
+
+* add customer link as widget
+
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
@@ -10,6 +14,7 @@
 ### Version 5.2.5
 
 * add possibility to disable select options
+* fix fieldset and grouping issues
 
 ### Version 5.2.4
 

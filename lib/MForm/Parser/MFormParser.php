@@ -695,17 +695,12 @@ class MFormParser
                         }
                     }
                 }
-                $html = $dom->C14N(false, true);
-                if (strpos($html, '<body') !== false) {
-                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                    if (isset($matches[1])) {
-                        $html = $matches[1];
-                    }
-                }
-
                 break;
+            case 'imglist':
             case 'medialist':
-                $html = rex_var_medialist::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
+                /** @var rex_var_medialist|rex_var_imglist $class */
+                $class = 'rex_var_' . $item->getType();
+                $html = $class::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -722,15 +717,15 @@ class MFormParser
                         }
                     }
                 }
-                $html = $dom->C14N(false, true);
-                if (strpos($html, '<body') !== false) {
-                    preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                    if (isset($matches[1])) {
-                        $html = $matches[1];
-                    }
-                }
-
                 break;
+        }
+
+        $html = $dom->C14N(false, true);
+        if (strpos($html, '<body') !== false) {
+            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+            if (isset($matches[1])) {
+                $html = $matches[1];
+            }
         }
 
         $templateElement->setElement($html);
@@ -1065,6 +1060,7 @@ class MFormParser
                         break;
                     case 'media':
                     case 'medialist':
+                    case 'imglist':
                         $this->generateMediaElement($item);
                         break;
                 }
