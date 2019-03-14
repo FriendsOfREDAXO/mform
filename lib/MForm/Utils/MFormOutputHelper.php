@@ -39,8 +39,9 @@ class MFormOutputHelper
     public static function prepareCustomLink(array $item, $externBlank = true)
     {
         // set url
-        if (!isset($item[1]) or empty($item[1])) return $item;
-        $item['customlink_url'] = $item[1];
+        if (!isset($item['link']) or empty($item['link'])) return $item;
+        $item['customlink_text'] = (isset($item['text']) && !isset($item['customlink_text'])) ? $item['text'] : '';
+        $item['customlink_url'] = $item['link'];
         $item['customlink_target'] = '';
 
         // media file?
