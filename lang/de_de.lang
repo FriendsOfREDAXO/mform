@@ -66,4 +66,4 @@ yform_values_custom_link_external = Extern-Link Button
 yform_values_custom_link_mailto = Mailto-Link button
 yform_values_custom_link_intern = Interner-Link Button
 yform_values_custom_link_link_category = Link-Kategorie
-yform_values_imagelist_description = Einzelne oder mehrere Medienpool-Datei/en direkt als Bild auswählen.
+yform_values_imagelist_description = Bildauswahl mit direkter Darstellung mit drag & drop
