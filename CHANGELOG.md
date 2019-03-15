@@ -2,7 +2,7 @@
 
 ### Version 5.3
 
-* added customer link as widget
+* added custom link as widget
 * exchange custom link for yform and rex_form
 * added image list widget for mfrom, rex_form and yform 
 
