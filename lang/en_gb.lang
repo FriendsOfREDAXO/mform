@@ -33,6 +33,7 @@ mform_example_base_select = Select and multiselect elements
 mform_example_base_checkbox = Checkbox and radio elements
 mform_example_base_inline = Structured inline elements
 mform_example_base_system = System button elements
+mform_example_base_widgets = MForm widget elements
 mform_example_extended_attribute_method = Attributes method
 mform_example_extended_options_method = Options method
 mform_example_extended_parameter_method = Parameter method
