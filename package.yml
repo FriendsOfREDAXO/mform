@@ -27,4 +27,4 @@ system_plugins:
     - docs
 conflicts:
     packages:
-        ui_tools: '>=1.0.0'
+        ui_tools: '<1.0.0'
