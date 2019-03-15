@@ -9,7 +9,7 @@ Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen
 
 **Hinweis**
 
-* MForm ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
+* Der MForm Formular-Builder ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
 
 
 ## Installation
