@@ -1,5 +1,5 @@
 package: mform
-version: '5.2.4'
+version: '5.3.0'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -21,7 +21,7 @@ page:
                 # demo_community: { title: 'translate:demo_community' }
 
 requires:
-    redaxo: '^5.1.0'
+    redaxo: '^5.6.5'
 
 system_plugins:
     - docs
