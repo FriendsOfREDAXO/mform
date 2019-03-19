@@ -803,7 +803,6 @@ class MFormParser
         foreach (array('intern'=>'enable','extern'=>'enable','media'=>'enable','mailto'=>'enable','tel'=>'disable') as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
             $key = ($key == 'extern') ? 'external' : $key;
-            $key = ($key == 'mailto') ? 'extmailtoernal' : $key;
             $item->setParameter(array_merge($item->getParameter(), array($key => $value)));
         }
 
