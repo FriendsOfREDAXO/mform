@@ -6,6 +6,8 @@
  */
 
 // rex request
+use MForm\Utils\MFormThemeHelper;
+
 $config = rex_post('config', array(
     array('mform_theme', 'string'),
     array('submit', 'boolean')
