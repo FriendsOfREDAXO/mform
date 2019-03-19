@@ -9,6 +9,7 @@ $parameters = array(
     'mailto' => ($this->getElement('mailto') == 1),
     'extern' => ($this->getElement('extern') == 1),
     'intern' => ($this->getElement('intern') == 1),
+    'phone' => ($this->getElement('phone') == 1),
     'types' => $this->getElement('types'),
     'category' => $this->getElement('category'),
     'media_category' => $this->getElement('media_category'),

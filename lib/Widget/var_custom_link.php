@@ -43,7 +43,7 @@ class rex_var_custom_link extends rex_var
                 return false;
             }
             $args = [];
-            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
@@ -58,7 +58,7 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
-    public static function getWidget($id, $name, $value, array $args = [])
+    public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
     {
         $valueName = self::getCustomLinkText($value);
         $category = '';
@@ -88,8 +88,11 @@ class rex_var_custom_link extends rex_var
         $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
+        $phoneClass = (isset($args['phone']) && $args['phone'] == 0) ? ' hidden' : $class;
 
-        $id = uniqid($id);
+        if ($btnIdUniq === true) {
+            $id = uniqid($id);
+        }
 
         $e = [];
         $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
@@ -97,9 +100,13 @@ class rex_var_custom_link extends rex_var
         <a href="#" class="btn btn-popup' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
         <a href="#" class="btn btn-popup' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
+        <a href="#" class="btn btn-popup' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
         <a href="#" class="btn btn-popup' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
         <a href="#" class="btn btn-popup' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
         ';
+
+        # $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"" . rex_i18n::msg('var_phone_link') . "\"><i class=\"rex-icon fa-phone\"></i></a>");
+
 
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);

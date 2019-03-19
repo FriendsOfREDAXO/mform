@@ -69,7 +69,6 @@ $mform->addLinkField(1,array('label'=>'Link','category'=>3));
 // linklist button
 $mform->addLinklistField(1,array('label'=>'Linklist','category'=>3));
 
-
 // fieldset
 $mform->addFieldset('Custom elements');
 
@@ -78,6 +77,9 @@ $mform->addCustomLinkField(5.1,array('label'=>'Customlink'));
 
 // input field
 $mform->addInputField("range", 5.2, array('label'=>'Range field'));
+
+// img list
+$mform->addImagelistField(5.3, array('label' => 'Imagelist'));
 
 
 // get formular
