@@ -51,6 +51,11 @@ class rex_form_widget_customlink_element extends rex_form_element
         $this->args['types'] = $types;
     }
 
+    public function setPhone($phone)
+    {
+        $this->args['phone'] = $phone;
+    }
+
     public function formatElement()
     {
         static $widget_counter = 1;
