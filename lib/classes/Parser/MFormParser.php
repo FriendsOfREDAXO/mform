@@ -730,12 +730,8 @@ class MFormParser
 
         switch ($item->getType()) {
             default:
-            case 'custom-link':
             case 'link':
-                /** @var rex_var_link|rex_var_custom_link $class */
-                $class = 'rex_var_' . str_replace('-', '_', $item->getType());
-                $name = ($item->getType() == 'link') ? 'REX_INPUT_LINK' : 'REX_INPUT_VALUE';
-                $html = $class::getWidget($item->getVarId()[0], $name . '[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+                $html = rex_var_link::getWidget($item->getVarId()[0], 'REX_INPUT_LINK[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -791,6 +787,79 @@ class MFormParser
         $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
     }
+
+
+    /**
+     * link, linklist
+     * @param MFormItem $item
+     * @return $this
+     * @author Joachim Doerr
+     */
+    private function generateCustomLinkElement(MFormItem $item)
+    {
+        // default manipulations
+        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+
+        foreach (array('intern'=>'enable','extern'=>'enable','media'=>'enable','mailto'=>'enable','tel'=>'disable') as $key => $value) {
+            $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
+            $key = ($key == 'extern') ? 'external' : $key;
+            $key = ($key == 'mailto') ? 'extmailtoernal' : $key;
+            $item->setParameter(array_merge($item->getParameter(), array($key => $value)));
+        }
+
+        $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));
+
+        // create templateElement object
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
+
+        $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $item->getParameter(), false);
+
+        $dom = new DOMDocument();
+        @$dom->loadHTML(utf8_decode($html));
+
+        $div = $dom->getElementsByTagName('div');
+
+        if ($div instanceof DOMNodeList) {
+            foreach ($div as $divItem) {
+                if ($divItem instanceof DOMElement && $divItem->hasChildNodes()) {
+                    $divItem->setAttribute('data-id', $item->getId());
+                    $divItem->setAttribute('data-clang', rex_clang::getCurrentId());
+                    $divItem->setAttribute('class', $divItem->getAttribute('class') . ' custom-link');
+                    /** @var DOMElement $childNode */
+                    foreach ($divItem->childNodes as $childNode) {
+                        if (($childNode->hasAttribute('class')
+                                && $childNode->getAttribute('class') == 'form-control')
+                            && ($childNode->hasAttribute('value')
+                                && $childNode->getAttribute('value') == '')) {
+                            $childNode->setAttribute('value', $item->getValue());
+                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                                foreach ($item->getAttributes() as $key => $value) {
+                                    $childNode->setAttribute($key, $value);
+                                }
+                            }
+                        }
+                    }
+                    // $html = utf8_encode($divItem->C14N(false,true));
+                    $html = $divItem->C14N(false, true);
+                    if (strpos($html, '<body') !== false) {
+                        preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+                        if (isset($matches[1])) {
+                            $html = $matches[1];
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+        $templateElement->setElement($html);
+        // add classes for custom type
+        $templateType = $this->getDefaultTemplateType($item, $templateElement);
+        // add to output element array
+        $this->elements[] = $this->parseElement($templateElement, $templateType);
+        return $this;
+    }
+
 
     /**
      * @param MFormItem[] $items
@@ -887,8 +956,11 @@ class MFormParser
                         break;
                     case 'link':
                     case 'linklist':
-                    case 'custom-link':
                         $this->generateLinkElement($item);
+                        break;
+                    case 'customlink':
+                    case 'custom-link':
+                        $this->generateCustomLinkElement($item);
                         break;
                     case 'media':
                     case 'medialist':
