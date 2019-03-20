@@ -21,13 +21,14 @@ class MForm extends MFormElements
      * mform constructor.
      * @param string $template
      * @param bool $debug
+     * @param bool $fill
      */
-    function __construct($template = null, $debug = false)
+    function __construct($template = null, $debug = false, $fill = true)
     {
         $this->theme = $template;
         $this->debug = $debug;
 
-        parent::__construct();
+        parent::__construct($fill);
     }
 
     /**

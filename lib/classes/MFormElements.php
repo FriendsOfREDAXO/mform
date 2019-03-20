@@ -25,10 +25,11 @@ class MFormElements
     /**
      * MFormElements constructor.
      * @author Joachim Doerr
+     * @param bool $fill
      */
-    public function __construct()
+    public function __construct($fill = true)
     {
-        if (!$this->result && rex_request('function', 'string') == 'edit') {
+        if (!$this->result && rex_request('function', 'string') == 'edit' && $fill === true) {
             // load rex vars
             $this->result = MFormValueHandler::loadRexVars();
         }
