@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 5.3.1
+* fixed: JSON-Values could not be used in 5.3
+
 ### Version 5.3
 
 * added custom link as widget
