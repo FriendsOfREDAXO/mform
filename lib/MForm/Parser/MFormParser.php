@@ -748,9 +748,10 @@ class MFormParser
     private function generateLinkElement(MFormItem $item)
     {
         $inputValue = false;
+
         if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
             MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-            $inputValue = true;
+            $inputValue = (sizeof($item->getVarId()) > 1);
         }
 
         // create templateElement object
