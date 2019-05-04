@@ -22,6 +22,7 @@ use rex_addon;
 use rex_clang;
 use rex_i18n;
 use rex_url;
+use rex_var_custom_link;
 use rex_var_link;
 use rex_var_linklist;
 use rex_var_media;
