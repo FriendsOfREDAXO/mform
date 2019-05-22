@@ -18,6 +18,20 @@ Jeder dieser Typen kann aktiviert oder deaktiviert werden. Per default sind folg
 * `data-intern`
 * `data-media`
 
+Beispiel: 
+
+```php
+$mform->addCustomLinkField(6, array('label'=>'Media', 'data-phone'=>'disable', 'data-mailto'=>'disable', 'data-intern'=>'disable'));
+```
+
+
+> ***Wichtig***
+Beim Einsatz mit **mblock** muss ein numerischer Key verwendet werden: 
+
+Beispiel: `$Mform->addCustomlinkField("$id.0.1")` 
+
+
+
 ## Einsatz außerhalb von MForm
 
 Das Custom-Link Element ist auch als Widget in YForm und als REXVAR einsetzbar. 
