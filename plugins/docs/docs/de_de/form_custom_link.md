@@ -25,10 +25,11 @@ $mform->addCustomLinkField(6, array('label'=>'Media', 'data-phone'=>'disable', '
 ```
 
 
-> ***Wichtig***
-Beim Einsatz mit **mblock** muss ein numerischer Key verwendet werden: 
+> ***Wichtig*** Beim Einsatz mit **mblock** muss ein numerischer Key verwendet werden: 
 
-Beispiel: `$Mform->addCustomlinkField("$id.0.1")` 
+Beispiel: 
+
+`$Mform->addCustomlinkField("$id.0.1")` 
 
 
 
