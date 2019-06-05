@@ -46,7 +46,10 @@ class MFormOutputHelper
 
                 if (empty($item['customlink_text'])) {
                     $art = rex_article::get($item[1], rex_clang::getCurrentId());
+                    if($art)
+                    {    
                     $item['customlink_text'] = $art->getName();
+                    }
                 }
             } else {
                 $item['customlink_class'] = ' extern';
