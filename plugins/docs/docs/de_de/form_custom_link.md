@@ -35,7 +35,32 @@ Beispiel:
 
 ## Einsatz außerhalb von MForm
 
-Das Custom-Link Element ist auch als Widget in YForm und als REXVAR einsetzbar. 
+Das Custom-Link Element ist auch als Widget in rex_form, YForm und als REXVAR einsetzbar. 
+
+In rex_form einfach ein bestehendes Objekt mit folgender Zeile erweitern:
+
+```php
+$field = $form->addField('', 'mein_custom_link_field', null, ['internal::fieldClass' => 'rex_form_widget_customlink_element'], true);
+```
+
+Zum Einstellen des Custom-Link Elements stehen neben den klassischen rex_form Methoden wie z.B.
+
+`$field->setLabel('Mein CustomLink Feld');`
+
+folgende zusätzliche Möglichkeiten zur Verfügung:
+
+* Link (intern) deaktivieren: `$field->setIntern(false);`
+* Link (extern) deaktivieren: `$field->setExternal(false);`
+* Medienlink deaktivieren: `$field->setMedia(false);`
+* Email-Link deaktivieren: `$field->setMailto(false);`
+* Telefonlink deaktivieren: `$field->setPhone(false);`
+
+Im Umkehrschluss können die einzelnen Felder durch Übergabe des Wertes `true` einzeln wieder aktiviert werden. Dies ist allerdings nicht zwingend nötig, da standardmäßig alle Felder auf `true` gesetzt sind.
+
+Weitere Einstellungen für spezielle Linkfelder:
+* Kategorie-ID setzen (bezieht sich auf interne Links): `$field->setCategoryId(1);`
+* Medienkategorie-ID setzen (bezieht sich auf das Medienlink-Feld): `$field->setMediaCategoryId(1);`
+* Dateitypen definieren (bezieht sich auf das Medienlink-Feld): `$field->setTypes('jpg,gif,png,pdf');`
 
 In YForm findet man es im Table-Manager.  
 
