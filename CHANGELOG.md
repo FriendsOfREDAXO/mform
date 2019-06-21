@@ -3,6 +3,7 @@
 ### Version 5.3.2
 * Docs for custom link rex_form @dpf-dd
 * Fixed: https://github.com/FriendsOfREDAXO/mform/issues/171
+* Description Style fix @IngoWinter
 
 
 ### Version 5.3.1
