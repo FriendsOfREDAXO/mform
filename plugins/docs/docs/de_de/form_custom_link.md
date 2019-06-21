@@ -77,6 +77,6 @@ PIPE-Notation:
 
 `custom_link|Link|Links|1|1|1|1|`
 
-Einsatz als "normales" Modul-Widget: 
+### Einsatz als "normales" Modul-Widget: 
 
 `REX_CUSTOM_LINK[id=1 widget=1 external=1 intern=0 mailto=0 phone=1 media=1]`
