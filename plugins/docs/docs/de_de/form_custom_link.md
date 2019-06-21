@@ -35,9 +35,19 @@ Beispiel:
 
 ## Einsatz außerhalb von MForm
 
+Das Custom-Link Element ist auch als Widget in rex_form, YForm und als REXVAR einsetzbar. 
+
+### Einsatz als "normales" Modul-Widget: 
+
+**Eingabe-Code**
+
+`REX_CUSTOM_LINK[id=1 widget=1 external=1 intern=0 mailto=0 phone=1 media=1]`
+
+Die Ausgabe ist ein einfaches REX_VALUE. 
+
+
 ### rex_form
 
-Das Custom-Link Element ist auch als Widget in rex_form, YForm und als REXVAR einsetzbar. 
 
 In rex_form einfach ein bestehendes Objekt mit folgender Zeile erweitern:
 
@@ -77,6 +87,3 @@ PIPE-Notation:
 
 `custom_link|Link|Links|1|1|1|1|`
 
-### Einsatz als "normales" Modul-Widget: 
-
-`REX_CUSTOM_LINK[id=1 widget=1 external=1 intern=0 mailto=0 phone=1 media=1]`
