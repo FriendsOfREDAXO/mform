@@ -35,6 +35,8 @@ Beispiel:
 
 ## Einsatz außerhalb von MForm
 
+### rex_form
+
 Das Custom-Link Element ist auch als Widget in rex_form, YForm und als REXVAR einsetzbar. 
 
 In rex_form einfach ein bestehendes Objekt mit folgender Zeile erweitern:
@@ -62,6 +64,9 @@ Weitere Einstellungen für spezielle Linkfelder:
 * Medienkategorie-ID setzen (bezieht sich auf das Medienlink-Feld): `$field->setMediaCategoryId(1);`
 * Dateitypen definieren (bezieht sich auf das Medienlink-Feld): `$field->setTypes('jpg,gif,png,pdf');`
 
+
+### YForm
+
 In YForm findet man es im Table-Manager.  
 
 PHP-Notation: 
@@ -75,7 +80,3 @@ PIPE-Notation:
 Einsatz als "normales" Modul-Widget: 
 
 `REX_CUSTOM_LINK[id=1 widget=1 external=1 intern=0 mailto=0 phone=1 media=1]`
-
-
-
-**Dieser Bereich der Doku muss noch witer ausgearbeitet werden.**
