@@ -37,7 +37,7 @@ Beispiel:
 
 Das Custom-Link Element ist auch als Widget in rex_form, YForm und als REXVAR einsetzbar. 
 
-### Einsatz als "normales" Modul-Widget: 
+### Moduleingaben 
 
 **Eingabe-Code**
 
