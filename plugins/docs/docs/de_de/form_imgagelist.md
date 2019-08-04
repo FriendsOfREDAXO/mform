@@ -8,7 +8,7 @@ Anwendung in mform:
 $mform->addImagelistField(1, array('label' => 'Bilder'));
 ```
 
-## Einsatz als REXAXO Variable
+## Einsatz als REDAXO Variable
 
 `REX_IMGLIST[id=1 widget=1] `
 
