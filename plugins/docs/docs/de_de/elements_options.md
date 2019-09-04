@@ -63,10 +63,26 @@ $mform->addOption(1, 'test-1');
 $mform->addOption(2, 'test-2');
 ```
 
-> **Hinweis**
+> **Hinweise**
 >
 > * Die `setOptions`-Methode verarbeitet keine Fremdwerte wie beispielsweise die `setAttributes`-Methode.
+> * Die Methoden `setOptions` und `addOption` sind nicht miteinander kombinierbar! Wenn Optionen aus der Moduleingabe mit Optionen einer externen Klasse ergänzt werden sollen, bitte wie folgend beschrieben vorgehen:
 
+```php
+// FUNKTIONIERT NICHT =>
+
+$option = ['mein Value' => 'meine Bezeichnung'];
+$mform->addSelectField(1);
+$mform->addOption($option);
+$mform->setOptions(meine_funktion::$zentrale_optionen);
+
+// FUNKTIONIERT =>
+
+$mform->addSelectField(1);
+$option = ['mein Value' => 'meine Bezeichnung'];
+$options = array_merge($option, meine_funktion::$zentrale_optionen);
+$mform->setOptions($options);
+```
 
 <a name="Formular-Elemente"></a>
 ## Formular-Elemente die Optionen verarbeiten
