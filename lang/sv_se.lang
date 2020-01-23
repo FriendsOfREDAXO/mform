@@ -66,4 +66,5 @@ yform_values_custom_link_external = Extern-link button
 yform_values_custom_link_mailto = Mailto-link button
 yform_values_custom_link_intern = Redaxo internal-link button
 yform_values_custom_link_link_category = Länk-kategori
+yform_values_custom_link_phone = Telefon-länk button
 yform_values_imagelist_description = Bildval med direkt visning / dra och släpp
