@@ -66,4 +66,5 @@ yform_values_custom_link_external = Extern-link button
 yform_values_custom_link_mailto = Mailto-link button
 yform_values_custom_link_intern = Redaxo internal-link button
 yform_values_custom_link_link_category = Categoría de enlace
+yform_values_custom_link_phone = Botón de enlace del teléfono
 yform_values_imagelist_description = Selección de imagen con visualización directa / arrastrar y soltar
