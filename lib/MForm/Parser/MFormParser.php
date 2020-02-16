@@ -670,6 +670,13 @@ class MFormParser
      */
     private function generateMediaElement(MFormItem $item)
     {
+        $inputValue = false;
+
+        if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
+            MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+            $inputValue = true;
+        }
+
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
@@ -682,11 +689,16 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'media':
-                $html = rex_var_media::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIA[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
+                $item->setVarId(substr($item->getVarId(), 1, -1));
+
+                $html = rex_var_media::getWidget($item->getVarId()[0], $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
+                $links = $dom->getElementsByTagName('a');
+                $id = str_replace(['][', '[', ']'], ['_', '', ''], $item->getVarId());
 
                 if ($inputs instanceof DOMNodeList) {
                     foreach ($inputs as $input) {
@@ -696,9 +708,19 @@ class MFormParser
                                     $input->setAttribute($key, $value);
                                 }
                             }
+                            $input->setAttribute('id', 'REX_MEDIA_' . $id);
                         }
                     }
                 }
+
+                if ($links instanceof DOMNodeList) {
+                    foreach ($links as $link) {
+                        if ($link instanceof DOMElement) {
+                            $link->setAttribute('onclick', preg_replace('/\d/', '\'' . $id . '\'', $link->getAttribute('onclick')));
+                        }
+                    }
+                }
+
                 break;
             case 'imglist':
             case 'medialist':
@@ -754,7 +776,7 @@ class MFormParser
 
         if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
             MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-            $inputValue = (is_array($item->getVarId()) && sizeof($item->getVarId()) > 1);
+            $inputValue = true;
         }
 
         // create templateElement object
