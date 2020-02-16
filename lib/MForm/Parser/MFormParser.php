@@ -59,7 +59,7 @@ class MFormParser
         // create fieldset open element
         $fieldsetElement = new MFormElement();
         $fieldsetElement->setClass($item->getClass()) // set fieldset default and custom class
-            ->setAttributes($this->parseAttributes($item->getAttributes())); // add attributes to fieldset element
+        ->setAttributes($this->parseAttributes($item->getAttributes())); // add attributes to fieldset element
 
         // create legend
         if (!empty($item->getValue())) {
@@ -87,8 +87,8 @@ class MFormParser
      * @param MFormItem $item
      * @param int $key
      * @param array $items
-     * @author Joachim Doerr
      * @return MFormParser
+     * @author Joachim Doerr
      */
     private function generateTabGroup(MFormItem $item, $key, array $items)
     {
@@ -130,8 +130,8 @@ class MFormParser
 
     /**
      * @param MFormItem $item
-     * @author Joachim Doerr
      * @return MFormParser
+     * @author Joachim Doerr
      */
     private function generateTab($item)
     {
@@ -198,7 +198,7 @@ class MFormParser
         // create collapse open element
         $collapseElement = new MFormElement();
         $collapseElement->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to collapse element
-            ->setId($item->getAttributes()['id']); // set collapse id
+        ->setId($item->getAttributes()['id']); // set collapse id
 
         if (array_key_exists('data-group-collapse', $item->getAttributes())) {
             $collapseElement->setClass($item->getAttributes()['data-group-collapse']);
@@ -427,7 +427,8 @@ class MFormParser
         $optionElements = '';
         $itemAttributes = $this->parseAttributes($item->getAttributes()); // parse attributes for output
 
-        if ($item->isMultiple() && is_array($item->getValue())) {
+        if ($item->isMultiple() && is_array($item->getValue()) &&
+            sizeof($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {
             $item->setValue(implode(',', $item->getValue()));
         }
 
@@ -525,9 +526,11 @@ class MFormParser
         // is mode edit and item multiple
         if ($item->getMode() == 'edit' && $item->isMultiple()) {
             // explode the hidden value string
-            foreach (explode(',', $itemValue) as $iValue) {
-                if ($key == $iValue) { // check is the option key in the hidden string
-                    $itemValue = $iValue; // set new item value
+            if (is_string($itemValue)) {
+                foreach (explode(',', $itemValue) as $iValue) {
+                    if ($key == $iValue) { // check is the option key in the hidden string
+                        $itemValue = $iValue; // set new item value
+                    }
                 }
             }
         }
@@ -751,7 +754,7 @@ class MFormParser
 
         if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
             MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-            $inputValue = (sizeof($item->getVarId()) > 1);
+            $inputValue = (is_array($item->getVarId()) && sizeof($item->getVarId()) > 1);
         }
 
         // create templateElement object
@@ -779,15 +782,15 @@ class MFormParser
                                     $input->setAttribute($key, $value);
                                 }
                             }
-                            $input->setAttribute('id', str_replace(['][','[',']'], ['_','',''], $input->getAttribute('id')));
+                            $input->setAttribute('id', str_replace(['][', '[', ']'], ['_', '', ''], $input->getAttribute('id')));
                         }
                     }
                 }
 
                 if ($links instanceof DOMNodeList) {
-                    foreach($links as $link) {
+                    foreach ($links as $link) {
                         if ($link instanceof DOMElement) {
-                            $link->setAttribute('onclick', str_replace(['][','[',']'], ['_','',''], $link->getAttribute('onclick')));
+                            $link->setAttribute('onclick', str_replace(['][', '[', ']'], ['_', '', ''], $link->getAttribute('onclick')));
                         }
                     }
                 }
@@ -844,7 +847,7 @@ class MFormParser
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
 
-        foreach (array('intern'=>'enable','extern'=>'enable','media'=>'enable','mailto'=>'enable','tel'=>'disable') as $key => $value) {
+        foreach (array('intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable') as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
             $key = ($key == 'extern') ? 'external' : $key;
             $key = ($key == 'tel') ? 'phone' : $key;
