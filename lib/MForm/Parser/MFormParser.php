@@ -700,18 +700,7 @@ class MFormParser
                 $links = $dom->getElementsByTagName('a');
                 $id = str_replace(['][', '[', ']'], ['_', '', ''], $item->getVarId());
 
-                if ($inputs instanceof DOMNodeList) {
-                    foreach ($inputs as $input) {
-                        if ($input instanceof DOMElement) {
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-                                foreach ($item->getAttributes() as $key => $value) {
-                                    $input->setAttribute($key, $value);
-                                }
-                            }
-                            $input->setAttribute('id', 'REX_MEDIA_' . $id);
-                        }
-                    }
-                }
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . $id);
 
                 if ($links instanceof DOMNodeList) {
                     foreach ($links as $link) {
@@ -724,41 +713,29 @@ class MFormParser
                 break;
             case 'imglist':
             case 'medialist':
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIALIST';
+                $item->setVarId(substr($item->getVarId(), 1, -1));
                 /** @var rex_var_medialist|rex_var_imglist $class */
                 $class = 'rex_var_' . $item->getType();
-                $html = $class::getWidget($item->getVarId()[0], 'REX_INPUT_MEDIALIST[' . $item->getVarId()[0] . ']', $item->getValue(), $parameter);
+                $html = $class::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $selects = $dom->getElementsByTagName('select');
+                $inputs = $dom->getElementsByTagName('input');
+                $links = $dom->getElementsByTagName('a');
+                $id = str_replace(['][', '[', ']'], ['', '', ''], $item->getVarId());
 
-                if ($selects instanceof DOMNodeList) {
-                    foreach ($selects as $select) {
-                        if ($select instanceof DOMElement) {
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-                                foreach ($item->getAttributes() as $key => $value) {
-                                    $select->setAttribute($key, $value);
-                                }
-                            }
-                        }
-                    }
-                }
+                if ($selects instanceof DOMNodeList) $this->processNodeFormElement($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIALIST_' . $id);
+                if ($links instanceof DOMNodeList) $this->processLinkListElement($links, $id);
                 break;
         }
 
-        $html = $dom->C14N(false, true);
-        if (strpos($html, '<body') !== false) {
-            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-            if (isset($matches[1])) {
-                $html = $matches[1];
-            }
-        }
-
-        $templateElement->setElement($html);
-
+        // get body inner
+        $templateElement->setElement($this->getBodyInner($dom));
         // add classes for custom type
         $templateType = $this->getDefaultTemplateType($item, $templateElement);
-
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
@@ -808,7 +785,6 @@ class MFormParser
                         }
                     }
                 }
-
                 if ($links instanceof DOMNodeList) {
                     foreach ($links as $link) {
                         if ($link instanceof DOMElement) {
@@ -819,42 +795,69 @@ class MFormParser
 
                 break;
             case 'linklist':
-                $html = rex_var_linklist::getWidget($item->getVarId()[0], 'REX_INPUT_LINKLIST[' . $item->getVarId()[0] . ']', $item->getValue(), $item->getParameter());
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
+                $item->setVarId(substr($item->getVarId(), 1, -1));
+                $html = rex_var_linklist::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $item->getParameter());
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $selects = $dom->getElementsByTagName('select');
+                $inputs = $dom->getElementsByTagName('input');
+                $links = $dom->getElementsByTagName('a');
+                $id = str_replace(['][', '[', ']'], ['', '', ''], $item->getVarId());
 
-                if ($selects instanceof DOMNodeList) {
-                    foreach ($selects as $select) {
-                        if ($select instanceof DOMElement) {
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-                                foreach ($item->getAttributes() as $key => $value) {
-                                    $select->setAttribute($key, $value);
-                                }
-                            }
-                        }
-                    }
-                }
+                if ($selects instanceof DOMNodeList) $this->processNodeFormElement($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINKLIST_' . $id);
+                if ($links instanceof DOMNodeList) $this->processLinkListElement($links, $id);
                 break;
         }
 
-        $html = $dom->C14N(false, true);
-        if (strpos($html, '<body') !== false) {
-            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-            if (isset($matches[1])) {
-                $html = $matches[1];
-            }
-        }
-
-        $templateElement->setElement($html);
-
+        // get body inner
+        $templateElement->setElement($this->getBodyInner($dom));
         // add classes for custom type
         $templateType = $this->getDefaultTemplateType($item, $templateElement);
-
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
+    }
+
+    /**
+     * @param DOMNodeList $elements
+     * @param MFormItem $item
+     * @param null $id
+     * @return MFormParser
+     * @author Joachim Doerr
+     */
+    private function processNodeFormElement(DOMNodeList $elements, MFormItem $item, $id = null)
+    {
+        foreach ($elements as $element) {
+            if ($element instanceof DOMElement) {
+                if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                    foreach ($item->getAttributes() as $key => $value) {
+                        $element->setAttribute($key, $value);
+                    }
+                }
+                if (!is_null($id)) {
+                    $element->setAttribute('id', $id);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @param DOMNodeList $elements
+     * @param $id
+     * @author Joachim Doerr
+     */
+    private function processLinkListElement(DOMNodeList $elements, $id)
+    {
+        foreach ($elements as $link) {
+            if ($link instanceof DOMElement) {
+                $link->setAttribute('onclick', str_replace(['][', '[', ']'], ['', '', ''], $link->getAttribute('onclick')));
+                $link->setAttribute('onclick', str_replace($id, '\'' . $id . '\'', $link->getAttribute('onclick')));
+            }
+        }
     }
 
 
@@ -909,14 +912,7 @@ class MFormParser
                             }
                         }
                     }
-                    // $html = utf8_encode($divItem->C14N(false,true));
-                    $html = $divItem->C14N(false, true);
-                    if (strpos($html, '<body') !== false) {
-                        preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
-                        if (isset($matches[1])) {
-                            $html = $matches[1];
-                        }
-                    }
+                    $html = $this->getBodyInner($divItem);
                     break;
                 }
             }
@@ -927,6 +923,23 @@ class MFormParser
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, $templateType);
         return $this;
+    }
+
+    /**
+     * @param DOMDocument|DOMElement $dom
+     * @return mixed|string
+     * @author Joachim Doerr
+     */
+    private function getBodyInner($dom)
+    {
+        $html = $dom->C14N(false, true);
+        if (strpos($html, '<body') !== false) {
+            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+            if (isset($matches[1])) {
+                $html = $matches[1];
+            }
+        }
+        return $html;
     }
 
 
