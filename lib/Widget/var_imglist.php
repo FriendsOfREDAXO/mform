@@ -69,7 +69,12 @@ class rex_var_imglist extends rex_var
         if (is_array($medialistarray)) {
             foreach ($medialistarray as $key => $file) {
                 if ($file != '') {
-                    $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '"><img class="thumbnail" src="' . rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file]) . '" /></li>';
+
+                    $url = rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file]);
+                    if (pathinfo($file, PATHINFO_EXTENSION) === 'svg') {
+                        $url = rex_url::media($file);
+                    }
+                    $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '"><img class="thumbnail" src="' . $url . '" /></li>';
 
                     $options .= '<option data-key="' . $key . '" value="' . $file . '">' . $file . '</option>';
                 }
@@ -81,8 +86,10 @@ class rex_var_imglist extends rex_var
             $disabled = '';
         }
 
+        $id = str_replace(array('][', '[', ']'), '', $id);
+
         $e = [];
-        $e['before'] = '<div class="rex-js-widget' . $wdgtClass . '" data-params="' . $open_params . '" data-widget-id="' . $id . '">';
+        $e['before'] = '<div class="rex-js-widget custom-imglist ' . $wdgtClass . '" data-params="' . $open_params . '" data-widget-id="' . $id . '">';
         $e['field'] = '<ul class="form-control thumbnail-list" id="REX_IMGLIST_' . $id . '">' . $thumbnails . '</ul><select class="form-control" name="REX_MEDIALIST_SELECT[' . $id . ']" id="REX_MEDIALIST_SELECT_' . $id . '" size="10">' . $options . '</select><input type="hidden" name="' . $name . '" id="REX_MEDIALIST_' . $id . '" value="' . $value . '" />';
         $e['functionButtons'] = '
                 <a href="#" class="btn btn-popup open" title="' . rex_i18n::msg('var_media_open') . '"' . $disabled . '><i class="rex-icon rex-icon-open-mediapool"></i></a>

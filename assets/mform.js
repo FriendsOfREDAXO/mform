@@ -63,36 +63,36 @@ function initMFormCollapseData(mform, reinit) {
     });
 }
 
-function initMFormAccordionToggle($element, reinit) {
+function initMFormAccordionToggle(element, reinit) {
     let opened = false;
 
-    $element.find('.collapse').each(function () {
+    element.find('.collapse').each(function () {
         if ($(this).hasClass('in')) {
             opened = true;
         }
     });
 
-    if (!opened && $element.attr('data-group-open-collapse') > 0) {
-        $element.find('.collapse').each(function (index) {
-            if ((index+1) == $element.attr('data-group-open-collapse')) {
+    if (!opened && element.attr('data-group-open-collapse') > 0) {
+        element.find('.collapse').each(function (index) {
+            if ((index+1) == element.attr('data-group-open-collapse')) {
                 $(this).addClass('in');
             }
         });
     }
 }
 
-function initMFormSelectAccordionToggle($element, init, reinit) {
-    let acc = $element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
+function initMFormSelectAccordionToggle(element, init, reinit) {
+    let acc = element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
 
     if (init && acc.length) {
-        $element.find('option').remove();
+        element.find('option').remove();
 
-        if (!$.isNumeric($element.attr('data-selected')) && acc.attr('data-group-open-collapse') > 0) {
-            $element.attr('data-selected', (acc.attr('data-group-open-collapse')));
+        if (!$.isNumeric(element.attr('data-selected')) && acc.attr('data-group-open-collapse') > 0) {
+            element.attr('data-selected', (acc.attr('data-group-open-collapse')));
         }
 
         if (acc.attr('data-group-open-collapse') == 0) {
-            $element.append('<option value="" selected="selected">' + $element.attr('data-group-selected-text') + '</option>');
+            element.append('<option value="" selected="selected">' + element.attr('data-group-selected-text') + '</option>');
         }
 
         acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
@@ -100,15 +100,15 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
                 indexId = (index + 1),
                 target = togglecollapse.attr('data-target');
 
-            $element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '">' + togglecollapse.text() + '</option>');
+            element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '">' + togglecollapse.text() + '</option>');
             togglecollapse.attr('data-index', indexId);
 
             if (reinit) {
                 $(target).removeClass('in');
             }
 
-            if ($.isNumeric($element.attr('data-selected')) && $element.attr('data-selected') == indexId) {
-                $element.find('option[value=' + indexId + ']').attr('selected', 'selected');
+            if ($.isNumeric(element.attr('data-selected')) && element.attr('data-selected') == indexId) {
+                element.find('option[value=' + indexId + ']').attr('selected', 'selected');
                 $(target).addClass('in').css('height','');
             }
         });
@@ -116,13 +116,13 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
 
     if (acc.length) {
 
-        let selected = $element.find(':selected'),
+        let selected = element.find(':selected'),
             target = selected.attr('data-target');
 
         if (!selected.length) {
-            target = $('a[data-index="' + $element.attr('data-selected') + '"]').attr('data-target');
+            target = $('a[data-index="' + element.attr('data-selected') + '"]').attr('data-target');
         } else {
-            $element.attr('data-selected', selected.attr('value'));
+            element.attr('data-selected', selected.attr('value'));
         }
 
         if (!$(target).hasClass('in') && !init) {
@@ -132,11 +132,11 @@ function initMFormSelectAccordionToggle($element, init, reinit) {
     }
 }
 
-function initMFormCollapseToggle($element, init) {
-    let target = $element.attr('data-target');
+function initMFormCollapseToggle(element, init) {
+    let target = element.attr('data-target');
 
-    if (!$element.attr('data-target')) {
-        let form_group = $element.parents('.form-group'),
+    if (!element.attr('data-target')) {
+        let form_group = element.parents('.form-group'),
             next_link = form_group.nextAll('a[data-toggle=collapse]');
 
         if (next_link.attr('data-target')) {
@@ -149,13 +149,13 @@ function initMFormCollapseToggle($element, init) {
     }
 
     if (init) {
-        if ($element.prop('checked')) {
+        if (element.prop('checked')) {
             collapseClass(target, 'add');
         } else {
             collapseClass(target, 'remove');
         }
     } else {
-        if ($element.prop('checked')) {
+        if (element.prop('checked')) {
             collapseToogle(target, 'show');
         } else {
             collapseToogle(target, 'hide');
@@ -210,91 +210,91 @@ function initMFormToggle(mform) {
 
 function mform_custom_link(item) {
     item.each(function () {
-        let $id = $(this).data('id'),
-            $clang = $(this).data('clang'),
-            $mediaTypes = $(this).data('types'),
-            $mediaCategory = $(this).data('media_category'),
-            $linkCategory = $(this).data('category'),
-            media_button = $(this).find('a#mform_media_' + $id),
-            link_button = $(this).find('a#mform_link_' + $id),
-            delete_button = $(this).find('a#mform_delete_' + $id),
-            extern_button = $(this).find('a#mform_extern_' + $id),
-            mailto_button = $(this).find('a#mform_mailto_' + $id),
-            tel_button = $(this).find('a#mform_tel_' + $id),
-            hidden_input = $(this).find('input[type=hidden]').addClass('form-control').attr('readonly', true),
-            showed_input = $(this).find('input[type=text]');
 
+        let id = $(this).data('id'),
+            clang = $(this).data('clang'),
+            media_types = $(this).data('types'),
+            media_Category = $(this).data('media_category'),
+            link_category = $(this).data('category');
 
-        media_button.unbind().bind('click', function () {
-            hidden_show_media(hidden_input, showed_input, $id);
+        $(this).find('a#mform_media_' + id).unbind().bind('click', function () {
+            id = $(this).parent().parent().attr('data-id');
             let args = '';
-            if ($mediaTypes !== undefined) {
-                args = '&args[types]=' + $mediaTypes;
+            if (media_types !== undefined) {
+                args = '&args[types]=' + media_types;
             }
-            if ($mediaCategory !== undefined) {
-                args = args + '&args[category]=' + $mediaCategory;
+            if (media_Category !== undefined) {
+                args = args + '&args[category]=' + media_Category;
             }
-            console.log(args);
-            openREXMedia($id, args); // &args[preview]=1&args[types]=jpg%2Cpng
+            hidden_show_media($(this).parent().parent(), id);
+            openREXMedia(id, args); // &args[preview]=1&args[types]=jpg%2Cpng
             return false;
         });
-        link_button.unbind().bind('click', function () {
-            show_hidden_link(hidden_input, showed_input);
-            let query = '&clang=' + $clang;
-            if ($linkCategory !== undefined) {
-                query = query + '&category_id=' + $linkCategory;
+        $(this).find('a#mform_link_' + id).unbind().bind('click', function () {
+            id = $(this).parent().parent().attr('data-id');
+            let query = '&clang=' + clang;
+            if (link_category !== undefined) {
+                query = query + '&category_id=' + link_category;
             }
-            openLinkMap('REX_LINK_' + $id, query);
+            show_hidden_link($(this).parent().parent(), id);
+            openLinkMap('REX_LINK_' + id, query);
             return false;
         });
-        extern_button.unbind().bind('click', function () {
-            show_hidden_link(hidden_input, showed_input);
-            let extern_link = prompt('Link', 'http://');
-            if (extern_link != 'http://' && extern_link != "" && extern_link != undefined) {
+        $(this).find('a#mform_extern_' + id).unbind().bind('click', function () {
+            id = $(this).parent().parent().attr('data-id');
+            console.log(id);
+            show_hidden_link($(this).parent().parent(), id);
+            let extern_link = prompt('Link', 'https://'),
+                hidden_input = $(this).parent().parent().find('input[type=hidden]').addClass('form-control').attr('readonly', true),
+                showed_input = $(this).parent().parent().find('input[type=text]');
+            console.log(extern_link);
+            if (extern_link !== 'https://' && extern_link !== "" && extern_link !== undefined) {
+                console.log('go');
                 showed_input.val(extern_link);
                 hidden_input.val(extern_link);
             }
             return false;
         });
-        mailto_button.unbind().bind('click', function () {
-            show_hidden_link(hidden_input, showed_input);
-            let mailto_link = prompt('Mail', 'mailto:');
-            if (mailto_link != 'mailto:' && mailto_link != "" && mailto_link != undefined) {
+        $(this).find('a#mform_mailto_' + id).unbind().bind('click', function () {
+            id = $(this).parent().parent().attr('data-id');
+            show_hidden_link($(this).parent().parent(), id);
+            let mailto_link = prompt('Mail', 'mailto:'),
+                hidden_input = $(this).parent().parent().find('input[type=hidden]').addClass('form-control').attr('readonly', true),
+                showed_input = $(this).parent().parent().find('input[type=text]');
+            if (mailto_link !== 'mailto:' && mailto_link !== "" && mailto_link !== undefined) {
                 showed_input.val(mailto_link);
                 hidden_input.val(mailto_link);
             }
             return false;
         });
-        tel_button.unbind().bind('click', function () {
-            show_hidden_link(hidden_input, showed_input);
-            let tel_link = prompt('Telephone', 'tel:');
-            if (tel_link != 'tel:' && tel_link != "" && tel_link != undefined) {
+        $(this).find('a#mform_tel_' + id).unbind().bind('click', function () {
+            id = $(this).parent().parent().attr('data-id');
+            show_hidden_link($(this).parent().parent(), id);
+            let tel_link = prompt('Telephone', 'tel:'),
+                hidden_input = $(this).parent().parent().find('input[type=hidden]').addClass('form-control').attr('readonly', true),
+                showed_input = $(this).parent().parent().find('input[type=text]');
+            if (tel_link !== 'tel:' && tel_link !== "" && tel_link !== undefined) {
                 showed_input.val(tel_link);
                 hidden_input.val(tel_link);
             }
             return false;
         });
-        delete_button.unbind().bind('click', function () {
-            showed_input.val('');
-            hidden_input.val('');
+        $(this).find('a#mform_delete_' + id).unbind().bind('click', function () {
+            $(this).parent().parent().find('input').val('');
             return false;
         });
     });
 }
 
-function hidden_show_media(hidden_input, showed_input, id) {
-    if (hidden_input.attr('type') != 'text') {
-        hidden_input.data('link_id', hidden_input.attr('id'));
-        hidden_input.attr('id', 'REX_MEDIA_' + id);
-        showed_input.val('').attr('type', 'hidden');
-        hidden_input.val('').attr('type', 'text');
-    }
+function hidden_show_media(element, id) {
+    element.find('#REX_LINK_' + id + '_NAME').val('').attr('type', 'hidden');
+    element.find('#REX_LINK_' + id).attr('type', 'text').addClass('form-control');
+    element.find('#REX_LINK_' + id).attr('id', 'REX_MEDIA_' + id);
 }
 
-function show_hidden_link(hidden_input, showed_input) {
-    if (hidden_input.attr('type') == 'text') {
-        hidden_input.attr('id', hidden_input.data('link_id'));
-        showed_input.val('').attr('type', 'text');
-        hidden_input.val('').attr('type', 'hidden');
-    }
+function show_hidden_link(element, id) {
+    element.find('#REX_MEDIA_' + id).attr('id', 'REX_LINK_' + id).val('');
+    element.find('#REX_LINK_' + id + '_NAME').val('').attr('type', 'text');
+    element.find('#REX_LINK_' + id).attr('type', 'hidden');
+    console.log(element.find('#REX_MEDIA_' + id).length);
 }

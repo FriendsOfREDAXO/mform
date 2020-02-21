@@ -673,8 +673,10 @@ class MFormParser
         $inputValue = false;
 
         if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
+            if (sizeof($item->getVarId()) > 1) {
+                $inputValue = true;
+            }
             MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-            $inputValue = true;
         }
 
         // create templateElement object
@@ -692,7 +694,7 @@ class MFormParser
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                 $item->setVarId(substr($item->getVarId(), 1, -1));
 
-                $html = rex_var_media::getWidget($item->getVarId()[0], $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = rex_var_media::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -859,7 +861,6 @@ class MFormParser
             }
         }
     }
-
 
     /**
      * link, linklist
