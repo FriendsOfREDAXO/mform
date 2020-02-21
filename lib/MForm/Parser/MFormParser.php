@@ -754,8 +754,10 @@ class MFormParser
         $inputValue = false;
 
         if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
+            if (sizeof($item->getVarId()) > 1) {
+                $inputValue = true;
+            }
             MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-            $inputValue = true;
         }
 
         // create templateElement object
