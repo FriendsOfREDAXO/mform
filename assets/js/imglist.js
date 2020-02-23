@@ -16,7 +16,7 @@ function imglist_init_widget(element) {
     let n = element.find('select').attr('id').match(/\d+/g),
         widget_id = element.attr('data-widget-id');
 
-    if (n != widget_id) {
+    if (n !== widget_id) {
         $('#REX_IMGLIST_' + widget_id).attr('id', 'REX_IMGLIST_' + n);
         element.attr('data-widget-id', n);
         widget_id = n;
@@ -33,7 +33,7 @@ function imglist_init_widget(element) {
         },
         stop: function () {
             // refresh input
-            imglist_write_input(widget_id, 'REX_MEDIALIST_', 'REX_IMGLIST_');
+            imglist_write_input(widget_id);
         }
     });
 }
@@ -85,7 +85,7 @@ function imglist_widget_actions(element) {
             }
 
             // refresh input
-            imglist_write_input(widget_id, 'REX_MEDIALIST_', 'REX_IMGLIST_');
+            imglist_write_input(widget_id);
 
             // refresh sortable
             element.find('ul.thumbnail-list').sortable('refresh');
@@ -130,7 +130,14 @@ function imglist_add_img_by_last_list_item(element) {
             let item = element.find('select option').eq(i);
             item.attr('data-key', i);
 
-            let new_li = $('<li data-key="' + i + '" value="' + item.val() + '" data-value="' + item.val() + '"><img class="thumbnail" src="index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=' + item.val() + '" title="' + item.val() + '" /></li>');
+            let extension = item.val().replace(/^.*\./, ''),
+                url = 'index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=';
+
+            if (extension ===  'svg') {
+                url = '/media/';
+            }
+
+            let new_li = $('<li data-key="' + i + '" value="' + item.val() + '" data-value="' + item.val() + '"><img class="thumbnail" src="' + url + item.val() + '" title="' + item.val() + '" /></li>');
 
             imglist_add_tooltip(element, new_li.find('img'));
 
@@ -141,7 +148,7 @@ function imglist_add_img_by_last_list_item(element) {
     }
     if (go_go_go) {
         // refresh input
-        imglist_write_input(widget_id, 'REX_MEDIALIST_', 'REX_IMGLIST_');
+        imglist_write_input(widget_id);
 
         // refresh sortable
         element.find('ul.thumbnail-list').sortable('refresh');
@@ -191,14 +198,16 @@ function imglist_list_items_select(element, item) {
     });
 }
 
-function imglist_write_input(id, i_list, i_select) {
-    let source_elements = $('#' + i_select + id + ' li'),
-        new_value = '';
-
-    for (let i = 0; i < source_elements.length; i++) {
-        new_value = new_value + $(source_elements[i]).attr('value');
-        if (source_elements.length > (i + 1)) new_value = new_value + ',';
-    }
-
-    $('#' + i_list + id).val(new_value);
+function imglist_write_input(id) {
+    $('.custom-imglist').each(function(){
+        if ($(this).attr('data-widget-id') === id) {
+            let source_elements = $(this).find('ul li'),
+                new_value = '';
+            for (let i = 0; i < source_elements.length; i++) {
+                new_value = new_value + $(source_elements[i]).attr('value');
+                if (source_elements.length > (i + 1)) new_value = new_value + ',';
+            }
+            $(this).find('input').val(new_value);
+        }
+    });
 }
