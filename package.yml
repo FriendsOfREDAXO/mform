@@ -21,6 +21,7 @@ page:
                 # demo_community: { title: 'translate:demo_community' }
 
 requires:
+    php: '>=7.1'
     redaxo: '^5.6.5'
 
 system_plugins:
