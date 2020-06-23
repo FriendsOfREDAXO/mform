@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+use MForm\Utils\MFormPageHelper;
+
 // parse info fragment
 $fragment = new rex_fragment();
 $fragment->setVar('title', $this->i18n('info'), false);
