@@ -98,7 +98,7 @@ class MFormParser
         foreach ($items as $k => $itm) {
             if ($k > $key && ($itm->getGroup() == $item->getGroup() && $itm->getType() == 'tab')) {
                 // add navigation item
-                $class = '';
+                $class = $item->getClass();
                 $value = '';
                 $element = new MFormElement();
                 $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . rex_session('mform_count'));
@@ -109,7 +109,7 @@ class MFormParser
                 $element->setValue($value . $itm->getValue());
 
                 if (array_key_exists('pull-right', $itm->getAttributes()))
-                    $class = 'pull-right';
+                    $class .= ' pull-right';
 
                 if ($itm->getGroupCount() == 1)
                     $class .= ' active';

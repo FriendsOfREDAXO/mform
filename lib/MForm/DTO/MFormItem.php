@@ -53,7 +53,7 @@ class MFormItem
     /**
      * @var string
      */
-    public $class;
+    public $class = '';
 
     /**
      * @var boolean

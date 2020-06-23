@@ -221,7 +221,7 @@ class MFormElements
     /**
      * @param null|string $value
      * @param array $attributes
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -232,7 +232,7 @@ class MFormElements
 
     /**
      * @param bool $tabGroupClose
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -248,7 +248,7 @@ class MFormElements
      * @param bool $accordion
      * @param bool $hideToggleLinks
      * @param int $openCollapse
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -261,7 +261,7 @@ class MFormElements
 
     /**
      * @param bool $collapseGroupClose
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -275,7 +275,7 @@ class MFormElements
      * @param null|string $value
      * @param bool $hideToggleLinks
      * @param int $openCollapse
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -286,7 +286,7 @@ class MFormElements
 
     /**
      * @param bool $accordionGroupClose
-     * @deprecated this method will be removed in MForm 7
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField($mform);
      * @return $this
      * @author Joachim Doerr
      */
@@ -347,14 +347,15 @@ class MFormElements
     /**
      * @param null|string $value
      * @param null|MForm|string $form
+     * @param array $attributes
      * @param bool $hideToggleLinks
      * @param int $openCollapse
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAccordionField($value = null, $form = null, $hideToggleLinks = false, $openCollapse = 0)
+    public function addAccordionField($value = null, $form = null, $attributes = array(), $hideToggleLinks = false, $openCollapse = 0)
     {
-        return $this->addCollapseField($value, $form, array(), true, $hideToggleLinks, $openCollapse);
+        return $this->addCollapseField($value, $form, $attributes, true, $hideToggleLinks, $openCollapse);
     }
 
     /**
