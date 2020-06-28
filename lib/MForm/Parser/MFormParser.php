@@ -214,9 +214,10 @@ class MFormParser
         }
 
         $target = ($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? ' data-parent="#accgr' . $item->getGroup() . '_' . rex_session('mform_count') . '"' : '';
+        $attr = ($this->acc && isset($item->getAttributes()['data-select-collapse-id'])) ? ' data-select-collapse-id="' . $item->getAttributes()['data-select-collapse-id'] . '"' : '';
         $collapseButton = new MFormElement();
         $collapseButton->setClass($item->getClass())
-            ->setAttributes('data-toggle="collapse" data-target="#' . $item->getAttributes()['id'] . '"' . $target)
+            ->setAttributes('data-toggle="collapse" data-target="#' . $item->getAttributes()['id'] . '"' . $target . $attr)
             ->setValue($item->getValue());
 
         $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse-button', true)); // add parsed legend to collapse element
@@ -711,7 +712,6 @@ class MFormParser
                         }
                     }
                 }
-
                 break;
             case 'imglist':
             case 'medialist':
@@ -763,14 +763,18 @@ class MFormParser
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
+        $parameter = $item->getParameter();
+
+        if (is_array($parameter) && isset($parameter['types'])) {
+            $parameter['types'] = str_replace(' ', '', strtolower($parameter['types']));
+        }
 
         switch ($item->getType()) {
             default:
             case 'link':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
                 $item->setVarId(substr($item->getVarId(), 1, -1));
-
-                $html = rex_var_link::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $item->getParameter());
+                $html = rex_var_link::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -796,12 +800,11 @@ class MFormParser
                         }
                     }
                 }
-
                 break;
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $item->setVarId(substr($item->getVarId(), 1, -1));
-                $html = rex_var_linklist::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $item->getParameter());
+                $html = rex_var_linklist::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -859,7 +862,7 @@ class MFormParser
         foreach ($elements as $link) {
             if ($link instanceof DOMElement) {
                 $link->setAttribute('onclick', str_replace(['][', '[', ']'], ['', '', ''], $link->getAttribute('onclick')));
-                $link->setAttribute('onclick', str_replace($id, '\'' . $id . '\'', $link->getAttribute('onclick')));
+                $link->setAttribute('onclick', str_replace('(' . $id, '(\'' . $id . '\'', $link->getAttribute('onclick')));
             }
         }
     }

@@ -29,6 +29,7 @@ class MFormPageHelper
             if (is_dir($file)) {
                 continue;
             }
+
             if (strpos($file, $type) !== false && strpos($file, 'output') === false) {
 
                 // add input
