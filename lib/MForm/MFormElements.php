@@ -221,7 +221,7 @@ class MFormElements
     /**
      * @param null|string $value
      * @param array $attributes
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -232,7 +232,7 @@ class MFormElements
 
     /**
      * @param bool $tabGroupClose
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addTabField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -248,7 +248,7 @@ class MFormElements
      * @param bool $accordion
      * @param bool $hideToggleLinks
      * @param int $openCollapse
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -261,7 +261,7 @@ class MFormElements
 
     /**
      * @param bool $collapseGroupClose
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addCollapseField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -275,7 +275,7 @@ class MFormElements
      * @param null|string $value
      * @param bool $hideToggleLinks
      * @param int $openCollapse
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -286,7 +286,7 @@ class MFormElements
 
     /**
      * @param bool $accordionGroupClose
-     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField($mform);
+     * @deprecated this method will be removed in MForm 7 please use MForm::factory()->addAccordionField();
      * @return $this
      * @author Joachim Doerr
      */
@@ -304,6 +304,19 @@ class MFormElements
     {
         $form = ($form instanceof MForm) ? $form->show() : $form;
         return $this->addHtml($form);
+    }
+
+    /**
+     * @param null $value
+     * @param null $form
+     * @param array $attributes
+     * @author Joachim Doerr
+     */
+    public function addFieldsetField($value = null, $form = null, $attributes = array())
+    {
+        $this->addElement('fieldset', NULL, $value, $attributes)
+            ->addForm($form)
+            ->addElement('close-fieldset', NULL, NULL, $attributes);
     }
 
     /**
