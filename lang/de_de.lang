@@ -39,6 +39,7 @@ mform_example_extended_options_method = Options Method
 mform_example_extended_parameter_method = Parameter Method
 mform_example_extended_full_json_support = Full JSON-Value-Support
 mform_example_extended_diverse_setter = Add und diverse Setter
+mform_example_extended_wrapper = Wrapper-Elemente
 mform_example_expert_html_form_elements = Neue HTML5 Formular-Elemente
 mform_example_expert_datalist = Datalists für Input-Elemente
 mform_example_expert_placeholder = Placeholder
