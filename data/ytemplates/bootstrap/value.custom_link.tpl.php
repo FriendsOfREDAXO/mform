@@ -7,7 +7,7 @@ $value = htmlspecialchars($this->getValue());
 $parameters = array(
     'media' => ($this->getElement('media') == 1),
     'mailto' => ($this->getElement('mailto') == 1),
-    'extern' => ($this->getElement('extern') == 1),
+    'external' => ($this->getElement('extern') == 1),
     'intern' => ($this->getElement('intern') == 1),
     'phone' => ($this->getElement('phone') == 1),
     'types' => $this->getElement('types'),
