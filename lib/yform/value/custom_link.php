@@ -29,7 +29,7 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
                 'name' => ['type' => 'name',   'label' => rex_i18n::msg('yform_values_defaults_name')],
                 'label' => ['type' => 'text',   'label' => rex_i18n::msg('yform_values_defaults_label')],
                 'media' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_media')],
-                'extern' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_external')],
+                'external' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_external')],
                 'mailto' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_mailto')],
                 'intern' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_intern')],
                 'phone' => ['type' => 'checkbox',   'label' => rex_i18n::msg('yform_values_custom_link_phone')],
