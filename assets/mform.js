@@ -82,7 +82,12 @@ function initMFormAccordionToggle(element, reinit) {
 }
 
 function initMFormSelectAccordionToggle(element, init, reinit) {
-    let acc = element.parent().parent().parent().find('.panel-group[data-group-select-accordion=true]');
+    let acc = element.parents().find('.panel-group[data-group-select-accordion=true]'),
+        parent_group = element.parents('.form-group');
+
+    if (parent_group.next().hasClass('mform')) {
+        acc = parent_group.next().find('.panel-group[data-group-accordion]')
+    }
 
     if (init && acc.length) {
         element.find('option').remove();
@@ -92,42 +97,57 @@ function initMFormSelectAccordionToggle(element, init, reinit) {
         }
 
         if (acc.attr('data-group-open-collapse') == 0) {
-            element.append('<option value="" selected="selected">' + element.attr('data-group-selected-text') + '</option>');
+            element.append('<option value="" data-chose-accordion-msg="1">' + element.attr('data-group-selected-text') + '</option>');
+        }
+
+        if (element.attr('data-hide-toggle-links') == 1) {
+            acc.find('a[data-toggle=collapse]').hide();
         }
 
         acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
             let togglecollapse = $(this),
                 indexId = (index + 1),
-                target = togglecollapse.attr('data-target');
+                target = indexId;
+
+            if ($(this).attr('data-select-collapse-id') !== undefined) {
+                indexId = $(this).attr('data-select-collapse-id')
+                target = indexId;
+            }
 
             element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '">' + togglecollapse.text() + '</option>');
             togglecollapse.attr('data-index', indexId);
 
             if (reinit) {
-                $(target).removeClass('in');
+                $(target).removeClass('in').attr('aria-expanded', false);
             }
 
             if ($.isNumeric(element.attr('data-selected')) && element.attr('data-selected') == indexId) {
                 element.find('option[value=' + indexId + ']').attr('selected', 'selected');
-                $(target).addClass('in').css('height','');
+                togglecollapse.next().addClass('in').css('height','').attr('aria-expanded', true);
             }
         });
     }
 
     if (acc.length) {
-
         let selected = element.find(':selected'),
-            target = selected.attr('data-target');
+            targetId = (!selected.length) ? element.attr('data-selected') : selected.attr('data-target'),
+            targetLink = $('a[data-index="' + targetId + '"]'),
+            target = targetLink.next();
 
-        if (!selected.length) {
-            target = $('a[data-index="' + element.attr('data-selected') + '"]').attr('data-target');
-        } else {
+        // console.log([selected,targetId,targetLink,target]);
+
+        if (selected.length) {
             element.attr('data-selected', selected.attr('value'));
         }
 
-        if (!$(target).hasClass('in') && !init) {
-            $target_elem = $('a[data-target="' + target + '"]');
-            $target_elem.trigger('click');
+        if (!target.hasClass('in') && !init) {
+            targetLink.trigger('click');
+        }
+
+        if (selected.val() == '') {
+            acc.find('.panel > .collapse.in').each(function () {
+                $(this).collapse('hide');
+            });
         }
     }
 }
@@ -139,12 +159,19 @@ function initMFormCollapseToggle(element, init) {
         let form_group = element.parents('.form-group'),
             next_link = form_group.nextAll('a[data-toggle=collapse]');
 
+        if (!next_link.length) {
+            let next = form_group.next();
+            if (next.is('div') && next.hasClass('mform')) {
+                next_link = next.find('> a[data-toggle=collapse]');
+            }
+        }
+
         if (next_link.attr('data-target')) {
             target = next_link.attr('data-target');
         }
     }
 
-    if (init && target.length) {
+    if (init && target !== undefined && target.length) {
         collapseClass(target, 'add');
     }
 
@@ -164,7 +191,7 @@ function initMFormCollapseToggle(element, init) {
 }
 
 function collapseToogle(target, type) {
-    if (target.length) {
+    if (target !== undefined && target.length) {
         $(target).each(function(){
             let element = $(this);
             if ($(this).attr('data-target')) {
@@ -176,7 +203,7 @@ function collapseToogle(target, type) {
 }
 
 function collapseClass(target, type) {
-    if (target.length) {
+    if (target !== undefined && target.length) {
         $(target).each(function(){
             let element = $(this);
             if ($(this).attr('data-target')) {
