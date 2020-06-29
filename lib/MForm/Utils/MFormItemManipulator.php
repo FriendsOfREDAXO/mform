@@ -24,6 +24,8 @@ class MFormItemManipulator
         // set value for html out
         if (!is_array($item->getValue())) {
             $item->setValue(htmlspecialchars($item->getValue()));
+        } else if (is_array($item->getVarId()) && sizeof($item->getVarId()) == 1 && is_array($item->getValue())) {
+            $item->setValue(htmlspecialchars($item->getStringValue()));
         }
 
         // is mode add and default value defined

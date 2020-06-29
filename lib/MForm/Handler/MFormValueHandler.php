@@ -54,6 +54,7 @@ class MFormValueHandler
                         $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]), true);
 
                         if (is_array($jsonResult)) {
+                            $result['value_string'][$i] = $result['value'][$i];
                             $result['value'][$i] = $jsonResult;
                         }
                     }
@@ -78,6 +79,9 @@ class MFormValueHandler
             // set default value
             $item->setDefaultValue(MFormClang::getClangValue($defaultValue));
         }
+
+        $valueString = null;
+
         if ($value === NULL && is_array($result) === true) {
             // read value by type
             switch ($item->getType()) {
@@ -104,7 +108,11 @@ class MFormValueHandler
                             $value = (array_key_exists($item->getVarId()[2], $value)) ? $value[$item->getVarId()[2]] : '';
                         }
                     }
+                    if (array_key_exists('value_string', $result) && isset($result['value_string'][$item->getVarId()[0]])) {
+                        $valueString = $result['value_string'][$item->getVarId()[0]];
+                    }
             }
+            if (!is_null($valueString)) $item->setStringValue($valueString);
             $item->setValue($value);
         } else {
             $item->setValue(MFormClang::getClangValue($value));

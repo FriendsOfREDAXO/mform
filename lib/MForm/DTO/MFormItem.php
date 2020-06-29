@@ -33,6 +33,11 @@ class MFormItem
     /**
      * @var string
      */
+    public $stringValue;
+
+    /**
+     * @var string
+     */
     public $defaultValue;
 
     /**
@@ -204,6 +209,26 @@ class MFormItem
     public function setValue($value)
     {
         $this->value = $value;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @author Joachim Doerr
+     */
+    public function getStringValue()
+    {
+        return $this->stringValue;
+    }
+
+    /**
+     * @param string $stringValue
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setStringValue($stringValue)
+    {
+        $this->stringValue = $stringValue;
         return $this;
     }
 
