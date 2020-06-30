@@ -19,6 +19,7 @@
 	- [Tabs- und Fieldset-Elemente](form_fieldset_tabs.md)
 	- [Text- und HTML-Elemente](form_text_html.md)
 	- [Custom-Link Element](form_custom_link.md)
+	- [ImageList](form_imgagelist.md)
 - Template System
 	- [Templates für Modul-Input-Style](template_modul_input.md)
 - Modul-Input Demo
