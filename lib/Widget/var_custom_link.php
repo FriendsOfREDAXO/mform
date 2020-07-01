@@ -32,7 +32,7 @@ class rex_var_custom_link extends rex_var
             return false;
         }
 
-        $value = $this->getContextData()->getValue('linklist' . $id);
+        $value = $this->getContextData()->getValue('value' . $id);
 
         if ($this->hasArg('isset') && $this->getArg('isset')) {
             return $value ? 'true' : 'false';
@@ -48,7 +48,7 @@ class rex_var_custom_link extends rex_var
                     $args[$key] = $this->getArg($key);
                 }
             }
-            $value = self::getWidget($id, 'REX_INPUT_LINKLIST[' . $id . ']', $value, $args);
+            $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', $value, $args);
         } else {
             if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
                 $value = rex_getUrl($value);
