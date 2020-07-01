@@ -52,7 +52,7 @@ class rex_var_custom_link extends rex_var
                 return false;
             }
             $args = [];
-            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
