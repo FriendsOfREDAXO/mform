@@ -610,6 +610,7 @@ class MFormParser
             ->setId($item->getId())
             ->setVarId($item->getVarId())
             ->setType($item->getType())
+            ->setClass($item->getClass())
             ->setLabel($value);
 
         // add count to id
