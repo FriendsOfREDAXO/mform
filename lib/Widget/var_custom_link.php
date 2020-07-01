@@ -72,6 +72,8 @@ class rex_var_custom_link extends rex_var
             }
         }
 
+        $wdgtClass = ' rex-js-widget-customlink';
+
         if (is_numeric($category) || isset($args['category']) && ($category = (int)$args['category'])) {
             $category = ' data-category="' . $category . '"';
         }
@@ -96,6 +98,8 @@ class rex_var_custom_link extends rex_var
 
         $e = [];
         $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
+        $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
+        $e['after'] = '</div>';
         $e['functionButtons'] = '
         <a href="#" class="btn btn-popup' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
         <a href="#" class="btn btn-popup' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
