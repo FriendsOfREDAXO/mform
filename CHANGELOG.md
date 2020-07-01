@@ -6,6 +6,9 @@
 * remove `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
+* added Yform inUseCheck for media inside `custom_link` and `imagelist`
+* added some styling
+* change parsley trigger to: `.mform` and event to `rex:ready` 
 
 ### Version 5.3
 
