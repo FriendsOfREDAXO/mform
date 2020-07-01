@@ -39,9 +39,9 @@ if (rex::isBackend()) {
     // widgets
     rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
     rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
+    rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
     // add mform js
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
-
 
     // reset count per page init
     rex_set_session('mform_count', 0);
