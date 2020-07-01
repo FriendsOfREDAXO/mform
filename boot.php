@@ -11,6 +11,7 @@ if (rex_addon::exists('yform') &&
     rex_addon::get('yform')->isAvailable() &&
     rex_plugin::get('yform', 'manager')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'data/ytemplates'));
+    rex_extension::register('MEDIA_IS_IN_USE', 'MformYformHelper::isMediaInUse');
 }
 
 if (rex::isBackend()) {
