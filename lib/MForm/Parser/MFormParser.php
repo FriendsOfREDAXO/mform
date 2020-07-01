@@ -20,7 +20,6 @@ use MForm\Utils\MFormItemManipulator;
 use MForm\Utils\MFormThemeHelper;
 use rex_addon;
 use rex_clang;
-use rex_i18n;
 use rex_url;
 use rex_var_custom_link;
 use rex_var_link;
