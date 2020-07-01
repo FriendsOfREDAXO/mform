@@ -10,6 +10,11 @@
  */
 class rex_var_custom_link extends rex_var
 {
+    /**
+     * @param $value
+     * @return string
+     * @author Joachim Doerr
+     */
     public static function getCustomLinkText($value)
     {
         $valueName = $value;
@@ -25,6 +30,10 @@ class rex_var_custom_link extends rex_var
         return $valueName;
     }
 
+    /**
+     * @return bool|string
+     * @author Joachim Doerr
+     */
     protected function getOutput()
     {
         $id = $this->getArg('id', 0, true);
@@ -58,6 +67,16 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
+    /**
+     * @param $id
+     * @param $name
+     * @param $value
+     * @param array $args
+     * @param bool $btnIdUniq
+     * @return string|string[]
+     * @throws rex_exception
+     * @author Joachim Doerr
+     */
     public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
     {
         $valueName = self::getCustomLinkText($value);
@@ -84,13 +103,13 @@ class rex_var_custom_link extends rex_var
             $types = ' data-types="' . $types . '"';
         }
 
-//        $class = (rex::getUser()->getComplexPerm('structure')->hasStructurePerm()) ? '' : ' rex-disabled';
         $class = '';
         $mediaClass = (isset($args['media']) && $args['media'] == 0) ? ' hidden' : $class;
         $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && $args['phone'] == 0) ? ' hidden' : $class;
+        $externalPrefix = (isset($args['external_prefix']) && $args['external_prefix'] == 0) ? $args['external_prefix'] : 'https://';
 
         if ($btnIdUniq === true) {
             $id = uniqid($id);
@@ -109,37 +128,12 @@ class rex_var_custom_link extends rex_var
         <a href="#" class="btn btn-popup' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
         ';
 
-        # $telFragment->appendXML("<a href=\"#\" class=\"btn btn-popup\" id=\"mform_tel_{$item->getId()}\" title=\"" . rex_i18n::msg('var_phone_link') . "\"><i class=\"rex-icon fa-phone\"></i></a>");
-
-
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
         return str_replace(
             '<div class="input-group">',
-            '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . ' data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
+            '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . ' data-extern-link-prefix="' . $externalPrefix . '" data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
             $fragment->parse('core/form/widget.php')
         );
     }
 }
-
-
-
-
-/*
- *
- *
-
-<div class="input-group custom-link" data-clang="1" data-id="2601customlinkf">
-    <input class="form-control" id="REX_LINK_2601customlinkf_NAME" name="REX_LINK_NAME[2601customlinkf]" readonly="readonly" type="text" value="">
-    <input id="REX_LINK_2601customlinkf" name="REX_INPUT_VALUE[1][customlinkf]" type="hidden" value="">
-    <span class="input-group-btn">
-        <a class="btn btn-popup" href="#" id="mform_media_2601customlinkf" title="Medium auswählen"><i class="rex-icon fa-file-o"></i></a>
-        <a class="btn btn-popup" href="#" id="mform_extern_2601customlinkf" title="Externe URL verlinken"><i class="rex-icon fa-external-link"></i></a>
-        <a class="btn btn-popup" href="#" id="mform_link_2601customlinkf" title="Link auswählen"><i class="rex-icon rex-icon-open-linkmap"></i></a>
-        <a class="btn btn-popup" href="#" id="mform_delete_2601customlinkf" title="Ausgewählten Link löschen"><i class="rex-icon rex-icon-delete-link"></i></a>
-    </span>
-</div>
-
- *
- *
- */

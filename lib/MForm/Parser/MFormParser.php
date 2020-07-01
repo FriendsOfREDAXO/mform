@@ -885,6 +885,10 @@ class MFormParser
             $item->setParameter(array_merge($item->getParameter(), array($key => $value)));
         }
 
+        if (isset($item->getAttributes()['data-extern-link-prefix'])) {
+            $item->setParameter(array_merge($item->getParameter(), array('external_prefix' => $item->getAttributes()['data-extern-link-prefix'])));
+        }
+
         $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));
 
         // create templateElement object
