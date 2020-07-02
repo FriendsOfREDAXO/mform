@@ -12,7 +12,6 @@ function mform_init() {
     initMFormTooltip(mform);
     // init toggle
     initMFormToggle(mform);
-
     // init mform collapse
     initMFormCollapseData(mform);
 
