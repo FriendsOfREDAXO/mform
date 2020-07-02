@@ -884,9 +884,10 @@ class MFormParser
             $key = ($key == 'tel') ? 'phone' : $key;
             $item->setParameter(array_merge($item->getParameter(), array($key => $value)));
         }
-
-        if (isset($item->getAttributes()['data-extern-link-prefix'])) {
-            $item->setParameter(array_merge($item->getParameter(), array('external_prefix' => $item->getAttributes()['data-extern-link-prefix'])));
+        foreach (array('data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category') as $data => $key) {
+            if (isset($item->getAttributes()[$data])) {
+                $item->setParameter(array_merge($item->getParameter(), array($key => $item->getAttributes()[$data])));
+            }
         }
 
         $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));

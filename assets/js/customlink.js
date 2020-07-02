@@ -32,7 +32,7 @@ function customlink_init_widget(element) {
             args = '&args[types]=' + media_types;
         }
         if (media_Category !== undefined) {
-            args = args + '&args[category]=' + media_Category;
+            args = args + '&rex_file_category=' + media_Category;
         }
 
         hidden_input.attr('id', 'REX_MEDIA_' + id);

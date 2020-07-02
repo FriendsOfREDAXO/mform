@@ -597,7 +597,7 @@ class MFormElements
      * @param null $defaultValue
      * @return $this
      * @author Joachim Doerr
-     * @internal attributes ['data-intern'=>'disable','data-extern'=>'disable','data-media'=>'disable','data-mailto'=>'enable','data-tel'=>'enable', 'data-extern-link-prefix' => 'https://www.'];
+     * @internal attributes ['data-intern'=>'enable','data-extern'=>'enable','data-media'=>'enable','data-mailto'=>'enable','data-tel'=>'disable', 'data-extern-link-prefix' => 'https://www.', 'data-link-category' => 14, 'data-media-category' => 1, 'data-media-type' => 'jpg,png'];
      */
     public function addCustomLinkField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {
