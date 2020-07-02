@@ -18,8 +18,7 @@
     height: 34px;
 }
 
-.mform select[multiple],
-.mform select[size] {
+.mform select[multiple], .mform select[size] {
     height: auto;
 }
 
@@ -28,7 +27,6 @@
     margin-left: 0;
     margin-right: 0;
 }
-
 
 /* mform tab style by Thomas Skerbis */
 
@@ -64,29 +62,28 @@
     margin-right: 0;
 }
 
-
 /* mform tab style by Thomas Skerbis */
 
-.mform .mform-tabs .nav-tabs>li.active>a,
-.mform .mform-tabs .nav-tabs>li.active>a:focus,
-.mform .mform-tabs .nav-tabs>li.active>a:hover {
+.mform .mform-tabs .nav-tabs > li.active > a,
+.mform .mform-tabs .nav-tabs > li.active > a:focus,
+.mform .mform-tabs .nav-tabs > li.active > a:hover {
     border-width: 0;
 }
 
-.mform .mform-tabs .nav-tabs>li>a {
+.mform .mform-tabs .nav-tabs > li > a {
     border: none;
     color: #283541;
     background: rgba(163, 163, 163, 0.22);
 }
 
-.mform .mform-tabs .nav-tabs>li.active>a,
-.mform .mform-tabs .nav-tabs>li>a:hover {
+.mform .mform-tabs .nav-tabs > li.active > a,
+.mform .mform-tabs .nav-tabs > li > a:hover {
     border: none;
     color: #000;
     background: #FFF;
 }
 
-.mform .mform-tabs .nav-tabs>li>a::before {
+.mform .mform-tabs .nav-tabs > li > a::before {
     content: "";
     background: #000;
     background: rgba(0, 0, 0, 0.18);
@@ -99,12 +96,12 @@
     transform: scale(0);
 }
 
-.mform .mform-tabs .nav-tabs>li.active>a::before,
-.mform .mform-tabs .nav-tabs>li:hover>a::after {
+.mform .mform-tabs .nav-tabs > li.active > a::before,
+.mform .mform-tabs .nav-tabs > li:hover > a::after {
     transform: scale(1);
 }
 
-.mform .mform-tabs .tab-nav>li>a::after {
+.mform .mform-tabs .tab-nav > li > a::after {
     background: #4285F4 none repeat scroll 0% 0%;
     color: #fff;
 }
@@ -120,8 +117,8 @@
 }
 
 .mform .mform-headline.grey-legend-background h3,
-.sortitem .mform fieldset.grey-legend-background>legend,
-.mform fieldset.grey-legend-background>legend {
+.sortitem .mform fieldset.grey-legend-background > legend,
+.mform fieldset.grey-legend-background > legend {
     border-bottom: none;
     padding: 8px 10px;
     background: #d8d8d8;
@@ -130,8 +127,8 @@
 }
 
 .mform .tab-content .mform-headline.grey-legend-background h3,
-.mform .tab-content fieldset.grey-legend-background>legend,
-.mform .tab-content fieldset.grey-legend-background>legend {
+.mform .tab-content fieldset.grey-legend-background > legend,
+.mform .tab-content fieldset.grey-legend-background > legend {
     background: #f3f3f3;
 }
 
@@ -140,7 +137,7 @@
 }
 
 .sortitem .mform .mform-headline.grey-legend-background h3,
-.sortitem .mform fieldset.grey-legend-background>legend {
+.sortitem .mform fieldset.grey-legend-background > legend {
     background: #ececec;
 }
 
@@ -148,7 +145,7 @@
     background: #f7f7f7;
 }
 
-.mform-alert+.mform-alert {
+.mform-alert + .mform-alert {
     margin-top: -15px;
 }
 
@@ -162,17 +159,18 @@
     line-height: 20px;
     padding: 15px;
     position: relative;
-    margin-bottom: 2px;
-    background: #ffffff;
-    z-index: +1;
-    background: #ffffff;
-    border: 1px solid #eee;
+    margin-bottom: 2px; 
+background: #ffffff;
+z-index: +1;
+background: #ffffff;
+border: 1px solid #eee;
 }
 
 .mform .btn-white[aria-expanded=true] {
     background: #4b9ad9;
-    color: #fff;
+color: #fff;
 }
+
 
 .mform .btn-white:hover {
     background-color: #4b9ad9;
@@ -188,34 +186,46 @@
     background-color: #fafafa;
 }
 
+
 .mform .btn-white:after {
     content: '\f067';
     width: 10px;
     height: 10px;
     color: #4b9ad9;
     display: inline-block;
-    margin-left: 15px;
-    float: right;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 20px;
-    ;
+    margin-left: 15px;float: right;font: normal normal normal 14px/1 FontAwesome;font-size: 20px;;
     font-size: 15px;
 }
 
 .mform .btn-white:hover:after {
+
     color: #FFF;
+
 }
 
+
+
 .mform .btn-white[aria-expanded="true"]:after {
-    content: '\f068';
+
+content: '\f068';
     color: #fff;
 }
+
+
+.mform .collapse-wrapper  {
+    box-sizing: border-box;
+    padding-top: 10px;
+    display: block; 
+
+}
+
+
 
 .mform a.mblock-info-tooltip {
     margin-left: 7px;
 }
 
-.mform .panel-group[data-group-hide-toggle-links=true] .panel>a[data-toggle=collapse] {
+.mform .panel-group[data-group-hide-toggle-links=true] .panel > a[data-toggle=collapse] {
     display: none;
 }
 
@@ -231,6 +241,6 @@
     border: none;
 }
 
-.mform .panel-group[data-group-hide-toggle-links] .panel+.panel {
+.mform .panel-group[data-group-hide-toggle-links] .panel + .panel {
     margin-top: 0;
 }
