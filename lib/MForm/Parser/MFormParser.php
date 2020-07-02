@@ -871,6 +871,7 @@ class MFormParser
      * link, linklist
      * @param MFormItem $item
      * @return $this
+     * @throws \rex_exception
      * @author Joachim Doerr
      */
     private function generateCustomLinkElement(MFormItem $item)

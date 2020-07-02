@@ -98,22 +98,26 @@ function initMFormSelectAccordionToggle(element, init, reinit) {
         acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
             let togglecollapse = $(this),
                 indexId = (index + 1),
-                target = indexId;
+                target = indexId,
+                selected;
 
             if ($(this).attr('data-select-collapse-id') !== undefined) {
                 indexId = $(this).attr('data-select-collapse-id')
                 target = indexId;
             }
 
-            element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '">' + togglecollapse.text() + '</option>');
+            if (element.attr('data-selected') === indexId) {
+                selected = ' selected="selected"';
+            }
+
+            element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '"'+ selected + '>' + togglecollapse.text() + '</option>');
             togglecollapse.attr('data-index', indexId);
 
             if (reinit) {
                 $(target).removeClass('in').attr('aria-expanded', false);
             }
 
-            if ($.isNumeric(element.attr('data-selected')) && element.attr('data-selected') == indexId) {
-                element.find('option[value=' + indexId + ']').attr('selected', 'selected');
+            if (element.attr('data-selected') === indexId) {
                 togglecollapse.next().addClass('in').css('height','').attr('aria-expanded', true);
             }
         });
