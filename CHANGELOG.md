@@ -10,6 +10,9 @@
 * added some styling
 * change parsley trigger to: `.mform` and event to `rex:ready` 
 
+Notice: The REX_CUSTOM_LINK Var now saves the data in a regular REX_VAR. So the usage of REX_CUSTOM_LINK is not backward compatible. You should move the values from Linklist to a value field. 
+
+
 ### Version 5.3
 
 * added custom link as widget
