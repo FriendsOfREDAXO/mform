@@ -84,34 +84,44 @@ class MFormValueHandler
 
         if ($value === NULL && is_array($result) === true) {
             // read value by type
-            switch ($item->getType()) {
-                case 'linklist':
-                    $value = $result['linklist'][$item->getVarId()[0]];
-                    break;
-                case 'imglist':
-                case 'medialist':
-                    $value = $result['filelist'][$item->getVarId()[0]];
-                    break;
-                case 'link':
-                    $value = $result['link'][$item->getVarId()[0]];
-                    break;
-                case 'media':
-                    $value = $result['file'][$item->getVarId()[0]];
-                    break;
-                default:
-                    if (array_key_exists('value', $result)) {
-                        $value = (array_key_exists($item->getVarId()[0], $result['value'])) ? $result['value'][$item->getVarId()[0]] : '';
-                        if (is_array($value) && isset($item->getVarId()[1])) {
-                            $value = (array_key_exists($item->getVarId()[1], $value)) ? $value[$item->getVarId()[1]] : '';
-                        }
-                        if (is_array($value) && isset($item->getVarId()[2])) {
-                            $value = (array_key_exists($item->getVarId()[2], $value)) ? $value[$item->getVarId()[2]] : '';
-                        }
-                    }
-                    if (array_key_exists('value_string', $result) && isset($result['value_string'][$item->getVarId()[0]])) {
-                        $valueString = $result['value_string'][$item->getVarId()[0]];
-                    }
+            $default = true;
+            if (is_array($item->getVarId()) && count($item->getVarId()) === 1) {
+                switch ($item->getType()) {
+                    case 'linklist':
+                        $value = $result['linklist'][$item->getVarId()[0]];
+                        $default = false;
+                        break;
+                    case 'imglist':
+                    case 'medialist':
+                        $value = $result['filelist'][$item->getVarId()[0]];
+                        $default = false;
+                        break;
+                    case 'link':
+                        $value = $result['link'][$item->getVarId()[0]];
+                        $default = false;
+                        break;
+                    case 'media':
+                        $value = $result['file'][$item->getVarId()[0]];
+                        $default = false;
+                        break;
+                }
             }
+
+            if ($default) {
+                if (array_key_exists('value', $result)) {
+                    $value = (array_key_exists($item->getVarId()[0], $result['value'])) ? $result['value'][$item->getVarId()[0]] : '';
+                    if (is_array($value) && isset($item->getVarId()[1])) {
+                        $value = (array_key_exists($item->getVarId()[1], $value)) ? $value[$item->getVarId()[1]] : '';
+                    }
+                    if (is_array($value) && isset($item->getVarId()[2])) {
+                        $value = (array_key_exists($item->getVarId()[2], $value)) ? $value[$item->getVarId()[2]] : '';
+                    }
+                }
+                if (array_key_exists('value_string', $result) && isset($result['value_string'][$item->getVarId()[0]])) {
+                    $valueString = $result['value_string'][$item->getVarId()[0]];
+                }
+            }
+
             if (!is_null($valueString)) $item->setStringValue($valueString);
             $item->setValue($value);
         } else {
