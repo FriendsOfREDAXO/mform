@@ -22,6 +22,7 @@ use rex_addon;
 use rex_clang;
 use rex_url;
 use rex_var_custom_link;
+use rex_var_imglist;
 use rex_var_link;
 use rex_var_linklist;
 use rex_var_media;
@@ -693,44 +694,30 @@ class MFormParser
             default:
             case 'media':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
-                $item->setVarId(substr($item->getVarId(), 1, -1));
-
-                $html = rex_var_media::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $id = $this->getWidgetId($item);
+                $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
-                $links = $dom->getElementsByTagName('a');
-                $id = str_replace(['][', '[', ']'], ['_', '', ''], $item->getVarId());
 
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . $id);
-
-                if ($links instanceof DOMNodeList) {
-                    foreach ($links as $link) {
-                        if ($link instanceof DOMElement) {
-                            $link->setAttribute('onclick', preg_replace('/\d/', '\'' . $id . '\'', $link->getAttribute('onclick')));
-                        }
-                    }
-                }
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . (int) $id);
                 break;
             case 'imglist':
             case 'medialist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIALIST';
-                $item->setVarId(substr($item->getVarId(), 1, -1));
+                $id = $this->getWidgetId($item);
                 /** @var rex_var_medialist|rex_var_imglist $class */
                 $class = 'rex_var_' . $item->getType();
-                $html = $class::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
-                $links = $dom->getElementsByTagName('a');
-                $id = str_replace(['][', '[', ']'], ['', '', ''], $item->getVarId());
 
                 if ($selects instanceof DOMNodeList) $this->processNodeFormElement($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
                 if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIALIST_' . $id);
-                if ($links instanceof DOMNodeList) $this->processLinkListElement($links, $id);
                 break;
         }
 
@@ -773,49 +760,27 @@ class MFormParser
             default:
             case 'link':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
-                $item->setVarId(substr($item->getVarId(), 1, -1));
-                $html = rex_var_link::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $id = $this->getWidgetId($item);
+                $html = rex_var_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
-                $links = $dom->getElementsByTagName('a');
 
-                if ($inputs instanceof DOMNodeList) {
-                    foreach ($inputs as $input) {
-                        if ($input instanceof DOMElement) {
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-                                foreach ($item->getAttributes() as $key => $value) {
-                                    $input->setAttribute($key, $value);
-                                }
-                            }
-                            $input->setAttribute('id', str_replace(['][', '[', ']'], ['_', '', ''], $input->getAttribute('id')));
-                        }
-                    }
-                }
-                if ($links instanceof DOMNodeList) {
-                    foreach ($links as $link) {
-                        if ($link instanceof DOMElement) {
-                            $link->setAttribute('onclick', str_replace(['][', '[', ']'], ['_', '', ''], $link->getAttribute('onclick')));
-                        }
-                    }
-                }
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINK_' . (int) $id);
                 break;
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
-                $item->setVarId(substr($item->getVarId(), 1, -1));
-                $html = rex_var_linklist::getWidget($item->getVarId(), $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $id = $this->getWidgetId($item);
+                $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
-                $links = $dom->getElementsByTagName('a');
-                $id = str_replace(['][', '[', ']'], ['', '', ''], $item->getVarId());
 
                 if ($selects instanceof DOMNodeList) $this->processNodeFormElement($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
                 if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINKLIST_' . $id);
-                if ($links instanceof DOMNodeList) $this->processLinkListElement($links, $id);
                 break;
         }
 
@@ -853,18 +818,22 @@ class MFormParser
     }
 
     /**
-     * @param DOMNodeList $elements
-     * @param $id
+     * @param MFormItem $item
+     * @return string
      * @author Joachim Doerr
      */
-    private function processLinkListElement(DOMNodeList $elements, $id)
+    private function getWidgetId(MFormItem $item)
     {
-        foreach ($elements as $link) {
-            if ($link instanceof DOMElement) {
-                $link->setAttribute('onclick', str_replace(['][', '[', ']'], ['', '', ''], $link->getAttribute('onclick')));
-                $link->setAttribute('onclick', str_replace('(' . $id, '(\'' . $id . '\'', $link->getAttribute('onclick')));
+        $item->setVarId(substr($item->getVarId(), 1, -1));
+        $varId = explode('][', $item->getVarId());
+
+        foreach ($varId as $key => $val) {
+            if(!is_numeric($val)) {
+                $varId[$key] = rand(0,(strlen($val)*rand()));
             }
         }
+
+        return implode('', $varId);
     }
 
     /**
