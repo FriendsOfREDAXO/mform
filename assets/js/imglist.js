@@ -33,7 +33,7 @@ function imglist_init_widget(element) {
         },
         stop: function () {
             // refresh input
-            imglist_write_input(widget_id);
+            imglist_write_input(element);
         }
     });
 }
@@ -73,9 +73,16 @@ function imglist_widget_actions(element) {
             prev_selected = selected.prev();
 
         if (selected.length) {
+            // remove option
+            element.find('select option').each(function () {
+                console.log($(this).attr('data-key') + '===' + selected.attr('data-key'));
+                if ($(this).attr('data-key') === selected.attr('data-key')) {
+                    $(this).remove();
+                }
+            });
+
             // remove element
             selected.remove();
-            element.find('select option:selected').remove();
 
             // set new selected item
             if (next_selected.length) {
@@ -85,7 +92,7 @@ function imglist_widget_actions(element) {
             }
 
             // refresh input
-            imglist_write_input(widget_id);
+            imglist_write_input(element);
 
             // refresh sortable
             element.find('ul.thumbnail-list').sortable('refresh');
@@ -148,7 +155,7 @@ function imglist_add_img_by_last_list_item(element) {
     }
     if (go_go_go) {
         // refresh input
-        imglist_write_input(widget_id);
+        imglist_write_input(element);
 
         // refresh sortable
         element.find('ul.thumbnail-list').sortable('refresh');
@@ -157,9 +164,9 @@ function imglist_add_img_by_last_list_item(element) {
 
 function imglist_list_items_action(element) {
     element.find('ul.thumbnail-list').on('click', 'li', function () {
-        let selected = ($(this).attr('data-selected') == 1);
-        $(this).parent().find('li').removeClass('selected').attr('data-selected', 0);
-        element.find('select option:selected').prop('selected', false);
+        let selected = ($(this).data('selected') === 1);
+        $(this).parent().find('li').removeClass('selected').data('selected', 0);
+        element.find('select option:selected').prop('selected', false).data('selected', 0);
 
         if (!selected) {
             imglist_list_items_select(element, $(this));
@@ -193,21 +200,20 @@ function imglist_list_items_select(element, item) {
     item.addClass('selected').attr('data-selected', 1);
     element.find('select option').each(function () {
         if ($(this).attr('data-key') === item.attr('data-key')) {
+            $(this).data('selected', 1);
             $(this).prop('selected', true);
         }
     });
 }
 
-function imglist_write_input(id) {
-    $('.custom-imglist').each(function(){
-        if ($(this).attr('data-widget-id') === id) {
-            let source_elements = $(this).find('ul li'),
-                new_value = '';
-            for (let i = 0; i < source_elements.length; i++) {
-                new_value = new_value + $(source_elements[i]).attr('value');
-                if (source_elements.length > (i + 1)) new_value = new_value + ',';
-            }
-            $(this).find('input').val(new_value);
+function imglist_write_input(element) {
+    let source_elements = element.find('ul li'),
+        new_value = '';
+    if (source_elements.length) {
+        for (let i = 0; i < source_elements.length; i++) {
+            new_value = new_value + $(source_elements[i]).attr('value');
+            if (source_elements.length > (i + 1)) new_value = new_value + ',';
         }
-    });
+        element.find('input').val(new_value);
+    }
 }
