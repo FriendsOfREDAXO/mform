@@ -709,7 +709,8 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 /** @var rex_var_medialist|rex_var_imglist $class */
                 $class = 'rex_var_' . $item->getType();
-                $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $value = (!is_string($item->getValue())) ? '' : $item->getValue();
+                $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
