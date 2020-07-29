@@ -695,13 +695,13 @@ class MFormParser
             case 'media':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = rex_var_media::getWidget((int)$id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . (int) $id);
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . (int)$id);
                 break;
             case 'imglist':
             case 'medialist':
@@ -768,7 +768,17 @@ class MFormParser
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINK_' . (int) $id);
+                if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINK_' . (int)$id);
+                if ($inputs instanceof DOMNodeList) {
+                    foreach ($inputs as $input) {
+                        if ($input instanceof DOMElement) {
+                            if ($input->getAttribute('type') == 'text') {
+                                $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
+                            }
+                        }
+                    }
+                }
+
                 break;
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
@@ -829,8 +839,8 @@ class MFormParser
         $varId = explode('][', $item->getVarId());
 
         foreach ($varId as $key => $val) {
-            if(!is_numeric($val)) {
-                $varId[$key] = rand(0,(strlen($val)*rand()));
+            if (!is_numeric($val)) {
+                $varId[$key] = rand(0, (strlen($val) * rand()));
             }
         }
 
