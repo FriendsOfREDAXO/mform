@@ -44,5 +44,7 @@ if (rex::isBackend()) {
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
 
     // reset count per page init
-    rex_set_session('mform_count', 0);
+    if (rex_backend_login::hasSession()) {
+        rex_set_session('mform_count', 0);
+    }
 }
