@@ -36,6 +36,7 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
                 'types' => ['type' => 'text',    'label' => rex_i18n::msg('yform_values_custom_link_media_types')],
                 'media_category' => ['type' => 'text',    'label' => rex_i18n::msg('yform_values_custom_link_media_category')],
                 'category' => ['type' => 'be_link',    'label' => rex_i18n::msg('yform_values_custom_link_link_category')],
+                'ylink' => ['type' => 'text',    'label' => rex_i18n::msg('yform_values_custom_link_ylink')],
                 'notice' => ['type' => 'text',    'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('yform_values_custom_link_description'),

@@ -13,6 +13,7 @@ $parameters = array(
     'types' => $this->getElement('types'),
     'category' => $this->getElement('category'),
     'media_category' => $this->getElement('media_category'),
+    'ylink' => $this->getElement('ylink'),
 );
 
 $widget = rex_var_custom_link::getWidget($buttonId, $name, $value, $parameters);
