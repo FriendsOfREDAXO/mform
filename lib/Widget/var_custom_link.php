@@ -48,15 +48,28 @@ class rex_var_custom_link extends rex_var
         }
 
         if ($this->hasArg('widget') && $this->getArg('widget')) {
-            if (!$this->environmentIs(self::ENV_INPUT)) {
-                return false;
-            }
+            if (!$this->environmentIs(self::ENV_INPUT)) return false;
+
             $args = [];
-            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix', 'ylink'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
             }
+
+            if (isset($args['ylink'])) {
+                $ylinks = array_filter(explode(',', $args['ylink']));
+                $args['ylink'] = [];
+                foreach ($ylinks as $ylink) {
+                    $link = array_filter(explode('::', $ylink));
+                    $args['ylink'][] = [
+                        'name' => $link[0],
+                        'table' => $link[1],
+                        'column' => $link[2],
+                    ];
+                }
+            }
+
             $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', $value, $args);
         } else {
             if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
@@ -111,6 +124,31 @@ class rex_var_custom_link extends rex_var
         $phoneClass = (isset($args['phone']) && $args['phone'] == 0) ? ' hidden' : $class;
         $externalPrefix = (isset($args['external_prefix']) && $args['external_prefix'] == 0) ? $args['external_prefix'] : 'https://';
 
+        $ylinks = '';
+
+        if (isset($args['ylink']) && is_array($args['ylink']) && sizeof($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
+
+            /*
+  <a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i></a>
+  <ul class="dropdown-menu">
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+  </ul>
+             */
+
+            foreach ($args['ylink'] as $link) {
+                if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
+                    $ylinks .= '<li><a href="#" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
+                }
+            }
+            if (!empty($ylinks)) {
+                $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i></a><ul class="dropdown-menu">' . $ylinks . '</ul>';
+            }
+        }
+
         if ($btnIdUniq === true) {
             $id = uniqid($id);
         }
@@ -119,7 +157,7 @@ class rex_var_custom_link extends rex_var
         $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
         $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
         $e['after'] = '</div>';
-        $e['functionButtons'] = '
+        $e['functionButtons'] = $ylinks . '
         <a href="#" class="btn btn-popup' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
         <a href="#" class="btn btn-popup' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
