@@ -56,6 +56,11 @@ class rex_form_widget_customlink_element extends rex_form_element
         $this->args['phone'] = $phone;
     }
 
+    public function setYLink($ylink)
+    {
+        $this->args['ylink'] = $ylink;
+    }
+
     public function formatElement()
     {
         static $widget_counter = 1;

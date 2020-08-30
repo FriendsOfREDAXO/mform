@@ -127,18 +127,6 @@ class rex_var_custom_link extends rex_var
         $ylinks = '';
 
         if (isset($args['ylink']) && is_array($args['ylink']) && sizeof($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
-
-            /*
-  <a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i></a>
-  <ul class="dropdown-menu">
-    <li><a href="#">Action</a></li>
-    <li><a href="#">Another action</a></li>
-    <li><a href="#">Something else here</a></li>
-    <li role="separator" class="divider"></li>
-    <li><a href="#">Separated link</a></li>
-  </ul>
-             */
-
             foreach ($args['ylink'] as $link) {
                 if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
                     $ylinks .= '<li><a href="#" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
