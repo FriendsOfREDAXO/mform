@@ -133,7 +133,7 @@ class rex_var_custom_link extends rex_var
                 }
             }
             if (!empty($ylinks)) {
-                $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i></a><ul class="dropdown-menu">' . $ylinks . '</ul>';
+                $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i> <span class="caret"></span></a><ul class="dropdown-menu">' . $ylinks . '</ul>';
             }
         }
 
