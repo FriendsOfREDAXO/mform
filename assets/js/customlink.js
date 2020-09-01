@@ -19,6 +19,31 @@ function customlink_init_widget(element) {
         showed_input = element.find('input[type=text]'),
         value, text, args, timer;
 
+    // ylink
+    element.find('#mform_ylink_' + id + ' a.ylink').unbind().bind('click', function() {
+        let table = $(this).data('table'),
+            column = $(this).data('column'),
+            pool = newPoolWindow('index.php?page=yform/manager/data_edit&table_name=' + table + '&rex_yform_manager_opener[id]=1&rex_yform_manager_opener[field]=' + column + '&rex_yform_manager_opener[multiple]=0');
+
+        clearInterval(timer);
+        closeDropDown(id);
+
+        $(pool).on('rex:YForm_selectData', function (event, id, label) {
+            event.preventDefault();
+            pool.close();
+
+            value = hidden_input.val();
+            text = showed_input.val();
+
+            let linkUrl = table.split('_').join('-') + '://' + id;
+
+            hidden_input.val(linkUrl);
+            showed_input.val(label);
+        });
+
+        return false;
+    });
+
     // media element
     element.find('a#mform_media_' + id).unbind().bind('click', function () {
         id = element.data('id');
@@ -27,6 +52,7 @@ function customlink_init_widget(element) {
         args = '';
 
         clearInterval(timer);
+        closeDropDown(id);
 
         if (media_types !== undefined) {
             args = '&args[types]=' + media_types;
@@ -61,6 +87,7 @@ function customlink_init_widget(element) {
         args = '&clang=' + clang;
 
         clearInterval(timer);
+        closeDropDown(id);
 
         if (link_category !== undefined) {
             args = args + '&category_id=' + link_category;
@@ -80,6 +107,7 @@ function customlink_init_widget(element) {
         text = showed_input.val();
 
         clearInterval(timer);
+        closeDropDown(id);
 
         if (value == '' || value.indexOf(extern_link_prefix) < 0) {
             value = extern_link_prefix;
@@ -107,6 +135,7 @@ function customlink_init_widget(element) {
         text = showed_input.val();
 
         clearInterval(timer);
+        closeDropDown(id);
 
         if (value == '' || value.indexOf("mailto:") < 0) {
             value = 'mailto:';
@@ -134,6 +163,7 @@ function customlink_init_widget(element) {
         text = showed_input.val();
 
         clearInterval(timer);
+        closeDropDown(id);
 
         if (value == '' || value.indexOf("tel:") < 0) {
             value = 'tel:';
@@ -157,8 +187,16 @@ function customlink_init_widget(element) {
     // delete link
     element.find('a#mform_delete_' + id).unbind().bind('click', function () {
         clearInterval(timer);
+        closeDropDown(id);
         showed_input.val('');
         hidden_input.val('');
         return false;
     });
+}
+
+function closeDropDown(id) {
+    let dropdown = $('ul#mform_ylink_' + id);
+    if (dropdown.is(':visible')) {
+        dropdown.dropdown('toggle');
+    }
 }
