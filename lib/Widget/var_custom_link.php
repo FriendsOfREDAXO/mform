@@ -31,6 +31,32 @@ class rex_var_custom_link extends rex_var
     }
 
     /**
+     * @param $value
+     * @param $table
+     * @param $column
+     * @param null $name
+     * @return string
+     * @throws rex_sql_exception
+     * @author Joachim Doerr
+     */
+    public static function getCustomLinkYFormLinkText($value, $table, $column, $name = null)
+    {
+        $valueName = $value;
+
+        preg_match('@(rex-.*)://(\d)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
+
+        if ((isset($matches[1][0]) && $matches[1][0] == str_replace('_', '-', $table)) && (isset($matches[2][0]) && is_numeric($matches[2][0]))) {
+            $sql = rex_sql::factory();
+            $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matches[2][0]]);
+            if (isset($result[0][$column])) {
+                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] .']';
+            }
+        }
+
+        return $valueName;
+    }
+
+    /**
      * @return bool|string
      * @author Joachim Doerr
      */
@@ -126,19 +152,23 @@ class rex_var_custom_link extends rex_var
 
         $ylinks = '';
 
+        if ($btnIdUniq === true) {
+            $id = uniqid($id);
+        }
+
         if (isset($args['ylink']) && is_array($args['ylink']) && sizeof($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
             foreach ($args['ylink'] as $link) {
                 if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
-                    $ylinks .= '<li><a href="#" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
+                    $ylinks .= '<li><a href="#" class="ylink" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
+
+                    if (strpos($value, str_replace('_', '-', $link['table'])) !== false) {
+                        $valueName = self::getCustomLinkYFormLinkText($value, $link['table'], $link['column']);
+                    }
                 }
             }
             if (!empty($ylinks)) {
-                $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i> <span class="caret"></span></a><ul class="dropdown-menu">' . $ylinks . '</ul>';
+                $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i> <span class="caret"></span></a><ul id="mform_ylink_' . $id . '" class="dropdown-menu">' . $ylinks . '</ul>';
             }
-        }
-
-        if ($btnIdUniq === true) {
-            $id = uniqid($id);
         }
 
         $e = [];
