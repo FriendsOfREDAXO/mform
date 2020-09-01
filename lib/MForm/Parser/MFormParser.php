@@ -877,7 +877,12 @@ class MFormParser
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'label', true));
 
-        $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $item->getParameter(), false);
+        $parameter = $item->getParameter();
+        if (!isset($parameter['ylink']) && isset($item->getAttributes()['ylink'])) {
+            $parameter['ylink'] = $item->getAttributes()['ylink'];
+        }
+
+        $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
 
         $dom = new DOMDocument();
         @$dom->loadHTML(utf8_decode($html));
