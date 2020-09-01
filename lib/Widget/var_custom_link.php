@@ -43,7 +43,7 @@ class rex_var_custom_link extends rex_var
     {
         $valueName = $value;
 
-        preg_match('@(rex-.*)://(\d)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
+        preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
 
         if ((isset($matches[1][0]) && $matches[1][0] == str_replace('_', '-', $table)) && (isset($matches[2][0]) && is_numeric($matches[2][0]))) {
             $sql = rex_sql::factory();
