@@ -19,6 +19,13 @@ Jeder dieser Typen kann aktiviert oder deaktiviert werden. Per default sind folg
 * `data-media`
 
 
+## Verwendung mit MBlock
+
+Das Custom-Link-Element darf keinen String (wie bei anderen Elementen) in der ID enthalten:  
+
+`$MBlock->addCustomLinkField("$id.0.1",array('label'=>'Link'));`
+
+
 ## Beispiel-Code: 
 
 ### MForm
