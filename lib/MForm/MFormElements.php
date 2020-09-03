@@ -410,6 +410,54 @@ class MFormElements
         return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
     }
 
+    public function addEditorField($id, $profile, $attributes = array(), $validations = array(), $defaultValue = NULL, $editor = NULL)
+    {
+        if (is_null($editor)) {
+            if (\rex_addon::exists('cke5') && \rex_addon::get('cke5')->isAvailable()) {
+                $editor = 'cke5';
+//            } else if(\rex_addon::exists('redactor') && \rex_addon::get('redactor')->isAvailable()) {
+//                $editor = 'redactor';
+//            } else if(\rex_addon::exists('redactor2') && \rex_addon::get('redactor2')->isAvailable()) {
+//                $editor = 'redactor2';
+//            } else if(\rex_addon::exists('ckeditor') && \rex_addon::get('ckeditor')->isAvailable()) {
+//                $editor = 'ckeditor';
+//            } else if(\rex_addon::exists('tiny') && \rex_addon::get('tiny')->isAvailable()) {
+//                $editor = 'tiny';
+//            } else if(\rex_addon::exists('tiny5') && \rex_addon::get('tiny5')->isAvailable()) {
+//                $editor = 'tiny5';
+//            } else if(\rex_addon::exists('markitup') && \rex_addon::get('markitup')->isAvailable()) {
+//                $editor = 'markitup';
+            }
+            // TODO add ckeditor, redactor, redactor2, tiny, tiny5, markitup
+        }
+
+        if (\rex_addon::exists($editor) && \rex_addon::get($editor)->isAvailable()) {
+            switch ($editor) {
+                case 'cke5':
+                    return $this->addCke5Field($id, $profile, $attributes, $validations, $defaultValue);
+            }
+        } else {
+            return $this->addAlertWarning(sprintf(\rex_i18n::msg('mform_editor_not_available'), $editor, $id, $profile));
+        }
+    }
+
+    /**
+     * @param $id
+     * @param $profile
+     * @param array $attributes
+     * @param array $validations
+     * @param null $defaultValue
+     * @author Joachim Doerr
+     */
+    public function addCke5Field($id, $profile, $attributes = array(), $validations = array(), $defaultValue = NULL)
+    {
+        if (\rex_addon::exists('cke5') && \rex_addon::get('cke5')->isAvailable()) {
+            return $this->addTextAreaField($id, array_merge(['class' => 'cke5-editor', 'data-lang' => \Cke5\Utils\Cke5Lang::getUserLang(), 'data-content-lang' => \Cke5\Utils\Cke5Lang::getOutputLang(), 'data-profile' => $profile], $attributes), $validations, $defaultValue);
+        } else {
+            return $this->addAlertWarning(sprintf(\rex_i18n::msg('mform_editor_not_available'), 'cke5', $id, $profile));
+        }
+    }
+
     /**
      * @param integer|float $id
      * @param array $attributes
@@ -598,6 +646,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      * @internal attributes ['data-intern'=>'enable','data-extern'=>'enable','data-media'=>'enable','data-mailto'=>'enable','data-tel'=>'disable', 'data-extern-link-prefix' => 'https://www.', 'data-link-category' => 14, 'data-media-category' => 1, 'data-media-type' => 'jpg,png'];
+     *
+     * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
+     * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
     public function addCustomLinkField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
     {

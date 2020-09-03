@@ -28,6 +28,8 @@ mform_config_save = Einstellungen speichern
 mform_wiki = MForm Github Doku Wiki
 mform_github = MForm FOR Github Repository
 
+mform_editor_not_available = Das Editor-Addon $s ist nicht verfügbar, bitte installieren und aktivieren sie das Addon. [InputValueId: %s, EditorProfile: %s]
+
 mform_example_base_text = Text-Input- und Hidden-Elemente
 mform_example_base_select = Select- und Multiselect-Elemente
 mform_example_base_checkbox = Checkbox und Radio-Elmente
