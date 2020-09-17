@@ -133,7 +133,7 @@ $mform->addTextAreaField(1, array('label'=>'Label Name'), array('empty'), 'Defau
 $mform = new MForm();
 
 // add textinput field
-$mform->addTextAreaReadOnlyField(1, 'Value Text', array('label'=>'Label Name');
+$mform->addTextAreaReadOnlyField(1, 'Value Text', array('label'=>'Label Name'));
 ```
 
 
