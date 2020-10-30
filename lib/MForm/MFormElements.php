@@ -410,6 +410,11 @@ class MFormElements
         return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
     }
 
+    public function addTimeField($id, $attributes = array(), $validations = array(), $defaultValue = NULL)
+    {
+        return $this->addInputField('time', $id, $attributes, $validations, $defaultValue);
+    }
+
     public function addEditorField($id, $profile, $attributes = array(), $validations = array(), $defaultValue = NULL, $editor = NULL)
     {
         if (is_null($editor)) {
