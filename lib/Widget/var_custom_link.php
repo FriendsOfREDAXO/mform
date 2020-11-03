@@ -42,6 +42,7 @@ class rex_var_custom_link extends rex_var
     public static function getCustomLinkYFormLinkText($value, $table, $column, $name = null)
     {
         $valueName = $value;
+        dump([$value, $table, $column, $name]);
 
         preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
 
@@ -83,19 +84,6 @@ class rex_var_custom_link extends rex_var
                 }
             }
 
-            if (isset($args['ylink'])) {
-                $ylinks = array_filter(explode(',', $args['ylink']));
-                $args['ylink'] = [];
-                foreach ($ylinks as $ylink) {
-                    $link = array_filter(explode('::', $ylink));
-                    $args['ylink'][] = [
-                        'name' => $link[0],
-                        'table' => $link[1],
-                        'column' => $link[2],
-                    ];
-                }
-            }
-
             $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', $value, $args);
         } else {
             if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
@@ -104,6 +92,28 @@ class rex_var_custom_link extends rex_var
         }
 
         return self::quote($value);
+    }
+
+    /**
+     * @param $args
+     * @return mixed
+     * @author Joachim Doerr
+     */
+    public static function prepareYLinkArg($args)
+    {
+        if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
+            $ylinks = array_filter(explode(',', $args['ylink']));
+            $args['ylink'] = [];
+            foreach ($ylinks as $ylink) {
+                $link = array_filter(explode('::', $ylink));
+                $args['ylink'][] = [
+                    'name' => $link[0],
+                    'table' => $link[1],
+                    'column' => $link[2],
+                ];
+            }
+        }
+        return $args;
     }
 
     /**
@@ -149,7 +159,7 @@ class rex_var_custom_link extends rex_var
         $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && $args['phone'] == 0) ? ' hidden' : $class;
         $externalPrefix = (isset($args['external_prefix']) && $args['external_prefix'] == 0) ? $args['external_prefix'] : 'https://';
-
+        $args = self::prepareYLinkArg($args);
         $ylinks = '';
 
         if ($btnIdUniq === true) {
@@ -176,12 +186,12 @@ class rex_var_custom_link extends rex_var
         $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
         $e['after'] = '</div>';
         $e['functionButtons'] = $ylinks . '
-        <a href="#" class="btn btn-popup' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
-        <a href="#" class="btn btn-popup' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
-        <a href="#" class="btn btn-popup' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
-        <a href="#" class="btn btn-popup' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
-        <a href="#" class="btn btn-popup' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
-        <a href="#" class="btn btn-popup' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
+        <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
+        <a href="#" class="btn btn-popup external_link ' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
+        <a href="#" class="btn btn-popup email_link ' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
+        <a href="#" class="btn btn-popup phone_link ' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
+        <a href="#" class="btn btn-popup intern_link ' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
+        <a href="#" class="btn btn-popup delete_link ' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
         ';
 
         $fragment = new rex_fragment();

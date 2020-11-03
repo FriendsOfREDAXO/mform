@@ -9,7 +9,7 @@ $(document).on('rex:ready', function (e, container) {
 });
 
 function customlink_init_widget(element) {
-    let id = element.data('id'),
+    let id = 'cl' + randId(),
         clang = element.data('clang'),
         media_types = element.data('types'),
         media_Category = element.data('media_category'),
@@ -19,9 +19,13 @@ function customlink_init_widget(element) {
         showed_input = element.find('input[type=text]'),
         value, text, args, timer;
 
+    element.data('id', id)
+    element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
+
     // ylink
-    element.find('#mform_ylink_' + id + ' a.ylink').unbind().bind('click', function() {
-        let table = $(this).data('table'),
+    element.find('.input-group-btn a.ylink').unbind().bind('click', function() {
+        let id = element.data('id'),
+            table = $(this).data('table'),
             column = $(this).data('column'),
             pool = newPoolWindow('index.php?page=yform/manager/data_edit&table_name=' + table + '&rex_yform_manager_opener[id]=1&rex_yform_manager_opener[field]=' + column + '&rex_yform_manager_opener[multiple]=0');
 
@@ -45,11 +49,10 @@ function customlink_init_widget(element) {
     });
 
     // media element
-    element.find('a#mform_media_' + id).unbind().bind('click', function () {
-        id = element.data('id');
-        value = hidden_input.val();
-        text = showed_input.val();
-        args = '';
+    element.find('a.media_link').unbind().bind('click', function () {
+        let id = element.data('id'),
+            value = hidden_input.val(),
+            args = '';
 
         clearInterval(timer);
         closeDropDown(id);
@@ -80,11 +83,9 @@ function customlink_init_widget(element) {
     });
 
     // link element
-    element.find('a#mform_link_' + id).unbind().bind('click', function () {
-        id = element.attr('data-id');
-        value = hidden_input.val();
-        text = showed_input.val();
-        args = '&clang=' + clang;
+    element.find('a.intern_link').unbind().bind('click', function () {
+        let id = element.data('id'),
+            args = '&clang=' + clang;
 
         clearInterval(timer);
         closeDropDown(id);
@@ -101,10 +102,10 @@ function customlink_init_widget(element) {
     });
 
     // extern link
-    element.find('a#mform_extern_' + id).unbind().bind('click', function () {
-        id = element.attr('data-id');
-        value = hidden_input.val();
-        text = showed_input.val();
+    element.find('a.external_link').unbind().bind('click', function () {
+        let id = element.data('id'),
+            value = hidden_input.val(),
+            text = showed_input.val();
 
         clearInterval(timer);
         closeDropDown(id);
@@ -129,10 +130,10 @@ function customlink_init_widget(element) {
     });
 
     // mail to link
-    element.find('a#mform_mailto_' + id).unbind().bind('click', function () {
-        id = $(this).parent().parent().attr('data-id');
-        value = hidden_input.val();
-        text = showed_input.val();
+    element.find('a.email_link').unbind().bind('click', function () {
+        let id = element.data('id'),
+            value = hidden_input.val(),
+            text = showed_input.val();
 
         clearInterval(timer);
         closeDropDown(id);
@@ -157,10 +158,10 @@ function customlink_init_widget(element) {
     });
 
     // phone link
-    element.find('a#mform_tel_' + id).unbind().bind('click', function () {
-        id = $(this).parent().parent().attr('data-id');
-        value = hidden_input.val();
-        text = showed_input.val();
+    element.find('a.phone_link').unbind().bind('click', function () {
+        let id = element.data('id'),
+            value = hidden_input.val(),
+            text = showed_input.val();
 
         clearInterval(timer);
         closeDropDown(id);
@@ -185,13 +186,18 @@ function customlink_init_widget(element) {
     });
 
     // delete link
-    element.find('a#mform_delete_' + id).unbind().bind('click', function () {
+    element.find('a.delete_link').unbind().bind('click', function () {
+        let id = element.data('id');
         clearInterval(timer);
         closeDropDown(id);
         showed_input.val('');
         hidden_input.val('');
         return false;
     });
+}
+
+function randId() {
+    return Math.random().toString(16).slice(2);
 }
 
 function closeDropDown(id) {
