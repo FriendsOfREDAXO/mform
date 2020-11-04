@@ -85,6 +85,7 @@ function customlink_init_widget(element) {
     // link element
     element.find('a.intern_link').unbind().bind('click', function () {
         let id = element.data('id'),
+            link_id = randInt(),
             args = '&clang=' + clang;
 
         clearInterval(timer);
@@ -94,9 +95,10 @@ function customlink_init_widget(element) {
             args = args + '&category_id=' + link_category;
         }
 
-        hidden_input.attr('id', 'REX_LINK_' + id);
+        showed_input.attr('id', 'REX_LINK_' + link_id + '_NAME');
+        hidden_input.attr('id', 'REX_LINK_' + link_id);
 
-        openLinkMap('REX_LINK_' + id, args);
+        openLinkMap('REX_LINK_' + link_id, args);
 
         return false;
     });
@@ -198,6 +200,10 @@ function customlink_init_widget(element) {
 
 function randId() {
     return Math.random().toString(16).slice(2);
+}
+
+function randInt() {
+    return parseInt((Math.random() * 1000000000000) + (Math.random()*1000000000000/Math.random()));
 }
 
 function closeDropDown(id) {
