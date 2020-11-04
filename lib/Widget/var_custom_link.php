@@ -42,7 +42,6 @@ class rex_var_custom_link extends rex_var
     public static function getCustomLinkYFormLinkText($value, $table, $column, $name = null)
     {
         $valueName = $value;
-        dump([$value, $table, $column, $name]);
 
         preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
 
