@@ -28,16 +28,20 @@ mform_config_save = Spara inställningar
 mform_wiki = MForm Github Doku Wiki
 mform_github = MForm FOR – Github Repository
 
+mform_editor_not_available = Editor-tillägget $ s är inte tillgängligt. Installera och aktivera tillägget. [InputValueId:% s, EditorProfile:% s]
+
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkbox = Checkbox and radio elements
 mform_example_base_inline = Structured inline elements
 mform_example_base_system = System button elements
+mform_example_base_widgets = MForm widget element
 mform_example_extended_attribute_method = Attributes method
 mform_example_extended_options_method = Options method
 mform_example_extended_parameter_method = Parameter method
 mform_example_extended_full_json_support = Full JSON value support
 mform_example_extended_diverse_setter = Add and diverse setter
+mform_example_extended_wrapper = Wrapper element
 mform_example_expert_html_form_elements = New HTML5 form elements
 mform_example_expert_datalist = Datalists for input elements
 mform_example_expert_placeholder = Placeholder
@@ -65,3 +69,6 @@ yform_values_custom_link_external = Extern-link button
 yform_values_custom_link_mailto = Mailto-link button
 yform_values_custom_link_intern = Redaxo internal-link button
 yform_values_custom_link_link_category = Länk-kategori
+yform_values_custom_link_phone = Telefon länkbutton
+yform_values_imagelist_description = Bildval med direktvisning / dra & släpp
+yform_values_custom_link_ylink = YForm-Link-Widget (label_text::yform_tabell::visning_column,label_text2::yform_tabell_2::visning_column_2)
