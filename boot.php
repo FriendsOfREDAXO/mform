@@ -26,13 +26,6 @@ if (rex::isBackend()) {
             rex_view::addCssFile($this->getAssetsUrl($css));
         }
     }
-
-    // add all parsley mform files
-    rex_view::addCssFile($this->getAssetsUrl('parsley/parsley.css'));
-    rex_view::addJsFile($this->getAssetsUrl('parsley/parsley.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('parsley/extra/validator/dateiso.js'));
-    rex_view::addJsFile($this->getAssetsUrl('parsley/extra/validator/words.js'));
-    rex_view::addJsFile($this->getAssetsUrl('parsley/i18n/de.js')); // TODO backend lang specific
     // add toggle files
     rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
