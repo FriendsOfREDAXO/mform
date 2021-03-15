@@ -242,3 +242,8 @@ content: '\f068';
 .mform .panel-group[data-group-hide-toggle-links] .panel + .panel {
     margin-top: 0;
 }
+
+.mform .collapse {
+background: #fafafa;
+padding-bottom: 3px;
+}
