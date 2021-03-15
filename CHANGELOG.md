@@ -3,14 +3,18 @@
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
-* remove `parsley` validation, you should use html validations: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
-* remove `closeCollapse`, `closeTab`, `closeAccordion`
+* removed `parsley` validation @skerbis, you should use html validations: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
+* removed `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
 * added Media inUseCheck for media inside `custom_link` and `imagelist` in YForm
 * added some styling
+* added some Svensk översättning @interweave-media 
+* added some English translation @ynamite, @gharlan
+* added some docs @skerbis
 
-Notice: The REX_CUSTOM_LINK Var now saves the data in a regular REX_VAR. So the usage of REX_CUSTOM_LINK is not backward compatible. You should move the values from Linklist to a value field. 
+
+> Notice: The REX_CUSTOM_LINK Var now saves the data in a regular REX_VAR. So the usage of REX_CUSTOM_LINK is not backward compatible. You should move the values from Linklist to a value field. 
 
 ### Version 5.3
 
