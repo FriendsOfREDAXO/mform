@@ -3,7 +3,7 @@
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
-* remove `parsley` validation, you should use html validations
+* remove `parsley` validation, you should use html validations: https://developer.mozilla.org/en-US/docs/Learn/Forms/Form_validation
 * remove `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
