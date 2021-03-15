@@ -9,7 +9,6 @@
     - [Elementen Attribute zuweisen](elements_attributes.md)
     - [Elementen Parameter zuweisen](elements_params.md)
     - [Elementen Optionen zuweisen](elements_options.md)
-    - [Elementen Validierungen zuweisen](elements_validates.md)
     - [Elementen Default-Values / Placeholder zuweisen](elements_default_values.md)
 - Formular Elemente
 	- [Textareas, Text-Input- und Hidden-Elemente](form_input_hidden.md)
