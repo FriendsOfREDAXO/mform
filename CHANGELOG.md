@@ -7,7 +7,7 @@
 * remove `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
-* added Media inUseCheck for media inside `custom_link` and `imagelist`
+* added Media inUseCheck for media inside `custom_link` and `imagelist` in YForm
 * added some styling
 
 Notice: The REX_CUSTOM_LINK Var now saves the data in a regular REX_VAR. So the usage of REX_CUSTOM_LINK is not backward compatible. You should move the values from Linklist to a value field. 
