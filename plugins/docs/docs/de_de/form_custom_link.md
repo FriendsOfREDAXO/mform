@@ -43,8 +43,45 @@ echo $mform->show();
 REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink="Countries::rex_ycountries::de_de,CountriesEN::rex_ycountries::en_gb"]
 ```
 
+### Alsesen der YLinks per Outputfilter
 
-### Auslesen der Ylinks
+### YForm links
+
+Um die  generierten Urls wie `rex_news://1` zu ersetzen, muss das folgende Skript in die `boot.php` des `project` AddOns eingefügt werden.
+Der Code für die Urls muss modifiziert werden. 
+
+```php
+rex_extension::register('OUTPUT_FILTER', function(\rex_extension_point $ep) {
+    return preg_replace_callback(
+        '@((rex_news|rex_person))://(\d+)(?:-(\d+))?/?@i',
+        function ($matches) {
+            // table = $matches[1]
+            // id = $matches[3]
+            $url = '';
+            switch ($matches[1]) {
+                case 'news':
+                    // Example, if the Urls are generated via Url-AddOn  
+                    $id = $matches[3];
+                    if ($id) {
+                       return rex_getUrl('', '', ['news' => $id]); 
+                    }
+                    break;
+                case 'person':
+                    // ein anderes Beispiel 
+                    $url = '/index.php?person='.$matches[3];
+                    break;
+            }
+            return $url;
+        },
+        $ep->getSubject()
+    );
+}, rex_extension::NORMAL);
+
+```
+
+
+
+### Auslesen der Ylinks manuell: 
 
 ```php 
 $link = explode("://", $img['link']);
