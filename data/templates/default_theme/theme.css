@@ -150,20 +150,18 @@
 }
 
 .mform .btn-white {
-    background-color: #eee;
-    color: #333;
-    border-radius: 5px;
-    text-align: left;
-    font-size: 14px;
-    height: 50px;
-    line-height: 20px;
-    padding: 15px;
-    position: relative;
-    margin-bottom: 2px; 
-background: #ffffff;
-z-index: +1;
-background: #ffffff;
-border: 1px solid #eee;
+background-color: #fff;
+color: #333;
+border-radius: 0;
+text-align: left;
+font-size: 14px;
+height: 50px;
+line-height: 20px;
+padding: 15px;
+border-top: 1px solid #e8e8e8;
+border-bottom: 1px solid #e8e8e8;
+position: relative;
+margin-bottom: 1px;
 }
 
 .mform .btn-white[aria-expanded=true] {
