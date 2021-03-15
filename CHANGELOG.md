@@ -3,15 +3,14 @@
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
+* remove `parsley` validation, you should use html validations
 * remove `closeCollapse`, `closeTab`, `closeAccordion`
 * change `addCollapse`, `addAccordion`, `addTab` functionality, use `addForm` to add content in this methods
 * added `addForm` method
 * added Yform inUseCheck for media inside `custom_link` and `imagelist`
 * added some styling
-* change parsley trigger to: `.mform` and event to `rex:ready` 
 
 Notice: The REX_CUSTOM_LINK Var now saves the data in a regular REX_VAR. So the usage of REX_CUSTOM_LINK is not backward compatible. You should move the values from Linklist to a value field. 
-
 
 ### Version 5.3
 
