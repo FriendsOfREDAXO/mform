@@ -42,3 +42,26 @@ echo $mform->show();
 ```html
 REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink="Countries::rex_ycountries::de_de,CountriesEN::rex_ycountries::en_gb"]
 ```
+
+
+### Auslesen der Ylinks
+
+```php 
+$link = explode("://", $img['link']);
+
+      if (count($link) > 1) {
+          // its a table link
+          // url AddOn
+        $url = rex_getUrl('', '', [$link[0] => $link[1]]); // key muss im url addon übereinstimmen
+      } else {
+          $extUrl = parse_url($link[0]);
+
+          if (isset($extUrl['scheme']) && ($extUrl['scheme'] == 'http' || $extUrl['scheme'] == 'https')) {
+              // its an external link 
+              $url = $link[0];
+          } else {
+              // internal id
+              $url = rex_getUrl($link[0]);
+          }
+      }
+```
