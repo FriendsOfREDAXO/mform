@@ -30,8 +30,8 @@
 
 **Credits**
 
-Joachim Dörr (joachimdoerr)
-Alexander Walther (alexplusde)  
-Paul Götz (pixelfirma)  
-Tim Filler (elricco)
-Thomas Skerbis (skerbis)
+- Joachim Dörr (joachimdoerr)
+- Alexander Walther (alexplusde)  
+- Paul Götz (pixelfirma)  
+- Tim Filler (elricco)
+- Thomas Skerbis (skerbis)
