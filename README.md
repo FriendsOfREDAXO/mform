@@ -37,32 +37,37 @@ MForm muss im Modul-Input eines REDAXO Moduls als PHP Code notiert werden.
 
 ### Instanziierung  
 
-    // instantiate
-    $MForm = new MForm();
-
+```php
+// instantiate
+$MForm = new MForm();
+```
 Der MForm Classe kann im Konstruktor der Templatename übergeben werden. Dabei entspricht der Templatename dem Prefix des Templateordners.
 
-    // instantiate
-    $MForm = new MForm('table');
-
+```php
+// instantiate
+$MForm = new MForm('table');
+```
 
 ### Formularelemente
 
 Die wesentlichen Formularelemente die MForm bereitstellt werden durch Methoden hinzugefügt.
 
-    // add headline
-    $MForm->addHeadline("Headline");
+```php
+// add headline
+$MForm->addHeadline("Headline");
     
-    // add text field
-    $MForm->addTextField(1, array('label'=>'Input', 'style'=>'width:200px'));
+// add text field
+$MForm->addTextField(1, array('label'=>'Input', 'style'=>'width:200px'));
+```
 
 Alle MForm Methoden erwarten optional Attribute, Parameter und Optionen. Diese können auch durch Setter nachträglich dem Element zugewiesen werden.
 
-    // add text field
-    $MForm->addTextField(1);
-    $MForm->setLabel('Text Field');
-    $MForm->setAttributes(array('style'=>'width:200px', 'class'=>'test-field'));
-
+```php
+// add text field
+$MForm->addTextField(1);
+$MForm->setLabel('Text Field');
+$MForm->setAttributes(array('style'=>'width:200px', 'class'=>'test-field'));
+```
 Der `REX_VALUE-Key` muss jeder Formular-Input-Methode als Pflichtfeld übergeben werden. Informative Elemente benötigen keine ID.
 
 
@@ -70,19 +75,21 @@ Der `REX_VALUE-Key` muss jeder Formular-Input-Methode als Pflichtfeld übergeben
 
 MForm unterstützt `REX_VALUE-ARRAYs` wodurch es praktisch keine `REX_VALUE`-Limitierung mehr gibt. Zu beachten ist, dass jeder x.0 Key als Sting übergeben werden muss.
 
-    // add text field
-    $MForm->addTextField("1.0");
-    $MForm->addTextField(1.1);
-    $MForm->addTextField("1.2.Titel");
-
+```php
+// add text field
+$MForm->addTextField("1.0");
+$MForm->addTextField(1.1);
+$MForm->addTextField("1.2.Titel");
+```
 
 ### Formular erzeugen
 
 Um das komponierte Formular erzeugen zu lassen muss muss die `show` Methode genutzt werden.
 
-    // create output
-    echo $MForm->show();
-
+```php
+ // create output
+echo $MForm->show();
+```
 
 ### Element-Methoden
 
