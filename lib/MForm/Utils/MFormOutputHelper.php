@@ -5,97 +5,76 @@
  * @license MIT
  */
 
-namespace MForm\Handler;
+namespace MForm\Utils;
 
 
-use MForm\DTO\MFormItem;
+use rex_article;
+use rex_article_slice;
+use rex_clang;
+use rex_path;
+use rex_url;
 
-class MFormAttributeHandler
+class MFormOutputHelper
 {
     /**
-     * set attributes to the item
-     * @param MFormItem $item
-     * @param mixed $name
-     * @param mixed $value
+     * @param $sliceId
+     * @return bool
      * @author Joachim Doerr
      */
-    public static function addAttribute(MFormItem $item, $name, $value)
+    public static function isFirstSlice($sliceId)
     {
-        switch ($name) {
-            case 'label':
-                $item->setLabel($value); // set item label
-                break;
-            case 'size':
-                // is size numeric set number
-                if ((is_numeric($value) && $value > 0)) {
-                    $item->setSize($value);
-                    $item->attributes['size'] = $value;
-                }
-                // is size full set attribute #sizefull# to replace calculateet size height
-                if ($value == 'full') {
-                    $item->setSize($value);
-                    $item->attributes['size'] = '#sizefull#';
-                }
-                break;
-            case 'full': // set full for markitup or redactor fields to use the default_full template
-                $item->setFull(true);
-                break;
-            case 'form-item-col-class':
-                $item->setFormItemColClass($value);
-                break;
-            case 'label-col-class':
-                $item->setLabelColClass($value);
-                break;
-            case 'info-collapse':
-                $item->setInfoCollapse($value);
-                break;
-            case 'info-tooltip':
-                $item->setInfoTooltip($value);
-                break;
-            case 'info-collapse-icon':
-                $item->setInfoCollapseIcon($value);
-                break;
-            case 'info-tooltip-icon':
-                $item->setInfoTooltipIcon($value);
-                break;
-            case 'multiple': // flag the multiple fields
-                $item->setMultiple(true);
-                $item->attributes[$name] = $value;
-                break;
-            case 'category':
-            case 'catId': // set cat id as parameter for link or media fields
-                if ($value > 0)
-                    MFormParameterHandler::addParameter($item, 'category', $value);
-                break;
-            case 'default-value': // set default value for any fields
-                $item->setDefaultValue($value);
-                break;
-            case 'class': // set custom class
-                $item->setClass($value);
-                break;
-            case 'default-class': // i like set the r5 default classes
-                $item->setDefaultClass($value);
-                break;
-            default: // set any attributes
-                $item->attributes[$name] = $value;
-        }
+        $first = rex_article_slice::getFirstSliceForArticle(rex_article::getCurrentId(), rex_clang::getCurrentId());
+        if ($first instanceof rex_article_slice)
+            return ($first->getId() == $sliceId);
+        else
+            return false;
     }
 
     /**
-     * set attributes array to item
-     * @param MFormItem $item
-     * @param array $attributes
+     * @param array $item
+     * @param bool $externBlank
+     * @return array
      * @author Joachim Doerr
      */
-    public static function setAttributes(MFormItem $item, $attributes)
+    public static function prepareCustomLink(array $item, $externBlank = true)
     {
-        // if attributes an array
-        if (is_array($attributes)) {
-            foreach ($attributes as $strName => $strValue) {
-                // set attribute by setAttribute method
-                self::addAttribute($item, $strName, $strValue);
+        // set url
+        if (!isset($item['link']) or empty($item['link'])) return $item;
+        $item['customlink_text'] = (isset($item['text']) && !isset($item['customlink_text'])) ? $item['text'] : '';
+        $item['customlink_url'] = $item['link'];
+        $item['customlink_target'] = '';
+
+        // media file?
+        if (file_exists(rex_path::media($item[1])) === true) {
+            $item['customlink_url'] = rex_url::media($item[1]);
+            $item['customlink_class'] = ' media';
+        } else {
+            // no media and no url and is numeric it must be an rex article id
+            if (filter_var($item[1], FILTER_VALIDATE_URL) === FALSE && is_numeric($item[1])) {
+                $item['customlink_url'] = rex_getUrl($item[1], rex_clang::getCurrentId());
+                $item['customlink_class'] = ' intern';
+
+                if (empty($item['customlink_text'])) {
+                    $art = rex_article::get($item[1], rex_clang::getCurrentId());
+                    if($art)
+                    {    
+                    $item['customlink_text'] = $art->getName();
+                    }
+                }
+            } else {
+                $item['customlink_class'] = ' extern';
+                if ($externBlank) {
+                    $item['customlink_target'] = ' target="_blank"';
+                }
             }
         }
-    }
-}
 
+        // no link text?
+        if (empty($item['customlink_text'])) {
+            $item['customlink_text'] = str_replace(array('http://', 'https://'), '', $item['customlink_url']);
+        }
+
+        return $item;
+    }
+
+}
