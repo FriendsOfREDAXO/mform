@@ -2,6 +2,7 @@
 
 ### Version 6.0.x
 - readme style fixes @crydotsnake 
+- remove .formcontrol on input fields type color
 
 
 ### Version 6.0.1
