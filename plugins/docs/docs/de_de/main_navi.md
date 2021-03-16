@@ -23,6 +23,8 @@
 	- [Templates für Modul-Input-Style](template_modul_input.md)
 - Modul-Input Demo
 	- [Modul-Input Redaxo 5.x](modul_demo_r5.x.md)
+- Wissenswertes
+        - [Tipps & Tricks](tipps_tricks.md)
 
 ---
 
@@ -32,3 +34,4 @@ Joachim Dörr (joachimdoerr)
 Alexander Walther (alexplusde)  
 Paul Götz (pixelfirma)  
 Tim Filler (elricco)
+Thomas Skerbis (skerbis)
