@@ -1,5 +1,10 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.0.1
+- added some docs
+- minor bugfixes
+
+
 ### Version 6.0.0
 
 * use rex_factory_trait in MForm class
