@@ -19,7 +19,7 @@ class MFormDefault
         'description' => '',
         'hidden' => 'form-control',
         'text' => 'form-control',
-        'color' => 'form-control',
+        'color' => '',
         'email' => 'form-control',
         'url' => 'form-control',
         'tel' => 'form-control',
