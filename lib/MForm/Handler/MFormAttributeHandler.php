@@ -67,10 +67,6 @@ class MFormAttributeHandler
                 if ($value > 0)
                     MFormParameterHandler::addParameter($item, 'category', $value);
                 break;
-            case 'validation': // add validation by parsley
-                if (is_array($value))
-                    MFormValidationHandler::setValidations($item, $value);
-                break;
             case 'default-value': // set default value for any fields
                 $item->setDefaultValue($value);
                 break;
