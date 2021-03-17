@@ -80,9 +80,6 @@ class MFormAttributeHandler
             case 'default-class': // i like set the r5 default classes
                 $item->setDefaultClass($value);
                 break;
-            case 'required':
-                MFormValidationHandler::addValidation($item, 'required');
-                break;
             default: // set any attributes
                 $item->attributes[$name] = $value;
         }
