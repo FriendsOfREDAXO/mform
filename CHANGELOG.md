@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.0.3
+prepareCustomLink fixed
+
+
 ### Version 6.0.2
 - readme style fixes @crydotsnake 
 - remove .formcontrol on input fields type color @olien
