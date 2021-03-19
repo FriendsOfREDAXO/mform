@@ -6,7 +6,6 @@
  */
 
 use MForm\Utils\MFormThemeHelper;
-use MForm\Utils\MFormOutputHelper;
 
 if (rex_addon::exists('yform') &&
     rex_addon::get('yform')->isAvailable() &&
