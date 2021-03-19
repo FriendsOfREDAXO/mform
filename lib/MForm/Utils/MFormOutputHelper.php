@@ -45,17 +45,17 @@ class MFormOutputHelper
         $item['customlink_target'] = '';
 
         // media file?
-        if (file_exists(rex_path::media($item[1])) === true) {
-            $item['customlink_url'] = rex_url::media($item[1]);
+        if (file_exists(rex_path::media($item['link'])) === true) {
+            $item['customlink_url'] = rex_url::media($item['link']);
             $item['customlink_class'] = ' media';
         } else {
             // no media and no url and is numeric it must be an rex article id
-            if (filter_var($item[1], FILTER_VALIDATE_URL) === FALSE && is_numeric($item[1])) {
-                $item['customlink_url'] = rex_getUrl($item[1], rex_clang::getCurrentId());
+            if (filter_var($item['link'], FILTER_VALIDATE_URL) === FALSE && is_numeric($item['link'])) {
+                $item['customlink_url'] = rex_getUrl($item['link'], rex_clang::getCurrentId());
                 $item['customlink_class'] = ' intern';
 
                 if (empty($item['customlink_text'])) {
-                    $art = rex_article::get($item[1], rex_clang::getCurrentId());
+                    $art = rex_article::get($item['link'], rex_clang::getCurrentId());
                     if($art)
                     {    
                     $item['customlink_text'] = $art->getName();
