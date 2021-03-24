@@ -881,6 +881,7 @@ class MFormParser
         if (!isset($parameter['ylink']) && isset($item->getAttributes()['ylink'])) {
             $parameter['ylink'] = $item->getAttributes()['ylink'];
         }
+        $parameter['class'] = $item->class;
 
         $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
 
