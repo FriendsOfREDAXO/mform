@@ -18,6 +18,8 @@ page:
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
                 # demo_community: { title: 'translate:demo_community' }
+default_config:
+    mform_theme: 'default_theme'
 
 requires:
     php: '>=7.3'
