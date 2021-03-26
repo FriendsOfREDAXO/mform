@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.0.4
+
+- Fixed missing external link in widget
+- Some minor fixes
+thx @lexplatt  @Hirbod
+
 ### Version 6.0.3
 prepareCustomLink fixed
 
