@@ -1,5 +1,5 @@
 {
-    "name": "FriendsOfREDAXO/mform",
+    "name": "friendsofredaxo/mform",
     "type": "redaxo-addon",
     "extra": {
         "installer-name": "mform"
