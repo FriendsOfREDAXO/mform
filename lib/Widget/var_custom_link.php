@@ -150,8 +150,10 @@ class rex_var_custom_link extends rex_var
         if (isset($args['types']) && ($types = $args['types'])) {
             $types = ' data-types="' . $types . '"';
         }
-
-        $class = $args['class'];
+        $class = '';
+        if (isset($args['class']))
+            { $class = $args['class'];
+            } 
         $mediaClass = (isset($args['media']) && $args['media'] == 0) ? ' hidden' : $class;
         $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
