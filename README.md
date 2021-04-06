@@ -97,9 +97,9 @@ MForm stellt folgende Element-Methoden bereit:
 
 * Strukturelle-Elemente
   * `addFieldset`
-  * `closeFieldset`
+  * `closeFieldset` (deprecated)
   * `addTab`
-  * `closeTab`
+  * `closeTab` (deprecated)
 * Text-Input- und Hidden-Elemente
   * `addTextField`
   * `addHiddenField`
