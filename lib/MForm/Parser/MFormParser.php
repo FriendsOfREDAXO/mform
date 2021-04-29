@@ -98,7 +98,7 @@ class MFormParser
         foreach ($items as $k => $itm) {
             if ($k > $key && ($itm->getGroup() == $item->getGroup() && $itm->getType() == 'tab')) {
                 // add navigation item
-                $class = $item->getClass();
+                $class = $itm->getClass();
                 $value = '';
                 $element = new MFormElement();
                 $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . rex_session('mform_count'));
