@@ -2,6 +2,7 @@
 
 ### Version 6.0.6
 
+- fixed: delete all entries in imagelist @ynamite 
 - fixed: wrong var prevents cusrtom classes on tabs @bitshiftersgmbh 
 
 ### Version 6.0.4
