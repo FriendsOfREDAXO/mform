@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.0.6
+
+- fixed: wrong var prevents cusrtom classes on tabs @bitshiftersgmbh 
+
 ### Version 6.0.4
 
 - Fixed missing external link in widget
