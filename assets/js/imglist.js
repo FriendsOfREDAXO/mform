@@ -215,5 +215,7 @@ function imglist_write_input(element) {
             if (source_elements.length > (i + 1)) new_value = new_value + ',';
         }
         element.find('input').val(new_value);
+    } else {
+	    element.find('input').val('');
     }
 }
