@@ -296,12 +296,15 @@ class MFormElements
     }
 
     /**
-     * @param null $form
+     * @param Mform|string|callable|null $form
      * @return MFormElements
      * @author Joachim Doerr
      */
     public function addForm($form = null)
     {
+        if (!$form instanceof MForm && is_callable($form)) {
+            $form = $form();
+        }
         $form = ($form instanceof MForm) ? $form->show() : $form;
         return $this->addHtml($form);
     }
