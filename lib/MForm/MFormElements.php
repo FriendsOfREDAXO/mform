@@ -311,7 +311,7 @@ class MFormElements
 
     /**
      * @param null $value
-     * @param null $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @author Joachim Doerr
      */
@@ -324,7 +324,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @return $this
      * @author Joachim Doerr
@@ -340,7 +340,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @param bool $accordion
      * @param bool $hideToggleLinks
@@ -362,7 +362,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @param bool $hideToggleLinks
      * @param int $openCollapse
