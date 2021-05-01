@@ -535,7 +535,13 @@ class MFormParser
                 }
             }
         }
+        /* Selected fix Skerbis */
+        $items_selected = [];
+        $items_selected = json_decode($item->stringValue);
 
+        if  (in_array($key, $items_selected )){
+             $element->setAttributes(' selected');
+        }
         // set default value or selected
         if ($selected && ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
