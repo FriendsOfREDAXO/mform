@@ -537,7 +537,7 @@ class MFormParser
         }
         /* Selected fix Skerbis */
         $items_selected = [];
-        $items_selected = json_decode($item->stringValue);
+        $items_selected = json_decode($item->stringValue, true);
 
         if  ($items_selected && in_array($key, $items_selected)){
              $element->setAttributes(' selected');
