@@ -543,7 +543,7 @@ class MFormParser
              $element->setAttributes(' selected');
         }
         // set default value or selected
-        if ($selected && ($key == $itemValue or ($item->getMode() == 'add' && $key == $item->getDefaultValue()))) {
+        if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
         }
 
