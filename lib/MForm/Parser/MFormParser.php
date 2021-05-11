@@ -539,7 +539,7 @@ class MFormParser
         $items_selected = [];
         $items_selected = json_decode($item->stringValue);
 
-        if  (count($items_selected)>0 && in_array($key, $items_selected)){
+        if  ($items_selected && in_array($key, $items_selected)){
              $element->setAttributes(' selected');
         }
         // set default value or selected
