@@ -45,7 +45,6 @@ mform_example_extended_wrapper = Wrapper-Elemente
 mform_example_expert_html_form_elements = Neue HTML5 Formular-Elemente
 mform_example_expert_datalist = Datalists für Input-Elemente
 mform_example_expert_placeholder = Placeholder
-mform_example_expert_validation = Parsley Validation
 mform_example_expert_debug_custom_theme = Debugmode und Custom-Theme
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
