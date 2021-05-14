@@ -15,7 +15,7 @@ mform_modul_output = Modul Ausgabe
 mform_help_headline = Informationen
 mform_help_subheadline_1 = MForm – spielend einfach Modul-Input-Formulare erzeugen
 mform_help_infotext_1 = Mit MForm können umfangreiche Modul-Input-Formulare spielend einfach angelegt werden. MForm stellt von Text-Input über Select bis Check- und Radioboxen alle wesentlichen Modul-Formular-Elemente bereit. Auch die Redaxo Link|Linklist- und Media|Medialist-Widgets lassen sich durch MForm einfach anlegen.
-mform_help_infotext_2 = MForm arbeitet zuverlässig mit Addons wie MBlock, Redactor oder Markitup. Zur Validierung von Modul-Formularen nutzt MForm den jQuery Validator Parsley und bietet so die Möglichkeit jedes mögliche Input-Feld mit Standardvalidierungen versehen zu können.
+mform_help_infotext_2 = MForm arbeitet zuverlässig mit Addons wie MBlock, Redactor oder Markitup.
 mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formularelemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element-Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen verarbeiten, wodurch ein Element kurzgesagt “einzeilig”, übersichtlich und mit wenig Aufwand angelegt werden kann.
 mform_help_infotext_4 = Da MForm Templates nutzt kann die Option der Fomrulare vom Entwickler seinen Vorstellungen angepasst werden.
 
