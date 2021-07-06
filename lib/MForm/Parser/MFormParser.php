@@ -536,11 +536,12 @@ class MFormParser
                 }
             }
         }
-
+        else {
         // set default value or selected
         if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
         }
+        }    
 
         if ($disabled) {
             $element->setAttributes($element->attributes . ' disabled');
