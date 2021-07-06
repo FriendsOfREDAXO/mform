@@ -538,10 +538,11 @@ class MFormParser
         /* Selected fix Skerbis */
         $items_selected = [];
         $items_selected = json_decode($item->stringValue, true);
-
-          if  ($item->isMultiple() && is_array($items_selected) && in_array((string)$key, $items_selected)){
+        
+        if  ($item->isMultiple() && $items_selected && in_array((string)$key, $items_selected)){
              $element->setAttributes(' selected');
         }
+               
         // set default value or selected
         if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
