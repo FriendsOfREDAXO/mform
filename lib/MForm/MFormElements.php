@@ -296,19 +296,22 @@ class MFormElements
     }
 
     /**
-     * @param null $form
+     * @param Mform|string|callable|null $form
      * @return MFormElements
      * @author Joachim Doerr
      */
     public function addForm($form = null)
     {
+        if (!$form instanceof MForm && is_callable($form)) {
+            $form = $form();
+        }
         $form = ($form instanceof MForm) ? $form->show() : $form;
         return $this->addHtml($form);
     }
 
     /**
      * @param null $value
-     * @param null $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @author Joachim Doerr
      */
@@ -321,7 +324,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @return $this
      * @author Joachim Doerr
@@ -337,7 +340,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @param bool $accordion
      * @param bool $hideToggleLinks
@@ -359,7 +362,7 @@ class MFormElements
 
     /**
      * @param null|string $value
-     * @param null|MForm|string $form
+     * @param Mform|string|callable|null $form
      * @param array $attributes
      * @param bool $hideToggleLinks
      * @param int $openCollapse
