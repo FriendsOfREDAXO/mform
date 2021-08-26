@@ -536,12 +536,14 @@ class MFormParser
             }
         }
         /* Selected fix Skerbis */
+        /* Vorbereitung für mblock 4, auskommentiert Wolfgang
         $items_selected = [];
         $items_selected = json_decode($item->stringValue, true);
 
         if  ($items_selected && in_array((string)$key, $items_selected)){
              $element->setAttributes(' selected');
         }
+        */
         // set default value or selected
         if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
             $element->setAttributes(' selected'); // add attribute selected
