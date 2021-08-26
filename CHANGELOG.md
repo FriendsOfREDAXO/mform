@@ -1,8 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 6.0.10
+### Version 6.0.9
 
-revert: Multiselect fix.
+Multiselect fix.
 
 ### Version 6.0.6
 
