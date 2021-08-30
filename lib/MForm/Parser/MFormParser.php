@@ -541,14 +541,19 @@ class MFormParser
             $items_selected = json_decode($item->stringValue, true);
 
             $current = explode('][',trim($item->varId,'[]'));
-            
-            if  ($items_selected[$current[1]] && in_array((string)$key, $items_selected[$current[1]])){
+
+            // JSON Values 1.x
+            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && in_array((string)$key, $items_selected[$current[1]])) {
+                $element->setAttributes(' selected');
+            // REX_VAL
+            } elseif (!isset($current[1])  && isset($items_selected) && is_array($items_selected) && in_array((string)$key, $items_selected)) {
                 $element->setAttributes(' selected');
             }
-        }
-        // set default value or selected
-        if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
-            $element->setAttributes(' selected'); // add attribute selected
+        } else {
+            // set default value or selected
+            if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == (string)$item->getDefaultValue()))) {
+                $element->setAttributes(' selected'); // add attribute selected
+            }
         }
 
         if ($disabled) {
