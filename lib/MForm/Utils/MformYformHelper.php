@@ -12,7 +12,7 @@ public static function isMediaInUse(\rex_extension_point $ep)
         $columns = $sql->getFieldnames();
         $select = in_array('multiple', $columns) ? ', `multiple`' : '';
 
-        $fields = $sql->getArray('SELECT `table_name`, `name`'.$select.' FROM `'.\rex_yform_manager_field::table().'` WHERE `type_id`="value" AND `type_name` IN("textarea","custom_link","imagelist")');
+        $fields = $sql->getArray('SELECT `table_name`, `name`'.$select.' FROM `'.\rex_yform_manager_field::table().'` WHERE `type_id`="value" AND `type_name` IN("custom_link","imagelist")');
         $fields = \rex_extension::registerPoint(new \rex_extension_point('YFORM_MEDIA_IS_IN_USE', $fields));
 
         if (!count($fields)) {
@@ -23,9 +23,7 @@ public static function isMediaInUse(\rex_extension_point $ep)
         $escapedFilename = $sql->escape($params['filename']);
         foreach ($fields as $field) {
             $tableName = $field['table_name'];
-			
-			$SearchField = '"%'. $params['filename'] . '%"'; 
-			$condition = $sql->escapeIdentifier($field['name']).' LIKE '.$SearchField;
+            $condition = $sql->escapeIdentifier($field['name']).' = '.$escapedFilename;
 
             if (isset($field['multiple']) && $field['multiple'] == 1) {
                 $condition = 'FIND_IN_SET('.$escapedFilename.', '.$sql->escapeIdentifier($field['name']).')';
@@ -53,4 +51,3 @@ public static function isMediaInUse(\rex_extension_point $ep)
         return $warning;
     }
 }
-
