@@ -2,7 +2,7 @@
 
 ### Version 6.0.9 – 6.0.11
 
-- Multiselect fix. @dtpop, @IngoWinter, @skerbis
+- Select fix. @dtpop, @IngoWinter, @skerbis, multiple issues fixed regarding single select- and multiselect-fields
 - Allow callable @DanielWeitenauer
 
 
