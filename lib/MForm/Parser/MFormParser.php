@@ -535,7 +535,7 @@ class MFormParser
                 }
             }
         }
-        /* Selected fix Skerbis */
+        /* Selected fix @skerbis @dtpop @MC-PMOE */
         if ($item->multiple) {
             $items_selected = [];
             $items_selected = json_decode($item->stringValue, true);
@@ -545,7 +545,7 @@ class MFormParser
             // JSON Values 1.x
             if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && in_array((string)$key, $items_selected[$current[1]])) {
 
-                $element->setAttributes(' selected');
+            $element->setAttributes(' selected');
 
             // JSON Values 1.x.x
             } else if (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string)$key, $items_selected[$current[1]][$current[2]])) {
