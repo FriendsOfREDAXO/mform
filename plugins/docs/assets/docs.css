@@ -9,9 +9,9 @@
     text-transform: uppercase;
     margin-bottom: 20px;
     letter-spacing: 0.02em;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
     padding: 13px 15px 10px;
-    background: #eee;
+    background: rgba(128, 128, 128, 0.1);
 }
 
 .api-docs-addon .rex-mform-docs .panel h2 {
@@ -25,12 +25,12 @@
 
 .rex-mform-docs blockquote {
     margin: 20px 0;
-    background: #f3f6fb;
+    background: rgba(128, 128, 128, 0.1);
 }
 .rex-mform-docs blockquote h2 {
     margin: -10px -20px 20px;
     background: transparent;
-    border-top: 1px #ccc;
+    border-top: 1px rgba(128, 128, 128, 0.2);
 }
 
 .rex-mform-docs ol {
@@ -63,24 +63,24 @@
 
 .rex-mform-docs hr {
     margin-top: 40px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
 }
 
 .rex-mform-docs table {
     width: 100%;
     max-width: 100%;
-    border-top: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
     margin: 20px 0 30px;
 }
 .rex-mform-docs th {
-    background: #f7f7f7;
-    border-bottom: 2px solid #ddd;
+    background: rgba(128, 128, 128, 0.1);
+    border-bottom: 2px solid rgba(128, 128, 128, 0.2);
     border-collapse: separate;
 }
 .rex-mform-docs th,
 .rex-mform-docs td {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid rgba(128, 128, 128, 0.2);
     padding: 8px;
     line-height: 1.42857143;
     vertical-align: top;
@@ -94,18 +94,15 @@
 }
 .rex-mform-docs .mform-docs-navi ul li {
     list-style-type: none;
-    background: #eee;
     padding: 0 15px;
     line-height: 40px;
 }
 .rex-mform-docs .mform-docs-navi ul {
-    background: #fff;
     margin-left: -15px;
     margin-right: -15px;
 }
 .rex-mform-docs .mform-docs-navi ul li li {
     list-style-type: none;
-    background: #fff;
     line-height: 30px;
 }
 .rex-mform-docs .mform-docs-navi ul li li:before {
