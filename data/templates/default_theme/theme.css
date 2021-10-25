@@ -16,86 +16,9 @@
     margin-right: 0;
 }
 
-/* mform tab style by Thomas Skerbis */
 
 .mform .mform-tabs .nav-tabs {
-    border-bottom: 0 !important;
-    margin: 0 !important;
-}
-
-.mform .mform-tabs .form-control.parsley-success:focus {
-    color: #468847;
-    background-color: #DFF0D8;
-    border: 1px solid #D6E9C6;
-}
-
-.mform .mform-tabs .form-control.parsley-error:focus {
-    color: #B94A48;
-    background-color: #F2DEDE;
-    border: 1px solid #EED3D7;
-}
-
-.mform .mform-tabs select.form-control {
-    height: 34px;
-}
-
-.mform .mform-tabs select[multiple],
-.mform .mform-tabs select[size] {
-    height: auto;
-}
-
-.mform .mform-tabs .form-horizontal .mform-headline,
-.mform .mform-tabs .form-horizontal .mform-description {
-    margin-left: 0;
-    margin-right: 0;
-}
-
-/* mform tab style by Thomas Skerbis */
-
-.mform .mform-tabs .nav-tabs > li.active > a,
-.mform .mform-tabs .nav-tabs > li.active > a:focus,
-.mform .mform-tabs .nav-tabs > li.active > a:hover {
-    border-width: 0;
-}
-
-.mform .mform-tabs .nav-tabs > li > a {
-    border: none;
-    color: #283541;
-    background: rgba(163, 163, 163, 0.22);
-}
-
-.mform .mform-tabs .nav-tabs > li.active > a,
-.mform .mform-tabs .nav-tabs > li > a:hover {
-    border: none;
-    color: #000;
-    background: #FFF;
-}
-
-.mform .mform-tabs .nav-tabs > li > a::before {
-    content: "";
-    background: #000;
-    background: rgba(0, 0, 0, 0.18);
-    height: 4px;
-    position: absolute;
-    width: 100%;
-    left: 0px;
-    top: -2px;
-    transition: all 250ms ease 0s;
-    transform: scale(0);
-}
-
-.mform .mform-tabs .nav-tabs > li.active > a::before,
-.mform .mform-tabs .nav-tabs > li:hover > a::after {
-    transform: scale(1);
-}
-
-.mform .mform-tabs .tab-nav > li > a::after {
-    background: #4285F4 none repeat scroll 0% 0%;
-    color: #fff;
-}
-
-.mform .mform-tabs .tab-pane {
-    padding: 5px 0;
+    margin-bottom: 0;
 }
 
 .mform .mform-tabs .tab-content {
@@ -231,7 +154,141 @@ content: '\f068';
     margin-top: 0;
 }
 
-.mform .collapse {
-background: #fafafa;
-padding-bottom: 3px;
+.mform .collapse,
+.mform .collapsing {
+    background: #fafafa;
+    padding-bottom: 1px;
+}
+
+
+
+body.rex-theme-dark .mform .mform-tabs .tab-content {
+    background-color: #202b35;
+}
+
+body.rex-theme-dark .mform .mform-headline.grey-legend-background h3,
+body.rex-theme-dark .sortitem .mform fieldset.grey-legend-background > legend,
+body.rex-theme-dark .mform fieldset.grey-legend-background > legend {
+    background-color: #d8d8d8;
+}
+
+body.rex-theme-dark .mform .tab-content .mform-headline.grey-legend-background h3,
+body.rex-theme-dark .mform .tab-content fieldset.grey-legend-background > legend,
+body.rex-theme-dark .mform .tab-content fieldset.grey-legend-background > legend {
+    background-color: #f3f3f3;
+}
+
+body.rex-theme-dark .sortitem .mform .mform-headline.grey-legend-background h3,
+body.rex-theme-dark .sortitem .mform fieldset.grey-legend-background > legend {
+    background-color: #ececec;
+}
+
+body.rex-theme-dark .mform .btn-white {
+    background-color: #202b35;
+    color: rgba(255, 255, 255, 0.75);
+    border-top-color: #151c22;
+    border-bottom-color: #151c22;
+}
+
+body.rex-theme-dark .mform .btn-white[aria-expanded=true] {
+    background-color: #1867a6;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+body.rex-theme-dark .mform .btn-white:hover {
+    background-color: #1867a6;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+body.rex-theme-dark .mform .btn-white:focus,
+body.rex-theme-dark .mform .btn-white:active {
+    background-color: #1867a6;
+}
+
+body.rex-theme-dark .mform-tabs .btn-white {
+    background-color: #202b35;
+}
+
+body.rex-theme-dark .mform .btn-white:after {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+body.rex-theme-dark .mform .btn-white:hover:after {
+    color: #7abaec;
+}
+
+body.rex-theme-dark .mform .btn-white[aria-expanded="true"]:after {
+    color: #7abaec;
+}
+
+body.rex-theme-dark .mform .collapse,
+body.rex-theme-dark .mform .collapsing {
+    background-color: #202b35;
+}
+
+@media (prefers-color-scheme: dark) {
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .mform-tabs .tab-content {
+        background-color: #202b35;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .mform-headline.grey-legend-background h3,
+    body.rex-has-theme:not(.rex-theme-light) .sortitem .mform fieldset.grey-legend-background > legend,
+    body.rex-has-theme:not(.rex-theme-light) .mform fieldset.grey-legend-background > legend {
+        background-color: #d8d8d8;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .tab-content .mform-headline.grey-legend-background h3,
+    body.rex-has-theme:not(.rex-theme-light) .mform .tab-content fieldset.grey-legend-background > legend,
+    body.rex-has-theme:not(.rex-theme-light) .mform .tab-content fieldset.grey-legend-background > legend {
+        background-color: #f3f3f3;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .sortitem .mform .mform-headline.grey-legend-background h3,
+    body.rex-has-theme:not(.rex-theme-light) .sortitem .mform fieldset.grey-legend-background > legend {
+        background-color: #ececec;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white {
+        background-color: #202b35;
+        color: rgba(255, 255, 255, 0.75);
+        border-top-color: #151c22;
+        border-bottom-color: #151c22;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white[aria-expanded=true] {
+        background-color: #1867a6;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white:hover {
+        background-color: #1867a6;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white:focus,
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white:active {
+        background-color: #1867a6;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-tabs .btn-white {
+        background-color: #202b35;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white:after {
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white:hover:after {
+        color: #7abaec;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .btn-white[aria-expanded="true"]:after {
+        color: #7abaec;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .collapse,
+    body.rex-has-theme:not(.rex-theme-light) .mform .collapsing {
+        background-color: #202b35;
+    }
 }
