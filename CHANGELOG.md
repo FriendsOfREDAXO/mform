@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.1.0
+
+- New: Dark-mode support for REDAXO >= 5.13
+
 ### Version 6.0.9 – 6.0.11
 
 - Select fix. @dtpop, @IngoWinter, @skerbis, multiple issues fixed regarding single select- and multiselect-fields
