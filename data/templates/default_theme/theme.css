@@ -169,7 +169,7 @@ body.rex-theme-dark .mform .mform-tabs .tab-content {
 body.rex-theme-dark .mform .mform-headline.grey-legend-background h3,
 body.rex-theme-dark .sortitem .mform fieldset.grey-legend-background > legend,
 body.rex-theme-dark .mform fieldset.grey-legend-background > legend {
-    background-color: #d8d8d8;
+    background-color: #1a3332;
 }
 
 body.rex-theme-dark .mform .tab-content .mform-headline.grey-legend-background h3,
@@ -235,7 +235,7 @@ body.rex-theme-dark .mform .collapsing {
     body.rex-has-theme:not(.rex-theme-light) .mform .mform-headline.grey-legend-background h3,
     body.rex-has-theme:not(.rex-theme-light) .sortitem .mform fieldset.grey-legend-background > legend,
     body.rex-has-theme:not(.rex-theme-light) .mform fieldset.grey-legend-background > legend {
-        background-color: #d8d8d8;
+        background-color: #1a3332;
     }
 
     body.rex-has-theme:not(.rex-theme-light) .mform .tab-content .mform-headline.grey-legend-background h3,
