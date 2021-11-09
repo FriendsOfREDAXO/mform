@@ -3,7 +3,6 @@
 ### Version 6.1.0
 
 - New: Dark-mode support for REDAXO >= 5.13 @schuer @skerbis
-- Fixed: Version compare @skerbis
 
 ### Version 6.0.9 – 6.0.13
 
