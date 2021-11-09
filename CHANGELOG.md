@@ -2,12 +2,14 @@
 
 ### Version 6.1.0
 
-- New: Dark-mode support for REDAXO >= 5.13
+- New: Dark-mode support for REDAXO >= 5.13 @schuer @skerbis
+- Fixed: Version compare @skerbis
 
-### Version 6.0.9 – 6.0.11
+### Version 6.0.9 – 6.0.13
 
 - Select fix. @dtpop, @IngoWinter, @skerbis, multiple issues fixed regarding single select- and multiselect-fields
 - Allow callable @DanielWeitenauer
+- new check for JSON Values 1.x.x
 
 
 ### Version 6.0.6
