@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 6.1.1
+- Adding return types for yform methods
+
 ### Version 6.1.0
 
 - New: Dark-mode support for REDAXO >= 5.13 @schuer @skerbis
