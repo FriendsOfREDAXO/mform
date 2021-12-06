@@ -20,7 +20,7 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
         $this->params['value_pool']['sql'][$this->getName()] = $this->getValue();
     }
 
-    public function getDefinitions()
+    public function getDefinitions(): array
     {
         return [
             'type' => 'value',
