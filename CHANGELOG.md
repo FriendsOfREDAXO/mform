@@ -1,8 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 6.1.1
+### Version 6.1.2
 
 - Fix: UTF-8 encoding for arabic and other charsets in link and link-lists
+
+### Version 6.1.1
+
 - Adding return types for yform methods
 
 ### Version 6.1.0
