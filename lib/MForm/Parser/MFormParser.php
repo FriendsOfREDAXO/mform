@@ -786,8 +786,8 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $html = rex_var_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
-                $dom = new DOMDocument();
-                @$dom->loadHTML(utf8_decode($html));
+                $dom = new DOMDocument('1.0', 'utf-8');
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html); // utf8_decode($html)
                 $inputs = $dom->getElementsByTagName('input');
 
                 if ($inputs instanceof DOMNodeList) $this->processNodeFormElement($inputs, $item, 'REX_LINK_' . (int)$id);
@@ -807,8 +807,8 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
-                $dom = new DOMDocument();
-                @$dom->loadHTML(utf8_decode($html));
+                $dom = new DOMDocument('1.0', 'utf-8');
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html); // utf8_decode($html)
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
@@ -907,8 +907,8 @@ class MFormParser
 
         $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
 
-        $dom = new DOMDocument();
-        @$dom->loadHTML(utf8_decode($html));
+        $dom = new DOMDocument('1.0', 'utf-8');
+        @$dom->loadHTML('<?xml encoding="utf-8" ?>'.$html); // utf8_decode($html)
 
         $div = $dom->getElementsByTagName('div');
 
