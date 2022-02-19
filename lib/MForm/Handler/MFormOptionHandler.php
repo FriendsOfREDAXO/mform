@@ -21,7 +21,7 @@ class MFormOptionHandler
      * @param mixed $key
      * @author Joachim Doerr
      */
-    public static function addOption(MFormItem $item, mixed $value, mixed $key): void
+    public static function addOption(MFormItem $item, $value, $key): void
     {
         // add option to options array
         $item->options[$key] = MFormClang::getClangValue($value);
@@ -33,7 +33,7 @@ class MFormOptionHandler
      * @param mixed $key
      * @author Joachim Doerr
      */
-    public static function disableOption(MFormItem $item, mixed $key): void
+    public static function disableOption(MFormItem $item, $key): void
     {
         // add option to options array
         $item->disabledOptions[$key] = $key;
@@ -46,7 +46,7 @@ class MFormOptionHandler
      * @param mixed $options
      * @author Joachim Doerr
      */
-    public static function addOptGroup(MFormItem $item, string $label, mixed $options): void
+    public static function addOptGroup(MFormItem $item, string $label, $options): void
     {
         $option = array();
         foreach ($options as $key => $value) {

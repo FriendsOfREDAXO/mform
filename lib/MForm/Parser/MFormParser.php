@@ -36,7 +36,7 @@ class MFormParser
     /**
      * @var string
      */
-    protected string $theme;
+    protected string $theme = 'default_theme';
 
     /**
      * @var bool
@@ -1118,7 +1118,6 @@ class MFormParser
      */
     public function parse(array $items, $theme = NULL, $debug = false)
     {
-        $this->theme = rex_addon::get('mform')->getConfig('mform_theme');
         if (!is_null($theme) && $theme != $this->theme) {
             $this->theme = $theme;
         }

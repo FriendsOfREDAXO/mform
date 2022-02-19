@@ -2,6 +2,11 @@
 
 ### Version 7.0.0.beta
 
+- add php 7.x compatibility
+- add fragment files
+
+### Version 7.0.0.beta
+
 - remove data themes and use fragments as theme templates
 - add radio-, checkbox and select toggle options for collapse
 - add radio-, checkbox and select toggle options for tabs

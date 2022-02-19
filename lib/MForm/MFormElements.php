@@ -60,7 +60,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addElement(string $type, float|int|string $id = NULL, string $value = NULL, array $attributes = NULL, array $options = NULL, array $parameter = NULL, mixed $catId = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addElement(string $type, $id = NULL, string $value = NULL, array $attributes = NULL, array $options = NULL, array $parameter = NULL, mixed $catId = NULL, array $validation = NULL, string $defaultValue = NULL): self
     {
         // remove ,
         $id = str_replace(',', '.', $id);
@@ -213,7 +213,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addForm(callable|MForm|string $form = NULL): self
+    public function addForm($form = NULL): self
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
@@ -228,7 +228,7 @@ class MFormElements
      * @param array|null $attributes
      * @author Joachim Doerr
      */
-    public function addFieldsetField(string $value = NULL, callable|MForm|string $form = NULL, array $attributes = NULL): self
+    public function addFieldsetField(string $value = NULL, $form = NULL, array $attributes = NULL): self
     {
         return $this->addElement('fieldset', NULL, $value, $attributes)
             ->addForm($form)
@@ -242,7 +242,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTabField(string $value = NULL, callable|MForm|string $form = NULL, array $attributes = NULL): self
+    public function addTabField(string $value = NULL, $form = NULL, array $attributes = NULL): self
     {
         return $this->addElement('tab', NULL, $value, $attributes)
             ->addForm($form)
@@ -259,7 +259,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapseField(string $value = NULL, callable|MForm|string $form = NULL, array $attributes = NULL, bool $accordion = false, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addCollapseField(string $value = NULL, $form = NULL, array $attributes = NULL, bool $accordion = false, bool $hideToggleLinks = false, int $openCollapse = 0): self
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) $attributes = [];
@@ -279,7 +279,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAccordionField(string $value = NULL, callable|MForm|string $form = NULL, array $attributes = NULL, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addAccordionField(string $value = NULL, $form = NULL, array $attributes = NULL, bool $hideToggleLinks = false, int $openCollapse = 0): self
     {
         return $this->addCollapseField($value, $form, $attributes, true, $hideToggleLinks, $openCollapse);
     }
@@ -293,7 +293,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addInputField(string $typ, float|int|string $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addInputField(string $typ, $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
     {
         return $this->addElement($typ, $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
     }
@@ -305,7 +305,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHiddenField(float|int|string $id, string $value = NULL, array $attributes = NULL): self
+    public function addHiddenField($id, string $value = NULL, array $attributes = NULL): self
     {
         return $this->addElement('hidden', $id, $value, $attributes);
     }
@@ -318,7 +318,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextField(float|int|string $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addTextField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
     {
         return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
     }
@@ -331,7 +331,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextAreaField(float|int|string $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addTextAreaField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
     {
         return $this->addInputField('textarea', $id, $attributes, $validations, $defaultValue);
     }
@@ -343,7 +343,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextReadOnlyField(float|int|string $id, string $value = NULL, array $attributes = NULL): self
+    public function addTextReadOnlyField($id, string $value = NULL, array $attributes = NULL): self
     {
         return $this->addElement('text-readonly', $id, $value, $attributes);
     }
@@ -355,7 +355,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextAreaReadOnlyField(float|int|string $id, string $value = NULL, array $attributes = NULL): self
+    public function addTextAreaReadOnlyField($id, string $value = NULL, array $attributes = NULL): self
     {
         return $this->addElement('textarea-readonly', $id, $value, $attributes);
     }
@@ -371,7 +371,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addOptionField(string $typ, float|int|string $id, array $attributes = NULL, array $options = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addOptionField(string $typ, $id, array $attributes = NULL, array $options = NULL, array $validation = NULL, string $defaultValue = NULL): self
     {
         return $this->addElement($typ, $id, NULL, $attributes, $options, NULL, NULL, $validation, $defaultValue);
     }
@@ -386,7 +386,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addSelectField(float|int|string $id, array $options = NULL, array $attributes = NULL, int $size = 1, array $validation = NULL, string $defaultValue = NULL): self
+    public function addSelectField($id, array $options = NULL, array $attributes = NULL, int $size = 1, array $validation = NULL, string $defaultValue = NULL): self
     {
         $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue);
         if ($size > 1) $this->setSize($size);
@@ -403,7 +403,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMultiSelectField(float|int|string $id, array $options = NULL, array $attributes = NULL, int $size = 3, array $validation = NULL, string $defaultValue = NULL): self
+    public function addMultiSelectField($id, array $options = NULL, array $attributes = NULL, int $size = 3, array $validation = NULL, string $defaultValue = NULL): self
     {
         $this->addOptionField('multiselect', $id, $attributes, $options, $validation, $defaultValue)
             ->setMultiple()
@@ -420,7 +420,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCheckboxField(float|int|string $id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addCheckboxField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $validation, $defaultValue);
     }
@@ -434,7 +434,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addToggleCheckboxField(float|int|string $id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addToggleCheckboxField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
     {
         if (!is_array($attributes)) $attributes = [];
         $attributes['data-mform-toggle'] = 'toggle';
@@ -450,7 +450,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addRadioField(float|int|string $id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addRadioField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
     {
         return $this->addOptionField('radio', $id, $attributes, $options, $validation, $defaultValue);
     }
@@ -463,7 +463,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addLinkField(float|int|string $id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addLinkField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
     {
         return $this->addElement('link', $id, NULL, $attributes, NULL, $parameter, $catId);
     }
@@ -476,7 +476,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addLinklistField(float|int|string $id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addLinklistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
     {
         return $this->addElement('linklist', $id, NULL, $attributes, NULL, $parameter, $catId);
     }
@@ -493,7 +493,7 @@ class MFormElements
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
-    public function addCustomLinkField(float|int|string $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addCustomLinkField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
     {
         return $this->addElement('custom-link', $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
     }
@@ -506,7 +506,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMediaField(float|int|string $id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addMediaField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
     {
         return $this->addElement('media', $id, NULL, $attributes, NULL, $parameter, $catId);
     }
@@ -520,7 +520,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMedialistField(float|int|string $id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addMedialistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
     {
         return $this->addElement('medialist', $id, NULL, $attributes, NULL, $parameter, $catId);
     }
@@ -534,7 +534,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addImagelistField(float|int|string $id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addImagelistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
     {
         return $this->addElement('imglist', $id, NULL, $attributes, NULL, $parameter, $catId);
     }
