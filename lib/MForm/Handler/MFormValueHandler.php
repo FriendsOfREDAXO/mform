@@ -69,11 +69,11 @@ class MFormValueHandler
     /**
      * @param MFormItem $item
      * @param array $result
-     * @param null|string $value
-     * @param null|string $defaultValue
+     * @param string|null $value
+     * @param string|null $defaultValue
      * @author Joachim Doerr
      */
-    public static function decorateItem(MFormItem $item, $result, $value = null, $defaultValue = null)
+    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null)
     {
         if (!is_null($defaultValue)) {
             // set default value

@@ -87,7 +87,7 @@ class MFormAttributeHandler
      * @param array $attributes
      * @author Joachim Doerr
      */
-    public static function setAttributes(MFormItem $item, $attributes)
+    public static function setAttributes(MFormItem $item, array $attributes): void
     {
         // if attributes an array
         if (is_array($attributes)) {

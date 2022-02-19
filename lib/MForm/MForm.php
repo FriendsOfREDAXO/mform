@@ -6,8 +6,12 @@
  */
 
 
+use MForm\Handler\MFormValueHandler;
 use MForm\MFormElements;
 use MForm\Parser\MFormParser;
+use MForm\Provider\MFormBaseElements;
+use MForm\Provider\MFormFormElements;
+use MForm\Provider\MFormStructuralElements;
 
 class MForm extends MFormElements
 {
@@ -25,12 +29,12 @@ class MForm extends MFormElements
 
     /**
      * mform constructor.
-     * @param string $template
+     * @param string|null $theme
      * @param bool $debug
      */
-    function __construct($template = null, $debug = false)
+    function __construct(string $theme = null, bool $debug = false)
     {
-        $this->theme = $template;
+        $this->theme = $theme;
         $this->debug = $debug;
 
         parent::__construct();
@@ -40,25 +44,28 @@ class MForm extends MFormElements
      * @return string
      * @author Joachim Doerr
      */
-    public function show()
+    public function show(): string
     {
         // mfrom count++
-        rex_set_session('mform_count', rex_session('mform_count') + 1);
-        // init obj
-        $parser = new MFormParser();
-        // parse elements
-        return $parser->parse($this->getItems(), $this->theme, $this->debug);
+        try {
+            rex_set_session('mform_count', rex_session('mform_count') + 1);
+            $parser = new MFormParser();
+            return $parser->parse($this->getItems(), $this->theme, $this->debug);
+        } catch (rex_exception $e) {
+            rex_logger::logException($e);
+            return rex_view::error($e->getMessage());
+        }
     }
 
     /**
-     * @param null $template
+     * @param string|null $theme
      * @param bool $debug
      * @return MForm
      * @author Joachim Doerr
      */
-    public static function factory($template = null, $debug = false)
+    public static function factory(string $theme = null, bool $debug = false): MForm
     {
         $class = static::getFactoryClass();
-        return new $class($template, $debug);
+        return new $class($theme, $debug);
     }
 }

@@ -1,5 +1,46 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+### Version 7.0.0
+
+- remove data themes and use fragments as theme templates
+- add radio-, checkbox and select toggle options for collapse
+- add radio-, checkbox and select toggle options for tabs
+- create generic collapse, accordion and tab handling for mblock usage
+- remove deprecated stuff
+- remove default theme config form in addon page
+- ytemplates moved from data to addon root path
+
+#### Migration to from v6.1.x to v7.0.0
+
+1. Removed class methods:
+   1. addEditorField
+   2. addFieldset
+   3. closeFieldset
+   4. addTab
+   5. closeTab
+   6. addCollapse
+   7. closeCollapse
+   8. addAccordion
+   9. closeAccordion
+   10. setAttribute
+   11. setValidation
+   12. addOption
+   13. disableOption
+   14. addValidation
+   15. addAttribute
+   16. isSerial
+   17. addCke5Field
+   18. setToggle
+   19. setParameter
+   20. addParameter
+2. Renamed class methods:
+   1. disableOptions => setDisableOptions
+3. Add new class methods:
+   1. 
+
+#### Migration FAQ
+
+
 ### Version 6.1.2
 
 - Fix: UTF-8 encoding for arabic and other charsets in link and link-lists

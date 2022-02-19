@@ -355,11 +355,11 @@ class MFormElement
      * @return array
      * @author Joachim Doerr
      */
-    public function getKeys()
+    public function getKeys(bool $asTag = true): array
     {
         $keys = array();
         foreach (get_object_vars($this) as $f => $v) {
-            $keys[] = sprintf(self::KEY, $f);
+            $keys[] = ($asTag) ? sprintf(self::KEY, $f) : $f;
         }
         return $keys;
     }

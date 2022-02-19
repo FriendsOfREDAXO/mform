@@ -1,5 +1,5 @@
 package: mform
-version: '6.1.2'
+version: '7.0.0'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -17,9 +17,6 @@ page:
                 demo_base: { title: 'translate:demo_base' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
-                # demo_community: { title: 'translate:demo_community' }
-default_config:
-    mform_theme: 'default_theme'
 
 requires:
     php: '>=7.3'

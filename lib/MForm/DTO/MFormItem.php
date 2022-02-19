@@ -78,6 +78,11 @@ class MFormItem
     /**
      * @var array
      */
+    public $toggleOptions = array();
+
+    /**
+     * @var array
+     */
     public $parameter = array();
 
     /**
@@ -355,6 +360,26 @@ class MFormItem
     public function setOptions($options)
     {
         $this->options = $options;
+        return $this;
+    }
+
+    /**
+     * @return array
+     * @author Joachim Doerr
+     */
+    public function getToggleOptions(): array
+    {
+        return $this->toggleOptions;
+    }
+
+    /**
+     * @param array $toggleOptions
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setToggleOptions(array $toggleOptions)
+    {
+        $this->toggleOptions = $toggleOptions;
         return $this;
     }
 

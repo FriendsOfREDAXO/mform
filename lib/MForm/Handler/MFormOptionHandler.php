@@ -21,7 +21,7 @@ class MFormOptionHandler
      * @param mixed $key
      * @author Joachim Doerr
      */
-    public static function addOption(MFormItem $item, $value, $key)
+    public static function addOption(MFormItem $item, mixed $value, mixed $key): void
     {
         // add option to options array
         $item->options[$key] = MFormClang::getClangValue($value);
@@ -33,7 +33,7 @@ class MFormOptionHandler
      * @param mixed $key
      * @author Joachim Doerr
      */
-    public static function disableOption(MFormItem $item, $key)
+    public static function disableOption(MFormItem $item, mixed $key): void
     {
         // add option to options array
         $item->disabledOptions[$key] = $key;
@@ -46,7 +46,7 @@ class MFormOptionHandler
      * @param mixed $options
      * @author Joachim Doerr
      */
-    public static function addOptGroup(MFormItem $item, $label, $options)
+    public static function addOptGroup(MFormItem $item, string $label, mixed $options): void
     {
         $option = array();
         foreach ($options as $key => $value) {
@@ -63,23 +63,36 @@ class MFormOptionHandler
      * @param array $options
      * @author Joachim Doerr
      */
-    public static function setOptions(MFormItem $item, $options)
+    public static function setOptions(MFormItem $item, array $options): void
     {
         // if options an array
-        if (is_array($options)) {
-            foreach ($options as $key => $value) {
-                if(is_array($value)) { // and is value an array
-                    // add opt group by setOptGroup method
-                    self::addOptGroup($item, $key, $value);
-                } else {
-                    // add default option by setOption method
-                    self::addOption($item, $value, $key);
-                }
+        foreach ($options as $key => $value) {
+            if(is_array($value)) { // and is value an array
+                // add opt group by setOptGroup method
+                self::addOptGroup($item, $key, $value);
+            } else {
+                // add default option by setOption method
+                self::addOption($item, $value, $key);
             }
         }
     }
 
-    public static function disableOptions(MFormItem $item, $keys)
+    /**
+     * @param MFormItem $item
+     * @param $options
+     * @author Joachim Doerr
+     */
+    public static function toggleOptions(MFormItem $item, $options): void
+    {
+        $item->toggleOptions = $options;
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param $keys
+     * @author Joachim Doerr
+     */
+    public static function disableOptions(MFormItem $item, $keys): void
     {
         if (is_array($keys)) {
             $item->disabledOptions = $keys;
@@ -92,7 +105,7 @@ class MFormOptionHandler
      * @param string $query
      * @author Joachim Doerr
      */
-    public static function setSqlOptions(MFormItem $item, $query)
+    public static function setSqlOptions(MFormItem $item, string $query): void
     {
         try {
             $sql = rex_sql::factory();

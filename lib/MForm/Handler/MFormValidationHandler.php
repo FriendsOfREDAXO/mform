@@ -12,16 +12,14 @@ use MForm\DTO\MFormItem;
 
 class MFormValidationHandler
 {
-    const PREFIX = 'data-parsley-';
-
     /**
      * add default validation
      * @param MFormItem $item
      * @param string $key
-     * @param mixed $value
+     * @param mixed|null $value
      * @author Joachim Doerr
      */
-    public static function addValidation(MFormItem $item, $key, $value = null)
+    public static function addValidation(MFormItem $item, string $key, mixed $value = null): void
     {
         // set key by value
         switch($value) {
@@ -50,17 +48,11 @@ class MFormValidationHandler
 
     /**
      * @param MFormItem $item
-     * @param $validations
+     * @param array $validations
      * @author Joachim Doerr
      */
-    public static function setValidations(MFormItem $item, $validations)
+    public static function setValidations(MFormItem $item, array $validations): void
     {
-        // if validations an array
-        if (is_array($validations)) {
-            foreach ($validations as $key => $value) {
-                // set validation attribute by setValidation method
-                self::addValidation($item, $key, $value);
-            }
-        }
+        // TODO add only html validations
     }
 }

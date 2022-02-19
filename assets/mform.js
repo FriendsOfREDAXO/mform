@@ -41,15 +41,17 @@ function initMFormCollapseData(mform, reinit) {
         });
     });
 
-    mform.find('select[data-toggle=accordion]').each(function () {
-        initMFormSelectAccordionToggle($(this), true, reinit);
+    mform.find('select[data-toggle=collapse]').each(function () {
+        let element = $(this);
+        // initial
+        initMFormSelectCollapseToggle($(this), true);
         // on change
         $(this).unbind().bind("change", function () {
-            initMFormSelectAccordionToggle($(this), false, false);
+            initMFormSelectCollapseToggle($(this), false);
         });
     });
 
-    mform.find('.panel-group[data-group-select-accordion=false]').each(function () {
+    mform.find('.panel-group[data-group-accordion=1]').each(function () {
         initMFormAccordionToggle($(this), reinit);
     });
 }
@@ -72,79 +74,15 @@ function initMFormAccordionToggle(element, reinit) {
     }
 }
 
-function initMFormSelectAccordionToggle(element, init, reinit) {
-    let acc = element.parents().find('.panel-group[data-group-select-accordion=true]'),
-        parent_group = element.parents('.form-group');
-
-    if (parent_group.next().hasClass('mform')) {
-        acc = parent_group.next().find('.panel-group[data-group-accordion]')
-    }
-
-    if (init && acc.length) {
-        element.find('option').remove();
-
-        if (!$.isNumeric(element.attr('data-selected')) && acc.attr('data-group-open-collapse') > 0) {
-            element.attr('data-selected', (acc.attr('data-group-open-collapse')));
+function initMFormSelectCollapseToggle(element, init) {
+    let toggleId = element.children("option:selected").data('toggle-item');
+    element.children("option:selected").parents('.form-group').next().find('.collapse').each(function(){
+        if ($(this).data('group-select-collapse-id') == toggleId) {
+            $(this).collapse('show');
+        } else {
+            $(this).collapse('hide');
         }
-
-        if (acc.attr('data-group-open-collapse') == 0) {
-            element.append('<option value="" data-chose-accordion-msg="1">' + element.attr('data-group-selected-text') + '</option>');
-        }
-
-        if (element.attr('data-hide-toggle-links') == 1) {
-            acc.find('a[data-toggle=collapse]').hide();
-        }
-
-        acc.find('> .panel > a[data-toggle=collapse]').each(function (index) {
-            let togglecollapse = $(this),
-                indexId = (index + 1),
-                target = indexId,
-                selected;
-
-            if ($(this).attr('data-select-collapse-id') !== undefined) {
-                indexId = $(this).attr('data-select-collapse-id')
-                target = indexId;
-            }
-
-            if (element.attr('data-selected') === indexId) {
-                selected = ' selected="selected"';
-            }
-
-            element.append('<option value="' + indexId + '" data-target="' + target + '" data-parent="' + togglecollapse.attr('data-parent') + '"'+ selected + '>' + togglecollapse.text() + '</option>');
-            togglecollapse.attr('data-index', indexId);
-
-            if (reinit) {
-                $(target).removeClass('in').attr('aria-expanded', false);
-            }
-
-            if (element.attr('data-selected') === indexId) {
-                togglecollapse.next().addClass('in').css('height','').attr('aria-expanded', true);
-            }
-        });
-    }
-
-    if (acc.length) {
-        let selected = element.find(':selected'),
-            targetId = (!selected.length) ? element.attr('data-selected') : selected.attr('data-target'),
-            targetLink = $('a[data-index="' + targetId + '"]'),
-            target = targetLink.next();
-
-        // console.log([selected,targetId,targetLink,target]);
-
-        if (selected.length) {
-            element.attr('data-selected', selected.attr('value'));
-        }
-
-        if (!target.hasClass('in') && !init) {
-            targetLink.trigger('click');
-        }
-
-        if (selected.val() == '') {
-            acc.find('.panel > .collapse.in').each(function () {
-                $(this).collapse('hide');
-            });
-        }
-    }
+    });
 }
 
 function initMFormCollapseToggle(element, init) {
