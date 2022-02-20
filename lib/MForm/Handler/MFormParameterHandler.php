@@ -38,7 +38,7 @@ class MFormParameterHandler
      * @param array $parameter
      * @author Joachim Doerr
      */
-    public static function setParameters(MFormItem $item, $parameter)
+    public static function addParameters(MFormItem $item, $parameter)
     {
         // is parameter an array
         if (is_array($parameter)) {

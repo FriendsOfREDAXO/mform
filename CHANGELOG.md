@@ -1,6 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 7.0.0.beta
+### Version 7.0.1.beta
 
 - add php 7.x compatibility
 - add fragment files
@@ -15,31 +15,53 @@
 - remove default theme config form in addon page
 - ytemplates moved from data to addon root path
 
-#### Migration to from v6.1.x to v7.0.0.beta
+#### Migration to from v6.x.x to v7.x.x
 
 1. Removed class methods:
    1. addEditorField
-   2. addFieldset
-   3. closeFieldset
-   4. addTab
-   5. closeTab
-   6. addCollapse
-   7. closeCollapse
-   8. addAccordion
-   9. closeAccordion
-   10. setAttribute
-   11. setValidation
-   12. addOption
-   13. disableOption
-   14. addValidation
-   15. addAttribute
-   16. isSerial
-   17. addCke5Field
-   18. setToggle
-   19. setParameter
-   20. addParameter
+   2. addCke5Field
+   3. addFieldset
+   4. closeFieldset
+   5. addTab
+   6. closeTab
+   7. addCollapse
+   8. closeCollapse
+   9. addAccordion
+   10. closeAccordion
+   11. isSerial
+   12. setToggle
 2. Renamed class methods:
-   1. disableOptions => setDisableOptions
+   1. addOption => setOption 
+   2. addAttribute => setAttribute
+   3. addValidation => setValidation
+   4. addValidations => setValidations
+   5. disableOptions => setDisableOptions
+   6. disableOption => setDisableOption
+   7. addFieldsetField => addFieldsetArea
+   8. addCollapseField => addCollapseElement
+   9. addTabField => addTabElement
+   10. addAccordionField => addAccordionElement
+   11. addTooltipInfo => setTooltipInfo
+   12. addCollapseInfo => setCollapseInfo
+   13. addParameters => setParameters
+   14. addParameter => setParameter
+
+#### Migration how do?
+
+- `Call to undefined method MForm::addFieldset()` or `MForm::closeFieldset()`
+  - Use `addFieldsetArea` like `MForm::factory()->addFieldsetArea('Label', MForm::factory()->addTextField(1, ['label' => 'Text']));`
+- `Call to undefined method MForm::addCollapse()` or `MForm::closeCollapse()`
+    - Use `addCollapseElement` like `MForm::factory()->addCollapseElement('Collapse', MForm::factory()->addTextField(1, ['label' => 'Text']));`
+- `Call to undefined method MForm::addTab()` or `MForm::closeTab()`
+    - Use `addTabElement` like `MForm::factory()->addTabElement('Tab', MForm::factory()->addTextField(1, ['label' => 'Text']));`
+- `Call to undefined method MForm::addAccordion()` or `MForm::closeAccordion()`
+    - Use `addAccordionElement` like `MForm::factory()->addAccordionElement('Accordion' MForm::factory()->addTextField(1, ['label' => 'Text']));`
+- `Call to undefined method MForm::addEditorField()` or `MForm::addCke5Field`
+  - Use `addTextAreaField` with editor attributes like `$mform->addTextAreaField('1', ['class' => 'cke5-editor', 'data-lang' => \Cke5\Utils\Cke5Lang::getUserLang(), 'data-profile' => 'default']);`
+- `Call to undefined method MForm::addOption()` or `MForm::addAttribute()` or `MForm::addValidation()` or `MForm::disableOptions()` or `MForm::disableOption()`
+    - Check the list `Renamed class methods` and use the new method name instead of the old one
+- `Call to undefined method MForm::setToggle()`
+    - Use `addToggleCheckboxField` instead of `addCheckboxField` with `setToggle`
 
 ### Version 6.1.2
 

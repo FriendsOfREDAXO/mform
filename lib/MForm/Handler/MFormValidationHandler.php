@@ -19,31 +19,31 @@ class MFormValidationHandler
      * @param mixed|null $value
      * @author Joachim Doerr
      */
-    public static function addValidation(MFormItem $item, string $key, mixed $value = null): void
+    public static function setValidation(MFormItem $item, string $key, mixed $value = null): void
     {
+        // TODO add only html validations
         // set key by value
-        switch($value) {
-            case 'required':
-            case 'empty':
-            case 'compare':
-            case 'email':
-            case 'number':
-            case 'float':
-            case 'digits':
-            case 'alphanum':
-            case 'url':
-                $key = $value;
-                break;
-        }
+//        switch($value) {
+//            case 'required':
+//            case 'empty':
+//            case 'compare':
+//            case 'email':
+//            case 'number':
+//            case 'float':
+//            case 'digits':
+//            case 'alphanum':
+//            case 'url':
+//                $key = $value;
+//                break;
+//        }
 
         // add attribute for parsley by key
-        switch ($key) {
-            case '_removed':
-            break;
-            default: 
-            break;
-               
-        }
+//        switch ($key) {
+//            case '_removed':
+//            break;
+//            default:
+//            break;
+//        }
     }
 
     /**

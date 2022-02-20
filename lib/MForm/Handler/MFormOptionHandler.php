@@ -15,35 +15,30 @@ use rex_sql;
 class MFormOptionHandler
 {
     /**
-     * set option to item
      * @param MFormItem $item
-     * @param mixed $value
-     * @param mixed $key
+     * @param $value
+     * @param $key
      * @author Joachim Doerr
      */
     public static function addOption(MFormItem $item, $value, $key): void
     {
-        // add option to options array
         $item->options[$key] = MFormClang::getClangValue($value);
     }
 
     /**
      * set option to item
      * @param MFormItem $item
-     * @param mixed $key
+     * @param $key
      * @author Joachim Doerr
      */
     public static function disableOption(MFormItem $item, $key): void
     {
-        // add option to options array
         $item->disabledOptions[$key] = $key;
     }
-
     /**
-     * set opt group to item
      * @param MFormItem $item
      * @param string $label
-     * @param mixed $options
+     * @param $options
      * @author Joachim Doerr
      */
     public static function addOptGroup(MFormItem $item, string $label, $options): void
@@ -84,7 +79,9 @@ class MFormOptionHandler
      */
     public static function toggleOptions(MFormItem $item, $options): void
     {
-        $item->toggleOptions = $options;
+        if (is_array($options)) {
+            $item->toggleOptions = $options;
+        }
     }
 
     /**
@@ -102,10 +99,10 @@ class MFormOptionHandler
     /**
      * set options form sql table as array to item
      * @param MFormItem $item
-     * @param string $query
+     * @param $query
      * @author Joachim Doerr
      */
-    public static function setSqlOptions(MFormItem $item, string $query): void
+    public static function setSqlOptions(MFormItem $item, $query): void
     {
         try {
             $sql = rex_sql::factory();

@@ -32,7 +32,7 @@ class MFormElements
     /**
      * @var array
      */
-    private array $result;
+    private array $result = [];
 
     /**
      * MFormElements constructor.
@@ -60,7 +60,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addElement(string $type, $id = NULL, string $value = NULL, array $attributes = NULL, array $options = NULL, array $parameter = NULL, mixed $catId = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, mixed $catId = null, array $validation = null, string $defaultValue = null): self
     {
         // remove ,
         $id = str_replace(',', '.', $id);
@@ -95,9 +95,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHtml(?string $value = NULL): self
+    public function addHtml(?string $value = null): self
     {
-        return $this->addElement('html', NULL, $value);
+        return $this->addElement('html', null, $value);
     }
 
     /**
@@ -106,9 +106,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHeadline(?string $value = NULL, array $attributes = NULL): self
+    public function addHeadline(?string $value = null, array $attributes = null): self
     {
-        return $this->addElement('headline', NULL, $value, $attributes);
+        return $this->addElement('headline', null, $value, $attributes);
     }
 
     /**
@@ -116,9 +116,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addDescription(?string $value = NULL): self
+    public function addDescription(?string $value = null): self
     {
-        return $this->addElement('description', NULL, $value);
+        return $this->addElement('description', null, $value);
     }
 
     /**
@@ -127,9 +127,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlert(string $key, ?string $value = NULL): self
+    public function addAlert(string $key, ?string $value = null): self
     {
-        return $this->addElement('alert', NULL, $value, ['class' => 'alert-' . $key]);
+        return $this->addElement('alert', null, $value, ['class' => 'alert-' . $key]);
     }
 
     /**
@@ -137,7 +137,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlertInfo(?string $value = NULL): self
+    public function addAlertInfo(?string $value = null): self
     {
         return $this->addAlert('info', $value);
     }
@@ -147,7 +147,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlertWarning(?string $value = NULL): self
+    public function addAlertWarning(?string $value = null): self
     {
         return $this->addAlert('warning', $value);
     }
@@ -157,7 +157,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlertDanger(?string $value = NULL): self
+    public function addAlertDanger(?string $value = null): self
     {
         return $this->addAlert('danger', $value);
     }
@@ -167,7 +167,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlertError(?string $value = NULL): self
+    public function addAlertError(?string $value = null): self
     {
         return $this->addAlert('error', $value);
     }
@@ -177,35 +177,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAlertSuccess(?string $value = NULL): self
+    public function addAlertSuccess(?string $value = null): self
     {
         return $this->addAlert('success', $value);
-    }
-
-    /**
-     * @param string|null $value
-     * @param string $icon
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function addTooltipInfo(?string $value = NULL, string $icon = ''): self
-    {
-        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip', $value);
-        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip-icon', $icon);
-        return $this;
-    }
-
-    /**
-     * @param string|null $value
-     * @param string $icon
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function addCollapseInfo(?string $value = NULL, string $icon = ''): self
-    {
-        MFormAttributeHandler::addAttribute($this->item, 'info-collapse', $value);
-        MFormAttributeHandler::addAttribute($this->item, 'info-collapse-icon', $icon);
-        return $this;
     }
 
     /**
@@ -213,7 +187,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addForm($form = NULL): self
+    public function addForm($form = null): self
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
@@ -228,11 +202,11 @@ class MFormElements
      * @param array|null $attributes
      * @author Joachim Doerr
      */
-    public function addFieldsetField(string $value = NULL, $form = NULL, array $attributes = NULL): self
+    public function addFieldsetArea(string $value = null, $form = null, array $attributes = null): self
     {
-        return $this->addElement('fieldset', NULL, $value, $attributes)
+        return $this->addElement('fieldset', null, $value, $attributes)
             ->addForm($form)
-            ->addElement('close-fieldset', NULL, NULL, $attributes);
+            ->addElement('close-fieldset', null, null, $attributes);
     }
 
     /**
@@ -242,11 +216,11 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTabField(string $value = NULL, $form = NULL, array $attributes = NULL): self
+    public function addTabElement(string $value = null, $form = null, array $attributes = null): self
     {
-        return $this->addElement('tab', NULL, $value, $attributes)
+        return $this->addElement('tab', null, $value, $attributes)
             ->addForm($form)
-            ->addElement('close-tab', NULL, NULL, $attributes);
+            ->addElement('close-tab', null, null, $attributes);
     }
 
     /**
@@ -259,15 +233,15 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapseField(string $value = NULL, $form = NULL, array $attributes = NULL, bool $accordion = false, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addCollapseElement(string $value = null, $form = null, array $attributes = null, bool $accordion = false, bool $hideToggleLinks = false, int $openCollapse = 0): self
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) $attributes = [];
         $attributes = array_merge($attributes, array('data-group-accordion' => (int)$accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse));
 
-        return $this->addElement('collapse', NULL, $value, $attributes)
+        return $this->addElement('collapse', null, $value, $attributes)
             ->addForm($form)
-            ->addElement('close-collapse', NULL, NULL, $attributes);
+            ->addElement('close-collapse', null, null, $attributes);
     }
 
     /**
@@ -279,9 +253,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAccordionField(string $value = NULL, $form = NULL, array $attributes = NULL, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addAccordionElement(string $value = null, $form = null, array $attributes = null, bool $hideToggleLinks = false, int $openCollapse = 0): self
     {
-        return $this->addCollapseField($value, $form, $attributes, true, $hideToggleLinks, $openCollapse);
+        return $this->addCollapseElement($value, $form, $attributes, true, $hideToggleLinks, $openCollapse);
     }
 
     /**
@@ -293,9 +267,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addInputField(string $typ, $id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addInputField(string $typ, $id, array $attributes = null, array $validations = null, string $defaultValue = null): self
     {
-        return $this->addElement($typ, $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
+        return $this->addElement($typ, $id, null, $attributes, null, null, null, $validations, $defaultValue);
     }
 
     /**
@@ -305,7 +279,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHiddenField($id, string $value = NULL, array $attributes = NULL): self
+    public function addHiddenField($id, string $value = null, array $attributes = null): self
     {
         return $this->addElement('hidden', $id, $value, $attributes);
     }
@@ -318,7 +292,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addTextField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
     {
         return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
     }
@@ -331,7 +305,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextAreaField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addTextAreaField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
     {
         return $this->addInputField('textarea', $id, $attributes, $validations, $defaultValue);
     }
@@ -343,7 +317,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextReadOnlyField($id, string $value = NULL, array $attributes = NULL): self
+    public function addTextReadOnlyField($id, string $value = null, array $attributes = null): self
     {
         return $this->addElement('text-readonly', $id, $value, $attributes);
     }
@@ -355,7 +329,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextAreaReadOnlyField($id, string $value = NULL, array $attributes = NULL): self
+    public function addTextAreaReadOnlyField($id, string $value = null, array $attributes = null): self
     {
         return $this->addElement('textarea-readonly', $id, $value, $attributes);
     }
@@ -371,9 +345,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addOptionField(string $typ, $id, array $attributes = NULL, array $options = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, array $validation = null, string $defaultValue = null): self
     {
-        return $this->addElement($typ, $id, NULL, $attributes, $options, NULL, NULL, $validation, $defaultValue);
+        return $this->addElement($typ, $id, null, $attributes, $options, null, null, $validation, $defaultValue);
     }
 
     /**
@@ -386,7 +360,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addSelectField($id, array $options = NULL, array $attributes = NULL, int $size = 1, array $validation = NULL, string $defaultValue = NULL): self
+    public function addSelectField($id, array $options = null, array $attributes = null, int $size = 1, array $validation = null, string $defaultValue = null): self
     {
         $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue);
         if ($size > 1) $this->setSize($size);
@@ -403,7 +377,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMultiSelectField($id, array $options = NULL, array $attributes = NULL, int $size = 3, array $validation = NULL, string $defaultValue = NULL): self
+    public function addMultiSelectField($id, array $options = null, array $attributes = null, int $size = 3, array $validation = null, string $defaultValue = null): self
     {
         $this->addOptionField('multiselect', $id, $attributes, $options, $validation, $defaultValue)
             ->setMultiple()
@@ -420,7 +394,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCheckboxField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addCheckboxField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $validation, $defaultValue);
     }
@@ -434,7 +408,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addToggleCheckboxField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addToggleCheckboxField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
     {
         if (!is_array($attributes)) $attributes = [];
         $attributes['data-mform-toggle'] = 'toggle';
@@ -450,7 +424,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addRadioField($id, array $options = NULL, array $attributes = NULL, array $validation = NULL, string $defaultValue = NULL): self
+    public function addRadioField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
     {
         return $this->addOptionField('radio', $id, $attributes, $options, $validation, $defaultValue);
     }
@@ -463,9 +437,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addLinkField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addLinkField($id, array $parameter = null, $catId = null, array $attributes = null): self
     {
-        return $this->addElement('link', $id, NULL, $attributes, NULL, $parameter, $catId);
+        return $this->addElement('link', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
@@ -476,9 +450,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addLinklistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addLinklistField($id, array $parameter = null, $catId = null, array $attributes = null): self
     {
-        return $this->addElement('linklist', $id, NULL, $attributes, NULL, $parameter, $catId);
+        return $this->addElement('linklist', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
@@ -493,9 +467,9 @@ class MFormElements
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
-    public function addCustomLinkField($id, array $attributes = NULL, array $validations = NULL, string $defaultValue = NULL): self
+    public function addCustomLinkField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
     {
-        return $this->addElement('custom-link', $id, NULL, $attributes, NULL, NULL, NULL, $validations, $defaultValue);
+        return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $validations, $defaultValue);
     }
 
     /**
@@ -506,13 +480,12 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMediaField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addMediaField($id, array $parameter = null, $catId = null, array $attributes = null): self
     {
-        return $this->addElement('media', $id, NULL, $attributes, NULL, $parameter, $catId);
+        return $this->addElement('media', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
-     * add rex media list field
      * @param float|int|string $id
      * @param array|null $parameter
      * @param null $catId
@@ -520,13 +493,12 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMedialistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addMedialistField($id, array $parameter = null, $catId = null, array $attributes = null): self
     {
-        return $this->addElement('medialist', $id, NULL, $attributes, NULL, $parameter, $catId);
+        return $this->addElement('medialist', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
-     * add rex media list field
      * @param float|int|string $id
      * @param array|null $parameter
      * @param null $catId
@@ -534,9 +506,9 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addImagelistField($id, array $parameter = NULL, $catId = NULL, array $attributes = NULL): self
+    public function addImagelistField($id, array $parameter = null, $catId = null, array $attributes = null): self
     {
-        return $this->addElement('imglist', $id, NULL, $attributes, NULL, $parameter, $catId);
+        return $this->addElement('imglist', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
@@ -605,6 +577,18 @@ class MFormElements
     }
 
     /**
+     * @param $name
+     * @param $value
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setAttribute($name, $value): self
+    {
+        MFormAttributeHandler::addAttribute($this->item, $name, $value);
+        return $this;
+    }
+
+    /**
      * @param array $validations
      * @return $this
      * @author Joachim Doerr
@@ -612,6 +596,18 @@ class MFormElements
     public function setValidations(array $validations): self
     {
         MFormValidationHandler::setValidations($this->item, $validations);
+        return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setValidation($key, $value = null): self
+    {
+        MFormValidationHandler::setValidation($this->item, $key, $value);
         return $this;
     }
 
@@ -638,6 +634,18 @@ class MFormElements
     }
 
     /**
+     * @param $key
+     * @param $value
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setOption($key, $value): self
+    {
+        MFormOptionHandler::addOption($this->item, $value, $key);
+        return $this;
+    }
+
+    /**
      * @param array $options
      * @return $this
      * @author Joachim Doerr
@@ -660,11 +668,22 @@ class MFormElements
     }
 
     /**
-     * @param string $query
+     * @param $key
+     * @author Joachim Doerr
+     * @return $this
+     */
+    public function setDisableOption($key)
+    {
+        MFormOptionHandler::disableOption($this->item, $key);
+        return $this;
+    }
+
+    /**
+     * @param $query
      * @return $this
      * @author Joachim Doerr
      */
-    public function setSqlOptions(string $query): self
+    public function setSqlOptions($query): self
     {
         MFormOptionHandler::setSqlOptions($this->item, $query);
         return $this;
@@ -681,11 +700,11 @@ class MFormElements
     }
 
     /**
-     * @param int $size
+     * @param $size
      * @return $this
      * @author Joachim Doerr
      */
-    public function setSize(int $size): self
+    public function setSize($size): self
     {
         MFormAttributeHandler::addAttribute($this->item, 'size', $size);
         return $this;
@@ -709,7 +728,32 @@ class MFormElements
      */
     public function setParameters(array $parameter): self
     {
-        MFormParameterHandler::setParameters($this->item, $parameter);
+        MFormParameterHandler::addParameters($this->item, $parameter);
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setParameter($name, $value): self
+    {
+        MFormParameterHandler::addParameter($this->item, $name, $value);
+        return $this;
+    }
+
+    /**
+     * @param string|null $value
+     * @param string $icon
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setTooltipInfo(?string $value = null, string $icon = ''): self
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip', $value);
+        MFormAttributeHandler::addAttribute($this->item, 'info-tooltip-icon', $icon);
         return $this;
     }
 
@@ -721,6 +765,19 @@ class MFormElements
     public function setTabIcon(string $icon): self
     {
         MFormAttributeHandler::addAttribute($this->item, 'tab-icon', $icon);
+        return $this;
+    }
+
+    /**
+     * @param string|null $value
+     * @param string $icon
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setCollapseInfo(?string $value = null, string $icon = ''): self
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'info-collapse', $value);
+        MFormAttributeHandler::addAttribute($this->item, 'info-collapse-icon', $icon);
         return $this;
     }
 
