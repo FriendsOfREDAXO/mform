@@ -1,6 +1,8 @@
 <?php
 
 switch ($this->type) {
+    case 'multiselect';
+        $this->attributes = $this->attributes . ' multiple';
     case 'select';
         echo $this->javascript . '<select id="' . $this->id . '" name="REX_INPUT_VALUE' . $this->varId . '" class="' . $this->class . '" ' . $this->attributes . ' data-selected="' . $this->value . '">' . $this->options . '</select>' . $this->hidden;
         break;
