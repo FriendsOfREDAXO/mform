@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -17,7 +17,7 @@ class MFormGroupExtensionHelper
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    public static function addTabGroupExtensionItems(array $items)
+    public static function addTabGroupExtensionItems(array $items): array
     {
         return self::addGroupExtensionItems($items, 'tab');
     }
@@ -27,7 +27,17 @@ class MFormGroupExtensionHelper
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    public static function addFieldsetGroupExtensionItems(array $items)
+    public static function addColumnGroupExtensionItems(array $items): array
+    {
+        return self::addGroupExtensionItems($items, 'column');
+    }
+
+    /**
+     * @param MFormItem[] $items
+     * @return MFormItem[]
+     * @author Joachim Doerr
+     */
+    public static function addFieldsetGroupExtensionItems(array $items): array
     {
         return self::addGroupExtensionItems($items, 'fieldset');
     }
@@ -37,7 +47,7 @@ class MFormGroupExtensionHelper
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    public static function addCollapseGroupExtensionItems(array $items)
+    public static function addCollapseGroupExtensionItems(array $items): array
     {
         return self::addGroupExtensionItems($items, 'collapse');
     }
@@ -47,7 +57,7 @@ class MFormGroupExtensionHelper
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    public static function addAccordionGroupExtensionItems(array $items)
+    public static function addAccordionGroupExtensionItems(array $items): array
     {
         return self::addGroupExtensionItems($items, 'accordion');
     }
@@ -58,7 +68,7 @@ class MFormGroupExtensionHelper
      * @return array
      * @author Joachim Doerr
      */
-    private static function addGroupExtensionItems(array $items, $type)
+    private static function addGroupExtensionItems(array $items, string $type): array
     {
         $newItems = array();
         $key = 0;
@@ -156,15 +166,15 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param $type
+     * @param string $type
      * @param int $group
      * @param int $groupCount
-     * @param int $groupKey
-     * @param MFormItem $item
+     * @param string $groupKey
+     * @param MFormItem|null $item
      * @return MFormItem
      * @author Joachim Doerr
      */
-    public static function createGroupItem($type, $group = 0, $groupCount = 0, $groupKey = 0, MFormItem $item = null)
+    public static function createGroupItem(string $type, int $group = 0, int $groupCount = 0, string $groupKey = '0', MFormItem $item = null): MFormItem
     {
         $newItem = new MFormItem();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -21,12 +21,6 @@ class MFormElement
      * @var string
      */
     public $varId;
-
-    /**
-     * @var integer
-     * Todo remove
-     */
-    public $subVarId;
 
     /**
      * @var string
@@ -141,17 +135,6 @@ class MFormElement
     public function setVarId($varId)
     {
         $this->varId = $varId;
-        return $this;
-    }
-
-    /**
-     * @param int $subVarId
-     * @return $this
-     * TODO remove
-     */
-    public function setSubVarId($subVarId)
-    {
-        $this->subVarId = $subVarId;
         return $this;
     }
 

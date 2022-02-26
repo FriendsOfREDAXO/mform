@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -18,7 +18,7 @@ class MFormParameterHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    public static function addParameter(MFormItem $item, $name, $value)
+    public static function addParameter(MFormItem $item, $name, $value): void
     {
         switch ($name) {
             case 'label':
@@ -38,7 +38,7 @@ class MFormParameterHandler
      * @param array $parameter
      * @author Joachim Doerr
      */
-    public static function addParameters(MFormItem $item, $parameter)
+    public static function addParameters(MFormItem $item, array $parameter): void
     {
         // is parameter an array
         if (is_array($parameter)) {
@@ -48,5 +48,4 @@ class MFormParameterHandler
             }
         }
     }
-
 }

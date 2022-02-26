@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -11,7 +11,7 @@ namespace MForm\DTO;
 class MFormDefault
 {
     // default classes for r5 bootstrap backend theme
-    static public $classes = array(
+    static public array $classes = array(
         'select' => 'form-control',
         'multiselect' => 'form-control',
         'fieldset' => 'form-horizontal',

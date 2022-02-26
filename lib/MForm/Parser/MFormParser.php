@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -16,7 +16,6 @@ use MForm\DTO\MFormItem;
 use MForm\Handler\MFormAttributeHandler;
 use MForm\Utils\MFormGroupExtensionHelper;
 use MForm\Utils\MFormItemManipulator;
-use rex_addon;
 use rex_clang;
 use rex_fragment;
 use rex_var_custom_link;
@@ -31,7 +30,7 @@ class MFormParser
     /**
      * @var array
      */
-    protected array $elements = array();
+    protected array $elements = [];
 
     /**
      * @var string
@@ -45,55 +44,92 @@ class MFormParser
 
     /**
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateFieldset(MFormItem $item): self
+    private function generateFieldset(MFormItem $item): void
     {
         // set default class for r5 mform default theme
         MFormItemManipulator::setDefaultClass($item);
 
         // create fieldset open element
         $fieldsetElement = new MFormElement();
-        $fieldsetElement
+        $fieldsetElement->setType('fieldset-open')
             ->setClass($item->getClass()) // set fieldset default and custom class
-            ->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to fieldset element
-            ->setType('fieldset-open');
+            ->setAttributes($this->parseAttributes($item->getAttributes()));
 
         // create legend
         if (!empty($item->getValue())) {
             $legendElement = new MFormElement();
-            $legendElement
+            $legendElement->setType('legend')
                 ->setValue($item->getValue())
-                ->setType('legend');
-            $fieldsetElement->setLegend($this->parseElement($legendElement, 'fieldset', true)); // add parsed legend to fieldset element
+                ->setLegend($this->parseElement($legendElement, 'wrapper', true)); // add parsed legend to fieldset element
         }
 
         // add fieldset open element to elements list
-        $this->elements[] = $this->parseElement($fieldsetElement, 'fieldset', true);
-        return $this;
+        $this->elements[] = $this->parseElement($fieldsetElement, 'wrapper', true);
     }
 
     /**
-     * @return $this
      * @author Joachim Doerr
      */
-    private function closeFieldset()
+    private function closeFieldset(): void
     {
         $element = new MFormElement();
         $element->setType('fieldset-close');
-        $this->elements[] = $this->parseElement($element, 'fieldset', true); // use parse element to load template file
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
      * @param MFormItem $item
-     * @param int $key
-     * @param array $items
-     * @return MFormParser
      * @author Joachim Doerr
      */
-    private function generateTabGroup(MFormItem $item, $key, array $items)
+    private function generateColumnGroup(): void
+    {
+        $element = new MFormElement();
+        $element->setType('columngroup-open');
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
+    }
+
+    /**
+     * @param MFormItem $item
+     * @author Joachim Doerr
+     */
+    private function generateColumn(MFormItem $item): void
+    {
+        $element = new MFormElement();
+        $element->setType('column-open')
+            ->setAttributes($this->parseAttributes($item->getAttributes()))
+            ->setClass($item->getClass());
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
+    }
+
+    /**
+     * @author Joachim Doerr
+     */
+    private function closeColumn(): void
+    {
+        $element = new MFormElement();
+        $element->setType('column-close');
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
+    }
+
+    /**
+     * @author Joachim Doerr
+     */
+    private function closeColumnGroup(): void
+    {
+        $element = new MFormElement();
+        $element->setType('columngroup-close');
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param string $key
+     * @param array $items
+     * @author Joachim Doerr
+     */
+    private function generateTabGroup(MFormItem $item, string $key, array $items): void
     {
         $nav = array();
 
@@ -104,7 +140,11 @@ class MFormParser
                 $class = $itm->getClass();
                 $value = '';
                 $element = new MFormElement();
-                $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . rex_session('mform_count'));
+                try {
+                    $element->setId('tabgr' . $itm->getGroup() . 'tabid' . $itm->getGroupCount() . '_' . rex_session('mform_count'));
+                } catch (\rex_exception $e) {
+                    \rex_logger::logException($e);
+                }
 
                 if (array_key_exists('tab-icon', $itm->getAttributes()))
                     $value = '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ';
@@ -120,7 +160,7 @@ class MFormParser
                 $element->setClass($class)
                     ->setType('tabnavli');
 
-                $nav[] = $this->parseElement($element, 'tab', true); // use parse element to load template file
+                $nav[] = $this->parseElement($element, 'wrapper', true);
             }
         }
 
@@ -129,16 +169,14 @@ class MFormParser
             ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setType('tabgroup-open');
 
-        $this->elements[] = $this->parseElement($element, 'tab', true); // use parse element to load template file
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
      * @param MFormItem $item
-     * @return MFormParser
      * @author Joachim Doerr
      */
-    private function generateTab($item)
+    private function generateTab($item): void
     {
         $element = new MFormElement();
         $element->setId('tabgr' . $item->getGroup() . 'tabid' . $item->getGroupCount() . '_' . rex_session('mform_count'))
@@ -147,40 +185,34 @@ class MFormParser
         if ($item->getGroupCount() == 1)
             $element->setClass('active');
 
-        $this->elements[] = $this->parseElement($element, 'tab', true); // use parse element to load template file
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
-     * @return $this
      * @author Joachim Doerr
      */
-    private function closeTab()
+    private function closeTab(): void
     {
         $element = new MFormElement();
         $element->setType('tab-close');
-        $this->elements[] = $this->parseElement($element, 'tab', true); // use parse element to load template file
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
-     * @return $this
      * @author Joachim Doerr
      */
-    private function closeTabGroup()
+    private function closeTabGroup(): void
     {
         $element = new MFormElement();
         $element->setType('tabgroup-close');
-        $this->elements[] = $this->parseElement($element, 'tab', true); // use parse element to load template file
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateCollapseGroup(MFormItem $item)
+    private function generateCollapseGroup(MFormItem $item): void
     {
         if (isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) {
             $this->acc = true;
@@ -188,17 +220,15 @@ class MFormParser
             $element->setAttributes($this->parseAttributes($item->getAttributes()))
                 ->setId('accgr' . $item->getGroup() . '_' . rex_session('mform_count'))
                 ->setType('accordion-open');
-            $this->elements[] = $this->parseElement($element, 'collapse', true); // use parse element to load template file
+            $this->elements[] = $this->parseElement($element, 'wrapper', true);
         }
-        return $this;
     }
 
     /**
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateCollapse(MFormItem $item)
+    private function generateCollapse(MFormItem $item): void
     {
         // is id in attr not set set an unique id
         if (!isset($item->getAttributes()['id'])) {
@@ -208,8 +238,8 @@ class MFormParser
         // create collapse open element
         $collapseElement = new MFormElement();
         $collapseElement->setAttributes($this->parseAttributes($item->getAttributes())) // add attributes to collapse element
-        ->setId($item->getAttributes()['id']) // set collapse id
-        ->setType(($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? 'accordion-collapse-open' : 'collapse-open');
+            ->setId($item->getAttributes()['id']) // set collapse id
+            ->setType(($this->acc && isset($item->getAttributes()['data-group-accordion']) && $item->getAttributes()['data-group-accordion'] == 1) ? 'accordion-collapse-open' : 'collapse-open');
 
         if (array_key_exists('data-group-collapse', $item->getAttributes())) {
             $collapseElement->setClass($item->getAttributes()['data-group-collapse']);
@@ -232,51 +262,42 @@ class MFormParser
             ->setValue($item->getValue())
             ->setType('collapse-button');
 
-        $collapseElement->setLegend($this->parseElement($collapseButton, 'collapse', true)); // add parsed legend to collapse element
+        $collapseElement->setLegend($this->parseElement($collapseButton, 'wrapper', true)); // add parsed legend to collapse element
 
         // add collapse open element to elements list
-        $this->elements[] = $this->parseElement($collapseElement, 'collapse', true);
-        return $this;
+        $this->elements[] = $this->parseElement($collapseElement, 'wrapper', true);
     }
 
     /**
-     * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function closeCollapse(MFormItem $item)
+    private function closeCollapse(): void
     {
         $element = new MFormElement();
         $element->setType(($this->acc) ? 'accordion-collapse-close' : 'collapse-close');
-        $this->elements[] = $this->parseElement($element, 'collapse', true);
-        return $this;
+        $this->elements[] = $this->parseElement($element, 'wrapper', true);
     }
 
     /**
-     * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function closeCollapseGroup(MFormItem $item)
+    private function closeCollapseGroup(): void
     {
         if ($this->acc) {
             $this->acc = false;
             $element = new MFormElement();
             $element->setType('accordion-close');
-            $this->elements[] = $this->parseElement($element, 'collapse', true); // use parse element to load template file
+            $this->elements[] = $this->parseElement($element, 'wrapper', true);
         }
-
-        return $this;
     }
 
     /**
      * create any no input inline element
      * html, headline, description
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateLineElement(MFormItem $item)
+    private function generateLineElement(MFormItem $item): void
     {
         // create templateElement object
         $element = new MFormElement();
@@ -287,17 +308,15 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($element, 'base');
-        return $this;
     }
 
     /**
      * create input text element
      * hidden, text, password
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateInputElement(MFormItem $item)
+    private function generateInputElement(MFormItem $item): void
     {
         $datalist = '';
 
@@ -351,17 +370,15 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * create textarea element
      * textarea
-     * @param $item
-     * @return $this
+     * @param MFormItem $item
      * @author Joachim Doerr
      */
-    private function generateAreaElement(MFormItem $item)
+    private function generateAreaElement(MFormItem $item): void
     {
         // set typ specific vars
         switch ($item->getType()) {
@@ -394,19 +411,17 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * create select or multiselect element
      * select, multiselect
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateOptionsElement(MFormItem $item)
+    private function generateOptionsElement(MFormItem $item): void
     {
-        // default manipulations0
+        // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
         MFormItemManipulator::setCustomId($item); // set optional custom id
         MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
@@ -495,7 +510,6 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
@@ -506,10 +520,11 @@ class MFormParser
      * @param string $templateType
      * @param bool $selected
      * @param bool $disabled
-     * @return mixed
+     * @param string $toggle
+     * @return string
      * @author Joachim Doerr
      */
-    private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, $toggle = '')
+    private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, $toggle = ''): string
     {
         // create element
         $element = new MFormElement();
@@ -574,10 +589,9 @@ class MFormParser
      * create checkbox element
      * checkbox
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateCheckboxElement(MFormItem $item)
+    private function generateCheckboxElement(MFormItem $item): void
     {
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
@@ -608,7 +622,6 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
@@ -618,10 +631,10 @@ class MFormParser
      * @param $key
      * @param $value
      * @param null|int $count
-     * @return mixed
+     * @return string
      * @author Joachim Doerr
      */
-    private function createCheckElement(MFormItem $item, $key, $value, $count = null)
+    private function createCheckElement(MFormItem $item, $key, $value, $count = null): string
     {
         // create element
         $element = new MFormElement();
@@ -650,10 +663,9 @@ class MFormParser
      * create radiobutton element
      * radiobutton
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateRadioElement(MFormItem $item)
+    private function generateRadioElement(MFormItem $item): void
     {
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
@@ -678,16 +690,14 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * media, medialist
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateMediaElement(MFormItem $item)
+    private function generateMediaElement(MFormItem $item): void
     {
         $inputValue = false;
 
@@ -745,16 +755,14 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * link, linklist
      * @param MFormItem $item
-     * @return $this
      * @author Joachim Doerr
      */
-    private function generateLinkElement(MFormItem $item)
+    private function generateLinkElement(MFormItem $item): void
     {
         $inputValue = false;
 
@@ -818,17 +826,15 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * @param DOMNodeList $elements
      * @param MFormItem $item
      * @param null $id
-     * @return MFormParser
      * @author Joachim Doerr
      */
-    private function processNodeFormElement(DOMNodeList $elements, MFormItem $item, $id = null)
+    private function processNodeFormElement(DOMNodeList $elements, MFormItem $item, $id = null): void
     {
         foreach ($elements as $element) {
             if ($element instanceof DOMElement) {
@@ -842,7 +848,6 @@ class MFormParser
                 }
             }
         }
-        return $this;
     }
 
     /**
@@ -850,7 +855,7 @@ class MFormParser
      * @return string
      * @author Joachim Doerr
      */
-    private function getWidgetId(MFormItem $item)
+    private function getWidgetId(MFormItem $item): string
     {
         $item->setVarId(substr($item->getVarId(), 1, -1));
         $varId = explode('][', $item->getVarId());
@@ -867,11 +872,9 @@ class MFormParser
     /**
      * link, linklist
      * @param MFormItem $item
-     * @return $this
-     * @throws \rex_exception
      * @author Joachim Doerr
      */
-    private function generateCustomLinkElement(MFormItem $item)
+    private function generateCustomLinkElement(MFormItem $item): void
     {
         // default manipulations
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
@@ -900,7 +903,11 @@ class MFormParser
         }
         $parameter['class'] = $item->class;
 
-        $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
+        try {
+            $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
+        } catch (\Exception $e) {
+            \rex_logger::logException($e);
+        }
 
         $dom = new DOMDocument('1.0', 'utf-8');
         @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
@@ -937,15 +944,14 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
-        return $this;
     }
 
     /**
      * @param DOMDocument|DOMElement $dom
-     * @return mixed|string
+     * @return mixed
      * @author Joachim Doerr
      */
-    private function getBodyInner($dom)
+    private function getBodyInner($dom): mixed
     {
         $html = $dom->C14N(false, true);
         if (strpos($html, '<body') !== false) {
@@ -960,114 +966,124 @@ class MFormParser
 
     /**
      * @param MFormItem[] $items
-     * @return $this
      * @author Joachim Doerr
      */
-    private function parseFormFields(array $items)
+    private function parseFormFields(array $items): void
     {
-        if (sizeof($items) > 0) {
-            foreach ($items as $key => $item) {
+        try {
+            if (sizeof($items) > 0) {
+                foreach ($items as $key => $item) {
+                    switch ($item->getType()) {
+                        // FIELDSET
+                        case 'fieldset':
+                            $this->generateFieldset($item);
+                            break;
+                        case 'close-fieldset':
+                            $this->closeFieldset();
+                            break;
 
-                switch ($item->getType()) {
-                    // FIELDSET
-                    case 'fieldset':
-                        $this->generateFieldset($item);
-                        break;
-                    case 'close-fieldset':
-                        $this->closeFieldset();
-                        break;
+                        // COLUMNS
+                        case 'start-group-column':
+                            $this->generateColumnGroup();
+                            break;
+                        case 'column':
+                            $this->generateColumn($item);
+                            break;
+                        case 'close-column':
+                            $this->closeColumn();
+                            break;
+                        case 'close-group-column':
+                            $this->closeColumnGroup();
+                            break;
 
-                    // TODO
-                    case 'start-group-fieldset':
-                    case 'close-group-fieldset':
-                        break;
+                        // TABS
+                        case 'start-group-tab':
+                            $this->generateTabGroup($item, $key, $items);
+                            break;
+                        case 'tab':
+                            $this->generateTab($item);
+                            break;
+                        case 'close-tab':
+                            $this->closeTab();
+                            break;
+                        case 'close-group-tab':
+                            $this->closeTabGroup();
+                            break;
 
-                    // TABS
-                    case 'start-group-tab':
-                        $this->generateTabGroup($item, $key, $items);
-                        break;
-                    case 'tab':
-                        $this->generateTab($item);
-                        break;
-                    case 'close-tab':
-                        $this->closeTab();
-                        break;
-                    case 'close-group-tab':
-                        $this->closeTabGroup();
-                        break;
+                        // COLLAPSE
+                        case 'start-group-collapse':
+                            $this->generateCollapseGroup($item);
+                            break;
+                        case 'collapse':
+                            $this->generateCollapse($item);
+                            break;
+                        case 'close-collapse':
+                            $this->closeCollapse();
+                            break;
+                        case 'close-group-collapse':
+                            $this->closeCollapseGroup();
+                            break;
 
-                    // COLLAPSE
-                    case 'start-group-collapse':
-                        $this->generateCollapseGroup($item);
-                        break;
-                    case 'collapse':
-                        $this->generateCollapse($item);
-                        break;
-                    case 'close-collapse':
-                        $this->closeCollapse($item);
-                        break;
-                    case 'close-group-collapse':
-                        $this->closeCollapseGroup($item);
-                        break;
-
-                    // FORM ELEMENTS
-                    case 'html':
-                    case 'headline':
-                    case 'description':
-                    case 'alert':
-                        $this->generateLineElement($item);
-                        break;
-                    case 'color':
-                    case 'email':
-                    case 'url':
-                    case 'tel':
-                    case 'search':
-                    case 'number':
-                    case 'range':
-                    case 'date':
-                    case 'time':
-                    case 'datetime':
-                    case 'datetime-local':
-                    case 'month':
-                    case 'week':
-                    case 'text':
-                    case 'hidden':
-                    case 'text-readonly':
-                        $this->generateInputElement($item);
-                        break;
-                    case 'markitup':
-                    case 'textarea':
-                    case 'textarea-readonly':
-                        $this->generateAreaElement($item);
-                        break;
-                    case 'select':
-                    case 'multiselect':
-                        $this->generateOptionsElement($item);
-                        break;
-                    case 'radio':
-                        $this->generateRadioElement($item);
-                        break;
-                    case 'checkbox':
-                    case 'multicheckbox':
-                        $this->generateCheckboxElement($item);
-                        break;
-                    case 'link':
-                    case 'linklist':
-                        $this->generateLinkElement($item);
-                        break;
-                    case 'customlink':
-                    case 'custom-link':
-                        $this->generateCustomLinkElement($item);
-                        break;
-                    case 'media':
-                    case 'medialist':
-                    case 'imglist':
-                        $this->generateMediaElement($item);
-                        break;
+                        // FORM ELEMENTS
+                        case 'html':
+                        case 'headline':
+                        case 'description':
+                        case 'alert':
+                            $this->generateLineElement($item);
+                            break;
+                        case 'color':
+                        case 'email':
+                        case 'url':
+                        case 'tel':
+                        case 'search':
+                        case 'number':
+                        case 'range':
+                        case 'date':
+                        case 'time':
+                        case 'datetime':
+                        case 'datetime-local':
+                        case 'month':
+                        case 'week':
+                        case 'text':
+                        case 'hidden':
+                        case 'text-readonly':
+                            $this->generateInputElement($item);
+                            break;
+                        case 'markitup':
+                        case 'textarea':
+                        case 'textarea-readonly':
+                            $this->generateAreaElement($item);
+                            break;
+                        case 'select':
+                        case 'multiselect':
+                            $this->generateOptionsElement($item);
+                            break;
+                        case 'radio':
+                            $this->generateRadioElement($item);
+                            break;
+                        case 'checkbox':
+                        case 'multicheckbox':
+                            $this->generateCheckboxElement($item);
+                            break;
+                        case 'link':
+                        case 'linklist':
+                            $this->generateLinkElement($item);
+                            break;
+                        case 'customlink':
+                        case 'custom-link':
+                            $this->generateCustomLinkElement($item);
+                            break;
+                        case 'media':
+                        case 'medialist':
+                        case 'imglist':
+                            $this->generateMediaElement($item);
+                            break;
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            \rex_logger::logException($e);
         }
-        return $this;
     }
 
     /**
@@ -1075,7 +1091,7 @@ class MFormParser
      * @return MFormElement
      * @author Joachim Doerr
      */
-    private function createLabelElement(MFormItem $item)
+    private function createLabelElement(MFormItem $item): MFormElement
     {
         $this->createTooltipElement($item);
 
@@ -1088,10 +1104,10 @@ class MFormParser
     }
 
     /**
-     * @param $item
+     * @param MFormItem $item
      * @author Joachim Doerr
      */
-    private function createTooltipElement(MFormItem $item)
+    private function createTooltipElement(MFormItem $item): void
     {
         // set tooltip
         if ($item->getInfoTooltip()) {
@@ -1116,12 +1132,13 @@ class MFormParser
      * @return string
      * @author Joachim Doerr
      */
-    public function parse(array $items, $theme = NULL, $debug = false)
+    public function parse(array $items, $theme = NULL, $debug = false): string
     {
         if (!is_null($theme) && $theme != $this->theme) {
             $this->theme = $theme;
         }
 
+        $items = MFormGroupExtensionHelper::addColumnGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addTabGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addCollapseGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items);
@@ -1149,7 +1166,7 @@ class MFormParser
      * @return string
      * @author Joachim Doerr
      */
-    private function getDefaultTemplateType(MFormItem $item, MFormElement $templateElement)
+    private function getDefaultTemplateType(MFormItem $item, MFormElement $templateElement): string
     {
         $templateType = 'default';
 
@@ -1201,7 +1218,7 @@ class MFormParser
      * @return string
      * @author Joachim Doerr
      */
-    private function parseAttributes($attributes)
+    private function parseAttributes(array $attributes): string
     {
         $inlineAttributes = '';
         if (sizeof($attributes) > 0) {

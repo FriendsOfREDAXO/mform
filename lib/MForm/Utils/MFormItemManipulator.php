@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -24,7 +24,7 @@ class MFormItemManipulator
         // set value for html out
         if (!is_array($item->getValue())) {
             $item->setValue(htmlspecialchars($item->getValue()));
-        } else if (is_array($item->getVarId()) && sizeof($item->getVarId()) == 1 && is_array($item->getValue())) {
+        } else if (is_array($item->getVarId()) && sizeof($item->getVarId()) == 1) {
             $item->setValue(htmlspecialchars($item->getStringValue()));
         }
 

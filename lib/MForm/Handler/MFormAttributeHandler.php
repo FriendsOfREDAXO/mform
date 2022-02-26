@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -19,7 +19,7 @@ class MFormAttributeHandler
      * @param mixed $value
      * @author Joachim Doerr
      */
-    public static function addAttribute(MFormItem $item, $name, $value)
+    public static function addAttribute(MFormItem $item, $name, $value): void
     {
         switch ($name) {
             case 'label':
@@ -38,8 +38,9 @@ class MFormAttributeHandler
                 }
                 break;
             case 'full': // set full for markitup or redactor fields to use the default_full template
-                $item->setFull(true);
+                $item->setFull($value == 1 || $value == 'true' || $value == true);
                 break;
+            case 'item-col-class':
             case 'form-item-col-class':
                 $item->setFormItemColClass($value);
                 break;
@@ -89,12 +90,9 @@ class MFormAttributeHandler
      */
     public static function setAttributes(MFormItem $item, array $attributes): void
     {
-        // if attributes an array
-        if (is_array($attributes)) {
-            foreach ($attributes as $strName => $strValue) {
-                // set attribute by setAttribute method
-                self::addAttribute($item, $strName, $strValue);
-            }
+        foreach ($attributes as $strName => $strValue) {
+            // set attribute by setAttribute method
+            self::addAttribute($item, $strName, $strValue);
         }
     }
 }

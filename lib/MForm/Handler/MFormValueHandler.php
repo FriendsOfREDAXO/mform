@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -21,10 +21,10 @@ class MFormValueHandler
      * @return array
      * @author Joachim Doerr
      */
-    public static function loadRexVars()
+    public static function loadRexVars(): array
     {
         $sliceId = rex_request('slice_id', 'int', false);
-        $result = array();
+        $result = [];
 
         if ($sliceId != false) {
             $table = rex::getTablePrefix() . 'article_slice';
@@ -73,7 +73,7 @@ class MFormValueHandler
      * @param string|null $defaultValue
      * @author Joachim Doerr
      */
-    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null)
+    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null): void
     {
         if (!is_null($defaultValue)) {
             // set default value

@@ -1,11 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-### Version 7.0.1.beta
+### Version 7.0.3-beta
+
+- added column element for some form input column elements
+- removed element fragments and added stuff to wrapper fragment
+- removed author email address
+
+### Version 7.0.1
 
 - add php 7.x compatibility
 - add fragment files
 
-### Version 7.0.0.beta
+### Version 7.0.0
 
 - remove data themes and use fragments as theme templates
 - add radio-, checkbox and select toggle options for collapse

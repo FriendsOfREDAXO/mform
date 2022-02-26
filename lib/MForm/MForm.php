@@ -1,17 +1,13 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
 
 
-use MForm\Handler\MFormValueHandler;
 use MForm\MFormElements;
 use MForm\Parser\MFormParser;
-use MForm\Provider\MFormBaseElements;
-use MForm\Provider\MFormFormElements;
-use MForm\Provider\MFormStructuralElements;
 
 class MForm extends MFormElements
 {

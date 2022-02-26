@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -207,6 +207,23 @@ class MFormElements
         return $this->addElement('fieldset', null, $value, $attributes)
             ->addForm($form)
             ->addElement('close-fieldset', null, null, $attributes);
+    }
+
+    /**
+     * @param int $col
+     * @param null $form
+     * @param array|null $attributes
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addColumnElement(int $col, $form = null, array $attributes = []): self
+    {
+        if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
+            $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
+        }
+        return $this->addElement('column', null, null, $attributes)
+            ->addForm($form)
+            ->addElement('close-column', null, null, $attributes);
     }
 
     /**
@@ -550,7 +567,7 @@ class MFormElements
      */
     public function setFormItemColClass(string $class): self
     {
-        MFormAttributeHandler::addAttribute($this->item, 'form-item-col-class', $class);
+        MFormAttributeHandler::addAttribute($this->item, 'item-col-class', $class);
         return $this;
     }
 

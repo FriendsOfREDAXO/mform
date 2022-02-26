@@ -1,6 +1,6 @@
 <?php
 /**
- * @author mail[at]doerr-softwaredevelopment[dot]com Joachim Doerr
+ * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
@@ -20,7 +20,7 @@ class MFormElementHandler
      * @return MFormItem
      * @author Joachim Doerr
      */
-    public static function createElement($id, $type, $varId)
+    public static function createElement($id, $type, $varId): MFormItem
     {
         // create item
         $item = new MFormItem();
