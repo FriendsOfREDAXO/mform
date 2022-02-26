@@ -951,7 +951,7 @@ class MFormParser
      * @return mixed
      * @author Joachim Doerr
      */
-    private function getBodyInner($dom): mixed
+    private function getBodyInner($dom)
     {
         $html = $dom->C14N(false, true);
         if (strpos($html, '<body') !== false) {
