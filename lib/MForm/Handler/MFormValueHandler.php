@@ -82,7 +82,7 @@ class MFormValueHandler
 
         $valueString = null;
 
-        if ($value === NULL && is_array($result) === true) {
+        if ($value === NULL && sizeof($result) > 0) {
             // read value by type
             $default = true;
             if (is_array($item->getVarId()) && count($item->getVarId()) === 1) {
