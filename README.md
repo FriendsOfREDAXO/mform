@@ -2,9 +2,6 @@
 
 MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Eingabeformularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle gängigen Modul-Input-Formular-Elemente und zusätzlice Widgets bereit welche sich einfach einbinden lassen. MForm eweitert auch **YForm** und **rex_form** um zusätzliche Widgets, z.B. ein Custom-Link-Feld und Image-List für Galerien. 
 
-![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mform/assets/mform.png)
-![Screenshot](https://raw.githubusercontent.com/FriendsOfREDAXO/mform/assets/imglist.png)
-
 Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im [Doku-Plugin](https://github.com/FriendsOfREDAXO/mform/blob/master/plugins/docs/docs/de_de/main_navi.md) finden.
 
 
