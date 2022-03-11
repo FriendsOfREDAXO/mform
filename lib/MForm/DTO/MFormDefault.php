@@ -12,6 +12,8 @@ class MFormDefault
 {
     // default classes for r5 bootstrap backend theme
     static public array $classes = array(
+        'start-group-column' => '',
+        'column' => '',
         'select' => 'form-control',
         'multiselect' => 'form-control',
         'fieldset' => 'form-horizontal',

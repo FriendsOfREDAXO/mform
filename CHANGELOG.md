@@ -5,6 +5,10 @@
 - added column element for some form input column elements
 - removed element fragments and added stuff to wrapper fragment
 - removed author email address
+- wrapper fragment changed, remove id handling in output and js for accordion, collapse and tab
+- properties direction changed in `addAccordionField`, `addCollapseField`
+- open properties added to `addTabField`
+- added inline wrapper element `addInlineElement`
 
 ### Version 7.0.1
 

@@ -12,7 +12,16 @@ switch ($this->type) {
         break;
 }
 
-echo '<div class="form-group">
-        <div class="' . $this->labelColClass . '">' . $this->label . $this->infoTooltip . $this->infoCollapseButton . '</div>
-        <div class="' . $this->formItemColClass . '">' . $this->element . '</div>
-      </div>' . $this->infoCollapse;
+$labelWrapper = '<div class="' . $this->labelColClass . '">';
+$labelWrapperEnd = '</div>';
+$inputWrapper = '<div class="' . $this->formItemColClass . '">';
+$inputWrapperEnd = '</div>';
+
+if ($this->inline == true) {
+    $labelWrapper = '';
+    $labelWrapperEnd = '';
+    $inputWrapper = '';
+    $inputWrapperEnd = '';
+}
+
+echo '<div class="form-group ' . $this->class . '">' . $labelWrapper . $this->label . $this->infoTooltip . $this->infoCollapseButton . $labelWrapperEnd . $inputWrapper . $this->element . $inputWrapperEnd . '</div>' . $this->infoCollapse;

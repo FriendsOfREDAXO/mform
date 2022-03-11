@@ -22,6 +22,9 @@ class MFormAttributeHandler
     public static function addAttribute(MFormItem $item, $name, $value): void
     {
         switch ($name) {
+            case 'legend':
+                $item->setLegend($value);
+                break;
             case 'label':
                 $item->setLabel($value); // set item label
                 break;

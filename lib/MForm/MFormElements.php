@@ -60,7 +60,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, mixed $catId = null, array $validation = null, string $defaultValue = null): self
+    public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, $catId = null, array $validation = null, string $defaultValue = null): self
     {
         // remove ,
         $id = str_replace(',', '.', $id);
@@ -91,13 +91,13 @@ class MFormElements
     }
 
     /**
-     * @param string|null $value
+     * @param string|null $html
      * @return $this
      * @author Joachim Doerr
      */
-    public function addHtml(?string $value = null): self
+    public function addHtml(?string $html = null): self
     {
-        return $this->addElement('html', null, $value);
+        return $this->addElement('html', null, $html);
     }
 
     /**
@@ -197,14 +197,14 @@ class MFormElements
     }
 
     /**
-     * @param string|null $value
+     * @param string|null $legend
      * @param callable|string|Mform|null $form
      * @param array|null $attributes
      * @author Joachim Doerr
      */
-    public function addFieldsetArea(string $value = null, $form = null, array $attributes = null): self
+    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = []): self
     {
-        return $this->addElement('fieldset', null, $value, $attributes)
+        return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
             ->addForm($form)
             ->addElement('close-fieldset', null, null, $attributes);
     }
@@ -227,52 +227,72 @@ class MFormElements
     }
 
     /**
-     * @param string|null $value
-     * @param callable|string|Mform|null $form
-     * @param array $attributes
+     * @param string|null $label
+     * @param null $form
+     * @param array|null $attributes
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTabElement(string $value = null, $form = null, array $attributes = null): self
+    public function addInlineElement(string $label = '', $form = null, array $attributes = []): self
     {
-        return $this->addElement('tab', null, $value, $attributes)
+        if ($form instanceof MForm) $form->setInline(true);
+        return $this->addElement('inline', null, null, $attributes)
+            ->setLabel($label)
+            ->addForm($form)
+            ->addElement('close-inline', null, null, $attributes);
+    }
+
+    /**
+     * @param string|null $label
+     * @param callable|string|Mform|null $form
+     * @param bool $openTab
+     * @param array|null $attributes
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = []): self
+    {
+        $attributes = array_merge($attributes, array('data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight));
+        return $this->addElement('tab', null, null, $attributes)
+            ->setLabel($label)
             ->addForm($form)
             ->addElement('close-tab', null, null, $attributes);
     }
 
     /**
-     * @param string|null $value
+     * @param string|null $label
      * @param callable|string|Mform|null $form
      * @param array|null $attributes
      * @param bool $accordion
      * @param bool $hideToggleLinks
-     * @param int $openCollapse
+     * @param bool $openCollapse
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapseElement(string $value = null, $form = null, array $attributes = null, bool $accordion = false, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addCollapseElement(string $label = '', $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false): self
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) $attributes = [];
         $attributes = array_merge($attributes, array('data-group-accordion' => (int)$accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse));
 
-        return $this->addElement('collapse', null, $value, $attributes)
+        return $this->addElement('collapse', null, null, $attributes)
+            ->setLabel($label)
             ->addForm($form)
             ->addElement('close-collapse', null, null, $attributes);
     }
 
     /**
-     * @param string|null $value
+     * @param string|null $label
      * @param callable|string|Mform|null $form
      * @param array|null $attributes
      * @param bool $hideToggleLinks
-     * @param int $openCollapse
+     * @param bool $openCollapse
      * @return $this
      * @author Joachim Doerr
      */
-    public function addAccordionElement(string $value = null, $form = null, array $attributes = null, bool $hideToggleLinks = false, int $openCollapse = 0): self
+    public function addAccordionElement(string $label = '', $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = []): self
     {
-        return $this->addCollapseElement($value, $form, $attributes, true, $hideToggleLinks, $openCollapse);
+        return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
     /**
@@ -491,9 +511,9 @@ class MFormElements
 
     /**
      * @param float|int|string $id
-     * @param array $parameter
+     * @param array|null $parameter
      * @param null $catId
-     * @param array $attributes
+     * @param array|null $attributes
      * @return $this
      * @author Joachim Doerr
      */
@@ -689,7 +709,7 @@ class MFormElements
      * @author Joachim Doerr
      * @return $this
      */
-    public function setDisableOption($key)
+    public function setDisableOption($key): self
     {
         MFormOptionHandler::disableOption($this->item, $key);
         return $this;

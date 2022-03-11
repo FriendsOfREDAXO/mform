@@ -26,7 +26,7 @@ class MFormItem
     public $varId;
 
     /**
-     * @var string
+     * @var string|array
      */
     public $value;
 
@@ -38,7 +38,7 @@ class MFormItem
     /**
      * @var string
      */
-    public $defaultValue;
+    public $defaultValue = '';
 
     /**
      * @var string
@@ -94,6 +94,11 @@ class MFormItem
      * @var string
      */
     public $label;
+
+    /**
+     * @var string
+     */
+    public $legend;
 
     /**
      * @var boolean
@@ -200,7 +205,7 @@ class MFormItem
     }
 
     /**
-     * @return string
+     * @return string|array
      */
     public function getValue()
     {
@@ -454,6 +459,26 @@ class MFormItem
     public function setLabel($label)
     {
         $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     * @author Joachim Doerr
+     */
+    public function getLegend()
+    {
+        return $this->legend;
+    }
+
+    /**
+     * @param string $legend
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setLegend(string $legend)
+    {
+        $this->legend = $legend;
         return $this;
     }
 

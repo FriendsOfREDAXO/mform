@@ -37,9 +37,9 @@ class MFormGroupExtensionHelper
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    public static function addFieldsetGroupExtensionItems(array $items): array
+    public static function addInlineGroupExtensionItems(array $items): array
     {
-        return self::addGroupExtensionItems($items, 'fieldset');
+        return self::addGroupExtensionItems($items, 'inline');
     }
 
     /**
@@ -105,8 +105,7 @@ class MFormGroupExtensionHelper
                         $groupCount++; // count by group
                         $groupKey = uniqid($groupCount, true);
 
-                        // open the new group before the group item will be add to the item list
-
+                        // open the new group before the group item will be added to the item list
                         if (is_array($toggleAttributes)) {
                             $mergeArray = array('data-group-select-accordion' => ($toggleAttributes['data-toggle'] == 'accordion') ? 'true' : 'false');
                             if (array_key_exists('hide-toggle-links', $toggleAttributes)) {

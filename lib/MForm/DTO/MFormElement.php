@@ -10,8 +10,6 @@ namespace MForm\DTO;
 
 class MFormElement
 {
-    const KEY = "<element:%s/>";
-
     /**
      * @var string
      */
@@ -117,6 +115,10 @@ class MFormElement
      */
     public $infoCollapse;
 
+    /**
+     * @var boolean
+     */
+    public $inline = false;
 
     /**
      * @param string $id
@@ -338,11 +340,11 @@ class MFormElement
      * @return array
      * @author Joachim Doerr
      */
-    public function getKeys(bool $asTag = true): array
+    public function getKeys(): array
     {
         $keys = array();
         foreach (get_object_vars($this) as $f => $v) {
-            $keys[] = ($asTag) ? sprintf(self::KEY, $f) : $f;
+            $keys[] = $f;
         }
         return $keys;
     }
@@ -358,5 +360,25 @@ class MFormElement
             $values[] = $v;
         }
         return $values;
+    }
+
+    /**
+     * @return bool
+     * @author Joachim Doerr
+     */
+    public function isInline(): bool
+    {
+        return $this->inline;
+    }
+
+    /**
+     * @param bool $inline
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setInline(bool $inline)
+    {
+        $this->inline = $inline;
+        return $this;
     }
 }
