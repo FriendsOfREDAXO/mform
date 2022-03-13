@@ -127,7 +127,12 @@ content: '\f068';
     display: block; 
 
 }
+.mform .form-inline label { display: block;}
 
+.mform .form-inline .form-horizontal .form-group {
+    margin-right: 0;
+    margin-left: 0;
+}
 
 
 .mform a.mblock-info-tooltip {
@@ -292,4 +297,5 @@ body.rex-theme-dark .mform .collapsing {
         background-color: #202b35;
     }
 }
+
 
