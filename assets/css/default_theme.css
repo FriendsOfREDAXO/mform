@@ -162,7 +162,7 @@ content: '\f068';
 .mform .collapse,
 .mform .collapsing {
     background: #fafafa;
-    padding-bottom: 1px;
+    padding: 10px;
 }
 
 
@@ -196,18 +196,18 @@ body.rex-theme-dark .mform .btn-white {
 }
 
 body.rex-theme-dark .mform .btn-white[aria-expanded=true] {
-    background-color: #1867a6;
+    background-color: #0f4671;
     color: rgba(255, 255, 255, 0.75);
 }
 
 body.rex-theme-dark .mform .btn-white:hover {
-    background-color: #1867a6;
+    background-color: #0f4671;
     color: rgba(255, 255, 255, 0.75);
 }
 
 body.rex-theme-dark .mform .btn-white:focus,
 body.rex-theme-dark .mform .btn-white:active {
-    background-color: #1867a6;
+    background-color: #0f4671;
 }
 
 body.rex-theme-dark .mform-tabs .btn-white {
@@ -297,5 +297,6 @@ body.rex-theme-dark .mform .collapsing {
         background-color: #202b35;
     }
 }
+
 
 
