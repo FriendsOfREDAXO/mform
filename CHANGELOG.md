@@ -9,6 +9,7 @@
 - properties direction changed in `addAccordionField`, `addCollapseField`
 - open properties added to `addTabField`
 - added inline wrapper element `addInlineElement`
+- minor css changes @skerbis
 
 ### Version 7.0.1
 
