@@ -161,9 +161,6 @@ content: '\f068';
 
 .mform .collapse,
 .mform .collapsing {
-    background: #fafafa;
-    padding: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
 
 
@@ -229,7 +226,7 @@ body.rex-theme-dark .mform .btn-white[aria-expanded="true"]:after {
 
 body.rex-theme-dark .mform .collapse,
 body.rex-theme-dark .mform .collapsing {
-    background-color: #202b35;
+   
 }
 
 @media (prefers-color-scheme: dark) {
@@ -295,7 +292,6 @@ body.rex-theme-dark .mform .collapsing {
 
     body.rex-has-theme:not(.rex-theme-light) .mform .collapse,
     body.rex-has-theme:not(.rex-theme-light) .mform .collapsing {
-        background-color: #202b35;
     }
 }
 
