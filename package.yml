@@ -22,8 +22,6 @@ requires:
     php: '>=7.3'
     redaxo: '^5.10.0'
 
-system_plugins:
-    - docs
 conflicts:
     packages:
         ui_tools: '<1.0.0'
