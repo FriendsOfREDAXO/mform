@@ -177,7 +177,7 @@ MForm stellt folgende Element-Methoden bereit:
 ## Ausgabe 
 
 MForm nutzt die von REDAXO bereitgestellten REDAXO Variablen. Entweder als klassische oder als JSON-Values. 
-Informationen hierzu in der (REDAXO Doku)[https://www.redaxo.org/doku/main/redaxo-variablen].
+Informationen hierzu in der [REDAXO Doku](https://www.redaxo.org/doku/main/redaxo-variablen).
 
 ## Lizenz
 
