@@ -6,6 +6,23 @@ MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Eingabeformularen er
 
 Die beiliegende **Demo-Sammlung** erlaubt das sofortige Ausprobieren von Modul-Codes. Module können direkt installiert und getestet werden. Die Codes sind alle kommentiert. 
 
+## Features
+
+- Erstellen von Moduleingaben per PHP
+- Ausgabe der Formulare anpassbar über Fragmente
+- Custom Widgets für Verlinkung (auch Yform) und Bilder
+- Factory die es ermöglicht Formularteile leicht auszulagern 
+- REDAXO JSON Value Nutzung
+- Mehrspaltige Formulare
+- Inline-Formular-Elemente
+- Modul-Beispiele zur direkten Installation
+- HMTL5-Formular-Elemente 
+- SQL-Felder
+- Collapse, Tabs 
+- Accordions Wrapper Elemente Via Checkbox 
+- Radio oder Select steuerbare Collapse Elemente
+- Durchgehende MBlock Kompatibilität
+- Datalists 
 
 **Hinweise**
 
@@ -156,6 +173,11 @@ MForm stellt folgende Element-Methoden bereit:
   * `setTabIcon`
   * `setToggleOptions`
   * `setTooltipInfo`
+
+## Ausgabe 
+
+MForm nutzt die von REDAXO bereitgestellten REDAXO Variablen. Entweder als klassische oder als JSON-Values. 
+Informationen hierzu in der (REDAXO Doku)[https://www.redaxo.org/doku/main/redaxo-variablen].
 
 ## Lizenz
 
