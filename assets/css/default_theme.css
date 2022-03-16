@@ -161,6 +161,8 @@ content: '\f068';
 
 .mform .collapse,
 .mform .collapsing {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 
