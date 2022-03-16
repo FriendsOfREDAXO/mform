@@ -9,7 +9,6 @@ page:
     perm: admin[]
     icon: rex-icon fa-subway
     subpages:
-        overview: { title: 'translate:overview' }
         demo:
             title: 'translate:referenz_demo'
             subpages:
@@ -18,6 +17,7 @@ page:
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
+        overview: { title: 'translate:overview', subPath: README.md }
 
 requires:
     php: '>=7.3'
