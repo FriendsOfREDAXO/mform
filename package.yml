@@ -17,7 +17,10 @@ page:
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
-        help: { title: 'translate:overview', subPath: README.md }
+        help:
+            title: 'translate:forcal_help'
+            subPath: README.md
+            itemclass: pull-right
 
 requires:
     php: '>=7.3'
