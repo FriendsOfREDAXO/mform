@@ -17,7 +17,7 @@ page:
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
-        overview: { title: 'translate:overview', subPath: README.md }
+        help: { title: 'translate:overview', subPath: README.md }
 
 requires:
     php: '>=7.3'
