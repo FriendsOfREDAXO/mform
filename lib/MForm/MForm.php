@@ -99,7 +99,7 @@ class MForm extends MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function setInline(bool $inline): self
+    protected function setInline(bool $inline): self
     {
         $this->inline = $inline;
         return $this;

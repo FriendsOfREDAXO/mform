@@ -298,7 +298,7 @@ class MFormParser
                     $optGroupLabel = $key; $optElements = ''; $count++; // + for group label
                     // create options
                     foreach ($value as $vKey => $vValue) {
-                        $count++; $disabled = false; $toggle = [];
+                        $count++; $disabled = false; $toggle = '';
                         if (in_array($vKey, $item->getDisabledOptions())) $disabled = true;
                         if (array_key_exists($vKey, $item->getToggleOptions())) $toggle = $item->getToggleOptions()[$vKey];
                         $optElements .= $this->createOptionElement($item, $vKey, $vValue, 'option', true, $disabled, $toggle);

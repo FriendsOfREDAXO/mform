@@ -19,21 +19,13 @@ mform_help_infotext_2 = För validering av modulformar använder MForm jQuery Va
 mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 mform_help_infotext_4 = Eftersom MForm använder mallar kan utvecklare enkelt utforma / strukturera formulär efter sina egna önskemål.
 
-mform_config_label_template = Theme för modul-formulär
-mform_config_saved = Inställningar sparades
-mform_config = Konfiguration
-
 mform_overview = Översikt
-mform_config_save = Spara inställningar
-mform_wiki = MForm Github Doku Wiki
 mform_github = MForm FOR – Github Repository
-
-mform_editor_not_available = Editor-tillägget $ s är inte tillgängligt. Installera och aktivera tillägget. [InputValueId:% s, EditorProfile:% s]
 
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkbox = Checkbox and radio elements
-mform_example_base_inline = Structured inline elements
+mform_example_base_info = Structured info elements
 mform_example_base_system = System button elements
 mform_example_base_widgets = MForm widget element
 mform_example_extended_attribute_method = Attributes method
@@ -54,8 +46,6 @@ mform_example_description_expert = The "expert examples" show that MForm can be 
 mform_example_description_community = Later
 
 mform_github = MForm FOR – Github Repository
-
-mform_redactor_profile_create_success = Redactor profile "%s" was successful created, please reload!
 
 var_extern_link = Link to extern url
 var_mailto_link = Link to email

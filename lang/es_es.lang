@@ -19,19 +19,13 @@ mform_help_infotext_2 = Para la validación de formularios de módulos, MForm us
 mform_help_infotext_3 = MForm se puede usar de forma similar a la clase "rex_form". Puede agregar elementos de formulario utilizando diferentes métodos de una instancia y asignarles atributos, parámetros u opciones utilizando otros métodos. Sin embargo, en el diseño de MForm, los métodos de elemento se crearon de forma que sus constructores procesaran todos los atributos, parámetros y opciones posibles, por lo que un elemento se puede llamar en una sola línea y se puede crear con poco esfuerzo.
 mform_help_infotext_4 = Dado que MForm utiliza plantillas, los desarrolladores pueden personalizar/estructurar fácilmente las formas como lo deseen.
 
-mform_config_label_template = Tema para formularios de módulo
-mform_config_saved = La configuración ha sido guardada.
-mform_config = Configuración
-
 mform_overview = Vista general
-mform_config_save = Guardar ajustes
-mform_wiki = MForm Github Docu Wiki
 mform_github = MForm Github Docu Wiki
 
 mform_example_base_text = Entrada de texto y elementos ocultos
 mform_example_base_select = Seleccionar y multiselectar elementos
 mform_example_base_checkbox = Casilla de verificación y elemento de radio
-mform_example_base_inline = Elementos estructurales en línea
+mform_example_base_info = Elementos estructurales en línea
 mform_example_base_system = Elementos del botón del sistema
 mform_example_extended_attribute_method = Atributos Método
 mform_example_extended_options_method = Método de Opciones

@@ -169,7 +169,7 @@ class MFormElements
      */
     public function addAlertError(?string $value = null): self
     {
-        return $this->addAlert('error', $value);
+        return $this->addAlertDanger($value);
     }
 
     /**

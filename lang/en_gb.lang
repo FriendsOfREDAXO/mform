@@ -19,21 +19,13 @@ mform_help_infotext_2 = For the validation of module forms, MForm uses the jQuer
 mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 mform_help_infotext_4 = Since MForm uses templates developers can easily style/structure forms however they wish.
 
-mform_config_label_template = Theme for module forms
-mform_config_saved = The settings have been saved.
-mform_config = Configuration
-
 mform_overview = Overview
-mform_config_save = Save settings
-mform_wiki = MForm Github Doku Wiki
 mform_github = MForm FOR – Github Repository
-
-mform_editor_not_available = The editor-addon $s is not available, please install and activate the missing addon. [InputValueId: %s, EditorProfile: %s]
 
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkbox = Checkbox and radio elements
-mform_example_base_inline = Structured inline elements
+mform_example_base_info = Structured info elements
 mform_example_base_system = System button elements
 mform_example_base_widgets = MForm widget elements
 mform_example_extended_attribute_method = Attributes method
@@ -45,8 +37,14 @@ mform_example_extended_wrapper = Wrapper elements
 mform_example_expert_html_form_elements = New HTML5 form elements
 mform_example_expert_datalist = Datalists for input elements
 mform_example_expert_placeholder = Placeholder
-mform_example_expert_validation = Parsley Validation
 mform_example_expert_debug_custom_theme = Debug mode and custom theme
+mform_example_wrapper_accordion = Accordion wrapper element
+mform_example_wrapper_collapse = Collapse wrapper element
+mform_example_wrapper_collapse_checkradio = Radio-checkbox collapse wrapper element
+mform_example_wrapper_collapse_select = Select collapse wrapper element
+mform_example_wrapper_columns = Grid/column wrapper element
+mform_example_wrapper_inline = Inline form-elements
+mform_example_wrapper_tabs = Tab wrapper-elements
 
 mform_example_description_base = The "basic examples" include the basic calls of the respective MForm element, without any "extras", extensions and validations.
 mform_example_description_extended = The "extended examples" show beyond the "basic examples", how to expand elements around attributes, options, parameters, labels, etc.
@@ -55,7 +53,12 @@ mform_example_description_community = Later
 
 mform_github = MForm FOR – Github Repository
 
-mform_redactor_profile_create_success = Redactor profile "%s" was successful created, please reload!
+mform_install = Install
+mform_update = Update
+mform_module_install = Module install
+mform_module_update = Module update
+mform_module_updated = Module "%s" was updated
+mform_module_created = Module "%s" was created
 
 var_extern_link = Link to extern url
 var_mailto_link = Link to email
