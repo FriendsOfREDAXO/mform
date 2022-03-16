@@ -194,7 +194,7 @@ see [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGELO
 * http://www.redaxo.org
 * https://github.com/FriendsOfREDAXO
 
-**Projekt-Lead**
+**Project lead**
 
 [Joachim Dörr](https://github.com/joachimdoerr)
 
