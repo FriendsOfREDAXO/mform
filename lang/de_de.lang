@@ -20,7 +20,7 @@ mform_help_infotext_2 = MForm arbeitet zuverlässig mit Addons wie MBlock, CKE5,
 mform_help_infotext_3 = MForm kann ähnlich eingesetzt werden wie die “rex_form” Klasse, dabei kann man mit verschiedenen Methoden einer Instanz Formularelemente hinzufügen und durch weitere Methoden den Elementen Attribute, Parameter oder Optionen zuweisen. Bei der Konstruktion von MForm wurden die Element-Methoden jedoch so angelegt, dass deren Konstruktoren jeweils alle möglichen Attribute, Parameter und Optionen verarbeiten, wodurch ein Element kurzgesagt “einzeilig”, übersichtlich und mit wenig Aufwand angelegt werden kann.
 mform_help_infotext_4 = Da MForm Templates nutzt kann die Option der Fomrulare vom Entwickler seinen Vorstellungen angepasst werden.
 
-mform_overview = Übersicht
+mform_help = Hilfe
 mform_github = MForm FOR Github Repository
 
 mform_example_base_text = Text-Input- und Hidden-Elemente
