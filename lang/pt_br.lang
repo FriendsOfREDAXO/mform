@@ -18,7 +18,6 @@ mform_help_infotext_1 = MForm é um Redaxo AddOn torna a criação de formas de 
 mform_help_infotext_3 = O MForm pode ser usado de forma semelhante à classe "rex_form". Você pode adicionar elementos de formulário usando diferentes métodos de uma instância e atribuir atributos, parâmetros ou opções a eles usando outros métodos.No entanto, no projeto do MForm, os métodos de elemento foram criados de forma que seus construtores processem todos os atributos, parâmetros e opções possíveis, onde um elemento pode ser chamado em uma única linha e pode ser criado com pouco esforço.
 mform_help_infotext_4 = Já que o MForm se vale de modelos, os desenvolvedores podem facilmente estilizar / estruturar formulários como eles desejarem.
 
-mform_overview = Visão geral
 mform_github = MForm FOR – ir para github
 
 mform_example_base_text = Entrada de texto e elementos ocultos
