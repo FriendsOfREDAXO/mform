@@ -14,7 +14,6 @@ use MForm\Handler\MFormAttributeHandler;
 use MForm\Handler\MFormElementHandler;
 use MForm\Handler\MFormOptionHandler;
 use MForm\Handler\MFormParameterHandler;
-use MForm\Handler\MFormValidationHandler;
 use MForm\Handler\MFormValueHandler;
 
 class MFormElements
@@ -55,12 +54,11 @@ class MFormElements
      * @param array|null $options
      * @param array|null $parameter
      * @param mixed|null $catId
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, $catId = null, array $validation = null, string $defaultValue = null): self
+    public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, $catId = null, string $defaultValue = null): self
     {
         // remove ,
         $id = str_replace(',', '.', $id);
@@ -82,9 +80,6 @@ class MFormElements
         }
         if (is_array($parameter) && sizeof($parameter) > 0) {
             $this->setParameters($parameter);
-        }
-        if (is_array($validation) && sizeof($validation) > 0) {
-            $this->setValidations($validation);
         }
 
         return $this;
@@ -299,14 +294,13 @@ class MFormElements
      * @param string $typ
      * @param float|int|string $id
      * @param array|null $attributes
-     * @param array|null $validations
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addInputField(string $typ, $id, array $attributes = null, array $validations = null, string $defaultValue = null): self
+    public function addInputField(string $typ, $id, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addElement($typ, $id, null, $attributes, null, null, null, $validations, $defaultValue);
+        return $this->addElement($typ, $id, null, $attributes, null, null, null, $defaultValue);
     }
 
     /**
@@ -324,27 +318,25 @@ class MFormElements
     /**
      * @param float|int|string $id
      * @param array|null $attributes
-     * @param array|null $validations
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
+    public function addTextField($id, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addInputField('text', $id, $attributes, $validations, $defaultValue);
+        return $this->addInputField('text', $id, $attributes, $defaultValue);
     }
 
     /**
      * @param float|int|string $id
      * @param array|null $attributes
-     * @param array|null $validations
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTextAreaField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
+    public function addTextAreaField($id, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addInputField('textarea', $id, $attributes, $validations, $defaultValue);
+        return $this->addInputField('textarea', $id, $attributes, $defaultValue);
     }
 
     /**
@@ -377,14 +369,13 @@ class MFormElements
      * @param float|int|string $id
      * @param array|null $attributes
      * @param array|null $options
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, array $validation = null, string $defaultValue = null): self
+    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, string $defaultValue = null): self
     {
-        return $this->addElement($typ, $id, null, $attributes, $options, null, null, $validation, $defaultValue);
+        return $this->addElement($typ, $id, null, $attributes, $options, null, null, $defaultValue);
     }
 
     /**
@@ -392,14 +383,13 @@ class MFormElements
      * @param array|null $options
      * @param array|null $attributes
      * @param int $size
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addSelectField($id, array $options = null, array $attributes = null, int $size = 1, array $validation = null, string $defaultValue = null): self
+    public function addSelectField($id, array $options = null, array $attributes = null, int $size = 1, string $defaultValue = null): self
     {
-        $this->addOptionField('select', $id, $attributes, $options, $validation, $defaultValue);
+        $this->addOptionField('select', $id, $attributes, $options, $defaultValue);
         if ($size > 1) $this->setSize($size);
         return $this;
     }
@@ -409,14 +399,13 @@ class MFormElements
      * @param array|null $options
      * @param array|null $attributes
      * @param int $size
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addMultiSelectField($id, array $options = null, array $attributes = null, int $size = 3, array $validation = null, string $defaultValue = null): self
+    public function addMultiSelectField($id, array $options = null, array $attributes = null, int $size = 3, string $defaultValue = null): self
     {
-        $this->addOptionField('multiselect', $id, $attributes, $options, $validation, $defaultValue)
+        $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue)
             ->setMultiple()
             ->setSize($size);
         return $this;
@@ -426,44 +415,41 @@ class MFormElements
      * @param float|int|string $id
      * @param array|null $options
      * @param array|null $attributes
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCheckboxField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
+    public function addCheckboxField($id, array $options = null, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addOptionField('checkbox', $id, $attributes, $options, $validation, $defaultValue);
+        return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
     }
 
     /**
      * @param float|int|string $id
      * @param array|null $options
      * @param array|null $attributes
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addToggleCheckboxField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
+    public function addToggleCheckboxField($id, array $options = null, array $attributes = null, string $defaultValue = null): self
     {
         if (!is_array($attributes)) $attributes = [];
         $attributes['data-mform-toggle'] = 'toggle';
-        return $this->addCheckboxField($id, $options, $attributes, $validation, $defaultValue);
+        return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
     }
 
     /**
      * @param float|int|string $id
      * @param array|null $options
      * @param array|null $attributes
-     * @param array|null $validation
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
      */
-    public function addRadioField($id, array $options = null, array $attributes = null, array $validation = null, string $defaultValue = null): self
+    public function addRadioField($id, array $options = null, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addOptionField('radio', $id, $attributes, $options, $validation, $defaultValue);
+        return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
     }
 
     /**
@@ -495,7 +481,6 @@ class MFormElements
     /**
      * @param float|int|string $id
      * @param array|null $attributes
-     * @param array|null $validations
      * @param string|null $defaultValue
      * @return $this
      * @author Joachim Doerr
@@ -504,9 +489,9 @@ class MFormElements
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
-    public function addCustomLinkField($id, array $attributes = null, array $validations = null, string $defaultValue = null): self
+    public function addCustomLinkField($id, array $attributes = null, string $defaultValue = null): self
     {
-        return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $validations, $defaultValue);
+        return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $defaultValue);
     }
 
     /**
@@ -622,29 +607,6 @@ class MFormElements
     public function setAttribute($name, $value): self
     {
         MFormAttributeHandler::addAttribute($this->item, $name, $value);
-        return $this;
-    }
-
-    /**
-     * @param array $validations
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setValidations(array $validations): self
-    {
-        MFormValidationHandler::setValidations($this->item, $validations);
-        return $this;
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     * @author Joachim Doerr
-     * @return $this
-     */
-    public function setValidation($key, $value = null): self
-    {
-        MFormValidationHandler::setValidation($this->item, $key, $value);
         return $this;
     }
 

@@ -23,6 +23,7 @@
 - make example modules installable
 - revised all example modules remove all .ini's and use instead of them .inc files
 - add new wrapper example files
+- validations removed
 
 #### Migration to from v6.x.x to v7.x.x
 
@@ -39,21 +40,22 @@
    10. closeAccordion
    11. isSerial
    12. setToggle
+   13. setValidation
+   14. setValidations
+
 2. Renamed class methods:
    1. addOption => setOption 
    2. addAttribute => setAttribute
-   3. addValidation => setValidation
-   4. addValidations => setValidations
-   5. disableOptions => setDisableOptions
-   6. disableOption => setDisableOption
-   7. addFieldsetField => addFieldsetArea
-   8. addCollapseField => addCollapseElement
-   9. addTabField => addTabElement
-   10. addAccordionField => addAccordionElement
-   11. addTooltipInfo => setTooltipInfo
-   12. addCollapseInfo => setCollapseInfo
-   13. addParameters => setParameters
-   14. addParameter => setParameter
+   4. disableOptions => setDisableOptions
+   5. disableOption => setDisableOption
+   6. addFieldsetField => addFieldsetArea
+   7. addCollapseField => addCollapseElement
+   8. addTabField => addTabElement
+   9. addAccordionField => addAccordionElement
+   10. addTooltipInfo => setTooltipInfo
+   11. addCollapseInfo => setCollapseInfo
+   12. addParameters => setParameters
+   13. addParameter => setParameter
 
 #### Migration how do?
 
@@ -67,7 +69,7 @@
     - Use `addAccordionElement` like `MForm::factory()->addAccordionElement('Accordion' MForm::factory()->addTextField(1, ['label' => 'Text']));`
 - `Call to undefined method MForm::addEditorField()` or `MForm::addCke5Field`
   - Use `addTextAreaField` with editor attributes like `$mform->addTextAreaField('1', ['class' => 'cke5-editor', 'data-lang' => \Cke5\Utils\Cke5Lang::getUserLang(), 'data-profile' => 'default']);`
-- `Call to undefined method MForm::addOption()` or `MForm::addAttribute()` or `MForm::addValidation()` or `MForm::disableOptions()` or `MForm::disableOption()`
+- `Call to undefined method MForm::addOption()` or `MForm::addAttribute()` or `MForm::disableOptions()` or `MForm::disableOption()`
     - Check the list `Renamed class methods` and use the new method name instead of the old one
 - `Call to undefined method MForm::setToggle()`
     - Use `addToggleCheckboxField` instead of `addCheckboxField` with `setToggle`
