@@ -18,7 +18,6 @@ mform_help_infotext_1 = MForm är en Redaxo AddOn gör skapandet av moduler myck
 mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 mform_help_infotext_4 = Eftersom MForm använder mallar kan utvecklare enkelt utforma / strukturera formulär efter sina egna önskemål.
 
-mform_overview = Översikt
 mform_github = MForm FOR – Github Repository
 
 mform_example_base_text = Text input and hidden elements
