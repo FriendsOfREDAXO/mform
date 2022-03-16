@@ -12,12 +12,6 @@ mform_info = Info
 mform_modul_input = Module input
 mform_modul_output = Modul output
 
-mform_help_headline = Information
-mform_help_subheadline_1 = MForm – Redaxo AddOn for module input forms
-mform_help_infotext_1 = MForm is a Redaxo AddOn makes the creation of module forms much easier. MForm uses templates which allow the administrator to customize the module style. MForm provides all the essential module input form elements for easy integration.
-mform_help_infotext_2 = MForm works reliably with addons like MBlock, CKE5, redactor or Markitup.
-mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
-mform_help_infotext_4 = Since MForm uses templates developers can easily style/structure forms however they wish.
 
 mform_help = Help
 mform_github = MForm FOR – Github Repository
