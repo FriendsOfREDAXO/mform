@@ -15,7 +15,6 @@ mform_modul_output = Modul output
 mform_help_headline = Information
 mform_help_subheadline_1 = MForm – Redaxo AddOn for module input forms
 mform_help_infotext_1 = MForm är en Redaxo AddOn gör skapandet av moduler mycket enklare. MForm använder mallar som gör att administratören kan anpassa modulstilen. MForm tillhandahåller alla element för grundläggande modulinmatning för enkel integration.
-mform_help_infotext_2 = För validering av modulformar använder MForm jQuery Validator Parsley som erbjuder möjlighet att tilldela standardvalideringar till alla möjliga inmatningsfält.
 mform_help_infotext_3 = MForm can be used in a similar way to the "rex_form" class. You can add form elements using different methods of an instance, and assign attributes, parameters, or options to them using other methods. However, in the design of MForm, the element methods were created in a way that their constructors process all possible attributes, parameters and options, whereby an element can be called in a single line and can be so created with little effort.
 mform_help_infotext_4 = Eftersom MForm använder mallar kan utvecklare enkelt utforma / strukturera formulär efter sina egna önskemål.
 
