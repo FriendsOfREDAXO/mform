@@ -4,25 +4,18 @@
 
 MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Eingabeformularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle gängigen Modul-Input-Formular-Elemente und zusätzlice Widgets bereit welche sich einfach einbinden lassen. MForm eweitert auch **YForm** und **rex_form** um zusätzliche Widgets, z.B. ein Custom-Link-Feld und Image-List für Galerien. 
 
-Eine detailierte Beschreibung wie Modul-Input-Formulare mit beliebigen Elementen versehen werden können lässt sich im [Doku-Plugin](https://github.com/FriendsOfREDAXO/mform/blob/master/plugins/docs/docs/de_de/main_navi.md) finden.
+Die beiliegende **Demo-Sammlung** erlaubt das sofortige Ausprobieren von Modul-Codes. Module können direkt installiert und getestet werden. Die Codes sind alle kommentiert. 
 
 
-**Hinweis**
+**Hinweise**
 
 * Der MForm Formular-Builder ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
+* Aktuell ist das Imagelist-Widget nicht mblock-kompatibel
 
 
-## Installation
+## Installation:
 
-1. Letzten [release](https://github.com/FriendsOfREDAXO/mform/releases/latest) downloaden
-2. Zip Archiv entpacken
-3. Entpackten Folder in `mform` umbenennen
-4. MForm Ordner in den REDAXO Addon Ordner `redaxo/src/addons/` verschieben
-5. In REDAXO einloggen und unter "AddOns" MForm installieren und aktivieren
-
-## Alternative Installationen
-
-MForm kann auch direkt über den Redaxo-Installer Installiert werden. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
+MForm kann direkt über den Redaxo-Installer Installiert werden. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
 
 1. In REDAXO einloggen
 2. Im Backend unter "Installer > Neue herunterladen" "MForm" suche und unter "Funktion" "ansehen" klicken
