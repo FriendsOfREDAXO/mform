@@ -12,12 +12,6 @@ mform_info = Informações
 mform_modul_input = Modo de entrada
 mform_modul_output = Modo de saída
 
-mform_help_headline = Informação
-mform_help_subheadline_1 = MForm - Redaxo AddOn para formulários de entrada de módulo
-mform_help_infotext_1 = MForm é um Redaxo AddOn torna a criação de formas de módulo muito mais fácil. O MForm usa modelos que permitem ao administrador personalizar o estilo do módulo. O MForm fornece todos os elementos essenciais do formulário de entrada do módulo para facilitar a integração.
-mform_help_infotext_3 = O MForm pode ser usado de forma semelhante à classe "rex_form". Você pode adicionar elementos de formulário usando diferentes métodos de uma instância e atribuir atributos, parâmetros ou opções a eles usando outros métodos.No entanto, no projeto do MForm, os métodos de elemento foram criados de forma que seus construtores processem todos os atributos, parâmetros e opções possíveis, onde um elemento pode ser chamado em uma única linha e pode ser criado com pouco esforço.
-mform_help_infotext_4 = Já que o MForm se vale de modelos, os desenvolvedores podem facilmente estilizar / estruturar formulários como eles desejarem.
-
 mform_github = MForm FOR – ir para github
 
 mform_example_base_text = Entrada de texto e elementos ocultos
