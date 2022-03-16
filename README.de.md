@@ -182,3 +182,18 @@ Informationen hierzu in der [REDAXO Doku](https://www.redaxo.org/doku/main/redax
 ## Lizenz
 
 MForm ist unter der [MIT Lizenz](LICENSE.md) lizensiert.
+
+## Changelog
+
+siehe [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGELOG.md)
+
+## Autor
+
+**Friends Of REDAXO**
+
+* http://www.redaxo.org
+* https://github.com/FriendsOfREDAXO
+
+**Projekt-Lead**
+
+[Joachim Dörr](https://github.com/joachimdoerr)
