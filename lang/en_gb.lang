@@ -1,6 +1,8 @@
 mform_name = MForm
 mform_title = MForm
 
+mform_change_message = MForm has been updated. Please refer to the update notes in the release notes and the changelog.  
+
 mform_demo = Sample collection
 mform_demo_base = Basic examples
 mform_demo_extended = Extended examples
