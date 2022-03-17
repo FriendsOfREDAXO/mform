@@ -17,6 +17,9 @@ page:
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_expert: { title: 'translate:demo_expert' }
+        changelog:
+            title: 'translate:changelog'
+            subPath: CHANGELOG.md
         help:
             title: 'translate:help'
             subPath: README.md
