@@ -16,6 +16,7 @@ mform_modul_output = Modul output
 
 
 mform_help = Help
+mform_changelog = Changelog
 mform_github = MForm FOR – Github Repository
 
 mform_example_base_text = Text input and hidden elements
