@@ -1,4 +1,4 @@
-# MForm - REDAXO Addon für bessere Input-Formulare
+# MForm - REDAXO Addon for better input forms
 
 ![Screenshot](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform7.png?raw=true)
 
