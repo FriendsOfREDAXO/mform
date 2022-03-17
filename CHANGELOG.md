@@ -29,6 +29,7 @@
 - add english readme @sckerbis
 - add readme to backend pages @skerbis
 - add changelog to backend navigation @skerbis 
+- fix double quote issue @dtpop
 
 ### Migration to from v6.x.x to v7.x.x
 

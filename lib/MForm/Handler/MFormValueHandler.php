@@ -51,7 +51,8 @@ class MFormValueHandler
                             $result['link'][$i] = $sql->getValue('link' . $i);
                         }
 
-                        $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i]), true);
+                        // thanks @dtpop
+                        $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i],ENT_NOQUOTES), true); // wb
 
                         if (is_array($jsonResult)) {
                             $result['value_string'][$i] = $result['value'][$i];
