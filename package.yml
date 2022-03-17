@@ -20,6 +20,7 @@ page:
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
+            itemclass: pull-right
         help:
             title: 'translate:help'
             subPath: README.md
