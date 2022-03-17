@@ -907,9 +907,21 @@ class MFormParser
     {
         $this->createTooltipElement($item);
 
+        $labelString = $item->getLabel();
+        if (is_array($item->getLabel())) {
+            foreach ($item->getLabel() as $key => $itemLabel) {
+                if (str_contains(\rex_i18n::getLocale(), $key)) {
+                    $labelString = $itemLabel;
+                }
+            }
+            if (is_array($labelString)) {
+                $labelString = array_values($labelString)[0];
+            }
+        }
+
         $label = new MFormElement();
         $label->setId($item->getId())
-            ->setValue($item->getLabel())
+            ->setValue($labelString)
             ->setType('label');
 
         return $label;

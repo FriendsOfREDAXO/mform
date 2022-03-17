@@ -91,7 +91,7 @@ class MFormItem
     public $multiple;
 
     /**
-     * @var string
+     * @var string|array
      */
     public $label;
 
@@ -445,7 +445,7 @@ class MFormItem
     }
 
     /**
-     * @return string
+     * @return string|array
      */
     public function getLabel()
     {
@@ -453,7 +453,7 @@ class MFormItem
     }
 
     /**
-     * @param string $label
+     * @param string|array $label
      * @return $this
      */
     public function setLabel($label)
