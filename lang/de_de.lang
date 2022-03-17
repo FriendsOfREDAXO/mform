@@ -1,7 +1,7 @@
 mform_name = MForm
 mform_title = MForm
 
-mform_change_message = MForm wurde aktualisiert. Bitte beachte die Update-Hinweise im nden Release-Notes und im Changelog. 
+mform_change_message = MForm wurde aktualisiert. Bitte beachte die Update-Hinweise im den Release-Notes und im Changelog. 
 
 mform_demo = Beispiel Sammlung
 mform_demo_base = Basis Beispiele
