@@ -24,6 +24,11 @@
 - revised all example modules remove all .ini's and use instead of them .inc files
 - add new wrapper example files
 - validations removed
+- changed screenshot @skerbis
+- correcting readme @skerbis
+- add english readme @sckerbis
+- add readme to backend pages @skerbis
+- add changelog to backend navigation @skerbis 
 
 ### Migration to from v6.x.x to v7.x.x
 
