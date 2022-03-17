@@ -16,6 +16,7 @@ mform_modul_input = Modul Eingabe
 mform_modul_output = Modul Ausgabe
 
 mform_help = Hilfe
+mform_changelog = Changelog
 mform_github = MForm FOR Github Repository
 
 mform_example_base_text = Text-Input- und Hidden-Elemente
