@@ -1,5 +1,5 @@
 package: mform
-version: '7.0.2-dev'
+version: '7.0.2-beta1'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
