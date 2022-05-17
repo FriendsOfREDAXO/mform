@@ -14,6 +14,11 @@ if (rex_addon::exists('yform') &&
 }
 
 if (rex::isBackend()) {
+    $addon = rex_addon::get('mform');
+    $pluginDocs = $addon->getPath().'plugins/docs';
+    if (file_exists($pluginDocs)) {
+    rex_dir::delete($pluginDocs);
+    }  
     // add toggle files
     rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
