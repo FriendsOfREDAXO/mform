@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 7.1.0
+
+- remove form-group wrapper for hidden input fields
+
 ## Version 7.0.0
 
 - added column element for some form input column elements

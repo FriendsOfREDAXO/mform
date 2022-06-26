@@ -85,7 +85,7 @@ class MFormParser
             $removeAttributes = ['data-group-hide-toggle-links', 'data-group-accordion', 'data-group-open-collapse'];
             $buttonAttributes = [
                 'data-toggle' => 'collapse',
-                'data-collapse-open' => (int) $attributes['data-group-open-collapse'],
+                'data-collapse-open' => (int)$attributes['data-group-open-collapse'],
                 'aria-expanded' => ((intval($attributes['data-group-open-collapse']) == 1) ? 'true' : 'false')
             ];
             if (isset($attributes['data-group-accordion']) && intval($attributes['data-group-accordion']) == 1) unset($buttonAttributes['data-collapse-open']);
@@ -165,8 +165,32 @@ class MFormParser
     }
 
     /**
+     * create hidden input element
+     * @param MFormItem $item
+     * @author Joachim Doerr
+     */
+    private function generateHiddenInputElement(MFormItem $item): void
+    {
+        // default manipulations
+        $this->executeDefaultManipulations($item);
+
+        // create element
+        $element = new MFormElement();
+        // add all replacement elements for template parsing
+        $element->setId($item->getId())
+            ->setVarId($item->getVarId())
+            ->setValue($item->getValue())
+            ->setType($item->getType())
+            ->setClass($item->getClass())
+            ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
+
+        // add to output element array
+        $this->elements[] = $this->parseElement($element, 'input');
+    }
+
+    /**
      * create input text element
-     * hidden, text, password
+     * text, password
      * @param MFormItem $item
      * @author Joachim Doerr
      */
@@ -178,7 +202,6 @@ class MFormParser
         switch ($item->getType()) {
             case 'hidden': // is type hidden set template hidden
                 $templateType = 'hidden';
-                $item->setLabel(''); // and unset label
                 break;
             case 'text-readonly': // is readonly
                 MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
@@ -201,9 +224,7 @@ class MFormParser
         }
 
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        MFormItemManipulator::setCustomId($item); // set optional custom id
-        MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        $this->executeDefaultManipulations($item);
 
         // create element
         $element = new MFormElement();
@@ -241,9 +262,7 @@ class MFormParser
         }
 
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        MFormItemManipulator::setCustomId($item); // set optional custom id
-        MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        $this->executeDefaultManipulations($item);
 
         // create element
         $element = new MFormElement();
@@ -274,9 +293,7 @@ class MFormParser
     private function generateOptionsElement(MFormItem $item): void
     {
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        MFormItemManipulator::setCustomId($item); // set optional custom id
-        MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        $this->executeDefaultManipulations($item);
 
         // init option element string
         $optionElements = '';
@@ -295,10 +312,14 @@ class MFormParser
                 // is value label we have a opt group
                 if (is_array($value)) {
                     // optGroup set
-                    $optGroupLabel = $key; $optElements = ''; $count++; // + for group label
+                    $optGroupLabel = $key;
+                    $optElements = '';
+                    $count++; // + for group label
                     // create options
                     foreach ($value as $vKey => $vValue) {
-                        $count++; $disabled = false; $toggle = '';
+                        $count++;
+                        $disabled = false;
+                        $toggle = '';
                         if (in_array($vKey, $item->getDisabledOptions())) $disabled = true;
                         if (array_key_exists($vKey, $item->getToggleOptions())) $toggle = $item->getToggleOptions()[$vKey];
                         $optElements .= $this->createOptionElement($item, $vKey, $vValue, 'option', true, $disabled, $toggle);
@@ -312,7 +333,9 @@ class MFormParser
 
                     $optionElements .= $this->parseElement($groupElement, 'select');
                 } else {
-                    $count++; $disabled = false; $toggle = '';
+                    $count++;
+                    $disabled = false;
+                    $toggle = '';
                     if (in_array($key, $item->getDisabledOptions())) $disabled = true;
                     if (array_key_exists($key, $item->getToggleOptions())) $toggle = $item->getToggleOptions()[$key];
                     $optionElements .= $this->createOptionElement($item, $key, $value, 'option', true, $disabled, $toggle);
@@ -428,9 +451,7 @@ class MFormParser
     private function generateCheckboxElement(MFormItem $item): void
     {
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        MFormItemManipulator::setCustomId($item); // set optional custom id
-        MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        $this->executeDefaultManipulations($item);
 
         $checkboxElements = '';
 
@@ -504,9 +525,7 @@ class MFormParser
     private function generateRadioElement(MFormItem $item): void
     {
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        MFormItemManipulator::setCustomId($item); // set optional custom id
-        MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        $this->executeDefaultManipulations($item);
         $radioElements = '';
 
         // options must be given
@@ -541,7 +560,7 @@ class MFormParser
             if (sizeof($item->getVarId()) > 1) {
                 $inputValue = true;
             }
-            MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+            $this->executeDefaultManipulations($item, true, false, false);
         }
 
         // create templateElement object
@@ -606,7 +625,7 @@ class MFormParser
             if (sizeof($item->getVarId()) > 1) {
                 $inputValue = true;
             }
-            MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+            $this->executeDefaultManipulations($item, true, false, false);
         }
 
         // create templateElement object
@@ -713,7 +732,7 @@ class MFormParser
     private function generateCustomLinkElement(MFormItem $item): void
     {
         // default manipulations
-        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+        $this->executeDefaultManipulations($item, true, false, false);
 
         foreach (array('intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable') as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
@@ -780,6 +799,20 @@ class MFormParser
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
+    }
+
+    /**
+     * @param MFormItem $item
+     * @param bool $setVarAndIds
+     * @param bool $setCustomId
+     * @param bool $setDefaultClass
+     * @author Joachim Doerr
+     */
+    private function executeDefaultManipulations(MFormItem $item, bool $setVarAndIds = true, bool $setCustomId = true, bool $setDefaultClass = true): void
+    {
+        if ($setVarAndIds) MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+        if ($setCustomId) MFormItemManipulator::setCustomId($item); // set optional custom id
+        if ($setDefaultClass) MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
     }
 
     /**
@@ -857,9 +890,11 @@ class MFormParser
                         case 'month':
                         case 'week':
                         case 'text':
-                        case 'hidden':
                         case 'text-readonly':
                             $this->generateInputElement($item);
+                            break;
+                        case 'hidden':
+                            $this->generateHiddenInputElement($item);
                             break;
                         case 'markitup':
                         case 'textarea':
