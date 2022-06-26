@@ -3,6 +3,7 @@
 ## Version 7.1.0
 
 - remove form-group wrapper for hidden input fields
+- fix collapse accordion aria-expanded click issue
 
 ## Version 7.0.0
 

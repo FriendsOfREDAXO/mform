@@ -74,8 +74,12 @@ function initMFormLinkCollapse(element, accordion) {
             if (accordion === true) {
                 $(this).parent().find('.collapse').collapse('hide');
             }
-            $(this).parent().find('a[aria-expanded=true]').attr('aria-expanded', false);
-            $(this).attr('aria-expanded', 'true');
+            if ($(this).attr('aria-expanded') === 'true') {
+                $(this).parent().find('a[aria-expanded=true]').attr('aria-expanded', 'false');
+            } else {
+                $(this).parent().find('a[aria-expanded=true]').attr('aria-expanded', 'false');
+                $(this).attr('aria-expanded', 'true');
+            }
             $(this).next().collapse('toggle');
         });
     });
