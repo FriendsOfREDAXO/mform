@@ -81,7 +81,7 @@ function initMFormLinkCollapse(element, accordion) {
     element.each(function () {
         $(this).find('.collapse').prev().unbind().bind('click', function () {
             if (accordion === true) {
-                $(this).parent().find('.collapse').collapse('hide');
+                $(this).parent().find('> .collapse').collapse('hide');
             }
             if ($(this).attr('aria-expanded') === 'true') {
                 $(this).parent().find('a[aria-expanded=true]').attr('aria-expanded', 'false');
@@ -113,9 +113,8 @@ function initMFormRadioCollapse(element, init) {
 function initMFormSelectCollapse(element, init) {
     let parent = getParentMForm(element),
         collapseId = element.children("option:selected").data('toggle-item');
-
     if (collapseId !== undefined) {
-        parent.find('.collapse').each(function () {
+        parent.find('.collapse[data-group-collapse-id=' + collapseId + ']').parent().find('> .collapse').each(function () {
             if ($(this).data('group-collapse-id') === collapseId) {
                 toggleCollapseElement($(this), 'show', init);
             } else {
@@ -128,7 +127,6 @@ function initMFormSelectCollapse(element, init) {
 function initMFormToggleCollapse(element, init) {
     let parent = getParentMForm(element),
         target = parent.find('.collapse[data-group-collapse-id=' + element.data('toggle-item') + ']');
-
     if (init && element.is(':checked')) {
         toggleCollapseElement(target, 'show', init);
     } else {
