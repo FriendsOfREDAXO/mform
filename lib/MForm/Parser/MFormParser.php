@@ -198,14 +198,8 @@ class MFormParser
     {
         $datalist = '';
 
-        // set typ specific vars
-        switch ($item->getType()) {
-            case 'hidden': // is type hidden set template hidden
-                $templateType = 'hidden';
-                break;
-            case 'text-readonly': // is readonly
-                MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
-                break;
+        if ($item->getType() == 'text-readonly') { // is readonly
+            MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
         // datalist?
@@ -297,7 +291,9 @@ class MFormParser
 
         // init option element string
         $optionElements = '';
-        $itemAttributes = $this->parseAttributes($item->getAttributes()); // parse attributes for output
+        $attributes = $item->getAttributes();
+        if (sizeof($item->getToggleOptions()) >=0) $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
+        $itemAttributes = $this->parseAttributes($attributes); // parse attributes for output
 
         if ($item->isMultiple() && is_array($item->getValue()) &&
             sizeof($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {

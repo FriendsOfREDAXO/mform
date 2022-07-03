@@ -21,6 +21,15 @@ function initMFormElements(mform) {
     initMFormTabs(mform);
     // init collapse
     initMFormCollapses(mform);
+    // init selectPicker
+    initMFormSelectPicker(mform);
+}
+
+function initMFormSelectPicker(mform) {
+    mform.find('.selectpicker').each(function () {
+        $(this).selectpicker('destroy');
+        $(this).selectpicker();
+    });
 }
 
 function initMFormTabs(mform) {
@@ -86,35 +95,40 @@ function initMFormLinkCollapse(element, accordion) {
 }
 
 function initMFormRadioCollapse(element, init) {
-    let collapseId = element.parents('.form-group').find('input[type=radio]:checked').data('toggle-item');
+    let parent = getParentMForm(element),
+        collapseId = element.parents('.form-group').find('input[type=radio]:checked').data('toggle-item');
     if (collapseId !== undefined) {
         element.parents('.form-group').find('input[type=radio]').each(function () {
             if ($(this).is(":checked") && $(this).data('toggle-item') === collapseId) {
                 if ($(this).data('toggle-item') !== '')
-                    toggleCollapseElement(element.parents('.mform').find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'show', init);
+                    toggleCollapseElement(parent.find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'show', init);
             } else {
                 if ($(this).data('toggle-item') !== '')
-                    toggleCollapseElement(element.parents('.mform').find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'hide', init);
+                    toggleCollapseElement(parent.find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'hide', init);
             }
         });
     }
 }
 
 function initMFormSelectCollapse(element, init) {
-    let collapseId = element.children("option:selected").data('toggle-item');
+    let parent = getParentMForm(element),
+        collapseId = element.children("option:selected").data('toggle-item');
+
     if (collapseId !== undefined) {
-        element.children("option:selected").parents('.mform').find('.collapse').each(function () {
+        parent.find('.collapse').each(function () {
             if ($(this).data('group-collapse-id') === collapseId) {
-                toggleCollapseElement($(this),'show', init);
+                toggleCollapseElement($(this), 'show', init);
             } else {
-                toggleCollapseElement($(this),'hide', init);
+                toggleCollapseElement($(this), 'hide', init);
             }
         });
     }
 }
 
 function initMFormToggleCollapse(element, init) {
-    let target = element.parents('.mform').find('.collapse[data-group-collapse-id=' + element.data('toggle-item') + ']');
+    let parent = getParentMForm(element),
+        target = parent.find('.collapse[data-group-collapse-id=' + element.data('toggle-item') + ']');
+
     if (init && element.is(':checked')) {
         toggleCollapseElement(target, 'show', init);
     } else {
@@ -125,6 +139,11 @@ function initMFormToggleCollapse(element, init) {
             toggleCollapseElement(target, 'hide', init);
         }
     }
+}
+
+function getParentMForm(element) {
+    let parents = element.parents('.mform');
+    return (parents.length > 1) ? $(parents[0]) : parents
 }
 
 function initMFormTooltip(mform) {

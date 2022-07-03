@@ -4,6 +4,9 @@
 
 - remove form-group wrapper for hidden input fields
 - fix collapse accordion aria-expanded click issue
+- added the selectpicker class by default, to remove it you have use the class `none-selectpicker` on your select element
+- added mblock compatibility for mform usage of with the selectpicker
+- fix some small issues to get ability for combined and nested wrapper element usage  
 
 ## Version 7.0.0
 

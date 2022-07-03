@@ -140,7 +140,7 @@ function imglist_add_img_by_last_list_item(element) {
             let extension = item.val().replace(/^.*\./, ''),
                 url = 'index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=';
 
-            if (extension ===  'svg') {
+            if (extension === 'svg') {
                 url = '/media/';
             }
 
@@ -216,6 +216,6 @@ function imglist_write_input(element) {
         }
         element.find('input').val(new_value);
     } else {
-	    element.find('input').val('');
+        element.find('input').val('');
     }
 }

@@ -18,6 +18,7 @@
     height: 100px;
     box-sizing: border-box;
 }
+
 .rex-js-widget-imglist ul li img {
     -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
     -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
