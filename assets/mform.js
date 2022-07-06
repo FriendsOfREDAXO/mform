@@ -1,16 +1,7 @@
-$(document).on('rex:ready', function () {
-    mform_init();
-});
-
-function mform_init() {
+$(document).on('rex:ready mblock:change', function () {
     let mform = $('.mform');
     initMFormElements(mform);
-    if (typeof mblock_module !== 'undefined') {
-        mblock_module.registerCallback('reindex_end', function () {
-            initMFormElements(mform);
-        });
-    }
-}
+});
 
 function initMFormElements(mform) {
     // init tooltip

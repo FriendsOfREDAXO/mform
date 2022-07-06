@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 7.1.1
+
+- use mblock:change event to reinit mform elements
+
 ## Version 7.1.0
 
 - remove form-group wrapper for hidden input fields
