@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -42,6 +43,37 @@ class MFormElements
         if (rex_request('function', 'string') == 'edit') {
             // load rex vars
             $this->result = MFormValueHandler::loadRexVars();
+        }
+
+        if (rex_request('save', 'int') == 1) {
+            $result = [];
+
+            if (isset($_POST['REX_INPUT_VALUE'])) {
+                foreach ($_POST['REX_INPUT_VALUE'] as $key => $value) {
+                    $result['value'][$key] = $value;
+                }
+            }
+            if (isset($_POST['REX_INPUT_MEDIA'])) {
+                foreach ($_POST['REX_INPUT_MEDIA'] as $key => $value) {
+                    $result['file'][$key] = $value;
+                }
+            }
+            if (isset($_POST['REX_INPUT_MEDIALIST'])) {
+                foreach ($_POST['REX_INPUT_MEDIALIST'] as $key => $value) {
+                    $result['filelist'][$key] = $value;
+                }
+            }
+            if (isset($_POST['REX_INPUT_LINK'])) {
+                foreach ($_POST['REX_INPUT_LINK'] as $key => $value) {
+                    $result['link'][$key] = $value;
+                }
+            }
+            if (isset($_POST['REX_INPUT_LINKLIST'])) {
+                foreach ($_POST['REX_INPUT_LINKLIST'] as $key => $value) {
+                    $result['linklist'][$key] = $value;
+                }
+            }
+            $this->result = $result;
         }
     }
 
