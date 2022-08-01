@@ -48,28 +48,28 @@ class MFormElements
         if (rex_request('save', 'int') == 1) {
             $result = [];
 
-            if (isset($_POST['REX_INPUT_VALUE'])) {
-                foreach ($_POST['REX_INPUT_VALUE'] as $key => $value) {
+            if (rex_request('REX_INPUT_VALUE','array')) {
+                foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
                     $result['value'][$key] = $value;
                 }
             }
-            if (isset($_POST['REX_INPUT_MEDIA'])) {
-                foreach ($_POST['REX_INPUT_MEDIA'] as $key => $value) {
+            if (rex_request('REX_INPUT_MEDIA','array')) {
+                foreach (rex_request('REX_INPUT_MEDIA','array') as $key => $value) {
                     $result['file'][$key] = $value;
                 }
             }
-            if (isset($_POST['REX_INPUT_MEDIALIST'])) {
-                foreach ($_POST['REX_INPUT_MEDIALIST'] as $key => $value) {
+            if (rex_request('REX_INPUT_MEDIALIST','array')) {
+                foreach (rex_request('REX_INPUT_MEDIALIST') as $key => $value) {
                     $result['filelist'][$key] = $value;
                 }
             }
-            if (isset($_POST['REX_INPUT_LINK'])) {
-                foreach ($_POST['REX_INPUT_LINK'] as $key => $value) {
+            if (rex_request('REX_INPUT_LINK','array')) {
+                foreach (rex_request('REX_INPUT_LINK') as $key => $value) {
                     $result['link'][$key] = $value;
                 }
             }
-            if (isset($_POST['REX_INPUT_LINKLIST'])) {
-                foreach ($_POST['REX_INPUT_LINKLIST'] as $key => $value) {
+            if (rex_request('REX_INPUT_LINKLIST','array')) {
+                foreach (rex_request('REX_INPUT_LINLIST') as $key => $value) {
                     $result['linklist'][$key] = $value;
                 }
             }
