@@ -63,6 +63,30 @@ class MFormValueHandler
             } catch (rex_sql_exception $e) {
                 rex_logger::logException($e);
             }
+        
+            if (isset($_POST['save']) && $_POST['save'] == 1) {
+
+                foreach (isset($_POST['REX_INPUT_VALUE']) && $_POST['REX_INPUT_VALUE'] as $key => $value) {
+                    $result['value'][$key] = $value;
+                }
+
+                foreach (isset($_POST['REX_INPUT_MEDIA']) && $_POST['REX_INPUT_MEDIA'] as $key => $value) {
+                    $result['file'][$key] = $value;
+                }
+
+                foreach (isset($_POST['REX_INPUT_MEDIALIST']) && $_POST['REX_INPUT_MEDIALIST'] as $key => $value) {
+                    $result['filelist'][$key] = $value;
+                }
+
+                foreach (isset($_POST['REX_INPUT_LINK']) && $_POST['REX_INPUT_LINK'] as $key => $value) {
+                    $result['link'][$key] = $value;
+                }
+                foreach (isset($_POST['REX_INPUT_LINKLIST']) && $_POST['REX_INPUT_LINKLIST'] as $key => $value) {
+                    $result['linklist'][$key] = $value;
+                }
+            }
+        
+        
         }
         return $result;
     }
