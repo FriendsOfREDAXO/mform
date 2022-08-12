@@ -57,3 +57,5 @@
 .rex-js-widget-imglist ul { /* for IE6,7 */
     zoom: 1;
 }
+/* Stretch height of ImageList */
+.form-control.thumbnail-list.ui-sortable {height: auto;}
