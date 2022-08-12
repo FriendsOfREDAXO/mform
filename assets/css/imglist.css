@@ -59,3 +59,7 @@
 }
 /* Stretch height of ImageList */
 .form-control.thumbnail-list.ui-sortable {height: auto;}
+
+.thumbnail-list .input-group-addon, .input-group-btn {
+    vertical-align: top;
+}
