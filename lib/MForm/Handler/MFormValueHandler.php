@@ -52,7 +52,7 @@ class MFormValueHandler
                         }
 
                         // thanks @dtpop
-                        $jsonResult = json_decode(htmlspecialchars_decode($result['value'][$i],ENT_NOQUOTES), true); // wb
+                        $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i],ENT_NOQUOTES), true); // wb
 
                         if (is_array($jsonResult)) {
                             $result['value_string'][$i] = $result['value'][$i];
