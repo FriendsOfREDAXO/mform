@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 7.2.1
+
+- make mform manipulable
+
+## Version 7.2.0
+
+- Stretch height of ImageList
+
+## Version 7.1.2
+
+- PRESAVE-Action: Die REX_VALUES werden nach einer PRESAVE Aktion aus dem $_POST geladen.
+- Dadurch sind Validierungen ohne Neueingabe des Contents jetzt möglich. @skerbis
+
 ## Version 7.1.1
 
 - use mblock:change event to reinit mform elements
