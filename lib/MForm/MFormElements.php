@@ -214,12 +214,18 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addForm($form = null): self
+    public function addForm($form = null, $parse = true): self
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
         }
-        $form = ($form instanceof MForm) ? $form->show() : $form;
+        if ($form instanceof MForm) {
+            if (!$parse) {
+                $this->items[] = $form;
+                return $this;
+            }
+            $form = $form->show();
+        }
         return $this->addHtml($form);
     }
 
@@ -229,10 +235,10 @@ class MFormElements
      * @param array|null $attributes
      * @author Joachim Doerr
      */
-    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = []): self
+    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], $parse = true): self
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
-            ->addForm($form)
+            ->addForm($form, $parse)
             ->addElement('close-fieldset', null, null, $attributes);
     }
 
@@ -243,13 +249,13 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addColumnElement(int $col, $form = null, array $attributes = []): self
+    public function addColumnElement(int $col, $form = null, array $attributes = [], $parse = true): self
     {
         if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
             $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
         }
         return $this->addElement('column', null, null, $attributes)
-            ->addForm($form)
+            ->addForm($form, $parse)
             ->addElement('close-column', null, null, $attributes);
     }
 
@@ -260,12 +266,12 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addInlineElement(string $label = '', $form = null, array $attributes = []): self
+    public function addInlineElement(string $label = '', $form = null, array $attributes = [], $parse = true): self
     {
         if ($form instanceof MForm) $form->setInline(true);
         return $this->addElement('inline', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form)
+            ->addForm($form, $parse)
             ->addElement('close-inline', null, null, $attributes);
     }
 
@@ -277,12 +283,12 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = []): self
+    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], $parse = true): self
     {
         $attributes = array_merge($attributes, array('data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight));
         return $this->addElement('tab', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form)
+            ->addForm($form, $parse)
             ->addElement('close-tab', null, null, $attributes);
     }
 
@@ -296,7 +302,7 @@ class MFormElements
      * @return $this
      * @author Joachim Doerr
      */
-    public function addCollapseElement(string $label = '', $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false): self
+    public function addCollapseElement(string $label = '', $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, $parse = true): self
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) $attributes = [];
@@ -304,7 +310,7 @@ class MFormElements
 
         return $this->addElement('collapse', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form)
+            ->addForm($form, $parse)
             ->addElement('close-collapse', null, null, $attributes);
     }
 
@@ -826,8 +832,28 @@ class MFormElements
      * @return MFormItem[]
      * @author Joachim Doerr
      */
-    protected function getItems(): array
+    public function getItems(): array
     {
         return $this->items;
+    }
+
+    /**
+     * @param array $items
+     * @return $this
+     * @author Joachim Doerr
+     */
+    public function setItems($items)
+    {
+        $this->items = $items;
+        return $this;
+    }
+
+    /**
+     * @return array
+     * @author Joachim Doerr
+     */
+    public function getResult()
+    {
+        return $this->result;
     }
 }

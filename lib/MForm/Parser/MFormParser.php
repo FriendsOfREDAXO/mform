@@ -112,6 +112,7 @@ class MFormParser
                         ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . $mformCount)
                         ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . $itm->getLabel())
                         ->setClass(
+                            ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
                             ((array_key_exists('pull-right', $itm->getAttributes()) && $itm->getAttributes()['pull-right'] === true) ? ' pull-right' : '') .
                             ((array_key_exists('data-group-open-tab', $itm->getAttributes()) && $itm->getAttributes()['data-group-open-tab'] === true) ? ' active' : '')
                         );
