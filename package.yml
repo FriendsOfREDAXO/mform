@@ -1,5 +1,5 @@
 package: mform
-version: '7.2.1'
+version: '7.2.2'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -10,7 +10,7 @@ page:
     icon: rex-icon fa-subway
     subpages:
         demo:
-            title: 'translate:referenz_demo'
+            title: 'translate:reference_demo'
             subpages:
                 pjax: true
                 demo_base: { title: 'translate:demo_base' }

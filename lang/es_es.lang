@@ -6,7 +6,7 @@ mform_demo_base = Ejemplos básicos
 mform_demo_extended = Ejemplos extendidos
 mform_demo_expert = Ejemplos de expertos
 mform_demo_community = Ejemplos de FOS
-mform_referenz_demo = Colección de muestra
+mform_reference_demo = Colección de muestra
 mform_info = Info
 
 mform_modul_input = Entrada del módulo

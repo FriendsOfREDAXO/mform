@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 7.2.2
+
+- fix PHP 8.1 deprecation warnings
+
 ## Version 7.2.1
 
 - make mform manipulable

@@ -6,7 +6,7 @@ mform_demo_base = Basis exempel
 mform_demo_extended = Utökade exempel
 mform_demo_expert = Expert exempel
 mform_demo_community = FOS exempel
-mform_referenz_demo = Provkollektion
+mform_reference_demo = Provkollektion
 mform_info = Info
 
 mform_modul_input = Modul input
