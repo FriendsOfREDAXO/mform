@@ -47,7 +47,7 @@ class MFormElements
         
         
         $prevent_action = false; 
-        if (rex_addon::get('gridblock')->isAvailable())
+        if (\rex_addon::get('gridblock')->isAvailable())
         {
             if (rex_gridblock::isBackend())
             {
