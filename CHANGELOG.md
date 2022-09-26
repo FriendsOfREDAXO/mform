@@ -3,6 +3,7 @@
 ## Version 7.2.2
 
 - fix PHP 8.1 deprecation warnings
+- prevent module action when Gridblock addon is used @skerbis
 
 ## Version 7.2.1
 
