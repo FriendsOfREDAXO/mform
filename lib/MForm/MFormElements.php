@@ -45,46 +45,41 @@ class MFormElements
             $this->result = MFormValueHandler::loadRexVars();
         }
         
-        
-        $prevent_action = false; 
-        if (\rex_addon::get('gridblock')->isAvailable())
-        {
-            if (\rex_gridblock::isBackend())
-            {
-                $prevent_action = true; 
-            }
-        }
+     
+		if ( !class_exists('\rex_gridblock') || (class_exists('\rex_gridblock') && !\rex_gridblock::isBackend()) ):
+		
+			if (rex_request('save', 'int') == 1) {
+				$result = [];
 
-         if (rex_request('save', 'int') === 1 && $prevent_action === false) {
-            $result = [];
-
-            if (rex_request('REX_INPUT_VALUE','array')) {
-                foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
-                    $result['value'][$key] = $value;
-                }
-            }
-            if (rex_request('REX_INPUT_MEDIA','array')) {
-                foreach (rex_request('REX_INPUT_MEDIA','array') as $key => $value) {
-                    $result['file'][$key] = $value;
-                }
-            }
-            if (rex_request('REX_INPUT_MEDIALIST','array')) {
-                foreach (rex_request('REX_INPUT_MEDIALIST') as $key => $value) {
-                    $result['filelist'][$key] = $value;
-                }
-            }
-            if (rex_request('REX_INPUT_LINK','array')) {
-                foreach (rex_request('REX_INPUT_LINK') as $key => $value) {
-                    $result['link'][$key] = $value;
-                }
-            }
-            if (rex_request('REX_INPUT_LINKLIST','array')) {
-                foreach (rex_request('REX_INPUT_LINLIST') as $key => $value) {
-                    $result['linklist'][$key] = $value;
-                }
-            }
-            $this->result = $result;
-        }
+				if (rex_request('REX_INPUT_VALUE','array')) {
+					foreach (rex_request('REX_INPUT_VALUE') as $key => $value) {
+						$result['value'][$key] = $value;
+					}
+				}
+				if (rex_request('REX_INPUT_MEDIA','array')) {
+					foreach (rex_request('REX_INPUT_MEDIA','array') as $key => $value) {
+						$result['file'][$key] = $value;
+					}
+				}
+				if (rex_request('REX_INPUT_MEDIALIST','array')) {
+					foreach (rex_request('REX_INPUT_MEDIALIST') as $key => $value) {
+						$result['filelist'][$key] = $value;
+					}
+				}
+				if (rex_request('REX_INPUT_LINK','array')) {
+					foreach (rex_request('REX_INPUT_LINK') as $key => $value) {
+						$result['link'][$key] = $value;
+					}
+				}
+				if (rex_request('REX_INPUT_LINKLIST','array')) {
+					foreach (rex_request('REX_INPUT_LINLIST') as $key => $value) {
+						$result['linklist'][$key] = $value;
+					}
+				}
+				$this->result = $result;
+			}
+			
+		endif;
     }
 
     /**
