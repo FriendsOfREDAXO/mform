@@ -44,8 +44,15 @@ class MFormElements
             // load rex vars
             $this->result = MFormValueHandler::loadRexVars();
         }
+        
+        // Gridblock fix
+        $prevent_action = false;
+        if (class_exists('\rex_gridblock') && \rex_gridblock::isBackend())
+        {
+            $prevent_action = true;
+        }
 
-        if (rex_request('save', 'int') == 1) {
+        if (rex_request('save', 'int') == 1 &&  $prevent_action == false) {
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE','array')) {
@@ -93,7 +100,7 @@ class MFormElements
     public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, $catId = null, string $defaultValue = null): self
     {
         // remove ,
-        $id = (is_string($id)) ? str_replace(',', '.', $id) : '';
+        $id = str_replace(',', '.', $id);
 
         // create item element
         $this->item = MFormElementHandler::createElement((sizeof($this->items) + 1), $type, $id);
