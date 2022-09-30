@@ -45,9 +45,9 @@ class MFormElements
             $this->result = MFormValueHandler::loadRexVars();
         }
         
-        // Gridblock fix
+        
         $prevent_action = false;
-        if (class_exists('\rex_gridblock') && \rex_gridblock::isBackend())
+        if (\rex_addon::get('\gridblock')->isAvailable() && class_exists('\rex_gridblock') && \rex_gridblock::isBackend())
         {
             $prevent_action = true;
         }
