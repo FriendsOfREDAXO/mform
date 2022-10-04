@@ -1,12 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 7.2.4
+## Version 7.2.2
 
 - fix PHP 8.1 deprecation warnings
 - prevent module action when Gridblock addon is used @skerbis
-
-## Version 7.2.2 - 7.2.3 
-not released
 
 ## Version 7.2.1
 
