@@ -58,7 +58,7 @@
     zoom: 1;
 }
 /* Stretch height of ImageList */
-.form-control.thumbnail-list.ui-sortable {height: auto;}
+.form-control.thumbnail-list.ui-sortable {height: auto; min-height: 220px;}
 
 .custom-imglist .input-group-addon, .input-group-btn {
     vertical-align: top;
