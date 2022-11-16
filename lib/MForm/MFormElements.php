@@ -52,7 +52,7 @@ class MFormElements
             $prevent_action = true;
         }
 
-        if (rex_request('save', 'int') == 1 &&  $prevent_action == false) {
+        if (if (rex_request('function', 'string') != 'edit' && rex_request('save', 'int') == 1 &&  $prevent_action == false) {
             $result = [];
 
             if (rex_request('REX_INPUT_VALUE','array')) {
