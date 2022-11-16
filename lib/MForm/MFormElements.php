@@ -76,7 +76,7 @@ class MFormElements
                 }
             }
             if (rex_request('REX_INPUT_LINKLIST','array')) {
-                foreach (rex_request('REX_INPUT_LINLIST') as $key => $value) {
+                foreach (rex_request('REX_INPUT_LINKLIST') as $key => $value) {
                     $result['linklist'][$key] = $value;
                 }
             }
