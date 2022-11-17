@@ -40,7 +40,7 @@ class MFormElements
      */
     public function __construct()
     {
-        if (rex_request('function', 'string') == 'edit' || \rex_be_controller::getCurrentPage() == 'content/edit')) {
+        if (rex_request('function', 'string') == 'edit' || \rex_be_controller::getCurrentPage() == 'content/edit') {
             // load rex vars
             $this->result = MFormValueHandler::loadRexVars();
         }
