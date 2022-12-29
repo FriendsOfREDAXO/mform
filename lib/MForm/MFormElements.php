@@ -61,7 +61,7 @@ class MFormElements
     public function addElement(string $type, $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, $catId = null, string $defaultValue = null): self
     {
         // remove ,
-        $id = str_replace(',', '.', $id);
+        $id = (is_string($id)) ? str_replace(',', '.', $id) : '';
 
         // create item element
         $this->item = MFormElementHandler::createElement((sizeof($this->items) + 1), $type, $id);
