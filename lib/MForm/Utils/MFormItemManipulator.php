@@ -23,7 +23,7 @@ class MFormItemManipulator
     {
         // set value for html out
         if (!is_array($item->getValue())) {
-            $item->setValue(htmlspecialchars(((!empty($item->getValue()))?$item->getValue():'')));
+            $item->setValue(htmlspecialchars(((   !empty($item->getValue()) || $item->getValue() === 0 || $item->getValue() === '0')?$item->getValue():'')));
         } else if (is_array($item->getVarId()) && sizeof($item->getVarId()) == 1) {
             $item->setValue(htmlspecialchars($item->getStringValue()));
         }
