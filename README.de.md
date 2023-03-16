@@ -317,7 +317,7 @@ Die Funktion kann in der functions.php vom theme-AddOn oder in der boot.php vom 
 // CustomLink-Funktion REX5 / mform / mblock
 
 if (!function_exists('getcustomLink')) {
-  function getcustomLink($url,$text) {
+  function getcustomLink($url) {
 
   // Wurde ein Wert für $url übergeben?
   if ($url) {
