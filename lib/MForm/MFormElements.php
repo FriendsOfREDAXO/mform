@@ -62,7 +62,7 @@ class MFormElements
     {
         // remove ,
         if(!is_int($id)) {
-            $id = str_replace(',', '.', $id);
+            $id = str_replace(',', '.', (string)$id);
         }
         
         // create item element
