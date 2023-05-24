@@ -407,7 +407,7 @@ class MFormParser
             }
         }
         /* Selected fix @skerbis @dtpop @MC-PMOE */
-        if ($item->multiple) {
+        if ($item->multiple && !is_null($item->stringValue)) {
             $items_selected = json_decode($item->stringValue, true);
 
             $current = explode('][', trim($item->varId, '[]'));
