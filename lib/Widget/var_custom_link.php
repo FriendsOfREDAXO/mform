@@ -27,6 +27,11 @@ class rex_var_custom_link extends rex_var
                 $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
             }
         }
+		$valueName = rex_extension::registerPoint(
+			new rex_extension_point('mform/varCustomLink.getCustomLinkText', $valueName, [
+				'value' => $value,
+			])
+		);
         return $valueName;
     }
 
