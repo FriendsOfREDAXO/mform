@@ -199,6 +199,8 @@ class rex_var_custom_link extends rex_var
         <a href="#" class="btn btn-popup intern_link ' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
         <a href="#" class="btn btn-popup delete_link ' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
         ';
+		
+		$e = rex_extension::registerPoint(new rex_extension_point('mform/valueCustomLink.getWidget', $e));
 
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
