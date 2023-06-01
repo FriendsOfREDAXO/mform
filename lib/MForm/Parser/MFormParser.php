@@ -794,6 +794,13 @@ class MFormParser
         $templateElement->setElement($html)
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
+
+		$templateElement = \rex_extension::registerPoint(
+			new \rex_extension_point('mform/mformParser.generateCustomLinkElement', $templateElement, [
+				'item' => $item,
+			])
+		);
+
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
