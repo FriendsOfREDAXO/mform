@@ -3,5 +3,8 @@
     "type": "redaxo-addon",
     "extra": {
         "installer-name": "mform"
+    },
+    "require-dev": {
+        "redaxo/source": "^5.10"
     }
 }
