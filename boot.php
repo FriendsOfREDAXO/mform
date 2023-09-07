@@ -24,7 +24,7 @@ if (rex::isBackend()) {
     rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
     // add mform js / css
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
-    rex_view::addCssFile($this->getAssetsUrl('css/default_theme.css'));
+    rex_view::addCssFile($this->getAssetsUrl('css/mform.css'));
     // reset count per page init
     if (rex_backend_login::hasSession()) {
         rex_set_session('mform_count', 0);
