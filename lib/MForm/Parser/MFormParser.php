@@ -64,7 +64,7 @@ class MFormParser
         $mformCount = '';
 
         try {
-            $mformCount = rex_session('mform_count');
+            $mformCount = rex_session('mform_count', 'int','0');
         } catch (rex_exception $e) {
             rex_logger::logException($e);
         }

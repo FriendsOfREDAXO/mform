@@ -50,7 +50,7 @@ class MForm extends MFormElements
     {
         // MForm count++
         try {
-            rex_set_session('mform_count', rex_session('mform_count') + 1);
+            rex_set_session('mform_count', rex_session('mform_count', 'int', 0) + 1);
             $parser = new MFormParser();
             return $parser->parse($this->getItems(), ((!empty($this->theme)) ? $this->theme : null), $this->debug, $this->inline);
         } catch (rex_exception $e) {
