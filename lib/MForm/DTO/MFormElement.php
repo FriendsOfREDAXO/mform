@@ -7,117 +7,72 @@
 
 namespace MForm\DTO;
 
-
 class MFormElement
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     public $id;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $varId;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $value;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $label;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $attributes;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $options;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $parameter;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $type;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $hidden;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $javascript;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $class;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $legend;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $element;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $output;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $datalist;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $labelColClass;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $formItemColClass;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoTooltipIcon;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoTooltip;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoCollapseButton;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoCollapse;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     public $inline = false;
 
     /**
@@ -337,12 +292,11 @@ class MFormElement
     }
 
     /**
-     * @return array
      * @author Joachim Doerr
      */
     public function getKeys(): array
     {
-        $keys = array();
+        $keys = [];
         foreach (get_object_vars($this) as $f => $v) {
             $keys[] = $f;
         }
@@ -355,7 +309,7 @@ class MFormElement
      */
     public function getValues()
     {
-        $values = array();
+        $values = [];
         foreach (get_object_vars($this) as $f => $v) {
             $values[] = $v;
         }
@@ -363,7 +317,6 @@ class MFormElement
     }
 
     /**
-     * @return bool
      * @author Joachim Doerr
      */
     public function isInline(): bool
@@ -372,7 +325,6 @@ class MFormElement
     }
 
     /**
-     * @param bool $inline
      * @return $this
      * @author Joachim Doerr
      */

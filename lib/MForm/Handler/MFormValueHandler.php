@@ -7,7 +7,6 @@
 
 namespace MForm\Handler;
 
-
 use MForm\DTO\MFormItem;
 use MForm\Utils\MFormClang;
 use rex;
@@ -15,10 +14,13 @@ use rex_logger;
 use rex_sql;
 use rex_sql_exception;
 
+use function array_key_exists;
+use function count;
+use function is_array;
+
 class MFormValueHandler
 {
     /**
-     * @return array
      * @author Joachim Doerr
      */
     public static function loadRexVars(): array
@@ -26,7 +28,7 @@ class MFormValueHandler
         $sliceId = rex_request('slice_id', 'int', false);
         $result = [];
 
-        if ($sliceId != false) {
+        if (false != $sliceId) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
             $where = 'id="' . $_REQUEST['slice_id'] . '"';
@@ -41,7 +43,7 @@ class MFormValueHandler
                 $sql->setQuery($query);
                 $rows = $sql->getRows();
                 if ($rows > 0) {
-                    for ($i = 1; $i <= 20; $i++) {
+                    for ($i = 1; $i <= 20; ++$i) {
                         $result['value'][$i] = $sql->getValue('value' . $i);
 
                         if ($i <= 10) {
@@ -52,7 +54,7 @@ class MFormValueHandler
                         }
 
                         // thanks @dtpop
-                        $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i],ENT_NOQUOTES), true); // wb
+                        $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i], ENT_NOQUOTES), true); // wb
 
                         if (is_array($jsonResult)) {
                             $result['value_string'][$i] = $result['value'][$i];
@@ -68,25 +70,21 @@ class MFormValueHandler
     }
 
     /**
-     * @param MFormItem $item
-     * @param array $result
-     * @param string|null $value
-     * @param string|null $defaultValue
      * @author Joachim Doerr
      */
-    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null): void
+    public static function decorateItem(MFormItem $item, array $result, ?string $value = null, ?string $defaultValue = null): void
     {
-        if (!is_null($defaultValue)) {
+        if (null !== $defaultValue) {
             // set default value
             $item->setDefaultValue(MFormClang::getClangValue($defaultValue));
         }
 
         $valueString = null;
 
-        if ($value === NULL && sizeof($result) > 0) {
+        if (null === $value && count($result) > 0) {
             // read value by type
             $default = true;
-            if (is_array($item->getVarId()) && count($item->getVarId()) === 1) {
+            if (is_array($item->getVarId()) && 1 === count($item->getVarId())) {
                 switch ($item->getType()) {
                     case 'linklist':
                         $value = $result['linklist'][$item->getVarId()[0]];
@@ -123,7 +121,9 @@ class MFormValueHandler
                 }
             }
 
-            if (!is_null($valueString)) $item->setStringValue($valueString);
+            if (null !== $valueString) {
+                $item->setStringValue($valueString);
+            }
             $item->setValue($value);
         } else {
             $item->setValue(MFormClang::getClangValue($value));

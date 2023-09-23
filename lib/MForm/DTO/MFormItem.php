@@ -7,147 +7,90 @@
 
 namespace MForm\DTO;
 
-
 class MFormItem
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     public $type;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $id;
 
-    /**
-     * @var array|string
-     */
+    /** @var array|string */
     public $varId;
 
-    /**
-     * @var string|array
-     */
+    /** @var string|array */
     public $value;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $stringValue;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $defaultValue = '';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $mode;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $size;
 
-    /**
-     * @var array
-     */
-    public $attributes = array();
+    /** @var array */
+    public $attributes = [];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $class = '';
 
-    /**
-     * @var boolean
-     */
-    public $defaultClass=true;
+    /** @var bool */
+    public $defaultClass = true;
 
-    /**
-     * @var array
-     */
-    public $options = array();
+    /** @var array */
+    public $options = [];
 
-    /**
-     * @var array
-     */
-    public $disabledOptions = array();
+    /** @var array */
+    public $disabledOptions = [];
 
-    /**
-     * @var array
-     */
-    public $toggleOptions = array();
+    /** @var array */
+    public $toggleOptions = [];
 
-    /**
-     * @var array
-     */
-    public $parameter = array();
+    /** @var array */
+    public $parameter = [];
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     public $multiple;
 
-    /**
-     * @var string|array
-     */
+    /** @var string|array */
     public $label;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $legend;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     public $full;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $labelColClass;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $formItemColClass;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $group;
 
-    /**
-     * @var integer
-     */
+    /** @var int */
     public $groupCount;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $groupKey;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoTooltip;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoCollapse;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoTooltipIcon;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     public $infoCollapseIcon;
 
     /**
@@ -333,7 +276,7 @@ class MFormItem
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isDefaultClass()
     {
@@ -341,7 +284,7 @@ class MFormItem
     }
 
     /**
-     * @param boolean $defaultClass
+     * @param bool $defaultClass
      * @return $this
      */
     public function setDefaultClass($defaultClass)
@@ -369,7 +312,6 @@ class MFormItem
     }
 
     /**
-     * @return array
      * @author Joachim Doerr
      */
     public function getToggleOptions(): array
@@ -378,7 +320,6 @@ class MFormItem
     }
 
     /**
-     * @param array $toggleOptions
      * @return $this
      * @author Joachim Doerr
      */
@@ -427,7 +368,7 @@ class MFormItem
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isMultiple()
     {
@@ -435,7 +376,7 @@ class MFormItem
     }
 
     /**
-     * @param boolean $multiple
+     * @param bool $multiple
      * @return $this
      */
     public function setMultiple($multiple)
@@ -472,7 +413,6 @@ class MFormItem
     }
 
     /**
-     * @param string $legend
      * @return $this
      * @author Joachim Doerr
      */
@@ -483,7 +423,7 @@ class MFormItem
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isFull()
     {
@@ -491,7 +431,7 @@ class MFormItem
     }
 
     /**
-     * @param boolean $full
+     * @param bool $full
      * @return $this
      */
     public function setFull($full)

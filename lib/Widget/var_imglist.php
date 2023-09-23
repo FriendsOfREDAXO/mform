@@ -68,10 +68,10 @@ class rex_var_imglist extends rex_var
         $medialistarray = explode(',', $value);
         if (is_array($medialistarray)) {
             foreach ($medialistarray as $key => $file) {
-                if ($file != '') {
+                if ('' != $file) {
 
                     $url = rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file]);
-                    if (pathinfo($file, PATHINFO_EXTENSION) === 'svg') {
+                    if ('svg' === pathinfo($file, PATHINFO_EXTENSION)) {
                         $url = rex_url::media($file);
                     }
                     $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '"><img class="thumbnail" src="' . $url . '" /></li>';
@@ -86,7 +86,7 @@ class rex_var_imglist extends rex_var
             $disabled = '';
         }
 
-        $id = str_replace(array('][', '[', ']'), '', $id);
+        $id = str_replace(['][', '[', ']'], '', $id);
 
         $e = [];
         $e['before'] = '<div class="rex-js-widget custom-imglist ' . $wdgtClass . '" data-params="' . $open_params . '" data-widget-id="' . $id . '">';

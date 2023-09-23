@@ -7,13 +7,13 @@
 
 namespace MForm\Handler;
 
-
 use MForm\DTO\MFormItem;
+
+use function is_array;
 
 class MFormParameterHandler
 {
     /**
-     * @param MFormItem $item
      * @param mixed $name
      * @param mixed $value
      * @author Joachim Doerr
@@ -34,8 +34,6 @@ class MFormParameterHandler
     }
 
     /**
-     * @param MFormItem $item
-     * @param array $parameter
      * @author Joachim Doerr
      */
     public static function addParameters(MFormItem $item, array $parameter): void

@@ -11,37 +11,33 @@
 class rex_var_custom_link extends rex_var
 {
     /**
-     * @param $value
      * @return string
      * @author Joachim Doerr
      */
     public static function getCustomLinkText($value)
     {
         $valueName = $value;
-        if (file_exists(rex_path::media($value)) === true) {
+        if (true === file_exists(rex_path::media($value))) {
             // do nothing
-        } else if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
+        } elseif (false === filter_var($value, FILTER_VALIDATE_URL) && is_numeric($value)) {
             // article!
-            $art = rex_article::get((int)$value);
+            $art = rex_article::get((int) $value);
             if ($art instanceof rex_article) {
                 $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
             }
         }
-		$valueName = rex_extension::registerPoint(
-			new rex_extension_point('mform/varCustomLink.getCustomLinkText', $valueName, [
-				'value' => $value,
-			])
-		);
+        $valueName = rex_extension::registerPoint(
+            new rex_extension_point('mform/varCustomLink.getCustomLinkText', $valueName, [
+                'value' => $value,
+            ]),
+        );
         return $valueName;
     }
 
     /**
-     * @param $value
-     * @param $table
-     * @param $column
      * @param null $name
-     * @return string
      * @throws rex_sql_exception
+     * @return string
      * @author Joachim Doerr
      */
     public static function getCustomLinkYFormLinkText($value, $table, $column, $name = null)
@@ -54,7 +50,7 @@ class rex_var_custom_link extends rex_var
             $sql = rex_sql::factory();
             $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matches[2][0]]);
             if (isset($result[0][$column])) {
-                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] .']';
+                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] . ']';
             }
         }
 
@@ -79,7 +75,9 @@ class rex_var_custom_link extends rex_var
         }
 
         if ($this->hasArg('widget') && $this->getArg('widget')) {
-            if (!$this->environmentIs(self::ENV_INPUT)) return false;
+            if (!$this->environmentIs(self::ENV_INPUT)) {
+                return false;
+            }
 
             $args = [];
             foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix', 'ylink'] as $key) {
@@ -90,7 +88,7 @@ class rex_var_custom_link extends rex_var
 
             $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', $value, $args);
         } else {
-            if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
+            if ($value && $this->hasArg('output') && 'id' != $this->getArg('output')) {
                 $value = rex_getUrl($value);
             }
         }
@@ -99,7 +97,6 @@ class rex_var_custom_link extends rex_var
     }
 
     /**
-     * @param $args
      * @return mixed
      * @author Joachim Doerr
      */
@@ -121,13 +118,9 @@ class rex_var_custom_link extends rex_var
     }
 
     /**
-     * @param $id
-     * @param $name
-     * @param $value
-     * @param array $args
      * @param bool $btnIdUniq
-     * @return string|string[]
      * @throws rex_exception
+     * @return string|string[]
      * @author Joachim Doerr
      */
     public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
@@ -137,8 +130,8 @@ class rex_var_custom_link extends rex_var
         $mediaCategory = '';
         $types = '';
 
-        if (filter_var($value, FILTER_VALIDATE_URL) === FALSE && is_numeric($value)) {
-            $art = rex_article::get((int)$value);
+        if (false === filter_var($value, FILTER_VALIDATE_URL) && is_numeric($value)) {
+            $art = rex_article::get((int) $value);
             if ($art instanceof rex_article) {
                 $category = $art->getCategoryId();
             }
@@ -146,38 +139,38 @@ class rex_var_custom_link extends rex_var
 
         $wdgtClass = ' rex-js-widget-customlink';
 
-        if (is_numeric($category) || isset($args['category']) && ($category = (int)$args['category'])) {
+        if (is_numeric($category) || isset($args['category']) && ($category = (int) $args['category'])) {
             $category = ' data-category="' . $category . '"';
         }
-        if (isset($args['media_category']) && ($mediaCategory = (int)$args['media_category'])) {
+        if (isset($args['media_category']) && ($mediaCategory = (int) $args['media_category'])) {
             $mediaCategory = ' data-media_category="' . $mediaCategory . '"';
         }
         if (isset($args['types']) && ($types = $args['types'])) {
             $types = ' data-types="' . $types . '"';
         }
         $class = '';
-        if (isset($args['class']))
-            { $class = $args['class'];
-            } 
-        $mediaClass = (isset($args['media']) && $args['media'] == 0) ? ' hidden' : $class;
-        $externalClass = (isset($args['external']) && $args['external'] == 0) ? ' hidden' : $class;
-        $emailClass = (isset($args['mailto']) && $args['mailto'] == 0) ? ' hidden' : $class;
-        $linkClass = (isset($args['intern']) && $args['intern'] == 0) ? ' hidden' : $class;
-        $phoneClass = (isset($args['phone']) && $args['phone'] == 0) ? ' hidden' : $class;
-        $externalPrefix = (isset($args['external_prefix']) && $args['external_prefix'] == 0) ? $args['external_prefix'] : 'https://';
+        if (isset($args['class'])) {
+            $class = $args['class'];
+        }
+        $mediaClass = (isset($args['media']) && 0 == $args['media']) ? ' hidden' : $class;
+        $externalClass = (isset($args['external']) && 0 == $args['external']) ? ' hidden' : $class;
+        $emailClass = (isset($args['mailto']) && 0 == $args['mailto']) ? ' hidden' : $class;
+        $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
+        $phoneClass = (isset($args['phone']) && 0 == $args['phone']) ? ' hidden' : $class;
+        $externalPrefix = (isset($args['external_prefix']) && 0 == $args['external_prefix']) ? $args['external_prefix'] : 'https://';
         $args = self::prepareYLinkArg($args);
         $ylinks = '';
 
-        if ($btnIdUniq === true) {
+        if (true === $btnIdUniq) {
             $id = uniqid($id);
         }
 
-        if (isset($args['ylink']) && is_array($args['ylink']) && sizeof($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
+        if (isset($args['ylink']) && is_array($args['ylink']) && count($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
             foreach ($args['ylink'] as $link) {
                 if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
                     $ylinks .= '<li><a href="#" class="ylink" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
 
-                    if (strpos($value, str_replace('_', '-', $link['table'])) !== false) {
+                    if (str_contains($value, str_replace('_', '-', $link['table']))) {
                         $valueName = self::getCustomLinkYFormLinkText($value, $link['table'], $link['column']);
                     }
                 }
@@ -205,7 +198,7 @@ class rex_var_custom_link extends rex_var
         return str_replace(
             '<div class="input-group">',
             '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . ' data-extern-link-prefix="' . $externalPrefix . '" data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
-            $fragment->parse('core/form/widget.php')
+            $fragment->parse('core/form/widget.php'),
         );
     }
 }
