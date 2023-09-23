@@ -1,0 +1,48 @@
+.php-cs-fixer.cache
+/.htaccess
+/composer.lock
+/.phpunit.cache/
+/assets/
+/media/
+/node_modules/
+/redaxo/cache/
+/redaxo/data/
+/releases/
+/resources/
+/vendor/
+
+# Addons
+/redaxo/src/addons/*
+!/redaxo/src/addons/backup/
+!/redaxo/src/addons/be_style/
+!/redaxo/src/addons/cronjob/
+!/redaxo/src/addons/debug/
+!/redaxo/src/addons/install/
+!/redaxo/src/addons/media_manager/
+!/redaxo/src/addons/mediapool/
+!/redaxo/src/addons/metainfo/
+!/redaxo/src/addons/phpmailer/
+!/redaxo/src/addons/project/
+!/redaxo/src/addons/structure/
+!/redaxo/src/addons/users/
+
+# PhpStorm setting
+/.idea/*
+!/.idea/encodings.xml
+!/.idea/icon.svg
+!/.idea/jsonSchemas.xml
+!/.idea/sqldialects.xml
+!/.idea/codeStyles/
+!/.idea/fileTemplates/
+!/.idea/inspectionProfiles/
+!/.idea/runConfigurations/
+/.idea/runConfigurations/*
+!/.idea/runConfigurations/phpunit.xml
+!/.idea/scopes/
+
+# VSCode setting
+.vscode
+
+# Docker
+/.docker
+/docker-compose.*.yml

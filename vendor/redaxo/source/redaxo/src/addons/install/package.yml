@@ -1,0 +1,32 @@
+package: install
+version: '2.11.1'
+author: Gregor Harlan
+supportpage: https://github.com/redaxo/redaxo
+
+page:
+    title: 'translate:title'
+    perm: admin[]
+    block: system
+    prio: 70
+    pjax: true
+    icon: rex-icon rex-icon-install
+    subpages:
+        packages:
+            title: 'translate:subpage_packages'
+            subpages:
+                update: { title: 'translate:subpage_update' }
+                add: { title: 'translate:subpage_add' }
+                upload: { title: 'translate:subpage_upload' }
+        settings: { title: 'translate:subpage_settings' }
+
+requires:
+    php:
+        version: '>=8.1'
+        extensions: [zlib]
+    redaxo: ^5.15.0
+
+
+console_commands:
+    install:download: rex_command_install_download
+    install:list: rex_command_install_list
+    install:update: rex_command_install_update

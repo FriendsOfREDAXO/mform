@@ -1,0 +1,59 @@
+{
+    "name": "kubawerlos/php-cs-fixer-custom-fixers",
+    "description": "A set of custom fixers for PHP CS Fixer",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Kuba Werłos",
+            "email": "werlos@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "ext-filter": "*",
+        "ext-tokenizer": "*",
+        "friendsofphp/php-cs-fixer": "^3.22"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6.4 || ^10.0.14"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpCsFixerCustomFixers\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhpCsFixerCustomFixersDev\\": ".dev-tools/src",
+            "Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "analyse": [
+            "@install-dev-tools",
+            "php-cs-fixer fix --ansi --diff --dry-run --verbose",
+            "@composer --no-interaction --working-dir=.dev-tools analyse"
+        ],
+        "fix": [
+            "@install-dev-tools",
+            "php-cs-fixer fix --ansi --verbose || exit 0",
+            "@composer --no-interaction --working-dir=.dev-tools fix"
+        ],
+        "infection": [
+            "@install-dev-tools",
+            "@composer --working-dir=.dev-tools infection"
+        ],
+        "install-dev-tools": [
+            "@composer --working-dir=.dev-tools --quiet install --classmap-authoritative"
+        ],
+        "test": [
+            "phpunit"
+        ],
+        "verify": [
+            "@analyse",
+            "@test",
+            "@infection"
+        ]
+    }
+}
