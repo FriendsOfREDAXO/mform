@@ -7,11 +7,10 @@
 
 namespace MForm\DTO;
 
-
 class MFormDefault
 {
     // default classes for r5 bootstrap backend theme
-    static public array $classes = array(
+    public static array $classes = [
         'start-group-column' => '',
         'column' => '',
         'select' => 'form-control',
@@ -38,6 +37,6 @@ class MFormDefault
         'textarea' => 'form-control',
         'textarea-readonly' => 'form-control',
         'checkbox' => '',
-        'radio' => ''
-    );
+        'radio' => '',
+    ];
 }

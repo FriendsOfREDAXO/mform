@@ -10,7 +10,7 @@ use MForm\Utils\MFormPageHelper;
 // parse info fragment
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_info'), false);
-$fragment->setVar('body', '<p>'.rex_i18n::msg('mform_example_description_base').'</p>', false);
+$fragment->setVar('body', '<p>' . rex_i18n::msg('mform_example_description_base') . '</p>', false);
 echo $fragment->parse('core/page/section.php');
 
 // parse info fragment

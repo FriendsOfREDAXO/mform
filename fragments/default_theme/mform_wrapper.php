@@ -1,5 +1,6 @@
 <?php
-//dump($this->type);
+
+// dump($this->type);
 switch ($this->type) {
     // DEFAULT STUFF
     case 'wrapper':
@@ -9,7 +10,7 @@ switch ($this->type) {
         echo '<div class="hidden" style="display:none">' . $this->label . $this->element . '</div>';
         break;
 
-    // COLUM
+        // COLUM
     case 'start-group-column':
         echo '<div class="row ' . $this->class . '" ' . $this->attributes . '>';
         break;
@@ -17,7 +18,7 @@ switch ($this->type) {
         echo '<div class="' . $this->class . '" ' . $this->attributes . '>';
         break;
 
-    // INLINE
+        // INLINE
     case 'start-group-inline':
         echo '<div class="form-inline-row">';
         break;
@@ -25,8 +26,8 @@ switch ($this->type) {
         echo '<div class="form-inline ' . $this->class . '" ' . $this->attributes . '>' . $this->label;
         break;
 
-    // COLLAPSE
-    case 'collapse-button';
+        // COLLAPSE
+    case 'collapse-button':
         echo '<a class="btn btn-white btn-block ' . $this->class . '" ' . $this->attributes . '>' . $this->value . '</a>';
         break;
     case 'start-group-collapse':
@@ -36,7 +37,7 @@ switch ($this->type) {
         echo $this->label . '<div class="collapse ' . $this->class . '" ' . $this->attributes . '>';
         break;
 
-    // TAB
+        // TAB
     case 'tabnavli':
         echo '<li role="presentation" class="' . $this->class . '"><a href="#' . $this->value . '" aria-controls="' . $this->value . '" role="tab" data-toggle="tab" data-tab-item="' . $this->value . '">' . $this->label . '</a></li>';
         break;
@@ -47,7 +48,7 @@ switch ($this->type) {
         echo '<div class="nav mform-tabs rex-page-nav" ' . $this->attributes . '><ul class="nav nav-tabs" role="tablist">' . $this->element . '</ul><div class="tab-content">';
         break;
 
-    // FIELDSET
+        // FIELDSET
     case 'fieldset':
         echo '<fieldset class="' . $this->class . '" ' . $this->attributes . '>' . $this->legend;
         break;
@@ -58,7 +59,7 @@ switch ($this->type) {
         echo '<legend>' . $this->legend . '</legend>';
         break;
 
-    // DIV CLOSE STUFF
+        // DIV CLOSE STUFF
     case 'close-tab':
     case 'close-collapse':
     case 'close-column':

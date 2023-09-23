@@ -13,10 +13,10 @@ switch ($this->type) {
         break;
 }
 
-if ($this->type == 'datalist') {
+if ('datalist' == $this->type) {
     echo '<datalist id="' . $this->id . '">' . $this->options . '</datalist>';
-} else if ($this->type == 'datalist-option') {
+} elseif ('datalist-option' == $this->type) {
     echo '<option ' . $this->attributes . '>' . $this->value . '</option>';
 } else {
-    echo (property_exists($this, 'wrapperOpen') ? $this->wrapperOpen : '') . '<input id="' . $this->id . '" type="' . $this->type . '" name="REX_INPUT_VALUE' . $this->varId . '" value="' . $this->value . '" class="' . $this->class . '" ' . $this->attributes . '>' . $this->datalist . (property_exists($this, 'wrapperClose') ? $this->wrapperClose : '');
+    echo(property_exists($this, 'wrapperOpen') ? $this->wrapperOpen : '') . '<input id="' . $this->id . '" type="' . $this->type . '" name="REX_INPUT_VALUE' . $this->varId . '" value="' . $this->value . '" class="' . $this->class . '" ' . $this->attributes . '>' . $this->datalist . (property_exists($this, 'wrapperClose') ? $this->wrapperClose : '');
 }
