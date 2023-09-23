@@ -37,9 +37,6 @@ jobs:
             -   name: Run PHP CS Fixer
                 run: composer cs-fix
 
-            # discard changes in unrelated files
-            -   run: git restore vendor/composer/installed.php
-
             # commit and push fixed files
             -   uses: stefanzweifel/git-auto-commit-action@v4
                 with:
