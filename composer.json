@@ -5,7 +5,6 @@
         "installer-name": "mform"
     },
     "require-dev": {
-        "redaxo/source": "^5.10",
         "redaxo/php-cs-fixer-config": "^2.0",
         "friendsofphp/php-cs-fixer": "^3.14",
         "phpunit/phpunit": "^9.5"
