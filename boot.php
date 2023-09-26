@@ -13,17 +13,17 @@ if (rex_addon::exists('yform') &&
 }
 
 if (rex::isBackend()) {
-    $addon = rex_addon::get('mform');
+    $mform = rex_addon::get('mform');
     // add toggle files
-    rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
-    rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
+    rex_view::addCssFile($mform->getAssetsUrl('toggle/toggle.css'));
+    rex_view::addJsFile($mform->getAssetsUrl('toggle/toggle.js'));
     // widgets
-    rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
-    rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
-    rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
+    rex_view::addCssFile($mform->getAssetsUrl('css/imglist.css'));
+    rex_view::addJsFile($mform->getAssetsUrl('js/imglist.js'));
+    rex_view::addJsFile($mform->getAssetsUrl('js/customlink.js'));
     // add mform js / css
-    rex_view::addJsFile($this->getAssetsUrl('mform.js'));
-    rex_view::addCssFile($this->getAssetsUrl('css/default_theme.css'));
+    rex_view::addJsFile($mform->getAssetsUrl('mform.js'));
+    rex_view::addCssFile($mform->getAssetsUrl('css/default_theme.css'));
     // reset count per page init
     if (rex_backend_login::hasSession()) {
         rex_set_session('mform_count', 0);
