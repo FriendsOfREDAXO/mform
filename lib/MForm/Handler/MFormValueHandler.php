@@ -31,7 +31,7 @@ class MFormValueHandler
         if (false != $sliceId) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
-            $where = 'id="' . $_REQUEST['slice_id'] . '"';
+            $where = 'id="' . $sliceId . '"';
 
             $query = '
                 SELECT ' . $fields . '

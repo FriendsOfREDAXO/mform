@@ -13,7 +13,7 @@ switch ($this->type) {
         break;
 }
 
-if ('datalist' == $this->type) {
+if ('datalist' === $this->type) {
     echo '<datalist id="' . $this->id . '">' . $this->options . '</datalist>';
 } elseif ('datalist-option' == $this->type) {
     echo '<option ' . $this->attributes . '>' . $this->value . '</option>';
