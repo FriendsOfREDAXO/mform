@@ -71,6 +71,8 @@ jobs:
           rsync -av --exclude='./vendor' --exclude='.github' --exclude='.git' --exclude='redaxo_cms' './' 'redaxo_cms/redaxo/src/addons/${{ github.event.repository.name }}'
           redaxo_cms/redaxo/bin/console install:download 'rexstan' '1.*'
           redaxo_cms/redaxo/bin/console package:install 'rexstan'
+          redaxo_cms/redaxo/bin/console install:download 'yform' '4.*'
+          redaxo_cms/redaxo/bin/console package:install 'yform'
           redaxo_cms/redaxo/bin/console package:install '${{ github.event.repository.name }}'
 
       # execute rexstan.php to create the needed user-config.neon
