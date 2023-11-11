@@ -7,18 +7,11 @@
 
 namespace MForm\Handler;
 
-
 use MForm\DTO\MFormItem;
 
 class MFormParameterHandler
 {
-    /**
-     * @param MFormItem $item
-     * @param mixed $name
-     * @param mixed $value
-     * @author Joachim Doerr
-     */
-    public static function addParameter(MFormItem $item, $name, $value): void
+    public static function addParameter(MFormItem $item, mixed $name, mixed $value): void
     {
         switch ($name) {
             case 'label':
@@ -33,19 +26,12 @@ class MFormParameterHandler
         }
     }
 
-    /**
-     * @param MFormItem $item
-     * @param array $parameter
-     * @author Joachim Doerr
-     */
     public static function addParameters(MFormItem $item, array $parameter): void
     {
         // is parameter an array
-        if (is_array($parameter)) {
-            foreach ($parameter as $name => $value) {
-                // set parameter by setParameter method
-                self::addParameter($item, $name, $value);
-            }
+        foreach ($parameter as $name => $value) {
+            // set parameter by setParameter method
+            self::addParameter($item, $name, $value);
         }
     }
 }

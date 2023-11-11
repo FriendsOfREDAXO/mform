@@ -14,12 +14,9 @@ use MForm\DTO\MFormItem;
 class MFormItemManipulator
 {
     /**
-     * set value for html out
-     * set subvar id for useage in templates
-     * @param MFormItem $item
-     * @author Joachim Doerr
+     * @description set value for html out and set subvarId for usage in templates
      */
-    public static function setVarAndIds(MFormItem $item)
+    public static function setVarAndIds(MFormItem $item): void
     {
         // set value for html out
         if (!is_array($item->getValue())) {
@@ -42,11 +39,9 @@ class MFormItemManipulator
     }
 
     /**
-     * set custom or default id for unique element id
-     * @param MFormItem $item
-     * @author Joachim Doerr
+     * @description set custom or default id for unique element id
      */
-    public static function setCustomId(MFormItem $item)
+    public static function setCustomId(MFormItem $item): void
     {
         // set default unique element id
         $item->setId('rv' . $item->getId()); // add alpha prefix for valid html syntax
@@ -59,11 +54,9 @@ class MFormItemManipulator
     }
 
     /**
-     * set default class for r5 default theme
-     * @param MFormItem $item
-     * @author Joachim Doerr
+     * @description set default class for r5 default theme
      */
-    public static function setDefaultClass(MFormItem $item)
+    public static function setDefaultClass(MFormItem $item): void
     {
         // is default class flag set
         if ($item->isDefaultClass()) {

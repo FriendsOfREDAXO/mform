@@ -7,20 +7,14 @@
 
 namespace MForm\Handler;
 
-
 use MForm\DTO\MFormItem;
 
 class MFormElementHandler
 {
     /**
-     * create basic mform element items
-     * @param integer $id
-     * @param string $type
-     * @param float|integer $varId
-     * @return MFormItem
-     * @author Joachim Doerr
+     * @description create basic mform element items
      */
-    public static function createElement($id, $type, $varId): MFormItem
+    public static function createElement(int $id, string $type, mixed $varId): MFormItem
     {
         // create item
         $item = new MFormItem();

@@ -13,10 +13,7 @@ use rex;
 class MFormClang
 {
     /**
-     * for multilingual backend
-     * @param array|string $languageData
-     * @return mixed|string
-     * @author Joachim Doerr
+     * @description for multilingual backend
      */
     public static function getClangValue($languageData)
     {

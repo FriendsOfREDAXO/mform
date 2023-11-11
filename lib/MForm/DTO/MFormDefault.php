@@ -7,10 +7,11 @@
 
 namespace MForm\DTO;
 
-
 class MFormDefault
 {
-    // default classes for r5 bootstrap backend theme
+    /**
+     * @description default classes for r5 bootstrap backend theme
+     */
     static public array $classes = array(
         'start-group-column' => '',
         'column' => '',

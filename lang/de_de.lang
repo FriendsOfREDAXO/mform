@@ -3,13 +3,13 @@ mform_title = MForm
 
 mform_change_message = MForm wurde aktualisiert. Bitte beachte die Update-Hinweise in den Release-Notes und im Changelog. 
 
-mform_demo = Beispielsammlung
+mform_mform_demo = Beispielsammlung
 mform_demo_base = Basis Beispiele
 mform_demo_extended = Erweiterte Beispiele
 mform_demo_expert = Experten Beispiele
 mform_demo_community = FOS Beispiele
 mform_demo_wrapper = Wrapper Beispiele
-mform_reference_demo = Beispielsammlung
+mform_reference_demo = MForm Beispielsammlung
 mform_info = Info
 
 mform_modul_input = Modul Eingabe

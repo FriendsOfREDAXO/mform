@@ -1,14 +1,19 @@
 <?php
-
 switch ($this->type) {
     case 'text':
         break;
     case 'radio':
-        $this->wrapperOpen = '<div class="radio"><label class="description" for="' . $this->id . '">';
+        if (str_contains($this->attributes, ':id=')) {
+            if (preg_match('/:id="([^"]+)"/', $this->attributes, $matches)) {
+                // Der Wert von ":id" befindet sich im ersten Element von $matches
+                $this->attributes = $this->attributes . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"';
+            }
+        }
+        $this->wrapperOpen = '<div class="radio"><label class="description">';
         $this->wrapperClose = $this->label . '</label></div>';
         break;
     case 'checkbox':
-        $this->wrapperOpen = '<div class="checkbox"><label class="description" for="' . $this->id . '">';
+        $this->wrapperOpen = '<div class="checkbox"><label class="description">';
         $this->wrapperClose = ' ' . $this->label . '</label></div>';
         break;
 }

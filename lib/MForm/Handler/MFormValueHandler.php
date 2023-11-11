@@ -7,7 +7,6 @@
 
 namespace MForm\Handler;
 
-
 use MForm\DTO\MFormItem;
 use MForm\Utils\MFormClang;
 use rex;
@@ -17,16 +16,12 @@ use rex_sql_exception;
 
 class MFormValueHandler
 {
-    /**
-     * @return array
-     * @author Joachim Doerr
-     */
     public static function loadRexVars(): array
     {
         $sliceId = rex_request('slice_id', 'int', false);
         $result = [];
 
-        if ($sliceId != false) {
+        if ($sliceId) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
             $where = 'id="' . $_REQUEST['slice_id'] . '"';
@@ -67,13 +62,6 @@ class MFormValueHandler
         return $result;
     }
 
-    /**
-     * @param MFormItem $item
-     * @param array $result
-     * @param string|null $value
-     * @param string|null $defaultValue
-     * @author Joachim Doerr
-     */
     public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null): void
     {
         if (!is_null($defaultValue)) {

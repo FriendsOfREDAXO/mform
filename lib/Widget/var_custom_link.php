@@ -192,7 +192,7 @@ class rex_var_custom_link extends rex_var
         $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
         $e['after'] = '</div>';
         $e['functionButtons'] = $ylinks . '
-        <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
+        <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon rex-icon-open-mediapool"></i></a>
         <a href="#" class="btn btn-popup external_link ' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup email_link ' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
         <a href="#" class="btn btn-popup phone_link ' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>

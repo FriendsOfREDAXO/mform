@@ -23,6 +23,8 @@ if (rex::isBackend()) {
     rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
     rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
     // add mform js / css
+    rex_view::addJsFile($this->getAssetsUrl('js/alpinejs.js'), [rex_view::JS_DEFERED => 'defer']);
+    rex_view::addJsFile($this->getAssetsUrl('repeater.js'));
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
     rex_view::addCssFile($this->getAssetsUrl('css/mform.css'));
     // reset count per page init

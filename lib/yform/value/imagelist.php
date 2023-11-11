@@ -1,8 +1,8 @@
 <?php
 /**
- * User: joachimdoerr
- * Date: 2019-03-13
- * Time: 22:10
+ * @author Joachim Doerr
+ * @package redaxo5
+ * @license MIT
  */
 
 class rex_yform_value_imagelist extends rex_yform_value_abstract
