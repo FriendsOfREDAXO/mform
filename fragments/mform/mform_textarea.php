@@ -1,3 +1,4 @@
 <?php
+/** @var rex_fragment $this */
 
-echo '<textarea id="' . $this->id . '" name="REX_INPUT_VALUE' . $this->varId . '" class="' . $this->class . '" ' . $this->attributes . '>' . $this->value . '</textarea>';
+echo '<textarea id="' . $this->getVar('id') . '" name="REX_INPUT_VALUE' . $this->getVar('varId') . '" class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</textarea>';

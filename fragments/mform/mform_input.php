@@ -1,27 +1,29 @@
 <?php
-switch ($this->type) {
+/** @var rex_fragment $this */
+
+switch ($this->getVar('type')) {
     case 'text':
         break;
     case 'radio':
-        if (str_contains($this->attributes, ':id=')) {
-            if (preg_match('/:id="([^"]+)"/', $this->attributes, $matches)) {
+        if (str_contains($this->getVar('attributes'), ':id=')) {
+            if (preg_match('/:id="([^"]+)"/', $this->getVar('attributes'), $matches)) {
                 // Der Wert von ":id" befindet sich im ersten Element von $matches
-                $this->attributes = $this->attributes . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"';
+                $this->setVar('attributes', $this->getVar('attributes') . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"');
             }
         }
-        $this->wrapperOpen = '<div class="radio"><label class="description">';
-        $this->wrapperClose = $this->label . '</label></div>';
+        $this->setVar('wrapperOpen', '<div class="radio"><label class="description">');
+        $this->setVar('wrapperClose', $this->getVar('label') . '</label></div>');
         break;
     case 'checkbox':
-        $this->wrapperOpen = '<div class="checkbox"><label class="description">';
-        $this->wrapperClose = ' ' . $this->label . '</label></div>';
+        $this->setVar('wrapperOpen', '<div class="checkbox"><label class="description">');
+        $this->setVar('wrapperClose', ' ' . $this->getVar('label') . '</label></div>');
         break;
 }
 
-if ($this->type == 'datalist') {
-    echo '<datalist id="' . $this->id . '">' . $this->options . '</datalist>';
-} else if ($this->type == 'datalist-option') {
-    echo '<option ' . $this->attributes . '>' . $this->value . '</option>';
+if ($this->getVar('type') == 'datalist') {
+    echo '<datalist id="' . $this->getVar('id') . '">' . $this->getVar('options') . '</datalist>';
+} else if ($this->getVar('type') == 'datalist-option') {
+    echo '<option ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</option>';
 } else {
-    echo (property_exists($this, 'wrapperOpen') ? $this->wrapperOpen : '') . '<input id="' . $this->id . '" type="' . $this->type . '" name="REX_INPUT_VALUE' . $this->varId . '" value="' . $this->value . '" class="' . $this->class . '" ' . $this->attributes . '>' . $this->datalist . (property_exists($this, 'wrapperClose') ? $this->wrapperClose : '');
+    echo (property_exists($this, 'wrapperOpen') ? $this->getVar('wrapperOpen') : '') . '<input id="' . $this->getVar('id') . '" type="' . $this->getVar('type') . '" name="REX_INPUT_VALUE' . $this->getVar('varId') . '" value="' . $this->getVar('value') . '" class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('datalist') . $this->getVar('wrapperClose', '');
 }

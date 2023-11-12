@@ -6,6 +6,7 @@
 - remove unused $inline variable
 - add inputs for default form input forms
 - alpine repeater with 2 level support
+- remove dynamic creation of property in fragments
 
 ## Version 7.2.2
 

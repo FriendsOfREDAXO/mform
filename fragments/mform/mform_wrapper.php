@@ -1,20 +1,21 @@
 <?php
-//dump($this->type);
-switch ($this->type) {
+/** @var rex_fragment $this */
+
+switch ($this->getVar('type')) {
     // DEFAULT STUFF
     case 'wrapper':
-        echo '<div class="mform form-horizontal">' . $this->output . '</div>';
+        echo '<div class="mform form-horizontal">' . $this->getVar('output') . '</div>';
         break;
     case 'hidden':
-        echo '<div class="hidden" style="display:none">' . $this->label . $this->element . '</div>';
+        echo '<div class="hidden" style="display:none">' . $this->getVar('label') . $this->getVar('element') . '</div>';
         break;
 
     // COLUM
     case 'start-group-column':
-        echo '<div class="row ' . $this->class . '" ' . $this->attributes . '>';
+        echo '<div class="row ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
     case 'column':
-        echo '<div class="' . $this->class . '" ' . $this->attributes . '>';
+        echo '<div class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
 
     // INLINE
@@ -22,40 +23,40 @@ switch ($this->type) {
         echo '<div class="form-inline-row">';
         break;
     case 'inline':
-        echo '<div class="form-inline ' . $this->class . '" ' . $this->attributes . '>' . $this->label;
+        echo '<div class="form-inline ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('label');
         break;
 
     // COLLAPSE
     case 'collapse-button';
-        echo '<a class="btn btn-white btn-block ' . $this->class . '" ' . $this->attributes . '>' . $this->value . '</a>';
+        echo '<a class="btn btn-white btn-block ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</a>';
         break;
     case 'start-group-collapse':
-        echo '<div class="collapse-group ' . $this->class . '" ' . $this->attributes . '>';
+        echo '<div class="collapse-group ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
     case 'collapse':
-        echo $this->label . '<div class="collapse ' . $this->class . '" ' . $this->attributes . '>';
+        echo $this->getVar('label') . '<div class="collapse ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
 
     // TAB
     case 'tabnavli':
-        echo '<li role="presentation" class="' . $this->class . '"><a href="#' . $this->value . '" aria-controls="' . $this->value . '" role="tab" data-toggle="tab" data-tab-item="' . $this->value . '">' . $this->label . '</a></li>';
+        echo '<li role="presentation" class="' . $this->getVar('class') . '"><a href="#' . $this->getVar('value') . '" aria-controls="' . $this->getVar('value') . '" role="tab" data-toggle="tab" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
         break;
     case 'tab':
-        echo '<div role="tabpanel" class="tab-pane ' . $this->class . '" ' . $this->attributes . '>';
+        echo '<div role="tabpanel" class="tab-pane ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
     case 'start-group-tab':
-        echo '<div class="nav mform-tabs rex-page-nav" ' . $this->attributes . '><ul class="nav nav-tabs" role="tablist">' . $this->element . '</ul><div class="tab-content">';
+        echo '<div class="nav mform-tabs rex-page-nav" ' . $this->getVar('attributes') . '><ul class="nav nav-tabs" role="tablist">' . $this->getVar('element') . '</ul><div class="tab-content">';
         break;
 
     // FIELDSET
     case 'fieldset':
-        echo '<fieldset class="' . $this->class . '" ' . $this->attributes . '>' . $this->legend;
+        echo '<fieldset class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('legend');
         break;
     case 'close-fieldset':
         echo '</fieldset>';
         break;
     case 'legend':
-        echo '<legend>' . $this->legend . '</legend>';
+        echo '<legend>' . $this->getVar('legend') . '</legend>';
         break;
 
     // DIV CLOSE STUFF
