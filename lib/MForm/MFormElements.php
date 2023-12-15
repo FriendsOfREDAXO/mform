@@ -185,7 +185,7 @@ class MFormElements
      * @param array|null $attributes
      * @author Joachim Doerr
      */
-    public function addFieldsetArea(?string $legend = null, $form = null, array $attributes = [], $parse = true): self
+    public function addFieldsetArea(?string $legend = '', $form = null, array $attributes = [], $parse = true): self
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
             ->addForm($form, $parse)
