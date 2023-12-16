@@ -8,7 +8,7 @@ switch ($this->getVar('type')) {
         if (str_contains($this->getVar('attributes'), ':id=')) {
             if (preg_match('/:id="([^"]+)"/', $this->getVar('attributes'), $matches)) {
                 // Der Wert von ":id" befindet sich im ersten Element von $matches
-                $this->setVar('attributes', $this->getVar('attributes') . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"');
+                $this->setVar('attributes', $this->getVar('attributes') . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"', false);
             }
         }
         $this->setVar('wrapperOpen', '<div class="radio"><label class="description">');

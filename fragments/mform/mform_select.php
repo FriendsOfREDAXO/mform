@@ -3,7 +3,7 @@
 
 switch ($this->getVar('type')) {
     case 'multiselect';
-        $this->setVar('attributes', $this->getVar('attributes') . ' multiple');
+        $this->setVar('attributes', $this->getVar('attributes') . ' multiple', false);
     case 'select';
         foreach (rex_view::getJsFiles() as $file) {
             if (str_contains($file, 'bootstrap-select')
