@@ -87,6 +87,10 @@ window.repeater = () => {
                     // der editor soll nicht durch das rex:ready event initialisiert werden
                     if ($(element).find('.cke5-editor') !== undefined) {
                         $(element).find('.cke5-editor').each(function() {
+                            if (typeof cke5_destroy !== 'function') {
+                                return;
+                            }
+
                             // damit es keine konflikte durch pjax gibt müssen die instanzen sauber entfernt werden
                             cke5_destroy($(this));
                             $(this).removeClass('cke5-editor') // verhindert das initialisieren durch rex:ready
@@ -134,7 +138,7 @@ window.repeater = () => {
                         },5);
                     }
                     // PREPARE CKE5
-                    if ($(element).find('.cke5-repeater').length > 0) {
+                    if ($(element).find('.cke5-repeater').length > 0 && typeof cke5_init_ready === 'function') {
                         // initialisiere jede cke5 textarea einzeiln
                         $(element).find('.cke5-repeater:not(.cke5-repeater-init)').each(function (){
                             if (!$(this).hasClass('cke5-repeater-init')) {
