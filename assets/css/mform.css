@@ -29,6 +29,10 @@
     margin-bottom: 0;
 }
 
+.mform .form-horizontal fieldset {
+    width: 100%;
+}
+
 .mform .mform-headline.grey-legend-background h3,
 .sortitem .mform fieldset.grey-legend-background > legend,
 .mform fieldset.grey-legend-background > legend {
