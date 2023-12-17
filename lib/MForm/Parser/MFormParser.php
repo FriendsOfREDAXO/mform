@@ -41,6 +41,8 @@ class MFormParser
 
     protected array $values = [];
 
+    protected array $obj = [];
+
     /**
      * @var string
      */
@@ -55,14 +57,31 @@ class MFormParser
         $repeaterId = (array_key_exists('repeater_id', $item->getAttributes())) ? $item->getAttributes()['repeater_id'] : uniqid('uid');
         $parentId = (array_key_exists('parent_id', $item->getAttributes())) ? $item->getAttributes()['parent_id'] : null;
         $obj = MFormRepeaterHelper::prepareChildMForms($items, $key, $repeaterId, $group, $groups, $parentId);
+        $this->obj = $obj;
 
         // set obj
         $obj = json_encode($obj);
 
+        // open section and repeater div
         if (is_null($parentId)) {
-            // open section and repeater div
+            // at this point we have to compare item value and obj
+            $itemValue = \rex_var::toArray($item->getValue());
+            $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
+
+            foreach ($itemValue as $index0 => $level0) {
+                if (is_array($level0)) {
+                    foreach ($level0 as $index1 => $level1) {
+                        if (isset($keys[$index1]) && count($level1) == 1 &&
+                            isset($level1[0]) && is_array($level1[0]) &&
+                            empty($level1[0])) {
+                            $itemValue[$index0][$index1] = $this->obj[$index1];
+                        }
+                    }
+                }
+            }
+
             $addInitGroup = ' if('.$groups.'.length <= 0) { addGroup('.$obj.') };';
-            $output[] = '<section class="repeater"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.$item->getValue().');'.$addInitGroup.'\' id="x-repeater">';
+            $output[] = '<section class="repeater"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.json_encode($itemValue).');'.$addInitGroup.'\' id="x-repeater">';
             // add button
             $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a></template>';
             $header = '

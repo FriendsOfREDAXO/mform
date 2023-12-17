@@ -12,6 +12,42 @@ use MForm\DTO\MFormItem;
 
 class MFormRepeaterHelper
 {
+    public static function getRepeaterChildKeys(array $items, $key): array
+    {
+        $next = false;
+        $keys = [];
+
+        foreach ($items as $k => $itm) {
+            if ($next && $itm instanceof MForm) {
+                // prepare obj array
+                $keys = array_merge($keys, self::getChildKeys($itm));
+                $next = false;
+            } else if ($k == $key) {
+                $next = true;
+            }
+        }
+        return $keys;
+    }
+
+    public static function getChildKeys($mform): array
+    {
+        $keys = [];
+
+        $items = $mform->getItems();
+        foreach ($items as $key => $mformItem) {
+            if ($mformItem instanceof MFormItem) {
+                $nameKey = self::getNameKey($mformItem);
+                if (!empty($nameKey) && $mformItem->getType() === 'repeater') {
+                    $keys[$nameKey] = $nameKey;
+                    $keys = array_merge($keys, self::getChildKeys($items[$key+1]));
+                }
+            } else if ($mformItem instanceof MForm && (isset($items[$key-1]) && $items[$key-1] instanceof MFormItem && $items[$key-1]->getType() !== 'repeater')) {
+                $keys = array_merge($keys, self::getChildKeys($mformItem));
+            }
+        }
+        return $keys;
+    }
+
     /**
      * @param array<MFormItem|MForm> $items
      */
@@ -46,7 +82,12 @@ class MFormRepeaterHelper
                     // dump($mformItem->getType());
                     switch ($mformItem->getType()) {
                         case 'repeater':
-                            $obj[$nameKey] = [];
+                            if ($items[$key+1] instanceof MForm) {
+                                // complete the repeater child tree
+                                $obj[$nameKey] = [self::prepareChildItems($items[$key+1], $repeaterId, $group, $groups, $parentId)];
+                            } else {
+                                $obj[$nameKey] = [];
+                            }
                         case 'close-repeater';
                             $mformItem->addAttribute('group', 'field')
                                 ->addAttribute('groups', 'group.' . $nameKey)
