@@ -2,6 +2,10 @@
 
 ## Version 8-beta1
 
+- add recursion for repeater mform subform obj structure
+
+## Version 8-beta1
+
 - change mform css filename
 - remove unused $inline variable
 - add inputs for default form input forms
