@@ -198,3 +198,6 @@ see [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGELO
 
 [Joachim Dörr](https://github.com/joachimdoerr)
 
+**Mform-Repeater**
+Based on code from: [Thorben eaCe](https://github.com/eaCe?tab=repositories)
+
