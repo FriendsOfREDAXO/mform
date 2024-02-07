@@ -12,7 +12,6 @@ page:
         demo:
             title: 'translate:reference_demo'
             subpages:
-                pjax: true
                 demo_base: { title: 'translate:demo_base' }
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
