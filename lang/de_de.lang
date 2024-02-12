@@ -62,7 +62,7 @@ var_extern_link = Externe URL verlinken
 var_mailto_link = Email verlinken
 var_phone_link = Telefonnummer verlinken
 
-yform_values_custom_link_description = CustomLink-Widget aus mform. Stellt ein Link-Widget für mehrere Link-Typen bereit. Medien-, externe, interne und E-Mail- Links
+yform_values_custom_link_description = 🧩 MForm: Stellt ein Link-Widget für mehrere Link-Typen bereit. Medien-, externe, interne und E-Mail- Links
 yform_values_custom_link_media = Media-Link Button
 yform_values_custom_link_media_types = Medien-Typen (komma-getrennt)
 yform_values_custom_link_media_category = Medien-Kategorie (ID)
@@ -71,5 +71,5 @@ yform_values_custom_link_mailto = Mailto-Link-Button
 yform_values_custom_link_intern = Interner-Link-Button
 yform_values_custom_link_link_category = Link-Kategorie
 yform_values_custom_link_phone = Telefon-Link-Button
-yform_values_imagelist_description = Bildauswahl mit direkter Darstellung / drag & drop
+yform_values_imagelist_description = 🧩 MForm: Bildauswahl mit direkter Darstellung / Drag & Drop
 yform_values_custom_link_ylink = YForm-Link-Widget (label_text::yform_tabelle::anzeige_column,label_text2::yform_tabelle_2::anzeige_column_2)
