@@ -71,10 +71,14 @@ class rex_var_imglist extends rex_var
                 if ('' != $file) {
 
                     $url = rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file]);
-                    if ('svg' === pathinfo($file, PATHINFO_EXTENSION)) {
+                    $extension = pathinfo($file, PATHINFO_EXTENSION);
+                    $isVideo = in_array($extension, ['mp4', 'webm', 'ogg']);
+                    if ('svg' === $extension || $isVideo) {
                         $url = rex_url::media($file);
                     }
-                    $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '"><img class="thumbnail" src="' . $url . '" /></li>';
+                    $media = $isVideo ? '<video playsinline autoplay muted loop class="thumbnail"><source src="' . $url . '" type="video/' . $extension . '"></video>' : '<img class="thumbnail" src="' . $url . '" />';
+
+                    $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '">' . $media . '</li>';
 
                     $options .= '<option data-key="' . $key . '" value="' . $file . '">' . $file . '</option>';
                 }
