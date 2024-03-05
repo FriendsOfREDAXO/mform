@@ -43,7 +43,6 @@ function customlink_init_widget(element) {
         clearInterval(timer)
         closeDropDown(id)
   
-        console.log('rex:YForm_selectData_' + id)
         window.addEventListener('rex:YForm_selectData_' + id, (event) => {
           event.preventDefault()
           const id = event.detail.id
