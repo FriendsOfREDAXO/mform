@@ -23,29 +23,41 @@ function customlink_init_widget(element) {
     element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
 
     // ylink
-    element.find('.input-group-btn a.ylink').unbind().bind('click', function() {
+    element
+      .find('.input-group-btn a.ylink')
+      .unbind()
+      .bind('click', function () {
         let id = element.data('id'),
-            table = $(this).data('table'),
-            column = $(this).data('column'),
-            pool = newPoolWindow('index.php?page=yform/manager/data_edit&table_name=' + table + '&rex_yform_manager_opener[id]=1&rex_yform_manager_opener[field]=' + column + '&rex_yform_manager_opener[multiple]=0');
-
-        clearInterval(timer);
-        closeDropDown(id);
-
-        window.addEventListener('rex:YForm_selectData', (event) => {
-            event.preventDefault()
-            const id = event.detail.id
-            const label = event.detail.value
-            YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+          table = $(this).data('table'),
+          column = $(this).data('column'),
+          pool = newPoolWindow(
+            'index.php?page=yform/manager/data_edit&table_name=' +
+              table +
+              '&rex_yform_manager_opener[id]=' +
+              id +
+              '&rex_yform_manager_opener[field]=' +
+              column +
+              '&rex_yform_manager_opener[multiple]=0'
+          )
+  
+        clearInterval(timer)
+        closeDropDown(id)
+  
+        console.log('rex:YForm_selectData_' + id)
+        window.addEventListener('rex:YForm_selectData_' + id, (event) => {
+          event.preventDefault()
+          const id = event.detail.id
+          const label = event.detail.value
+          YForm_selectData(id, label, pool, hidden_input, showed_input, table)
         })
-    
+  
         $(pool).on('rex:YForm_selectData', function (event, id, label) {
-            event.preventDefault()
-            YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+          event.preventDefault()
+          YForm_selectData(id, label, pool, hidden_input, showed_input, table)
         })
-
-        return false;
-    });
+  
+        return false
+      })
 
     // media element
     element.find('a.media_link').unbind().bind('click', function () {
