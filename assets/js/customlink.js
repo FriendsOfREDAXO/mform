@@ -32,9 +32,17 @@ function customlink_init_widget(element) {
         clearInterval(timer);
         closeDropDown(id);
 
-        window.addEventListener('rex:YForm_selectData', (event) =>
-            YForm_selectData(event, pool, hidden_input, showed_input, table)
-        )
+        window.addEventListener('rex:YForm_selectData', (event) => {
+            event.preventDefault()
+            const id = event.detail.id
+            const label = event.detail.value
+            YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+        })
+    
+        $(pool).on('rex:YForm_selectData', function (event, id, label) {
+            event.preventDefault()
+            YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+        })
 
         return false;
     });
@@ -189,12 +197,15 @@ function customlink_init_widget(element) {
     });
 }
 
-const YForm_selectData = (event, pool, hidden_input, showed_input, table) => {
-  event.preventDefault()
+const YForm_selectData = (
+  id,
+  label,
+  pool,
+  hidden_input,
+  showed_input,
+  table
+) => {
   pool.close()
-
-  const id = event.detail.id
-  const label = event.detail.value
 
   value = hidden_input.val()
   text = showed_input.val()
