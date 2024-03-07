@@ -32,3 +32,4 @@ requires:
 conflicts:
     packages:
         ui_tools: '<1.0.0'
+        yform:'<4.2.1'
