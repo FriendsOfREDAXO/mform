@@ -1,5 +1,5 @@
 <?php
-$attributes  ='';
+$attributes  = '';
 switch ($this->type) {
     case 'multiselect':
        $attributes .= ' multiple';
