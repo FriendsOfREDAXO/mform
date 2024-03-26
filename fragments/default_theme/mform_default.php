@@ -2,23 +2,19 @@
 
 switch ($this->type) {
     case 'default':
-        $labelColClass = 'col-sm-2 control-label';
-        $formItemColClass = 'col-sm-10';
+        $this->labelColClass = 'col-sm-2 control-label';
+        $this->formItemColClass = 'col-sm-10';
         break;
     case 'default_full':
     case 'default_custom_full':
-        $labelColClass = 'col-sm-12';
-        $formItemColClass = 'col-sm-12';
+        $this->labelColClass = 'col-sm-12';
+        $this->formItemColClass = 'col-sm-12';
         break;
-    default:
-        // Standardwerte oder Fehlerbehandlung, falls notwendig
-        $labelColClass = 'col-sm-2 control-label';
-        $formItemColClass = 'col-sm-10';
 }
 
-$labelWrapper = '<div class="' . $labelColClass . '">';
+$labelWrapper = '<div class="' . $this->labelColClass . '">';
 $labelWrapperEnd = '</div>';
-$inputWrapper = '<div class="' . $formItemColClass . '">';
+$inputWrapper = '<div class="' . $this->formItemColClass . '">';
 $inputWrapperEnd = '</div>';
 
 if (true === $this->inline) {
