@@ -62,6 +62,13 @@ class MFormOutputHelper
                 }
             } else {
                 $item['customlink_class'] = ' extern';
+
+                if (strpos($item['customlink_url'], 'tel:') === 0) {
+                    $item['customlink_class'] = 'tel';
+                } elseif (strpos($item['customlink_url'], 'mailto:') === 0) {
+                    $item['customlink_class'] = 'mail';
+                }
+                
                 if ($externBlank) {
                     $item['customlink_target'] = ' target="_blank"';
                 }
