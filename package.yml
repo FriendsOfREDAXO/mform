@@ -7,7 +7,7 @@ page:
     title: 'translate:title'
     pjax: true
     perm: admin[]
-    icon: rex-icon fa-subway
+    icon: rex-icon fa-solid fa-diagram-next
     subpages:
         demo:
             title: 'translate:reference_demo'
@@ -28,9 +28,8 @@ page:
 
 requires:
     php: '>=7.6'
-    redaxo: '^5.10.0'
+    redaxo: '^5.17.0'
 
 conflicts:
     packages:
         ui_tools: '<1.0.0'
-        yform: '<4.2.1'
