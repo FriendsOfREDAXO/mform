@@ -7,25 +7,21 @@ page:
     title: 'translate:title'
     pjax: true
     perm: admin[]
-    icon: rex-icon fa-subway
+    icon: rex-icon fa-diagram-next
     subpages:
-        mform_demo:
-            title: 'translate:mform_reference_demo'
-            subpages:
-                pjax: true
-                demo_base: { title: 'translate:demo_base' }
-                demo_wrapper: { title: 'translate:demo_wrapper' }
-                demo_extended: { title: 'translate:demo_extended' }
-                demo_expert: { title: 'translate:demo_expert' }
+        docs:
+            title: 'translate:help'
+            icon: rex-icon fa-info-circle
+            perm: mform[docs]
+            hidden: true
+        demo:
+            title: 'translate:demo'
+            icon: rex-icon fa-desktop
+            perm: mform[demo]
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
             itemclass: pull-right
-        help:
-            title: 'translate:help'
-            subPath: README.md
-            itemclass: pull-right
-
 requires:
     php: '>=7.4'
     redaxo: '^5.10.0'
