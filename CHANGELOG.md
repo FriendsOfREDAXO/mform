@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8-beta3
+
+- added repeater examples
+
 ## Version 8-beta2
 
 - add recursion for repeater mform subform obj structure
