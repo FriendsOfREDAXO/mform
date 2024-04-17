@@ -9,14 +9,17 @@
 namespace MForm;
 
 use MForm;
+use MForm\DTO\MFormInputsConfig;
 use MForm\DTO\MFormItem;
 use MForm\Handler\MFormAttributeHandler;
 use MForm\Handler\MFormElementHandler;
 use MForm\Handler\MFormOptionHandler;
 use MForm\Handler\MFormParameterHandler;
 use MForm\Handler\MFormValueHandler;
+use MForm\Inputs\MFormInputsInterface;
 use rex_be_controller;
 
+use rex_path;
 use function array_key_exists;
 use function count;
 use function is_array;
@@ -320,6 +323,30 @@ abstract class MFormElements
     public function addImagelistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('imglist', $id, null, $attributes, null, $parameter, $catId);
+    }
+
+    public function addInputs(float|int|string $id, string $filename, MFormInputsConfig $inputsConfig = null): ?MForm
+    {
+        if (null === $inputsConfig) {
+            $inputsConfig = new MFormInputsConfig($id);
+        } else {
+            $inputsConfig->id = $id;
+        }
+        if (!empty($filename)) {
+            if (substr($filename,(strlen($filename) - 1), 1) == '/') $filename = substr($filename, 0, strlen($filename) - 1);
+            $basename = pathinfo($filename, PATHINFO_BASENAME);
+            if (str_contains($filename, '.php')) {
+                $filename = substr($filename, 0, strlen($filename) - 4);
+            }
+            $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
+            if (file_exists($file)) {
+                include_once $file;
+                /** @var MFormInputsInterface $inputs */
+                $inputs = new $basename($this, $inputsConfig);
+                return $this->addForm($inputs->generateInputs());
+            }
+        }
+        return null;
     }
 
     public function setLabel(string $label): MForm

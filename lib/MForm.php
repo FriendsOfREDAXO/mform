@@ -43,25 +43,6 @@ class MForm extends MFormElements
         return new $class(null, $debug);
     }
 
-    public function addInputs(string $filename = null, MFormInputsConfig $inputsConfig = null): ?MForm
-    {
-        if (!empty($filename)) {
-            if (substr($filename,(strlen($filename) - 1), 1) == '/') $filename = substr($filename, 0, strlen($filename) - 1);
-            $basename = pathinfo($filename, PATHINFO_BASENAME);
-            if (str_contains($filename, '.php')) {
-                $filename = substr($filename, 0, strlen($filename) - 4);
-            }
-            $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
-            if (file_exists($file)) {
-                include_once $file;
-                /** @var MFormInputsInterface $inputs */
-                $inputs = new $basename($this, $inputsConfig);
-                return $inputs->generateInputs();
-            }
-        }
-        return null;
-    }
-
     public function setTheme(string $theme): self
     {
         $this->theme = $theme;

@@ -3,6 +3,7 @@
 ## Version 8-beta3
 
 - added repeater examples
+- fix :id, move addInputs method to elements class
 
 ## Version 8-beta2
 
