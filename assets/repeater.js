@@ -270,13 +270,13 @@ window.repeater = () => {
         },
         openMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id + '_NAME');
+                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         addMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id + '_NAME' + params);
+                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id + params);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
@@ -284,7 +284,7 @@ window.repeater = () => {
             let params = '',
                 element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
                 param = params + '&file_name=' + element.media,
-                media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id + '_NAME');
+                media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
