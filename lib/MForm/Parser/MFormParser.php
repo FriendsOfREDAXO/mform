@@ -257,7 +257,7 @@ class MFormParser
     {
         // create templateElement object
         $element = new MFormElement();
-        $element->setOutput($item->getValue())
+        $element->setOutput((is_string($item->getValue())?$item->getValue():''))
             ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setClass($item->getClass()) // set output to replace in template
             ->setType($item->getType());
@@ -686,10 +686,10 @@ class MFormParser
                 $inputs = $dom->getElementsByTagName('input');
 
                 if ($selects instanceof DOMNodeList) {
-                    $this->processNodeFormElement($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
+                    $this->processNodeFormElements($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
                 }
                 if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElement($inputs, $item, 'REX_MEDIALIST_' . $id);
+                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIALIST_' . $id);
                 }
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
@@ -764,10 +764,10 @@ class MFormParser
                 $inputs = $dom->getElementsByTagName('input');
 
                 if ($selects instanceof DOMNodeList) {
-                    $this->processNodeFormElement($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                    $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
                 }
                 if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElement($inputs, $item, 'REX_LINKLIST_' . $id);
+                    $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
                 }
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);

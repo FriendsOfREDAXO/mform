@@ -14,16 +14,16 @@ switch ($this->getVar('type')) {
         break;
 }
 
-$labelWrapper = '<div class="' . $this->getVar('labelColClass') . '">';
-$labelWrapperEnd = '</div>';
-$inputWrapper = '<div class="' . $this->getVar('formItemColClass') . '">';
-$inputWrapperEnd = '</div>';
+$labelWrapperOpen = '<div class="' . $this->getVar('labelColClass') . '">';
+$labelWrapperClose = '</div>';
+$inputWrapperOpen = '<div class="' . $this->getVar('formItemColClass') . '">';
+$inputWrapperClose = '</div>';
 
 if ($this->getVar('inline')) {
-    $labelWrapper = '';
-    $labelWrapperEnd = '';
-    $inputWrapper = '';
-    $inputWrapperEnd = '';
+    $labelWrapperOpen = '';
+    $labelWrapperClose = '';
+    $inputWrapperOpen = '';
+    $inputWrapperClose = '';
 }
 
-echo '<div class="form-group ' . $this->getVar('class') . '">' . $labelWrapper . $this->getVar('label') . $this->getVar('infoTooltip') . $this->getVar('infoCollapseButton') . $labelWrapperEnd . $inputWrapper . $this->getVar('element') . $inputWrapperEnd . '</div>' . $this->getVar('infoCollapse');
+echo '<div class="form-group ' . $this->getVar('class') . '">' . $labelWrapperOpen . $this->getVar('label') . $this->getVar('infoTooltip') . $this->getVar('infoCollapseButton') . $labelWrapperClose . $inputWrapperOpen . $this->getVar('element') . $inputWrapperClose . '</div>' . $this->getVar('infoCollapse');

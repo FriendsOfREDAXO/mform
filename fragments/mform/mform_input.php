@@ -1,6 +1,9 @@
 <?php
 /** @var rex_fragment $this */
 
+$wrapperOpen = '';
+$wrapperClose = '';
+
 switch ($this->getVar('type')) {
     case 'text':
         break;
@@ -11,12 +14,12 @@ switch ($this->getVar('type')) {
                 $this->setVar('attributes', $this->getVar('attributes') . ' :name="\'REX_INPUT_VALUE[\'+'.$matches[1].'+\']\'"', false);
             }
         }
-        $this->setVar('wrapperOpen', '<div class="radio"><label class="description">');
-        $this->setVar('wrapperClose', $this->getVar('label') . '</label></div>');
+        $wrapperOpen = '<div class="radio"><label class="description">';
+        $wrapperClose = $this->getVar('label') . '</label></div>';
         break;
     case 'checkbox':
-        $this->setVar('wrapperOpen', '<div class="checkbox"><label class="description">');
-        $this->setVar('wrapperClose', ' ' . $this->getVar('label') . '</label></div>');
+        $wrapperOpen = '<div class="checkbox"><label class="description">';
+        $wrapperClose = ' ' . $this->getVar('label') . '</label></div>';
         break;
 }
 
@@ -25,5 +28,5 @@ if ($this->getVar('type') == 'datalist') {
 } else if ($this->getVar('type') == 'datalist-option') {
     echo '<option ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</option>';
 } else {
-    echo (property_exists($this, 'wrapperOpen') ? $this->getVar('wrapperOpen') : '') . '<input id="' . $this->getVar('id') . '" type="' . $this->getVar('type') . '" name="REX_INPUT_VALUE' . $this->getVar('varId') . '" value="' . $this->getVar('value') . '" class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('datalist') . $this->getVar('wrapperClose', '');
+    echo $wrapperOpen . '<input id="' . $this->getVar('id') . '" type="' . $this->getVar('type') . '" name="REX_INPUT_VALUE' . $this->getVar('varId') . '" value="' . $this->getVar('value') . '" class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('datalist') . $wrapperClose;
 }
