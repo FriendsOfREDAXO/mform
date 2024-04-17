@@ -15,6 +15,7 @@ page:
                 demo_base: { title: 'translate:demo_base' }
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
+                demo_repeater: { title: 'translate:demo_repeater' }
                 demo_expert: { title: 'translate:demo_expert' }
         changelog:
             title: 'translate:changelog'
