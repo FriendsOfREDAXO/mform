@@ -97,7 +97,7 @@ class MFormRepeaterHelper
                         case 'media':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('repeater_link', true);
-                            $obj[$nameKey] = ['media' => ''];
+                            $obj[$nameKey] = "";
                             break;
                         case 'link':
                         case 'custom-link':
