@@ -87,10 +87,9 @@ window.repeater = () => {
                     // der editor soll nicht durch das rex:ready event initialisiert werden
                     if ($(element).find('.cke5-editor') !== undefined) {
                         $(element).find('.cke5-editor').each(function() {
-                            // if (typeof cke5_destroy !== 'function') {
-                            //     return;
-                            // }
-
+                            if (typeof cke5_destroy !== 'function') {
+                                return;
+                            }
                             // damit es keine konflikte durch pjax gibt müssen die instanzen sauber entfernt werden
                             cke5_destroy($(this));
                             $(this).removeClass('cke5-editor') // verhindert das initialisieren durch rex:ready
@@ -264,22 +263,14 @@ window.repeater = () => {
         },
         openMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id +'_NAME'),
-                element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey];
-            $(media).on('rex:selectMedia', (event, mediaName) => {
-                element.media = mediaName;
-                this.updateValues();
-            });
+                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id +'_NAME');
+            this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         addMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id +'_NAME' + params),
-                element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey];
-            $(media).on('rex:selectMedia', (event, mediaName) => {
-                element.media = mediaName;
-                this.updateValues();
-            });
+                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id +'_NAME' + params);
+            this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         viewMedia(id, index, nameKey, fieldsKey, fieldIndex) {
@@ -287,17 +278,26 @@ window.repeater = () => {
                 element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
                 param = params + '&file_name='+ element.media,
                 media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id + '_NAME');
-            $(media).on('rex:selectMedia', (event, mediaName) => {
-                element.media = mediaName;
-                this.updateValues();
-            });
+            this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         deleteMedia(id, index, nameKey, fieldsKey, fieldIndex) {
-            let element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey];
-            $('#'+id+'_NAME').val('');
-            element.media = '';
+            if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                this.groups[index][fieldsKey][fieldIndex][nameKey] = '';
+            } else {
+                this.groups[index][nameKey] = '';
+            }
             this.updateValues();
+        },
+        onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex) {
+            $(media).on('rex:selectMedia', (event, mediaName) => {
+                if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                    this.groups[index][fieldsKey][fieldIndex][nameKey] = mediaName;
+                } else {
+                    this.groups[index][nameKey] = mediaName;
+                }
+                this.updateValues();
+            });
         },
     }
 }
