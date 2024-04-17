@@ -206,7 +206,7 @@ window.repeater = () => {
             cke5_destroy(cke5Area);
             cke5_init_ready([cke5Area]);
             $(window).on('rex:cke5IsInit', (event, editor, uniqueId) => {
-                if (cke5Area.attr('id') === uniqueId) {
+                if (cke5Area.attr('id') === $(editor.sourceElement).attr('id')) {
                     let element = that.rexGetInputIndexElement($(editor.sourceElement)),
                         nameKey = $(editor.sourceElement).attr('item_name_key');
                     editor.setData(element[nameKey]);
