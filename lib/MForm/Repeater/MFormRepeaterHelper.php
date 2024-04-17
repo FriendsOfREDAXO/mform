@@ -88,6 +88,7 @@ class MFormRepeaterHelper
                             } else {
                                 $obj[$nameKey] = [];
                             }
+                            break;
                         case 'close-repeater';
                             $mformItem->addAttribute('group', 'field')
                                 ->addAttribute('groups', 'group.' . $nameKey)
@@ -110,14 +111,14 @@ class MFormRepeaterHelper
                             # $mformItem->addAttribute('repeater_link', true);
                             $obj[$nameKey] = ['list' => []];
                             break;
+
+                        // without break
                         case 'textarea':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             if (str_contains($mformItem->getClass(), 'cke5-editor')) {
                                 $mformItem->addAttribute('repeater_cke', 1);
                                 $mformItem->setClass($mformItem->getClass() . ' hidden');
                             }
-                            $obj[$nameKey] = "";
-                            break;
                         case 'checkbox':
                             foreach ($mformItem->getOptions() as $k => $option) {
                                 $mformItem->addAttribute('data-value', (string) $k);
