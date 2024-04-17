@@ -17,46 +17,63 @@ function customlink_init_widget(element) {
         link_category = element.data('category'),
         hidden_input = element.find('input[type=hidden]'),
         showed_input = element.find('input[type=text]'),
-        value, text, args, timer;
+        value, text, args, timer, repeaterLink = (showed_input.attr('repeater_link') === 1);
 
-    element.data('id', id)
-    element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
+    if (!element.hasClass('init_custom_link_widget')) {
+        element.addClass('init_custom_link_widget');
 
-    // ylink
-    element
-      .find('.input-group-btn a.ylink')
-      .unbind()
-      .bind('click', function () {
-        let id = element.data('id'),
-          table = $(this).data('table'),
-          column = $(this).data('column'),
-          pool = newPoolWindow(
-            'index.php?page=yform/manager/data_edit&table_name=' +
-              table +
-              '&rex_yform_manager_opener[id]=' +
-              id +
-              '&rex_yform_manager_opener[field]=' +
-              column +
-              '&rex_yform_manager_opener[multiple]=0'
-          )
-  
-        clearInterval(timer)
-        closeDropDown(id)
-  
-        window.addEventListener('rex:YForm_selectData_' + id, (event) => {
-          event.preventDefault()
-          const id = event.detail.id
-          const label = event.detail.value
-          YForm_selectData(id, label, pool, hidden_input, showed_input, table)
-        })
-  
-        $(pool).on('rex:YForm_selectData', function (event, id, label) {
-          event.preventDefault()
-          YForm_selectData(id, label, pool, hidden_input, showed_input, table)
-        })
-  
-        return false
-      })
+        if (repeaterLink) {
+            let parent = element.parents('.repeater-group'),
+                index = parent.attr('iteration'),
+                groups = input.attr('groups').split('.');
+            if (groups.length > 1) {
+                let parentParent = parent.parents('.repeater-group'),
+                    parentIndex = (parentParent) ? parentParent.attr('iteration') : undefined;
+                if (parentIndex !== undefined) {
+                    index = index + 0 + parentIndex;
+                }
+            }
+            id = index;
+        }
+
+        element.data('id', id)
+        element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
+
+        // ylink
+        element
+          .find('.input-group-btn a.ylink')
+          .unbind()
+          .bind('click', function () {
+            let id = element.data('id'),
+              table = $(this).data('table'),
+              column = $(this).data('column'),
+              pool = newPoolWindow(
+                'index.php?page=yform/manager/data_edit&table_name=' +
+                  table +
+                  '&rex_yform_manager_opener[id]=' +
+                  id +
+                  '&rex_yform_manager_opener[field]=' +
+                  column +
+                  '&rex_yform_manager_opener[multiple]=0'
+              )
+
+            clearInterval(timer)
+            closeDropDown(id)
+
+            window.addEventListener('rex:YForm_selectData_' + id, (event) => {
+              event.preventDefault()
+              const id = event.detail.id
+              const label = event.detail.value
+              YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+            })
+
+            $(pool).on('rex:YForm_selectData', function (event, id, label) {
+              event.preventDefault()
+              YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+            })
+
+            return false
+          })
 
     // media element
     element.find('a.media_link').unbind().bind('click', function () {
@@ -64,148 +81,166 @@ function customlink_init_widget(element) {
             value = hidden_input.val(),
             args = '';
 
-        clearInterval(timer);
-        closeDropDown(id);
+            clearInterval(timer);
+            closeDropDown(id);
 
-        if (media_types !== undefined) {
-            args = '&args[types]=' + media_types;
-        }
-        if (media_Category !== undefined) {
-            args = args + '&rex_file_category=' + media_Category;
-        }
-
-        hidden_input.attr('id', 'REX_MEDIA_' + id);
-
-        openREXMedia(id, args); // &args[preview]=1&args[types]=jpg%2Cpng
-
-        timer = setInterval(function () {
-            if (!$('#REX_MEDIA_' + id).length) {
-                clearInterval(timer);
-            } else {
-                if (value != hidden_input.val()) {
-                    clearInterval(timer);
-                    showed_input.val(hidden_input.val());
-                }
+            if (media_types !== undefined) {
+                args = '&args[types]=' + media_types;
             }
-        }, 10);
+            if (media_Category !== undefined) {
+                args = args + '&rex_file_category=' + media_Category;
+            }
 
-        return false;
-    });
+            hidden_input.attr('id', 'REX_MEDIA_' + id);
 
-    // link element
-    element.find('a.intern_link').unbind().bind('click', function () {
-        let id = element.data('id'),
-            link_id = randInt(),
-            args = '&clang=' + clang;
+            openREXMedia(id, args); // &args[preview]=1&args[types]=jpg%2Cpng
 
-        clearInterval(timer);
-        closeDropDown(id);
+            timer = setInterval(function () {
+                if (!$('#REX_MEDIA_' + id).length) {
+                    clearInterval(timer);
+                } else {
+                    if (value != hidden_input.val()) {
+                        clearInterval(timer);
+                        showed_input.val(hidden_input.val());
+                    }
+                }
+            }, 10);
 
-        if (link_category !== undefined) {
-            args = args + '&category_id=' + link_category;
-        }
+            let mediaMap = openREXMedia(id, args); // &args[preview]=1&args[types]=jpg%2Cpng
+            $(mediaMap).on('rex:selectMedia', (event, mediaName) => {
+                hidden_input.val(mediaName)
+                showed_input.val(mediaName);
+                dispatchCustomLinkEvent(hidden_input, mediaName, mediaName);
+            });
+            return false;
+        });
 
-        showed_input.attr('id', 'REX_LINK_' + link_id + '_NAME');
-        hidden_input.attr('id', 'REX_LINK_' + link_id);
+        // link element
+        element.find('a.intern_link').unbind().bind('click', function () {
+            let id = element.data('id'),
+                link_id = randInt(),
+                args = '&clang=' + clang;
 
-        openLinkMap('REX_LINK_' + link_id, args);
+            clearInterval(timer);
+            closeDropDown(id);
 
-        return false;
-    });
+            if (link_category !== undefined) {
+                args = args + '&category_id=' + link_category;
+            }
 
-    // extern link
-    element.find('a.external_link').unbind().bind('click', function () {
-        let id = element.data('id'),
-            value = hidden_input.val(),
-            text = showed_input.val();
+            showed_input.attr('id', 'REX_LINK_' + link_id + '_NAME');
+            hidden_input.attr('id', 'REX_LINK_' + link_id);
 
-        clearInterval(timer);
-        closeDropDown(id);
+            let linkMap = openLinkMap('REX_LINK_' + link_id, args);
+            $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {
+                dispatchCustomLinkEvent(hidden_input, linkurl, linktext);
+            });
+            return false;
+        });
 
-        if (value == '' || value.indexOf(extern_link_prefix) < 0) {
-            value = extern_link_prefix;
-        }
+        // extern link
+        element.find('a.external_link').unbind().bind('click', function () {
+            let id = element.data('id'),
+                value = hidden_input.val(),
+                text = showed_input.val();
 
-        let extern_link = prompt('Link', value);
+            clearInterval(timer);
+            closeDropDown(id);
 
-        hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
+            if (value == '' || value.indexOf(extern_link_prefix) < 0) {
+                value = extern_link_prefix;
+            }
 
-        if (extern_link !== 'https://' && extern_link !== "" && extern_link !== undefined && extern_link != null) {
-            hidden_input.val(extern_link);
-            showed_input.val(extern_link);
-        }
-        if (extern_link == null) {
-            hidden_input.val(value);
-            showed_input.val(text);
-        }
-        return false;
-    });
+            let extern_link = prompt('Link', value);
 
-    // mail to link
-    element.find('a.email_link').unbind().bind('click', function () {
-        let id = element.data('id'),
-            value = hidden_input.val(),
-            text = showed_input.val();
+            hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
 
-        clearInterval(timer);
-        closeDropDown(id);
+            if (extern_link !== 'https://' && extern_link !== "" && extern_link !== undefined && extern_link != null) {
+                hidden_input.val(extern_link);
+                showed_input.val(extern_link);
+            }
+            if (extern_link == null) {
+                hidden_input.val(value);
+                showed_input.val(text);
+            }
+            dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
+            return false;
+        });
 
-        if (value == '' || value.indexOf("mailto:") < 0) {
-            value = 'mailto:';
-        }
+        // mail to link
+        element.find('a.email_link').unbind().bind('click', function () {
+            let id = element.data('id'),
+                value = hidden_input.val(),
+                text = showed_input.val();
 
-        hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
+            clearInterval(timer);
+            closeDropDown(id);
 
-        let mailto_link = prompt('Mail', value);
+            if (value == '' || value.indexOf("mailto:") < 0) {
+                value = 'mailto:';
+            }
 
-        if (mailto_link !== 'mailto:' && mailto_link !== "" && mailto_link !== undefined && mailto_link != null) {
-            showed_input.val(mailto_link);
-            hidden_input.val(mailto_link);
-        }
-        if (mailto_link == null) {
-            hidden_input.val(value);
-            showed_input.val(text);
-        }
-        return false;
-    });
+            hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
 
-    // phone link
-    element.find('a.phone_link').unbind().bind('click', function () {
-        let id = element.data('id'),
-            value = hidden_input.val(),
-            text = showed_input.val();
+            let mailto_link = prompt('Mail', value);
 
-        clearInterval(timer);
-        closeDropDown(id);
+            if (mailto_link !== 'mailto:' && mailto_link !== "" && mailto_link !== undefined && mailto_link != null) {
+                showed_input.val(mailto_link);
+                hidden_input.val(mailto_link);
+            }
+            if (mailto_link == null) {
+                hidden_input.val(value);
+                showed_input.val(text);
+            }
+            dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
+            return false;
+        });
 
-        if (value == '' || value.indexOf("tel:") < 0) {
-            value = 'tel:';
-        }
+        // phone link
+        element.find('a.phone_link').unbind().bind('click', function () {
+            let id = element.data('id'),
+                value = hidden_input.val(),
+                text = showed_input.val();
 
-        hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
+            clearInterval(timer);
+            closeDropDown(id);
 
-        let tel_link = prompt('Telephone', value);
+            if (value == '' || value.indexOf("tel:") < 0) {
+                value = 'tel:';
+            }
 
-        if (tel_link !== 'tel:' && tel_link !== "" && tel_link !== undefined && tel_link != null) {
-            showed_input.val(tel_link);
-            hidden_input.val(tel_link);
-        }
-        if (tel_link == null) {
-            hidden_input.val(value);
-            showed_input.val(text);
-        }
-        return false;
-    });
+            hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
 
-    // delete link
-    element.find('a.delete_link').unbind().bind('click', function () {
-        let id = element.data('id');
-        clearInterval(timer);
-        closeDropDown(id);
-        showed_input.val('');
-        hidden_input.val('');
-        return false;
-    });
+            let tel_link = prompt('Telephone', value);
+
+            if (tel_link !== 'tel:' && tel_link !== "" && tel_link !== undefined && tel_link != null) {
+                showed_input.val(tel_link);
+                hidden_input.val(tel_link);
+            }
+            if (tel_link == null) {
+                hidden_input.val(value);
+                showed_input.val(text);
+            }
+            dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
+            return false;
+        });
+
+        // delete link
+        element.find('a.delete_link').unbind().bind('click', function () {
+            let id = element.data('id');
+            clearInterval(timer);
+            closeDropDown(id);
+            showed_input.val('');
+            hidden_input.val('');
+            dispatchCustomLinkEvent(hidden_input, '', '');
+            return false;
+        });
+    }
+}
+
+function dispatchCustomLinkEvent(element, linkurl, linktext) {
+    let event = jQuery.Event("rex:selectCustomLink");
+    jQuery(window).trigger(event, [linkurl, linktext, element]);
 }
 
 const YForm_selectData = (
@@ -225,6 +260,8 @@ const YForm_selectData = (
 
   hidden_input.val(linkUrl)
   showed_input.val(label)
+
+  dispatchCustomLinkEvent(hidden_input, linkUrl, name);
 }
 
 function randId() {

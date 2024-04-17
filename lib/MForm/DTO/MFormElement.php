@@ -9,291 +9,154 @@ namespace MForm\DTO;
 
 class MFormElement
 {
-    /** @var string */
-    public $id;
+    public string $id = "";
+    public string $varId = "";
+    public string $value = "";
+    public string $label = "";
+    public string $attributes = "";
+    public string $options = "";
+    public string $parameter = "";
+    public string $type = "";
+    public string $hidden = "";
+    public string $javascript = "";
+    public string $class = "";
+    public string $legend = "";
+    public string $element = "";
+    public string $output = "";
+    public string $datalist = "";
+    public string $labelColClass = "";
+    public string $formItemColClass = "";
+    public string $infoTooltipIcon = "";
+    public string $infoTooltip = "";
+    public string $infoCollapseButton = "";
+    public string $infoCollapse = "";
 
-    /** @var string */
-    public $varId;
-
-    /** @var string */
-    public $value;
-
-    /** @var string */
-    public $label;
-
-    /** @var string */
-    public $attributes;
-
-    /** @var string */
-    public $options;
-
-    /** @var string */
-    public $parameter;
-
-    /** @var string */
-    public $type;
-
-    /** @var string */
-    public $hidden;
-
-    /** @var string */
-    public $javascript;
-
-    /** @var string */
-    public $class;
-
-    /** @var string */
-    public $legend;
-
-    /** @var string */
-    public $element;
-
-    /** @var string */
-    public $output;
-
-    /** @var string */
-    public $datalist;
-
-    /** @var string */
-    public $labelColClass;
-
-    /** @var string */
-    public $formItemColClass;
-
-    /** @var string */
-    public $infoTooltipIcon;
-
-    /** @var string */
-    public $infoTooltip;
-
-    /** @var string */
-    public $infoCollapseButton;
-
-    /** @var string */
-    public $infoCollapse;
-
-    /** @var bool */
-    public $inline = false;
-
-    /**
-     * @param string $id
-     * @return $this
-     */
-    public function setId($id)
+    public function setId(string $id): static
     {
         $this->id = $id;
         return $this;
     }
 
-    /**
-     * @param string $varId
-     * @return $this
-     */
-    public function setVarId($varId)
+    public function setVarId(string $varId): static
     {
         $this->varId = $varId;
         return $this;
     }
 
-    /**
-     * @param string $value
-     * @return $this
-     */
-    public function setValue($value)
+    public function setValue(string $value): static
     {
         $this->value = $value;
         return $this;
     }
 
-    /**
-     * @param string $label
-     * @return $this
-     */
-    public function setLabel($label)
+    public function setLabel(string $label): static
     {
         $this->label = $label;
         return $this;
     }
 
-    /**
-     * @param string $attributes
-     * @return $this
-     */
-    public function setAttributes($attributes)
+    public function setAttributes(string $attributes): static
     {
         $this->attributes = $attributes;
         return $this;
     }
 
-    /**
-     * @param string $options
-     * @return $this
-     */
-    public function setOptions($options)
+    public function setOptions(string $options): static
     {
         $this->options = $options;
         return $this;
     }
 
-    /**
-     * @param string $parameter
-     * @return $this
-     */
-    public function setParameter($parameter)
+    public function setParameter(string $parameter): static
     {
         $this->parameter = $parameter;
         return $this;
     }
 
-    /**
-     * @param string $type
-     * @return $this
-     */
-    public function setType($type)
+    public function setType(string $type): static
     {
         $this->type = $type;
         return $this;
     }
 
-    /**
-     * @param string $hidden
-     * @return $this
-     */
-    public function setHidden($hidden)
+    public function setHidden(string $hidden): static
     {
         $this->hidden = $hidden;
         return $this;
     }
 
-    /**
-     * @param string $class
-     * @return $this
-     */
-    public function setClass($class)
-    {
-        $this->class = $class;
-        return $this;
-    }
-
-    /**
-     * @param string $javascript
-     * @return $this
-     */
-    public function setJavascript($javascript)
+    public function setJavascript(string $javascript): static
     {
         $this->javascript = $javascript;
         return $this;
     }
 
-    /**
-     * @param string $legend
-     * @return $this
-     */
-    public function setLegend($legend)
+    public function setClass(string $class): static
+    {
+        $this->class = $class;
+        return $this;
+    }
+
+    public function setLegend(string $legend): static
     {
         $this->legend = $legend;
         return $this;
     }
 
-    /**
-     * @param string $element
-     * @return $this
-     */
-    public function setElement($element)
+    public function setElement(string $element): static
     {
         $this->element = $element;
         return $this;
     }
 
-    /**
-     * @param string $output
-     * @return $this
-     */
-    public function setOutput($output)
+    public function setOutput(string $output): static
     {
         $this->output = $output;
         return $this;
     }
 
-    /**
-     * @param string $datalist
-     * @return $this
-     */
-    public function setDatalist($datalist)
+    public function setDatalist(string $datalist): static
     {
         $this->datalist = $datalist;
         return $this;
     }
 
-    /**
-     * @param string $labelColClass
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setLabelColClass($labelColClass)
+    public function setLabelColClass(string $labelColClass): static
     {
         $this->labelColClass = $labelColClass;
         return $this;
     }
 
-    /**
-     * @param string $formItemColClass
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setFormItemColClass($formItemColClass)
+    public function setFormItemColClass(string $formItemColClass): static
     {
         $this->formItemColClass = $formItemColClass;
         return $this;
     }
 
-    /**
-     * @param string $infoTooltipIcon
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setInfoTooltipIcon($infoTooltipIcon)
+    public function setInfoTooltipIcon(string $infoTooltipIcon): static
     {
         $this->infoTooltipIcon = $infoTooltipIcon;
         return $this;
     }
 
-    /**
-     * @param string $infoTooltip
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setInfoTooltip($infoTooltip)
+    public function setInfoTooltip(string $infoTooltip): static
     {
         $this->infoTooltip = $infoTooltip;
         return $this;
     }
 
-    /**
-     * @param string $infoCollapseButton
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setInfoCollapseButton($infoCollapseButton)
+    public function setInfoCollapseButton(string $infoCollapseButton): static
     {
         $this->infoCollapseButton = $infoCollapseButton;
         return $this;
     }
 
-    /**
-     * @param string $infoCollapse
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setInfoCollapse($infoCollapse)
+    public function setInfoCollapse(string $infoCollapse): static
     {
         $this->infoCollapse = $infoCollapse;
         return $this;
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     public function getKeys(): array
     {
         $keys = [];
@@ -303,34 +166,12 @@ class MFormElement
         return $keys;
     }
 
-    /**
-     * @return array
-     * @author Joachim Doerr
-     */
-    public function getValues()
+    public function getValues(): array
     {
         $values = [];
         foreach (get_object_vars($this) as $f => $v) {
             $values[] = $v;
         }
         return $values;
-    }
-
-    /**
-     * @author Joachim Doerr
-     */
-    public function isInline(): bool
-    {
-        return $this->inline;
-    }
-
-    /**
-     * @return $this
-     * @author Joachim Doerr
-     */
-    public function setInline(bool $inline)
-    {
-        $this->inline = $inline;
-        return $this;
     }
 }

@@ -29,6 +29,10 @@
     margin-bottom: 0;
 }
 
+.mform .form-horizontal fieldset {
+    width: 100%;
+}
+
 .mform .mform-headline.grey-legend-background h3,
 .sortitem .mform fieldset.grey-legend-background > legend,
 .mform fieldset.grey-legend-background > legend {
@@ -287,4 +291,78 @@ body.rex-theme-dark .mform .collapsing {
 }
 
 
+.rex-theme-light section.repeater .repeater-group,
+section.repeater .repeater-group {
+    padding: 0.5rem 1.25rem 1.25rem 1.25rem;
+    margin-bottom: 0.5rem;
+    transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 
+    border: 1px solid rgba(100, 100, 100, 0.20);
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+}
+
+.rex-theme-light section.repeater .repeater-group:hover,
+section.repeater .repeater-group:hover {
+    border-left: 0.25rem solid rgba(0, 0, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
+}
+
+.rex-theme-dark section.repeater .repeater-group {
+    border: 1px solid rgba(72, 72, 72, 0.2);
+    background: rgba(17, 17, 17, 0.55);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+}
+
+.rex-theme-dark section.repeater .repeater-group:hover {
+    border-left: 0.25rem solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
+}
+
+section.repeater .repeater-group:last-child {
+    margin-bottom: 0;
+}
+
+section.repeater .repeater-group > .mform > fieldset:first-child {
+    margin-top: -1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    section.repeater .repeater-group {
+        border: 1px solid rgba(72, 72, 72, 0.2);
+        background: rgba(17, 17, 17, 0.55);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+    }
+
+    section.repeater .repeater-group:hover {
+        border-left: 0.25rem solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
+    }
+}
+
+section.repeater .repeater-group header {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    transition: background 0.3s ease-out;
+}
+
+section.repeater .repeater-group:hover > header {
+    /*background: rgba(0, 0, 0, 0.03);*/
+}
+
+section.repeater .repeater-group .button {
+    padding: 5px;
+    line-height: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+section.repeater .repeater-group .button.move {
+    color: #3c4d60;
+}
+
+section.repeater .repeater-group .button.remove {
+    color: #d9534f;
+}

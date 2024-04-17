@@ -7,6 +7,8 @@
 
 namespace MForm\Utils;
 
+
+use rex_exception;
 use rex_fragment;
 use rex_i18n;
 use rex_logger;
@@ -24,11 +26,7 @@ use function is_array;
 
 class MFormPageHelper
 {
-    /**
-     * @return string
-     * @author Joachim Doerr
-     */
-    public static function exchangeExamples($type)
+    public static function exchangeExamples($type): string
     {
         $return = '';
         $modulesDirectories = glob(rex_path::addon('mform', 'pages/module/' . $type) . '/*', GLOB_ONLYDIR);
@@ -79,14 +77,14 @@ class MFormPageHelper
                                 // create msg
                                 $installMsg = rex_view::success(sprintf(rex_i18n::msg('mform_module_created'), rex_i18n::msg('mform_example_' . $key)));
                             }
-                        } catch (rex_sql_exception $e) {
+                        } catch (rex_sql_exception | rex_exception $e) {
                             rex_logger::logException($e);
                             $installMsg = rex_view::error($e->getMessage());
                         }
                     }
 
                     // install or reset/update button
-                    if (rex_module::forKey($key) instanceof rex_module || null !== $moduleId) {
+                    if (rex_module::forKey($key) instanceof rex_module || !is_null($moduleId)) {
                         $content .= '<h3>' . rex_i18n::msg('mform_update') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . ' [id: ' . $moduleId . ']</i></h3>' . $installMsg . '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_update') . '</a>';
                     } else {
                         $content .= '<h3>' . rex_i18n::msg('mform_install') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . '</i></h3>' . $installMsg . '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_install') . '</a>';

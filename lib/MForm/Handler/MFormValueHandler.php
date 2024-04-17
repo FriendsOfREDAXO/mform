@@ -20,15 +20,12 @@ use function is_array;
 
 class MFormValueHandler
 {
-    /**
-     * @author Joachim Doerr
-     */
     public static function loadRexVars(): array
     {
         $sliceId = rex_request('slice_id', 'int', false);
         $result = [];
 
-        if (false != $sliceId) {
+        if ($sliceId) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
             $where = 'id="' . $sliceId . '"';
@@ -69,10 +66,7 @@ class MFormValueHandler
         return $result;
     }
 
-    /**
-     * @author Joachim Doerr
-     */
-    public static function decorateItem(MFormItem $item, array $result, ?string $value = null, ?string $defaultValue = null): void
+    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null): void
     {
         if (null !== $defaultValue) {
             // set default value

@@ -12,12 +12,9 @@ use MForm\DTO\MFormItem;
 class MFormAttributeHandler
 {
     /**
-     * set attributes to the item.
-     * @param mixed $name
-     * @param mixed $value
-     * @author Joachim Doerr
+     * @description set attributes to the item
      */
-    public static function addAttribute(MFormItem $item, $name, $value): void
+    public static function addAttribute(MFormItem $item, mixed $name, mixed $value): void
     {
         switch ($name) {
             case 'legend':
@@ -85,8 +82,7 @@ class MFormAttributeHandler
     }
 
     /**
-     * set attributes array to item.
-     * @author Joachim Doerr
+     * @description set attributes array to item
      */
     public static function setAttributes(MFormItem $item, array $attributes): void
     {

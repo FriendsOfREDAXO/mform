@@ -48,6 +48,10 @@ class rex_var_imglist extends rex_var
             $open_params .= '&amp;rex_file_category=' . $category;
         }
 
+        if (array_key_exists(':id',$args)) {
+            unset($args[':id']);
+        }
+
         foreach ($args as $aname => $avalue) {
             $open_params .= '&amp;args[' . $aname . ']=' . urlencode($avalue);
         }

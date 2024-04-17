@@ -73,3 +73,13 @@ yform_values_custom_link_link_category = Link-Kategorie
 yform_values_custom_link_phone = Telefon-Link-Button
 yform_values_imagelist_description = 🧩 MForm: Bildauswahl mit direkter Darstellung / Drag & Drop
 yform_values_custom_link_ylink = YForm-Link-Widget (label_text::yform_tabelle::anzeige_column,label_text2::yform_tabelle_2::anzeige_column_2)
+
+# Docs
+
+mform_docs = Dokumentation
+mform_docs_basics = Grundlagen
+mform_docs_redaxo = REDAXO-Widgets
+mform_docs_customlink = Custom-Link-Widget
+mform_docs_imagelist = Imagelist-Widget
+mform_docs_wrapper = Wrapper und Layouts
+mform_docs_advanced = Erweitert

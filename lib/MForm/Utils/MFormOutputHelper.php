@@ -15,11 +15,7 @@ use rex_url;
 
 class MFormOutputHelper
 {
-    /**
-     * @return bool
-     * @author Joachim Doerr
-     */
-    public static function isFirstSlice($sliceId)
+    public static function isFirstSlice($sliceId): bool
     {
         $first = rex_article_slice::getFirstSliceForArticle(rex_article::getCurrentId(), rex_clang::getCurrentId());
         if ($first instanceof rex_article_slice) {
@@ -29,12 +25,7 @@ class MFormOutputHelper
         return false;
     }
 
-    /**
-     * @param bool $externBlank
-     * @return array
-     * @author Joachim Doerr
-     */
-    public static function prepareCustomLink(array $item, $externBlank = true)
+    public static function prepareCustomLink(array $item, bool $externBlank = true): array
     {
         // set url
         if (!isset($item['link']) || empty($item['link'])) {
@@ -68,7 +59,7 @@ class MFormOutputHelper
                 } elseif (strpos($item['customlink_url'], 'mailto:') === 0) {
                     $item['customlink_class'] = 'mail';
                 }
-                
+
                 if ($externBlank) {
                     $item['customlink_target'] = ' target="_blank"';
                 }

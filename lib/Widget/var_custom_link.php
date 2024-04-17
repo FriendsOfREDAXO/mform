@@ -96,11 +96,7 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
-    /**
-     * @return mixed
-     * @author Joachim Doerr
-     */
-    public static function prepareYLinkArg($args)
+    public static function prepareYLinkArg($args) :array
     {
         if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
             $ylinks = array_filter(explode(',', $args['ylink']));
@@ -117,12 +113,6 @@ class rex_var_custom_link extends rex_var
         return $args;
     }
 
-    /**
-     * @param bool $btnIdUniq
-     * @throws rex_exception
-     * @return string|string[]
-     * @author Joachim Doerr
-     */
     public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
     {
         $valueName = self::getCustomLinkText($value);

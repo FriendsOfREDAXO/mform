@@ -1,5 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8-beta2
+
+- add recursion for repeater mform subform obj structure
+
+## Version 8-beta1
+
+- change mform css filename
+- remove unused $inline variable
+- add inputs for default form input forms
+- alpine repeater with 2 level support
+- remove dynamic creation of property in fragments
+
 ## Version 7.2.2
 
 - fix PHP 8.1 deprecation warnings

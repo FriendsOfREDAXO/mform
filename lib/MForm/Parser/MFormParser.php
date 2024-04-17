@@ -11,13 +11,14 @@ use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Exception;
+use MForm;
 use MForm\DTO\MFormElement;
 use MForm\DTO\MFormItem;
 use MForm\Handler\MFormAttributeHandler;
+use MForm\Repeater\MFormRepeaterHelper;
 use MForm\Utils\MFormGroupExtensionHelper;
 use MForm\Utils\MFormItemManipulator;
 use rex_clang;
-use rex_exception;
 use rex_extension;
 use rex_extension_point;
 use rex_fragment;
@@ -43,27 +44,124 @@ class MFormParser
 {
     protected array $elements = [];
 
-    protected string $theme = 'default_theme';
+    protected array $values = [];
 
-    protected bool $acc = false;
-
-    private bool $inline = false;
+    protected array $obj = [];
 
     /**
-     * @author Joachim Doerr
+     * @var string
      */
+    protected string $theme = 'mform';
+
+    private function openRepeaterElement(MFormItem $item, string $key, array $items): void
+    {
+        $this->executeDefaultManipulations($item, false, false);
+
+        $groups = (array_key_exists('groups', $item->getAttributes())) ? $item->getAttributes()['groups'] : 'groups';
+        $group = (array_key_exists('group', $item->getAttributes())) ? $item->getAttributes()['group'] : 'group';
+        $repeaterId = (array_key_exists('repeater_id', $item->getAttributes())) ? $item->getAttributes()['repeater_id'] : uniqid('uid');
+        $parentId = (array_key_exists('parent_id', $item->getAttributes())) ? $item->getAttributes()['parent_id'] : null;
+        $obj = MFormRepeaterHelper::prepareChildMForms($items, $key, $repeaterId, $group, $groups, $parentId);
+        $this->obj = $obj;
+
+        // set obj
+        $obj = json_encode($obj);
+
+        // open section and repeater div
+        if (is_null($parentId)) {
+            // at this point we have to compare item value and obj
+            $itemValue = \rex_var::toArray($item->getValue());
+            $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
+
+            foreach ($itemValue as $index0 => $level0) {
+                if (is_array($level0)) {
+                    foreach ($level0 as $index1 => $level1) {
+                        if (isset($keys[$index1]) && count($level1) == 1 &&
+                            isset($level1[0]) && is_array($level1[0]) &&
+                            empty($level1[0])) {
+                            $itemValue[$index0][$index1] = $this->obj[$index1];
+                        }
+                    }
+                }
+            }
+
+            $addInitGroup = ' if('.$groups.'.length <= 0) { addGroup('.$obj.') };';
+            $output[] = '<section class="repeater"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.json_encode($itemValue).');'.$addInitGroup.'\' id="x-repeater">';
+            // add button
+            $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a></template>';
+            $header = '
+                <header>
+                    <div class="row">
+                        <div class="col-sm-12 text-right">
+                            <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
+                                <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="button add"><i class="rex-icon fa-plus-circle"></i></a>
+                            </template>
+                            <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index)" class="button remove"><i class="rex-icon fa-times"></i></a>
+                            <template x-if="'.$repeaterId.'Index !== 0">
+                                <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index-1)" class="button move"><i class="rex-icon fa-chevron-up"></i></a>
+                            </template>    
+                            <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
+                                <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index+1)" class="button move"><i class="rex-icon fa-chevron-down"></i></a>
+                            </template>
+                        </div>
+                    </div>
+                </header>        
+        ';
+            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
+        } else {
+            $varId = trim(str_replace(['][','[',']'],['.','',''], $item->getVarId()));
+            $link = '<a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\'><i class="rex-icon fa-plus-circle"></i> Field hinzufügen</a>';
+            $output[] = '<template x-if="'.$groups.'.length <= 0" x-init=\'if('.$groups.'.length <= 0) { addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'") }\'>';
+            $output[] = $link;
+            $output[] = '</template>';
+            $header = '
+                <header>
+                    <div class="row">
+                        <div class="col-sm-12 text-right">
+                            <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
+                                <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="button add"><i class="rex-icon fa-plus-circle"></i></a>
+                            </template>
+                            <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\')" class="button remove"><i class="rex-icon fa-times"></i></a>
+                            <template x-if="'.$repeaterId.'Index !== 0">
+                                <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\')" class="button move"><i class="rex-icon fa-chevron-up"></i></a>
+                            </template>
+                            <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
+                                <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\')" class="button move"><i class="rex-icon fa-chevron-down"></i></a>
+                            </template>
+                        </div>
+                    </div>
+                </header>
+            ';
+            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
+        }
+        // open repeater group
+        // header buttons
+        $output[] = $header;
+
+        // add to output element array
+        $this->elements[] = implode("",$output);
+
+    }
+
+    private function closeRepeaterElement(MFormItem $item): void
+    {
+        $this->executeDefaultManipulations($item, false, false);
+        // add to output element array
+        $this->elements[] = "</div></template>";
+
+        // section end and form input
+        if (!array_key_exists('parent_id', $item->getAttributes())) {
+            $this->elements[] = "<textarea name=\"REX_INPUT_VALUE".$item->getVarId()."\" class=\"hidden\" x-bind:value=\"value\">".$item->getValue()."</textarea>";
+            $this->elements[] = "</div></section>";
+        }
+    }
+
+
     private function openWrapperElement(MFormItem $item, string $key, array $items): void
     {
         $element = new MFormElement();
         $attributes = $item->getAttributes();
         $removeAttributes = [];
-        $mformCount = '';
-
-        try {
-            $mformCount = rex_session('mform_count', 'int', '0');
-        } catch (rex_exception $e) {
-            rex_logger::logException($e);
-        }
 
         if (!empty($item->getLabel())) {
             $element->setLabel($this->parseElement($this->createLabelElement($item->setId('uid_' . uniqid())), 'base'));
@@ -107,11 +205,11 @@ class MFormParser
             $nav = [];
             /** @var MFormItem $itm */
             foreach ($items as $k => $itm) {
-                if ($k > $key && ($itm->getGroup() == $item->getGroup() && 'tab' == $itm->getType())) {
+                if ($itm instanceof MFormItem && $k > $key && ($itm->getGroup() == $item->getGroup() && 'tab' == $itm->getType())) {
                     // add navigation item
                     $element = new MFormElement();
                     $element->setType('tabnavli')
-                        ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . $mformCount)
+                        ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . $item->getGroupKey())
                         ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . $itm->getLabel())
                         ->setClass(
                             ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
@@ -124,7 +222,7 @@ class MFormParser
             $element->setElement(implode('', $nav));
         }
         if ('tab' == $item->getType()) {
-            $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $mformCount;
+            $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
             if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
                 $item->setClass($item->getClass() . 'active');
             }
@@ -145,9 +243,6 @@ class MFormParser
         $this->elements[] = $this->parseElement($element, 'wrapper');
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function closeWrapperElement(string $type): void
     {
         $element = new MFormElement();
@@ -156,9 +251,7 @@ class MFormParser
     }
 
     /**
-     * create any no input inline element
-     * html, headline, description.
-     * @author Joachim Doerr
+     * @description create any no input inline element [html|headline|description]
      */
     private function generateLineElement(MFormItem $item): void
     {
@@ -174,8 +267,7 @@ class MFormParser
     }
 
     /**
-     * create hidden input element.
-     * @author Joachim Doerr
+     * @description helper method to create hidden input elements
      */
     private function generateHiddenInputElement(MFormItem $item): void
     {
@@ -187,7 +279,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue($item->getValue())
+            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
@@ -197,9 +289,7 @@ class MFormParser
     }
 
     /**
-     * create input text element
-     * text, password.
-     * @author Joachim Doerr
+     * @description helper method to create input text elements
      */
     private function generateInputElement(MFormItem $item): void
     {
@@ -232,7 +322,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue($item->getValue())
+            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setDatalist($datalist)
@@ -249,9 +339,7 @@ class MFormParser
     }
 
     /**
-     * create textarea element
-     * textarea.
-     * @author Joachim Doerr
+     * @description helper method to create textarea elements
      */
     private function generateAreaElement(MFormItem $item): void
     {
@@ -269,7 +357,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue($item->getValue())
+            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes()));
@@ -285,9 +373,7 @@ class MFormParser
     }
 
     /**
-     * create select or multiselect element
-     * select, multiselect.
-     * @author Joachim Doerr
+     * @description helper method to create select or multiselect element
      */
     private function generateOptionsElement(MFormItem $item): void
     {
@@ -297,7 +383,7 @@ class MFormParser
         // init option element string
         $optionElements = '';
         $attributes = $item->getAttributes();
-        if (count($item->getToggleOptions()) >= 0) {
+        if (count($item->getToggleOptions()) > 0) {
             $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
         }
         $itemAttributes = $this->parseAttributes($attributes); // parse attributes for output
@@ -307,12 +393,12 @@ class MFormParser
             $item->setValue(implode(',', $item->getValue()));
         }
 
-        // options must te be given
+        // options must be given
         if (count($item->getOptions()) > 0) {
             // size count
             $count = 0;
             foreach ($item->getOptions() as $key => $value) {
-                // is value label we have a opt group
+                // is value label we have an opt group
                 if (is_array($value)) {
                     // optGroup set
                     $optGroupLabel = $key;
@@ -364,7 +450,7 @@ class MFormParser
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
             ->setType($item->getType())
-            ->setValue($item->getValue())
+            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
             ->setAttributes($itemAttributes)
             ->setClass($item->getClass())
             ->setOptions($optionElements);
@@ -384,8 +470,7 @@ class MFormParser
     }
 
     /**
-     * helper method to create option elements.
-     * @author Joachim Doerr
+     * @description helper method to create option elements
      */
     private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string $toggle = ''): string
     {
@@ -448,9 +533,7 @@ class MFormParser
     }
 
     /**
-     * create checkbox element
-     * checkbox.
-     * @author Joachim Doerr
+     * @description helper method to create checkboxes
      */
     private function generateCheckboxElement(MFormItem $item): void
     {
@@ -478,9 +561,7 @@ class MFormParser
     }
 
     /**
-     * helper method to create checkbox and radiobutton elements
-     * checkbox, radiobutton.
-     * @author Joachim Doerr
+     * @description helper method to create check elements [checkbox|radiobutton]
      */
     private function createCheckElement(MFormItem $item, $key, $value, ?int $count = null): string
     {
@@ -523,9 +604,7 @@ class MFormParser
     }
 
     /**
-     * create radiobutton element
-     * radiobutton.
-     * @author Joachim Doerr
+     * @description helper method to create radiobutton element
      */
     private function generateRadioElement(MFormItem $item): void
     {
@@ -553,8 +632,7 @@ class MFormParser
     }
 
     /**
-     * media, medialist.
-     * @author Joachim Doerr
+     * @description helper method to create media input elements [media|medialist]
      */
     private function generateMediaElement(MFormItem $item): void
     {
@@ -564,15 +642,16 @@ class MFormParser
             if (count($item->getVarId()) > 1) {
                 $inputValue = true;
             }
-            $this->executeDefaultManipulations($item, true, false, false);
+            $this->executeDefaultManipulations($item, false, false);
         }
 
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'));
         $parameter = $item->getParameter();
+        $attributes = $item->getAttributes();
 
-        if (is_array($parameter) && isset($parameter['types'])) {
+        if (isset($parameter['types'])) {
             $parameter['types'] = str_replace(' ', '', strtolower($parameter['types']));
         }
 
@@ -586,9 +665,10 @@ class MFormParser
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
+                $this->prepareLinkInput($dom, $inputs, $item, $attributes);
 
                 if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElement($inputs, $item, 'REX_MEDIA_' . (int) $id);
+                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
                 }
                 break;
             case 'imglist':
@@ -611,11 +691,16 @@ class MFormParser
                 if ($inputs instanceof DOMNodeList) {
                     $this->processNodeFormElement($inputs, $item, 'REX_MEDIALIST_' . $id);
                 }
+
+                $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
         }
 
+        $body = $this->getBodyInner($dom);
+        $body = $this->addClickPrevent($body, $attributes);
+
         // get body inner
-        $templateElement->setElement($this->getBodyInner($dom))
+        $templateElement->setElement($body)
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
         // add to output element array
@@ -623,8 +708,7 @@ class MFormParser
     }
 
     /**
-     * link, linklist.
-     * @author Joachim Doerr
+     * @description link, linklist
      */
     private function generateLinkElement(MFormItem $item): void
     {
@@ -634,15 +718,16 @@ class MFormParser
             if (count($item->getVarId()) > 1) {
                 $inputValue = true;
             }
-            $this->executeDefaultManipulations($item, true, false, false);
+            $this->executeDefaultManipulations($item, false, false);
         }
 
         // create templateElement object
         $templateElement = new MFormElement();
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'));
         $parameter = $item->getParameter();
+        $attributes = $item->getAttributes();
 
-        if (is_array($parameter) && isset($parameter['types'])) {
+        if (isset($parameter['types'])) {
             $parameter['types'] = str_replace(' ', '', strtolower($parameter['types']));
         }
 
@@ -657,19 +742,16 @@ class MFormParser
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElement($inputs, $item, 'REX_LINK_' . (int) $id);
-                }
-                if ($inputs instanceof DOMNodeList) {
-                    foreach ($inputs as $input) {
-                        if ($input instanceof DOMElement) {
-                            if ('text' == $input->getAttribute('type')) {
-                                $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
-                            }
+                foreach ($inputs as $input) {
+                    $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int)$id);
+                    if ($input instanceof DOMElement) {
+                        if ($input->getAttribute('type') == 'text') {
+                            $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
                         }
                     }
                 }
 
+                $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
@@ -687,40 +769,118 @@ class MFormParser
                 if ($inputs instanceof DOMNodeList) {
                     $this->processNodeFormElement($inputs, $item, 'REX_LINKLIST_' . $id);
                 }
+
+                $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
         }
 
+        $body = $this->getBodyInner($dom);
+        $body = $this->addClickPrevent($body, $attributes);
+
         // get body inner
-        $templateElement->setElement($this->getBodyInner($dom))
+        $templateElement->setElement($body)
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
 
-    /**
-     * @param null $id
-     * @author Joachim Doerr
-     */
-    private function processNodeFormElement(DOMNodeList $elements, MFormItem $item, $id = null): void
+    private function prepareLinkInput(DOMDocument $dom, DOMNodeList $inputs, $item, $attributes): void
     {
-        foreach ($elements as $element) {
-            if ($element instanceof DOMElement) {
-                if (is_array($item->getAttributes()) && count($item->getAttributes()) > 0) {
-                    foreach ($item->getAttributes() as $key => $value) {
-                        $element->setAttribute($key, $value);
-                    }
+        foreach ($inputs as $input) {
+            if ($input instanceof DOMElement) {
+                switch ($input->getAttribute('type')) {
+                    case 'text':
+                        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+                            $item->addAttribute('x-model', $attributes['x-model'] . '.name');
+                            $this->processNodeFormElement($input, $item);
+                            $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id']))?"+'-'+".$attributes['parent_id'].'Index':'')."+'_NAME'");
+                        } else {
+                            $this->processNodeFormElement($input, $item);
+                        }
+                        break;
+                    case 'hidden':
+                        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+                            $item->addAttribute('x-model', $attributes['x-model'] . '.id');
+                            $this->processNodeFormElement($input, $item);
+                            $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id']))?"+'-'+".$attributes['parent_id'].'Index':''));
+                        } else {
+                            $this->processNodeFormElement($input, $item);
+                        }
+                        break;
                 }
-                if (null !== $id) {
-                    $element->setAttribute('id', $id);
+            }
+        }
+
+        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+            $links = $dom->getElementsByTagName('a');
+            foreach ($links as $link) {
+                if ($link instanceof DOMElement) {
+                    $onclick = $link->getAttribute('onclick');
+                    $groups = explode('.',$attributes['groups']);
+                    $linkAttributes = '';
+                    if (str_contains($onclick, 'openLinkMap')) {
+                        $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                        if (!is_null($attributes['parent_id'])) {
+                            $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                        }
+                    }
+                    if (str_contains($onclick, 'deleteREXLink')) {
+                        $linkAttributes = "removeLink(".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                        if (!is_null($attributes['parent_id'])) {
+                            $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                        }
+                    }
+                    if (str_contains($onclick, 'Media')) {
+                        $method = 'openMedia';
+                        if (str_contains($onclick, 'addREXMedia(')) $method = 'addMedia';
+                        if (str_contains($onclick, 'deleteREXMedia(')) $method = 'deleteMedia';
+                        if (str_contains($onclick, 'viewREXMedia(')) $method = 'viewMedia';
+                        if (str_contains($onclick, 'openREXMedialist(')) $method = 'openMedialist';
+                        if (str_contains($onclick, 'addREXMedialist(')) $method = 'addMedialist';
+                        if (str_contains($onclick, 'deleteREXMedialist(')) $method = 'deleteMedialist';
+                        if (str_contains($onclick, 'viewREXMedialist(')) $method = 'viewMedialist';
+                        $linkAttributes = "$method('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                        if (!is_null($attributes['parent_id'])) {
+                            $linkAttributes = "$method('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                        }
+                    }
+                    $link->setAttribute('click.prevent', $linkAttributes);
+                    $link->removeAttribute('onclick');
                 }
             }
         }
     }
 
-    /**
-     * @author Joachim Doerr
-     */
+    private function addClickPrevent(string $body, array $attributes): string
+    {
+        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+            $body = str_replace('click.prevent', '@click.prevent', $body);
+        }
+        return $body;
+    }
+
+    private function processNodeFormElements(DOMNodeList $elements, MFormItem $item, $id = null): void
+    {
+        foreach ($elements as $element) {
+            if ($element instanceof DOMElement) {
+                $this->processNodeFormElement($element, $item, $id);
+            }
+        }
+    }
+
+    private function processNodeFormElement(DOMElement $element, MFormItem $item, $id = null): void
+    {
+        if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+            foreach ($item->getAttributes() as $key => $value) {
+                $element->setAttribute($key, (string) $value);
+            }
+        }
+        if (!is_null($id)) {
+            $element->setAttribute('id', $id);
+        }
+    }
+
     private function getWidgetId(MFormItem $item): string
     {
         $item->setVarId(substr($item->getVarId(), 1, -1));
@@ -735,14 +895,10 @@ class MFormParser
         return implode('', $varId);
     }
 
-    /**
-     * link, linklist.
-     * @author Joachim Doerr
-     */
     private function generateCustomLinkElement(MFormItem $item): void
     {
         // default manipulations
-        $this->executeDefaultManipulations($item, true, false, false);
+        $this->executeDefaultManipulations($item, false, false);
 
         foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable'] as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
@@ -763,18 +919,23 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'));
 
         $parameter = $item->getParameter();
+        $attributes = $item->getAttributes();
+
         if (!isset($parameter['ylink']) && isset($item->getAttributes()['ylink'])) {
             $parameter['ylink'] = $item->getAttributes()['ylink'];
         }
         $parameter['class'] = $item->class;
 
         $div = null;
+        $html = '';
 
         try {
             $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
             $dom = new DOMDocument('1.0', 'utf-8');
             @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
             $div = $dom->getElementsByTagName('div');
+            $inputs = $dom->getElementsByTagName('input');
+            $this->prepareLinkInput($dom, $inputs, $item, $attributes);
         } catch (Exception $e) {
             rex_logger::logException($e);
         }
@@ -810,35 +971,21 @@ class MFormParser
         $templateElement = rex_extension::registerPoint(
             new rex_extension_point('mform/mformParser.generateCustomLinkElement', $templateElement, [
                 'item' => $item,
-            ]),
+            ])
         );
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
 
-    /**
-     * @author Joachim Doerr
-     */
-    private function executeDefaultManipulations(MFormItem $item, bool $setVarAndIds = true, bool $setCustomId = true, bool $setDefaultClass = true): void
+    private function executeDefaultManipulations(MFormItem $item, bool $setCustomId = true, bool $setDefaultClass = true): void
     {
-        if ($setVarAndIds) {
-            MFormItemManipulator::setVarAndIds($item);
-        } // transform ids for template usage
-        if ($setCustomId) {
-            MFormItemManipulator::setCustomId($item);
-        } // set optional custom id
-        if ($setDefaultClass) {
-            MFormItemManipulator::setDefaultClass($item);
-        } // set default class for r5 mform default theme
+        MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
+        if ($setCustomId) MFormItemManipulator::setCustomId($item); // set optional custom id
+        if ($setDefaultClass) MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
     }
 
-    /**
-     * @param DOMDocument|DOMElement $dom
-     * @return mixed
-     * @author Joachim Doerr
-     */
-    private function getBodyInner($dom)
+    private function getBodyInner(DOMDocument|DOMElement $dom): bool|string
     {
         $html = $dom->C14N(false, true);
         if (str_contains($html, '<body')) {
@@ -852,96 +999,112 @@ class MFormParser
 
     /**
      * @param MFormItem[] $items
-     * @author Joachim Doerr
      */
     private function parseFormFields(array $items): void
     {
         try {
             if (count($items) > 0) {
                 foreach ($items as $key => $item) {
-                    switch ($item->getType()) {
-                        // OPEN WRAPPER ELEMENT
-                        case 'tab':
-                        case 'fieldset':
-                        case 'collapse':
-                        case 'inline':
-                        case 'column':
-                        case 'start-group-tab':
-                        case 'start-group-collapse':
-                        case 'start-group-inline':
-                        case 'start-group-column':
-                            $this->openWrapperElement($item, $key, $items);
-                            break;
 
+                    if ($item instanceof MForm) {
+                        $mformItem = new MFormItem();
+                        $mformItem->setType('html')
+                            ->setValue($item->show());
+                        $item = $mformItem;
+                    }
+
+                    if ($item instanceof MFormItem) {
+                        switch ($item->getType()) {
+                            // OPEN REPEATER
+                            case 'repeater':
+                                $this->openRepeaterElement($item, $key, $items);
+                                break;
+                            // CLOSE REPEATER
+                            case 'close-repeater':
+                                $this->closeRepeaterElement($item);
+                                break;
+
+                            // OPEN WRAPPER ELEMENT
+                            case 'tab':
+                            case 'fieldset':
+                            case 'collapse':
+                            case 'inline':
+                            case 'column':
+                            case 'start-group-tab':
+                            case 'start-group-collapse':
+                            case 'start-group-inline':
+                            case 'start-group-column':
+                                $this->openWrapperElement($item, $key, $items);
+                                break;
                             // CLOSE WRAPPER ELEMENT
-                        case 'close-tab':
-                        case 'close-fieldset':
-                        case 'close-collapse':
-                        case 'close-inline':
-                        case 'close-column':
-                        case 'close-group-tab':
-                        case 'close-group-collapse':
-                        case 'close-group-inline':
-                        case 'close-group-column':
-                            $this->closeWrapperElement($item->getType());
-                            break;
+                            case 'close-tab':
+                            case 'close-fieldset':
+                            case 'close-collapse':
+                            case 'close-inline':
+                            case 'close-column':
+                            case 'close-group-tab':
+                            case 'close-group-collapse':
+                            case 'close-group-inline':
+                            case 'close-group-column':
+                                $this->closeWrapperElement($item->getType());
+                                break;
 
                             // FORM ELEMENTS
-                        case 'html':
-                        case 'headline':
-                        case 'description':
-                        case 'alert':
-                            $this->generateLineElement($item);
-                            break;
-                        case 'color':
-                        case 'email':
-                        case 'url':
-                        case 'tel':
-                        case 'search':
-                        case 'number':
-                        case 'range':
-                        case 'date':
-                        case 'time':
-                        case 'datetime':
-                        case 'datetime-local':
-                        case 'month':
-                        case 'week':
-                        case 'text':
-                        case 'text-readonly':
-                            $this->generateInputElement($item);
-                            break;
-                        case 'hidden':
-                            $this->generateHiddenInputElement($item);
-                            break;
-                        case 'markitup':
-                        case 'textarea':
-                        case 'textarea-readonly':
-                            $this->generateAreaElement($item);
-                            break;
-                        case 'select':
-                        case 'multiselect':
-                            $this->generateOptionsElement($item);
-                            break;
-                        case 'radio':
-                            $this->generateRadioElement($item);
-                            break;
-                        case 'checkbox':
-                        case 'multicheckbox':
-                            $this->generateCheckboxElement($item);
-                            break;
-                        case 'link':
-                        case 'linklist':
-                            $this->generateLinkElement($item);
-                            break;
-                        case 'customlink':
-                        case 'custom-link':
-                            $this->generateCustomLinkElement($item);
-                            break;
-                        case 'media':
-                        case 'medialist':
-                        case 'imglist':
-                            $this->generateMediaElement($item);
-                            break;
+                            case 'html':
+                            case 'headline':
+                            case 'description':
+                            case 'alert':
+                                $this->generateLineElement($item);
+                                break;
+                            case 'color':
+                            case 'email':
+                            case 'url':
+                            case 'tel':
+                            case 'search':
+                            case 'number':
+                            case 'range':
+                            case 'date':
+                            case 'time':
+                            case 'datetime':
+                            case 'datetime-local':
+                            case 'month':
+                            case 'week':
+                            case 'text':
+                            case 'text-readonly':
+                                $this->generateInputElement($item);
+                                break;
+                            case 'hidden':
+                                $this->generateHiddenInputElement($item);
+                                break;
+                            case 'markitup':
+                            case 'textarea':
+                            case 'textarea-readonly':
+                                $this->generateAreaElement($item);
+                                break;
+                            case 'select':
+                            case 'multiselect':
+                                $this->generateOptionsElement($item);
+                                break;
+                            case 'radio':
+                                $this->generateRadioElement($item);
+                                break;
+                            case 'checkbox':
+                            case 'multicheckbox':
+                                $this->generateCheckboxElement($item);
+                                break;
+                            case 'link':
+                            case 'linklist':
+                                $this->generateLinkElement($item);
+                                break;
+                            case 'custom-link':
+                                $this->generateCustomLinkElement($item);
+                                break;
+                            case 'media':
+                            case 'medialist':
+                            case 'imglist':
+                                $this->generateMediaElement($item);
+                                break;
+                        }
                     }
                 }
             }
@@ -950,9 +1113,6 @@ class MFormParser
         }
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function createLabelElement(MFormItem $item): MFormElement
     {
         $this->createTooltipElement($item);
@@ -970,16 +1130,18 @@ class MFormParser
         }
 
         $label = new MFormElement();
-        $label->setId($item->getId())
-            ->setValue($labelString)
+        $label->setId($item->getId());
+
+        if (array_key_exists(':id', $item->getAttributes())) {
+            $label->setId($item->getId() . '" :id="'.$item->getAttributes()[':id'].'"');
+        }
+
+        $label->setValue($labelString)
             ->setType('label');
 
         return $label;
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function createTooltipElement(MFormItem $item): void
     {
         // set tooltip
@@ -998,16 +1160,9 @@ class MFormParser
         }
     }
 
-    /**
-     * final parsing.
-     * @param MFormItem[] $items
-     * @author Joachim Doerr
-     */
-    public function parse(array $items, ?string $theme = null, bool $debug = false, bool $inline = false): string
+    public function parse(array $items, ?string $theme = null, bool $debug = false): string
     {
-        $this->inline = $inline;
-
-        if (null !== $theme && $theme != $this->theme) {
+        if (!is_null($theme) && $theme != $this->theme) {
             $this->theme = $theme;
         }
 
@@ -1019,7 +1174,7 @@ class MFormParser
 
         // show for debug items
         if ($debug) {
-            dump(['items' => $items, 'theme' => $this->theme, 'inline' => $this->inline, 'debug' => $debug]);
+            dump(['items' => $items, 'theme' => $this->theme, 'debug' => $debug]);
         }
 
         $this->parseFormFields($items);
@@ -1033,9 +1188,6 @@ class MFormParser
         return $this->parseElement($element, 'wrapper');
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function getDefaultTemplateType(MFormItem $item, MFormElement $templateElement): string
     {
         $templateType = 'default';
@@ -1055,13 +1207,9 @@ class MFormParser
         return $templateType;
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function parseElement(MFormElement $element, string $fragmentType): string
     {
-        $element->setValue((is_array($element->value)) ? '' : $element->value)
-            ->setInline($this->inline);
+        $element->setValue((is_array($element->value)) ? '' : $element->value);
 
         $fragment = new rex_fragment();
 
@@ -1074,15 +1222,12 @@ class MFormParser
 
         try {
             return $fragment->parse($this->theme . '/mform_' . $fragmentType . '.php');
-        } catch (rex_exception $e) {
+        } catch (Exception $e) {
             rex_logger::logException($e);
             return rex_view::error($e->getMessage());
         }
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     private function parseAttributes(array $attributes): string
     {
         $inlineAttributes = '';

@@ -17,26 +17,18 @@ use function is_array;
 
 class MFormOptionHandler
 {
-    /**
-     * @author Joachim Doerr
-     */
     public static function addOption(MFormItem $item, $value, $key): void
     {
         $item->options[$key] = MFormClang::getClangValue($value);
     }
 
     /**
-     * set option to item.
-     * @author Joachim Doerr
+     * @description set option to item
      */
     public static function disableOption(MFormItem $item, $key): void
     {
         $item->disabledOptions[$key] = $key;
     }
-
-    /**
-     * @author Joachim Doerr
-     */
     public static function addOptGroup(MFormItem $item, string $label, $options): void
     {
         $option = [];
@@ -48,10 +40,6 @@ class MFormOptionHandler
         $item->options[$label] = $option;
     }
 
-    /**
-     * set option array to item.
-     * @author Joachim Doerr
-     */
     public static function setOptions(MFormItem $item, array $options): void
     {
         // if options an array
@@ -66,9 +54,6 @@ class MFormOptionHandler
         }
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     public static function toggleOptions(MFormItem $item, $options): void
     {
         if (is_array($options)) {
@@ -76,9 +61,6 @@ class MFormOptionHandler
         }
     }
 
-    /**
-     * @author Joachim Doerr
-     */
     public static function disableOptions(MFormItem $item, $keys): void
     {
         if (is_array($keys)) {
@@ -87,8 +69,7 @@ class MFormOptionHandler
     }
 
     /**
-     * set options form sql table as array to item.
-     * @author Joachim Doerr
+     * @description set options form sql table as array to item
      */
     public static function setSqlOptions(MFormItem $item, $query): void
     {
