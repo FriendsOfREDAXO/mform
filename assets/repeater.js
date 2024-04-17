@@ -66,7 +66,7 @@ window.repeater = () => {
                     // dazu braucht es ein delay von mindestens einer milli sekunde
                     // deswegen erstmal keine instanzierung durch rex:ready
                     if ($(element).find('.selectpicker') !== undefined) {
-                        $(element).find('.selectpicker').each(function(){
+                        $(element).find('.selectpicker').each(function () {
                             $(this).removeClass('selectpicker')
                                 .addClass('repeater-selectpicker');
                         });
@@ -79,14 +79,14 @@ window.repeater = () => {
                     // }
                     // PREPARE TOGGLE
                     if ($(element).find('input[type=checkbox][data-mform-toggle^=toggle]').length > 0) {
-                        $(element).find('input[type=checkbox][data-mform-toggle^=toggle]').each(function(){
+                        $(element).find('input[type=checkbox][data-mform-toggle^=toggle]').each(function () {
                             $(this).removeAttr('data-mform-toggle').addClass('repeater-toggle').removeAttr('x-on:change');
                         });
                     }
                     // PREPARE CKE5
                     // der editor soll nicht durch das rex:ready event initialisiert werden
                     if ($(element).find('.cke5-editor') !== undefined) {
-                        $(element).find('.cke5-editor').each(function() {
+                        $(element).find('.cke5-editor').each(function () {
                             if (typeof cke5_destroy !== 'function') {
                                 return;
                             }
@@ -114,7 +114,7 @@ window.repeater = () => {
                     }
                     // SELECT PICKER PREPARE
                     if ($(element).find('.repeater-selectpicker').length > 0) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $(element).find('.repeater-selectpicker').each(function () {
                                 if (!$(this).hasClass('select-repeater-init')) {
                                     $(this).addClass('select-repeater-init');
@@ -122,11 +122,11 @@ window.repeater = () => {
                                     $(this).selectpicker();
                                 }
                             });
-                        },5);
+                        }, 5);
                     }
                     // SELECT PICKER PREPARE
                     if ($(element).find('.repeater-toggle').length > 0) {
-                        setTimeout(function() {
+                        setTimeout(function () {
                             // initialisiere jede einzeilne toggle input checkbox
                             $(element).find('.repeater-toggle').each(function () {
                                 if (!$(this).hasClass('repeater-toggle-init')) {
@@ -134,12 +134,12 @@ window.repeater = () => {
                                     that.rexInitToggle($(this));
                                 }
                             });
-                        },5);
+                        }, 5);
                     }
                     // PREPARE CKE5
                     if ($(element).find('.cke5-repeater').length > 0) {
                         // initialisiere jede cke5 textarea einzeiln
-                        $(element).find('.cke5-repeater:not(.cke5-repeater-init)').each(function (){
+                        $(element).find('.cke5-repeater:not(.cke5-repeater-init)').each(function () {
                             if (!$(this).hasClass('cke5-repeater-init')) {
                                 $(this).addClass('cke5-repeater-init');
                                 that.rexInitCke5($(this));
@@ -177,7 +177,10 @@ window.repeater = () => {
         rexGetInputElement(input) {
             let nameKey = input.attr('item_name_key'),
                 element = this.rexGetInputIndexElement(input);
-            return (element[nameKey] !== undefined) ? element[nameKey] : undefined;
+            if (element[nameKey] === undefined) {
+                element[nameKey] = {'name': '', 'id': ''};
+            }
+            return element[nameKey];
         },
         rexInitToggle(input) {
             let that = this,
@@ -187,7 +190,7 @@ window.repeater = () => {
                 input.prop('checked', true);
             }
             input.bootstrapMFormToggle('destroy').bootstrapMFormToggle();
-            input.change(function() {
+            input.change(function () {
                 if ($(this).prop('checked') === true) {
                     $(this).val($(this).attr('data-value'));
                     element[nameKey] = $(this).attr('data-value');
@@ -246,37 +249,41 @@ window.repeater = () => {
             this.updateValues();
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
-            let linkMap = openLinkMap(id),
-                element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey];
+            let linkMap = openLinkMap(id).replace('redaxo://', '');
             $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {
-                element['name'] = linktext;
-                element['id'] = linkurl.replace('redaxo://', '');
+                if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                    this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': linktext, 'id': linkurl};
+                } else {
+                    this.groups[index][nameKey] = {'name': linktext, 'id': linkurl};
+                }
                 this.updateValues();
             });
             return false;
         },
         removeLink(index, nameKey, fieldsKey, fieldIndex) {
-            let element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey];
-            element['id'] = '';
-            element['name'] = '';
+            if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': '', 'id': ''};
+            } else {
+                this.groups[index][nameKey] = {'name': '', 'id': ''};
+            }
             this.updateValues();
         },
         openMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id +'_NAME');
+                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id + '_NAME');
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         addMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id +'_NAME' + params);
+                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id + '_NAME' + params);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         viewMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
                 element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
-                param = params + '&file_name='+ element.media,
+                param = params + '&file_name=' + element.media,
                 media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id + '_NAME');
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
