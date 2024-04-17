@@ -148,7 +148,8 @@ class MFormRepeaterHelper
     {
         $nameKey = self::getNameKey($mformItem);
         $mformItem->addAttribute('x-model', $group . '.' . $nameKey)
-            ->addAttribute(':id', $nameKey . '-' . $repeaterId . 'Index' .((!empty($parentId)) ? '-' . $parentId . 'Index' : ''))
+            ->addAttribute(':id', "'".$nameKey."-'+".$repeaterId."Index".((!empty($parentId))?"+'-'+".$parentId.'Index':''))
+            ->addAttribute('data-id', $nameKey . '-' . $repeaterId . 'Index' .((!empty($parentId)) ? '-' . $parentId . 'Index' : ''))
             ->addAttribute('group', $group)
             ->addAttribute('groups', $groups)
             ->addAttribute('repeaterId', $repeaterId)
