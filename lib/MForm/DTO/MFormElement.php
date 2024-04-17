@@ -159,7 +159,7 @@ class MFormElement
 
     public function getKeys(): array
     {
-        $keys = array();
+        $keys = [];
         foreach (get_object_vars($this) as $f => $v) {
             $keys[] = $f;
         }
@@ -168,7 +168,7 @@ class MFormElement
 
     public function getValues(): array
     {
-        $values = array();
+        $values = [];
         foreach (get_object_vars($this) as $f => $v) {
             $values[] = $v;
         }

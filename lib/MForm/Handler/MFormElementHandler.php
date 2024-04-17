@@ -19,7 +19,7 @@ class MFormElementHandler
         // create item
         $item = new MFormItem();
         $item->setId($id) // set id
-            ->setVarId(explode('.',$varId)) // set redaxo input value id
+            ->setVarId(explode('.', $varId)) // set redaxo input value id
             ->setType($type) // set item type
             ->setMode(rex_request('function', 'string')); // set mode add or edit
 

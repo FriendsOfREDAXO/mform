@@ -11,6 +11,10 @@ namespace MForm\Utils;
 use MForm;
 use MForm\DTO\MFormItem;
 
+use function array_key_exists;
+use function count;
+use function is_array;
+
 class MFormGroupExtensionHelper
 {
     /**
@@ -75,6 +79,7 @@ class MFormGroupExtensionHelper
         $group = false;
         $toggleAttributes = false;
 
+        /** @var MFormItem $item */
         foreach ($items as $key => $item) {
             if ($item instanceof MFormItem) {
                 switch ($item->getType()) {
@@ -83,10 +88,12 @@ class MFormGroupExtensionHelper
                             $toggleAttributes = $item->getAttributes();
                             unset($toggleAttributes['data-mform-toggle']);
                         }
+                        // no break
                     case 'select':
                         if (array_key_exists('data-toggle', $item->getAttributes())) {
                             $toggleAttributes = $item->getAttributes();
                         }
+                        // no break
                     default:
                         // add default item
                         $newItems[] = $item;
@@ -98,12 +105,12 @@ class MFormGroupExtensionHelper
                         if (!$group) {
                             $group = true;
                             $count = 1; // reset count by type for group
-                            $groupCount++; // count by group
+                            ++$groupCount; // count by group
                             $groupKey = uniqid($groupCount);
 
                             // open the new group before the group item will be added to the item list
                             if (is_array($toggleAttributes)) {
-                                $mergeArray = array('data-group-select-accordion' => ($toggleAttributes['data-toggle'] == 'accordion') ? 'true' : 'false');
+                                $mergeArray = ['data-group-select-accordion' => ('accordion' == $toggleAttributes['data-toggle']) ? 'true' : 'false'];
                                 if (array_key_exists('hide-toggle-links', $toggleAttributes)) {
                                     $mergeArray['data-group-hide-toggle-links'] = ($toggleAttributes['hide-toggle-links']) ? 'true' : 'false';
                                 }
@@ -169,10 +176,10 @@ class MFormGroupExtensionHelper
     {
         $newItem = new MFormItem();
 
-        if (!is_null($item) && is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
-            $attributes = array();
+        if (null !== $item && is_array($item->getAttributes()) && count($item->getAttributes()) > 0) {
+            $attributes = [];
             foreach ($item->getAttributes() as $key => $value) {
-                if (strpos($key, "data-group-") !== false) {
+                if (str_contains($key, 'data-group-')) {
                     $attributes[$key] = $value;
                 }
             }

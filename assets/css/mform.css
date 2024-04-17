@@ -108,7 +108,7 @@
     display: inline-block;
     margin-left: 15px;
     float: right;
-    font: normal normal normal 14px/1 FontAwesome;
+    font: normal normal 900 14px/1 "Font Awesome 6 Free",FontAwesome;
     font-size: 15px;
 }
 

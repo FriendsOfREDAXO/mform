@@ -7,9 +7,10 @@
 
 namespace MForm\Utils;
 
-
 use rex;
 use rex_view;
+
+use function count;
 
 class MFormModuleHelper
 {
@@ -41,27 +42,31 @@ class MFormModuleHelper
 
     public static function addBackendInfoImgList($images, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
     {
-        if (empty($message))
+        if (empty($message)) {
             $message = "<p>$message</p>";
+        }
 
-        $imgs = array();
+        $imgs = [];
 
-        if (!empty($images))
-            foreach ($images as $image)
-                $imgs[] = "<img src=\"/index.php?rex_media_type=$mediaType&rex_media_file=$image\" style=\"margin-bottom: 10px; margin-right: 10px;\" alt=\"\">";
+        if (!empty($images)) {
+            foreach ($images as $image) {
+                $imgs[] = "<img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\" style=\"margin-bottom: 10px; margin-right: 10px;\">";
+            }
+        }
 
-        if (!empty($message) && !empty($imgs))
-            $message = $message . '<hr>';
+        if (!empty($message) && !empty($imgs)) {
+            $message .= '<hr>';
+        }
 
         self::$msg[] = $message . implode('', $imgs);
     }
 
     public static function addBackendInfoImgMsg($image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
     {
-        if (empty($message)){
-            self::$msg[] = "<p><img src=\"/index.php?rex_media_type=$mediaType&rex_media_file=$image\" alt=\"\"></p>";
+        if (empty($message)) {
+            self::$msg[] = "<p><img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\"></p>";
         } else {
-            self::$msg[] = '<p>' . sprintf($message, $image) . "<hr><img src=\"/index.php?rex_media_type=$mediaType&rex_media_file=$image\" alt=\"\"></p>";
+            self::$msg[] = '<p>' . sprintf($message, $image) . "<hr><img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\"></p>";
         }
     }
 
@@ -72,9 +77,9 @@ class MFormModuleHelper
 
     public static function exchangeBackendInfo(string $headline = 'Settings', string $viewType = 'content'): string
     {
-        if (sizeof(self::$msg) > 0 && rex::isBackend()) {
+        if (count(self::$msg) > 0 && rex::isBackend()) {
             $output = '<div class="mform-module-settings">' . rex_view::$viewType(implode('', self::$msg), $headline) . '</div>';
-            self::$msg = array();
+            self::$msg = [];
             return $output;
         }
         return '';

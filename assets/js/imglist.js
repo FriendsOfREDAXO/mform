@@ -139,12 +139,13 @@ function imglist_add_img_by_last_list_item(element) {
 
             let extension = item.val().replace(/^.*\./, ''),
                 url = 'index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=';
-
-            if (extension === 'svg') {
+            let isVideo = ['mp4', 'webm', 'ogg'].includes(extension);
+            if (extension === 'svg' || isVideo) {
                 url = '/media/';
             }
+            let media = isVideo ? `<video playsinline autoplay muted loop class="thumbnail"><source src="${url}${item.val()}" type="video/${extension}"></video>` : `<img class="thumbnail" src="${url}${item.val()}" title="${item.val()}" />`;
 
-            let new_li = $('<li data-key="' + i + '" value="' + item.val() + '" data-value="' + item.val() + '"><img class="thumbnail" src="' + url + item.val() + '" title="' + item.val() + '" /></li>');
+            let new_li = $(`<li data-key="${i}" value="${item.val()}" data-value="${item.val()}">${media}</li>`);
 
             imglist_add_tooltip(element, new_li.find('img'));
 

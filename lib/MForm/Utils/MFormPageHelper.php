@@ -21,6 +21,9 @@ use rex_string;
 use rex_url;
 use rex_view;
 
+use function count;
+use function is_array;
+
 class MFormPageHelper
 {
     public static function exchangeExamples($type): string
@@ -33,11 +36,15 @@ class MFormPageHelper
                 $installKey = rex_request('install', 'string', null);
                 $installMsg = '';
                 $content = '';
-                if (!is_dir($modulesDirectory)) continue;
-                if (file_exists($modulesDirectory . '/input.inc'))
+                if (!is_dir($modulesDirectory)) {
+                    continue;
+                }
+                if (file_exists($modulesDirectory . '/input.inc')) {
                     $content .= '<h3>' . rex_i18n::msg('mform_modul_input') . '</h3>' . rex_string::highlight(file_get_contents($modulesDirectory . '/input.inc'));
-                if (file_exists($modulesDirectory . '/output.inc'))
+                }
+                if (file_exists($modulesDirectory . '/output.inc')) {
                     $content .= '<h3>' . rex_i18n::msg('mform_modul_output') . '</h3>' . rex_string::highlight(file_get_contents($modulesDirectory . '/output.inc'));
+                }
 
                 $path = explode('/', $modulesDirectory);
                 $module = array_pop($path);
@@ -50,7 +57,7 @@ class MFormPageHelper
                         $sql = rex_sql::factory();
                         $sql->setTable('rex_module')
                             ->setValue('input', file_get_contents($modulesDirectory . '/input.inc'))
-                            ->setValue('output', ((file_exists($modulesDirectory . '/output.inc')) ? file_get_contents($modulesDirectory . '/output.inc') : ''))
+                            ->setValue('output', (file_exists($modulesDirectory . '/output.inc')) ? file_get_contents($modulesDirectory . '/output.inc') : '')
                             ->setValue('name', rex_i18n::msg('mform_example_' . $key))
                             ->setValue('key', $key);
 
@@ -66,7 +73,7 @@ class MFormPageHelper
                                 // insert module
                                 $sql->insert();
                                 rex_module_cache::generateKeyMapping();
-                                $moduleId = (int)$sql->getLastId();
+                                $moduleId = (int) $sql->getLastId();
                                 // create msg
                                 $installMsg = rex_view::success(sprintf(rex_i18n::msg('mform_module_created'), rex_i18n::msg('mform_example_' . $key)));
                             }
@@ -88,7 +95,7 @@ class MFormPageHelper
                     $fragment->setVar('title', rex_i18n::msg('mform_example_' . $key));
                     $fragment->setVar('content', '<div class="span" style="padding: 0 20px 10px 20px">' . $content . '</div>', false);
                     $fragment->setVar('collapse', true);
-                    $fragment->setVar('collapsed', ($installKey != $key));
+                    $fragment->setVar('collapsed', $installKey != $key);
                     $content = $fragment->parse('core/page/section.php');
                     $return .= $content;
                 }

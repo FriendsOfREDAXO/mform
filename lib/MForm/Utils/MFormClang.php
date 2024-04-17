@@ -7,8 +7,9 @@
 
 namespace MForm\Utils;
 
-
 use rex;
+
+use function is_array;
 
 class MFormClang
 {
@@ -23,13 +24,13 @@ class MFormClang
             $langData = '';
             foreach ($languageData as $key => $value) {
                 // is user lang in lang data array
-                if ($key == rex::getUser()->getLanguage() or $key . '_utf8' == rex::getUser()->getLanguage()) {
+                if ($key == rex::getUser()->getLanguage() || $key . '_utf8' == rex::getUser()->getLanguage()) {
                     // set value for exchange
                     $langData = $value;
                 }
             }
             // nothing found
-            if ($langData == '') {
+            if ('' == $langData) {
                 // get first lang array value
                 $langData = reset($languageData);
             }
@@ -39,5 +40,4 @@ class MFormClang
         }
         return $langData;
     }
-
 }

@@ -54,7 +54,7 @@ class rex_var_custom_link extends rex_var
             $sql = rex_sql::factory();
             $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matches[2][0]]);
             if (isset($result[0][$column])) {
-                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] .']';
+                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] . ']';
             }
         }
 
@@ -79,7 +79,9 @@ class rex_var_custom_link extends rex_var
         }
 
         if ($this->hasArg('widget') && $this->getArg('widget')) {
-            if (!$this->environmentIs(self::ENV_INPUT)) return false;
+            if (!$this->environmentIs(self::ENV_INPUT)) {
+                return false;
+            }
 
             $args = [];
             foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix', 'ylink'] as $key) {
@@ -90,7 +92,7 @@ class rex_var_custom_link extends rex_var
 
             $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', $value, $args);
         } else {
-            if ($value && $this->hasArg('output') && $this->getArg('output') != 'id') {
+            if ($value && $this->hasArg('output') && 'id' != $this->getArg('output')) {
                 $value = rex_getUrl($value);
             }
         }
@@ -98,12 +100,7 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
-    /**
-     * @param $args
-     * @return mixed
-     * @author Joachim Doerr
-     */
-    public static function prepareYLinkArg($args)
+    public static function prepareYLinkArg($args) :array
     {
         if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
             $ylinks = array_filter(explode(',', $args['ylink']));
@@ -120,16 +117,6 @@ class rex_var_custom_link extends rex_var
         return $args;
     }
 
-    /**
-     * @param $id
-     * @param $name
-     * @param $value
-     * @param array $args
-     * @param bool $btnIdUniq
-     * @return string|string[]
-     * @throws rex_exception
-     * @author Joachim Doerr
-     */
     public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
     {
         $valueName = self::getCustomLinkText($value);

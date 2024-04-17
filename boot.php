@@ -7,14 +7,12 @@
 
 if (rex_addon::exists('yform') &&
     rex_addon::get('yform')->isAvailable() &&
-    rex_plugin::get('yform', 'manager')->isAvailable())
-{
+    rex_plugin::get('yform', 'manager')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'ytemplates'));
     rex_extension::register('MEDIA_IS_IN_USE', 'MformYformHelper::isMediaInUse');
 }
 
 if (rex::isBackend()) {
-    $addon = rex_addon::get('mform');
     // add toggle files
     rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));

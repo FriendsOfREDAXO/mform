@@ -25,18 +25,18 @@ class MFormAttributeHandler
                 break;
             case 'size':
                 // is size numeric set number
-                if ((is_numeric($value) && $value > 0)) {
+                if (is_numeric($value) && $value > 0) {
                     $item->setSize($value);
                     $item->attributes['size'] = $value;
                 }
                 // is size full set attribute #sizefull# to replace calculateet size height
-                if ($value == 'full') {
+                if ('full' == $value) {
                     $item->setSize($value);
                     $item->attributes['size'] = '#sizefull#';
                 }
                 break;
             case 'full': // set full for markitup or redactor fields to use the default_full template
-                $item->setFull($value == 1 || $value == 'true' || $value == true);
+                $item->setFull(1 == $value || 'true' == $value || true == $value);
                 break;
             case 'item-col-class':
             case 'form-item-col-class':
@@ -63,8 +63,9 @@ class MFormAttributeHandler
                 break;
             case 'category':
             case 'catId': // set cat id as parameter for link or media fields
-                if ($value > 0)
+                if ($value > 0) {
                     MFormParameterHandler::addParameter($item, 'category', $value);
+                }
                 break;
             case 'default-value': // set default value for any fields
                 $item->setDefaultValue($value);

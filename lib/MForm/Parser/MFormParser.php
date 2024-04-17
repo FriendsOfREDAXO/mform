@@ -32,11 +32,16 @@ use rex_var_media;
 use rex_var_medialist;
 use rex_view;
 
+use function array_key_exists;
+use function count;
+use function in_array;
+use function is_array;
+use function is_int;
+use function is_string;
+use function strlen;
+
 class MFormParser
 {
-    /**
-     * @var array
-     */
     protected array $elements = [];
 
     protected array $values = [];
@@ -170,31 +175,37 @@ class MFormParser
         }
 
         // COLLAPSE MANIPULATIONS
-        if ($item->getType() == 'collapse') {
+        if ('collapse' == $item->getType()) {
             $removeAttributes = ['data-group-hide-toggle-links', 'data-group-accordion', 'data-group-open-collapse'];
             $buttonAttributes = [
                 'data-toggle' => 'collapse',
-                'data-collapse-open' => (int)$attributes['data-group-open-collapse'],
-                'aria-expanded' => ((intval($attributes['data-group-open-collapse']) == 1) ? 'true' : 'false')
+                'data-collapse-open' => (int) $attributes['data-group-open-collapse'],
+                'aria-expanded' => ((1 == (int) $attributes['data-group-open-collapse']) ? 'true' : 'false'),
             ];
-            if (isset($attributes['data-group-accordion']) && intval($attributes['data-group-accordion']) == 1) unset($buttonAttributes['data-collapse-open']);
-            if ($buttonAttributes['aria-expanded'] == 'true') $item->setClass($item->getClass() . ' in');
+            if (isset($attributes['data-group-accordion']) && 1 == (int) $attributes['data-group-accordion']) {
+                unset($buttonAttributes['data-collapse-open']);
+            }
+            if ('true' == $buttonAttributes['aria-expanded']) {
+                $item->setClass($item->getClass() . ' in');
+            }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
-                ->setClass((empty($item->getLabel()) or (array_key_exists('data-group-hide-toggle-links', $attributes) && $attributes['data-group-hide-toggle-links'] == 'true')) ? ' hidden' : '')
+                ->setClass((empty($item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
                 ->setValue($item->getLabel());
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
         }
 
-        if ($item->getType() == 'start-group-collapse') $removeAttributes = ['data-group-collapse-id'];
+        if ('start-group-collapse' == $item->getType()) {
+            $removeAttributes = ['data-group-collapse-id'];
+        }
 
         // TAB MANIPULATIONS
-        if ($item->getType() == 'start-group-tab') {
+        if ('start-group-tab' == $item->getType()) {
             $nav = [];
             /** @var MFormItem $itm */
             foreach ($items as $k => $itm) {
-                if ($itm instanceof MFormItem && $k > $key && ($itm->getGroup() == $item->getGroup() && $itm->getType() == 'tab')) {
+                if ($itm instanceof MFormItem && $k > $key && ($itm->getGroup() == $item->getGroup() && 'tab' == $itm->getType())) {
                     // add navigation item
                     $element = new MFormElement();
                     $element->setType('tabnavli')
@@ -202,20 +213,28 @@ class MFormParser
                         ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . $itm->getLabel())
                         ->setClass(
                             ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
-                            ((array_key_exists('pull-right', $itm->getAttributes()) && $itm->getAttributes()['pull-right'] === true) ? ' pull-right' : '') .
-                            ((array_key_exists('data-group-open-tab', $itm->getAttributes()) && $itm->getAttributes()['data-group-open-tab'] === true) ? ' active' : '')
+                            ((array_key_exists('pull-right', $itm->getAttributes()) && true === $itm->getAttributes()['pull-right']) ? ' pull-right' : '') .
+                            ((array_key_exists('data-group-open-tab', $itm->getAttributes()) && true === $itm->getAttributes()['data-group-open-tab']) ? ' active' : ''),
                         );
                     $nav[] = $this->parseElement($element, 'wrapper');
                 }
             }
             $element->setElement(implode('', $nav));
         }
-        if ($item->getType() == 'tab') {
+        if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
-            if (isset($attributes['data-group-open-tab']) && $attributes['data-group-open-tab'] === true) $item->setClass($item->getClass() . 'active');
+            if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
+                $item->setClass($item->getClass() . 'active');
+            }
         }
 
-        if (count($removeAttributes) > 0) foreach ($removeAttributes as $key) if (isset($attributes[$key])) unset($attributes[$key]); // remove group data tags
+        if (count($removeAttributes) > 0) {
+            foreach ($removeAttributes as $key) {
+                if (isset($attributes[$key])) {
+                    unset($attributes[$key]);
+                }
+            }
+        } // remove group data tags
 
         $element->setType($item->getType())
             ->setAttributes($this->parseAttributes($attributes))
@@ -276,17 +295,17 @@ class MFormParser
     {
         $datalist = '';
 
-        if ($item->getType() == 'text-readonly') { // is readonly
+        if ('text-readonly' == $item->getType()) { // is readonly
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
         // datalist?
         if ($item->getOptions()) {
-            $item->addAttribute('list', 'list' . $item->getId());
+            $item->setAttributes(array_merge($item->getAttributes(), ['list' => 'list' . $item->getId()]));
 
             $optionElements = '';
             foreach ($item->getOptions() as $key => $value) {
-                $optionElements .= $this->createOptionElement($item, $value, (!is_integer($key)) ? "label=\"$key\"" : '', 'datalist-option', false);
+                $optionElements .= $this->createOptionElement($item, $value, (!is_int($key)) ? "label=\"$key\"" : '', 'datalist-option', false);
             }
             $element = new MFormElement();
             $element->setOptions($optionElements)
@@ -325,7 +344,7 @@ class MFormParser
     private function generateAreaElement(MFormItem $item): void
     {
         // set typ specific vars
-        if ($item->getType() == 'textarea-readonly') {
+        if ('textarea-readonly' == $item->getType()) {
             $item->setType('textarea'); // type is textarea
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
@@ -364,16 +383,18 @@ class MFormParser
         // init option element string
         $optionElements = '';
         $attributes = $item->getAttributes();
-        if (sizeof($item->getToggleOptions()) > 0) $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
+        if (count($item->getToggleOptions()) > 0) {
+            $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
+        }
         $itemAttributes = $this->parseAttributes($attributes); // parse attributes for output
 
         if ($item->isMultiple() && is_array($item->getValue()) &&
-            sizeof($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {
+            count($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {
             $item->setValue(implode(',', $item->getValue()));
         }
 
         // options must be given
-        if (sizeof($item->getOptions()) > 0) {
+        if (count($item->getOptions()) > 0) {
             // size count
             $count = 0;
             foreach ($item->getOptions() as $key => $value) {
@@ -382,14 +403,18 @@ class MFormParser
                     // optGroup set
                     $optGroupLabel = $key;
                     $optElements = '';
-                    $count++; // + for group label
+                    ++$count; // + for group label
                     // create options
                     foreach ($value as $vKey => $vValue) {
-                        $count++;
+                        ++$count;
                         $disabled = false;
                         $toggle = '';
-                        if (in_array($vKey, $item->getDisabledOptions())) $disabled = true;
-                        if (array_key_exists($vKey, $item->getToggleOptions())) $toggle = $item->getToggleOptions()[$vKey];
+                        if (in_array($vKey, $item->getDisabledOptions())) {
+                            $disabled = true;
+                        }
+                        if (array_key_exists($vKey, $item->getToggleOptions())) {
+                            $toggle = $item->getToggleOptions()[$vKey];
+                        }
                         $optElements .= $this->createOptionElement($item, $vKey, $vValue, 'option', true, $disabled, $toggle);
                     }
 
@@ -401,16 +426,20 @@ class MFormParser
 
                     $optionElements .= $this->parseElement($groupElement, 'select');
                 } else {
-                    $count++;
+                    ++$count;
                     $disabled = false;
                     $toggle = '';
-                    if (in_array($key, $item->getDisabledOptions())) $disabled = true;
-                    if (array_key_exists($key, $item->getToggleOptions())) $toggle = $item->getToggleOptions()[$key];
+                    if (in_array($key, $item->getDisabledOptions())) {
+                        $disabled = true;
+                    }
+                    if (array_key_exists($key, $item->getToggleOptions())) {
+                        $toggle = $item->getToggleOptions()[$key];
+                    }
                     $optionElements .= $this->createOptionElement($item, $key, $value, 'option', true, $disabled, $toggle);
                 }
             }
             // is size full
-            if ($item->getSize() == 'full') {
+            if ('full' == $item->getSize()) {
                 // use count to replace #sizefull# placeholder
                 $itemAttributes = str_replace('#sizefull#', $count, $itemAttributes);
             }
@@ -458,7 +487,7 @@ class MFormParser
         $itemValue = $item->getValue();
 
         // is mode edit and item multiple
-        if ($item->getMode() == 'edit' && $item->isMultiple()) {
+        if ('edit' == $item->getMode() && $item->isMultiple()) {
             // explode the hidden value string
             if (is_string($itemValue)) {
                 foreach (explode(',', $itemValue) as $iValue) {
@@ -469,36 +498,38 @@ class MFormParser
             }
         }
         /* Selected fix @skerbis @dtpop @MC-PMOE */
-        if ($item->multiple && !is_null($item->stringValue)) {
+        if ($item->multiple && null !== $item->stringValue) {
             $items_selected = json_decode($item->stringValue, true);
 
             $current = explode('][', trim($item->varId, '[]'));
 
             // JSON Values 1.x
-            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && in_array((string)$key, $items_selected[$current[1]])) {
+            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && in_array((string) $key, $items_selected[$current[1]])) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // JSON Values 1.x.x
-            } else if (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string)$key, $items_selected[$current[1]][$current[2]])) {
+            } elseif (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string) $key, $items_selected[$current[1]][$current[2]])) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // REX_VAL
-            } elseif (!isset($current[1]) && isset($items_selected) && is_array($items_selected) && in_array((string)$key, $items_selected)) {
+            } elseif (!isset($current[1]) && isset($items_selected) && is_array($items_selected) && in_array((string) $key, $items_selected)) {
                 $element->setAttributes($element->attributes . ' selected');
             }
         } else {
             // set default value or selected
-            if ($selected && ((string)$key == (string)$itemValue or ($item->getMode() == 'add' && (string)$key == $item->getDefaultValue()))) {
+            if ($selected && ((string) $key == (string) $itemValue || ('add' == $item->getMode() && (string) $key == $item->getDefaultValue()))) {
                 $element->setAttributes($element->attributes . ' selected'); // add attribute selected
             }
         }
 
-        if ($disabled) $element->setAttributes($element->attributes . ' disabled');
+        if ($disabled) {
+            $element->setAttributes($element->attributes . ' disabled');
+        }
 
         // parse element
-        return $this->parseElement($element, ($templateType == 'datalist-option') ? 'input' : 'select');
+        return $this->parseElement($element, ('datalist-option' == $templateType) ? 'input' : 'select');
     }
 
     /**
@@ -512,11 +543,12 @@ class MFormParser
         $checkboxElements = '';
 
         // options must be given
-        if (sizeof($item->getOptions()) > 0)
+        if (count($item->getOptions()) > 0) {
             foreach ($item->getOptions() as $key => $value) {
                 $checkboxElements .= $this->createCheckElement($item, $key, $value); // create element by helper
                 break;
             }
+        }
 
         // create templateElement object
         $templateElement = new MFormElement();
@@ -531,7 +563,7 @@ class MFormParser
     /**
      * @description helper method to create check elements [checkbox|radiobutton]
      */
-    private function createCheckElement(MFormItem $item, $key, $value, int $count = null): string
+    private function createCheckElement(MFormItem $item, $key, $value, ?int $count = null): string
     {
         // create element
         $element = new MFormElement();
@@ -545,17 +577,23 @@ class MFormParser
         $attributes = $item->getAttributes();
 
         // add count to id
-        if (is_numeric($count)) $element->setId($item->getId() . $count);
+        if (is_numeric($count)) {
+            $element->setId($item->getId() . $count);
+        }
         // add data toggle
-        if (sizeof($item->getToggleOptions()) > 0) {
+        if (count($item->getToggleOptions()) > 0) {
             $attributes['data-toggle-item'] = (array_key_exists($key, $item->getToggleOptions())) ? $item->getToggleOptions()[$key] : '';
         }
         if (isset($attributes['data-toggle-item'])) {
-            if ($item->getType() == 'checkbox') $attributes = array_merge(['data-checkbox-toggle' => 'collapse'], $attributes);
-            if ($item->getType() == 'radio') $attributes = array_merge(['data-radio-toggle' => 'collapse'], $attributes);
+            if ('checkbox' == $item->getType()) {
+                $attributes = array_merge(['data-checkbox-toggle' => 'collapse'], $attributes);
+            }
+            if ('radio' == $item->getType()) {
+                $attributes = array_merge(['data-radio-toggle' => 'collapse'], $attributes);
+            }
         }
         // set checked by value or default value
-        if ($key == $item->getValue() or ($item->getMode() == 'add' && $key == $item->getDefaultValue())) {
+        if ($key == $item->getValue() || ('add' == $item->getMode() && $key == $item->getDefaultValue())) {
             $element->setAttributes(' checked="checked" ' . $this->parseAttributes($attributes));
         } else {
             $element->setAttributes($this->parseAttributes($attributes));
@@ -575,10 +613,10 @@ class MFormParser
         $radioElements = '';
 
         // options must be given
-        if (sizeof($item->getOptions()) > 0) {
+        if (count($item->getOptions()) > 0) {
             $count = 0; // init count
             foreach ($item->getOptions() as $key => $value) {
-                $count++; // + count
+                ++$count; // + count
                 $radioElements .= $this->createCheckElement($item, $key, $value, $count); // create element by helper
             }
         }
@@ -600,8 +638,8 @@ class MFormParser
     {
         $inputValue = false;
 
-        if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
-            if (sizeof($item->getVarId()) > 1) {
+        if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
+            if (count($item->getVarId()) > 1) {
                 $inputValue = true;
             }
             $this->executeDefaultManipulations($item, false, false);
@@ -622,14 +660,16 @@ class MFormParser
             case 'media':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_media::getWidget((int)$id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
                 $inputs = $dom->getElementsByTagName('input');
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
 
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int)$id);
+                if ($inputs instanceof DOMNodeList) {
+                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
+                }
                 break;
             case 'imglist':
             case 'medialist':
@@ -645,11 +685,14 @@ class MFormParser
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($selects instanceof DOMNodeList) $this->processNodeFormElements($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElements($inputs, $item, 'REX_MEDIALIST_' . $id);
+                if ($selects instanceof DOMNodeList) {
+                    $this->processNodeFormElement($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
+                }
+                if ($inputs instanceof DOMNodeList) {
+                    $this->processNodeFormElement($inputs, $item, 'REX_MEDIALIST_' . $id);
+                }
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
-
                 break;
         }
 
@@ -671,8 +714,8 @@ class MFormParser
     {
         $inputValue = false;
 
-        if (is_array($item->getVarId()) && sizeof($item->getVarId()) > 0) {
-            if (sizeof($item->getVarId()) > 1) {
+        if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
+            if (count($item->getVarId()) > 1) {
                 $inputValue = true;
             }
             $this->executeDefaultManipulations($item, false, false);
@@ -709,7 +752,7 @@ class MFormParser
                 }
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
-            break;
+                break;
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
@@ -720,8 +763,12 @@ class MFormParser
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($selects instanceof DOMNodeList) $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
-                if ($inputs instanceof DOMNodeList) $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
+                if ($selects instanceof DOMNodeList) {
+                    $this->processNodeFormElement($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                }
+                if ($inputs instanceof DOMNodeList) {
+                    $this->processNodeFormElement($inputs, $item, 'REX_LINKLIST_' . $id);
+                }
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
@@ -841,7 +888,7 @@ class MFormParser
 
         foreach ($varId as $key => $val) {
             if (!is_numeric($val)) {
-                $varId[$key] = rand(0, (strlen($val) * rand()));
+                $varId[$key] = random_int(0, strlen($val) * random_int(0, getrandmax()));
             }
         }
 
@@ -853,19 +900,19 @@ class MFormParser
         // default manipulations
         $this->executeDefaultManipulations($item, false, false);
 
-        foreach (array('intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable') as $key => $value) {
+        foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable'] as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
-            $key = ($key == 'extern') ? 'external' : $key;
-            $key = ($key == 'tel') ? 'phone' : $key;
-            $item->setParameter(array_merge($item->getParameter(), array($key => $value)));
+            $key = ('extern' == $key) ? 'external' : $key;
+            $key = ('tel' == $key) ? 'phone' : $key;
+            $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
         }
-        foreach (array('data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category') as $data => $key) {
+        foreach (['data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
             if (isset($item->getAttributes()[$data])) {
-                $item->setParameter(array_merge($item->getParameter(), array($key => $item->getAttributes()[$data])));
+                $item->setParameter(array_merge($item->getParameter(), [$key => $item->getAttributes()[$data]]));
             }
         }
 
-        $item->setId(str_replace(array('_', ']', '['), '', rand(100, 999) . $item->getVarId()));
+        $item->setId(str_replace(['_', ']', '['], '', random_int(100, 999) . $item->getVarId()));
 
         // create templateElement object
         $templateElement = new MFormElement();
@@ -902,11 +949,11 @@ class MFormParser
                     /** @var DOMElement $childNode */
                     foreach ($divItem->childNodes as $childNode) {
                         if (($childNode->hasAttribute('class')
-                                && $childNode->getAttribute('class') == 'form-control')
+                                && 'form-control' == $childNode->getAttribute('class'))
                             && ($childNode->hasAttribute('value')
-                                && $childNode->getAttribute('value') == '')) {
+                                && '' == $childNode->getAttribute('value'))) {
                             $childNode->setAttribute('value', $item->getValue());
-                            if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+                            if (is_array($item->getAttributes()) && count($item->getAttributes()) > 0) {
                                 foreach ($item->getAttributes() as $key => $value) {
                                     $childNode->setAttribute($key, $value);
                                 }
@@ -942,7 +989,7 @@ class MFormParser
     {
         $html = $dom->C14N(false, true);
         if (str_contains($html, '<body')) {
-            preg_match("/<body>(.*)<\/body>/ism", $html, $matches);
+            preg_match('/<body>(.*)<\\/body>/ism', $html, $matches);
             if (isset($matches[1])) {
                 $html = $matches[1];
             }
@@ -950,14 +997,13 @@ class MFormParser
         return $html;
     }
 
-
     /**
      * @param MFormItem[] $items
      */
     private function parseFormFields(array $items): void
     {
         try {
-            if (sizeof($items) > 0) {
+            if (count($items) > 0) {
                 foreach ($items as $key => $item) {
 
                     if ($item instanceof MForm) {
@@ -1101,8 +1147,9 @@ class MFormParser
         // set tooltip
         if ($item->getInfoTooltip()) {
             // parse tooltip
-            if (empty($item->getInfoTooltipIcon()))
+            if (empty($item->getInfoTooltipIcon())) {
                 $item->setInfoTooltipIcon('fa-exclamation');
+            }
 
             $tooltip = new MFormElement();
             $tooltip->setValue($item->getInfoTooltip())
@@ -1134,7 +1181,7 @@ class MFormParser
 
         // wrap elements
         $element = new MFormElement();
-        $element->setOutput(implode($this->elements))
+        $element->setOutput(implode('', $this->elements))
             ->setType('wrapper');
 
         // return output
@@ -1147,14 +1194,14 @@ class MFormParser
 
         // set default template
         if (!empty($item->getLabelColClass()) && !empty($item->getFormItemColClass())) {
-            $templateType = $templateType . '_custom'; // add _custom to template type
+            $templateType .= '_custom'; // add _custom to template type
             $templateElement->setLabelColClass($item->getLabelColClass())
                 ->setFormItemColClass($item->getFormItemColClass());
         }
 
         // is full flag true and template type default
         if ($item->isFull()) {
-            $templateType = $templateType . '_full'; // add _full to template type
+            $templateType .= '_full'; // add _full to template type
         }
 
         return $templateType;
@@ -1169,8 +1216,9 @@ class MFormParser
         $keys = $element->getKeys();
         $vals = $element->getValues();
 
-        foreach ($keys as $index => $key)
+        foreach ($keys as $index => $key) {
             $fragment->setVar($key, $vals[$index], false);
+        }
 
         try {
             return $fragment->parse($this->theme . '/mform_' . $fragmentType . '.php');
@@ -1183,9 +1231,9 @@ class MFormParser
     private function parseAttributes(array $attributes): string
     {
         $inlineAttributes = '';
-        if (sizeof($attributes) > 0) {
+        if (count($attributes) > 0) {
             foreach ($attributes as $key => $value) {
-                if (!in_array($key, array('id', 'name', 'type', 'value', 'checked', 'selected'))) {
+                if (!in_array($key, ['id', 'name', 'type', 'value', 'checked', 'selected'])) {
                     $inlineAttributes .= ' ' . $key . '="' . $value . '"';
                 }
             }

@@ -29,7 +29,7 @@ class MFormOptionHandler
     }
     public static function addOptGroup(MFormItem $item, string $label, $options): void
     {
-        $option = array();
+        $option = [];
         foreach ($options as $key => $value) {
             // add option to option array
             $option[$key] = MFormClang::getClangValue($value);
@@ -42,7 +42,7 @@ class MFormOptionHandler
     {
         // if options an array
         foreach ($options as $key => $value) {
-            if(is_array($value)) { // and is value an array
+            if (is_array($value)) { // and is value an array
                 // add opt group by setOptGroup method
                 self::addOptGroup($item, $key, $value);
             } else {

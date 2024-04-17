@@ -7,9 +7,11 @@
 
 namespace MForm\Utils;
 
-
 use MForm\DTO\MFormDefault;
 use MForm\DTO\MFormItem;
+
+use function count;
+use function is_array;
 
 class MFormItemManipulator
 {
@@ -20,13 +22,13 @@ class MFormItemManipulator
     {
         // set value for html out
         if (!is_array($item->getValue())) {
-            $item->setValue(htmlspecialchars(((!empty($item->getValue()))?$item->getValue():'')));
-        } else if (is_array($item->getVarId()) && sizeof($item->getVarId()) == 1) {
+            $item->setValue(htmlspecialchars((!empty($item->getValue())) ? $item->getValue() : ''));
+        } elseif (is_array($item->getVarId()) && 1 == count($item->getVarId())) {
             $item->setValue(htmlspecialchars($item->getStringValue()));
         }
 
         // is mode add and default value defined
-        if ($item->getMode() == 'add' && $item->getDefaultValue()) {
+        if ('add' == $item->getMode() && $item->getDefaultValue()) {
             // set default value for value html out
             $item->setValue(htmlspecialchars($item->getDefaultValue()));
         }
@@ -47,7 +49,7 @@ class MFormItemManipulator
         $item->setId('rv' . $item->getId()); // add alpha prefix for valid html syntax
         foreach ($item->getAttributes() as $key => $value) {
             // check is id in attributes set
-            if ($key == 'id') {
+            if ('id' == $key) {
                 $item->setId($value); // set custom id
             }
         }

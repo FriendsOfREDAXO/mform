@@ -17,11 +17,15 @@ use MForm\Handler\MFormParameterHandler;
 use MForm\Handler\MFormValueHandler;
 use rex_be_controller;
 
+use function array_key_exists;
+use function count;
+use function is_array;
+use function is_callable;
+use function is_int;
+
 abstract class MFormElements
 {
-    /**
-     * @var MFormItem[]
-     */
+    /** @var MFormItem[] */
     private array $items = [];
 
     private MFormItem $item;
@@ -33,12 +37,7 @@ abstract class MFormElements
      */
     public function __construct()
     {
-        // TODO refactor for new usage -> check if ready module form edit
-        //      add to mform class
-        if (
-            (rex_request('function', 'string') === 'edit' && rex_request('function', 'string') != 'add')
-            || (rex_be_controller::getCurrentPage() === 'content/edit' && rex_request('function', 'string') != 'add')
-        ) {    // load rex vars
+        if (('edit' === rex_request('function', 'string') && 'add' != rex_request('function', 'string')) || ('content/edit' === rex_be_controller::getCurrentPage() && 'add' != rex_request('function', 'string'))) {            // load rex vars
             $this->result = MFormValueHandler::loadRexVars();
         }
     }
@@ -46,15 +45,15 @@ abstract class MFormElements
     /**
      * @description method to generate element array - add fields
      */
-    public function addElement(string $type, float|int|string $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, int $catId = null, string $defaultValue = null): self
+    public function addElement(string $type, float|int|string $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, ?int $catId = null, ?string $defaultValue = null): self
     {
         // remove ,
         if (!is_int($id)) {
-            $id = str_replace(',', '.', (string)$id);
+            $id = str_replace(',', '.', (string) $id);
         }
-        
+
         // create item element
-        $this->item = MFormElementHandler::createElement((sizeof($this->items) + 1), $type, $id);
+        $this->item = MFormElementHandler::createElement(count($this->items) + 1, $type, $id);
         $this->items[$this->item->getId()] = $this->item; // add item element to items array
 
         // execute to set default value and / or loaded value
@@ -62,13 +61,13 @@ abstract class MFormElements
 
         $this->setCategory($catId);
 
-        if (is_array($attributes) && sizeof($attributes) > 0) {
+        if (is_array($attributes) && count($attributes) > 0) {
             $this->setAttributes($attributes);
         }
-        if (is_array($options) && sizeof($options) > 0) {
+        if (is_array($options) && count($options) > 0) {
             $this->setOptions($options);
         }
-        if (is_array($parameter) && sizeof($parameter) > 0) {
+        if (is_array($parameter) && count($parameter) > 0) {
             $this->setParameters($parameter);
         }
 
@@ -136,14 +135,14 @@ abstract class MFormElements
         return $this->addHtml($form);
     }
 
-    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], $parse = false): self
+    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false): self
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
             ->addForm($form, $parse)
             ->addElement('close-fieldset', null, null, $attributes);
     }
 
-    public function addColumnElement(int $col, $form = null, array $attributes = [], $parse = false): self
+    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false): self
     {
         if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
             $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
@@ -153,7 +152,7 @@ abstract class MFormElements
             ->addElement('close-column', null, null, $attributes);
     }
 
-    public function addInlineElement(string $label = '', $form = null, array $attributes = [], $parse = false): self
+    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false): self
     {
         return $this->addElement('inline', null, null, $attributes)
             ->setLabel($label)
@@ -161,9 +160,9 @@ abstract class MFormElements
             ->addElement('close-inline', null, null, $attributes);
     }
 
-    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], $parse = false): self
+    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false): self
     {
-        $attributes = array_merge($attributes, array('data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight));
+        $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
             ->setLabel($label)
             ->addForm($form, $parse)
@@ -173,8 +172,10 @@ abstract class MFormElements
     public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false): self
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
-        if (!is_array($attributes)) $attributes = [];
-        $attributes = array_merge($attributes, array('data-group-accordion' => (int)$accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse));
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        $attributes = array_merge($attributes, ['data-group-accordion' => (int) $accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse]);
 
         return $this->addElement('collapse', null, null, $attributes)
             ->setLabel($label)
@@ -235,7 +236,9 @@ abstract class MFormElements
     public function addSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 1, string $defaultValue = null): self
     {
         $this->addOptionField('select', $id, $attributes, $options, $defaultValue);
-        if ($size > 1) $this->setSize($size);
+        if ($size > 1) {
+            $this->setSize($size);
+        }
         return $this;
     }
 
@@ -254,7 +257,9 @@ abstract class MFormElements
 
     public function addToggleCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): self
     {
-        if (!is_array($attributes)) $attributes = [];
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
         $attributes['data-mform-toggle'] = 'toggle';
         return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
     }
@@ -457,10 +462,6 @@ abstract class MFormElements
         return $this;
     }
 
-    /**
-     * @return MFormItem[]
-     * @author Joachim Doerr
-     */
     public function getItems(): array
     {
         return $this->items;
