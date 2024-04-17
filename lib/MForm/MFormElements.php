@@ -45,7 +45,7 @@ abstract class MFormElements
     /**
      * @description method to generate element array - add fields
      */
-    public function addElement(string $type, float|int|string $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, ?int $catId = null, ?string $defaultValue = null): self
+    public function addElement(string $type, float|int|string $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, ?int $catId = null, ?string $defaultValue = null): MForm
     {
         // remove ,
         if (!is_int($id)) {
@@ -74,52 +74,52 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addHtml(?string $html = null): self
+    public function addHtml(?string $html = null): MForm
     {
         return $this->addElement('html', null, $html);
     }
 
-    public function addHeadline(?string $value = null, array $attributes = null): self
+    public function addHeadline(?string $value = null, array $attributes = null): MForm
     {
         return $this->addElement('headline', null, $value, $attributes);
     }
 
-    public function addDescription(?string $value = null): self
+    public function addDescription(?string $value = null): MForm
     {
         return $this->addElement('description', null, $value);
     }
 
-    public function addAlert(string $key, ?string $value = null): self
+    public function addAlert(string $key, ?string $value = null): MForm
     {
         return $this->addElement('alert', null, $value, ['class' => 'alert-' . $key]);
     }
 
-    public function addAlertInfo(?string $value = null): self
+    public function addAlertInfo(?string $value = null): MForm
     {
         return $this->addAlert('info', $value);
     }
 
-    public function addAlertWarning(?string $value = null): self
+    public function addAlertWarning(?string $value = null): MForm
     {
         return $this->addAlert('warning', $value);
     }
 
-    public function addAlertDanger(?string $value = null): self
+    public function addAlertDanger(?string $value = null): MForm
     {
         return $this->addAlert('danger', $value);
     }
 
-    public function addAlertError(?string $value = null): self
+    public function addAlertError(?string $value = null): MForm
     {
         return $this->addAlertDanger($value);
     }
 
-    public function addAlertSuccess(?string $value = null): self
+    public function addAlertSuccess(?string $value = null): MForm
     {
         return $this->addAlert('success', $value);
     }
 
-    public function addForm(callable|MForm|string $form = null, bool $parse = false, bool $debug = false): self
+    public function addForm(callable|MForm|string $form = null, bool $parse = false, bool $debug = false): MForm
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
@@ -135,14 +135,14 @@ abstract class MFormElements
         return $this->addHtml($form);
     }
 
-    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false): self
+    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false): MForm
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
             ->addForm($form, $parse)
             ->addElement('close-fieldset', null, null, $attributes);
     }
 
-    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false): self
+    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false): MForm
     {
         if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
             $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
@@ -152,7 +152,7 @@ abstract class MFormElements
             ->addElement('close-column', null, null, $attributes);
     }
 
-    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false): self
+    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false): MForm
     {
         return $this->addElement('inline', null, null, $attributes)
             ->setLabel($label)
@@ -160,7 +160,7 @@ abstract class MFormElements
             ->addElement('close-inline', null, null, $attributes);
     }
 
-    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false): self
+    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false): MForm
     {
         $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
@@ -169,7 +169,7 @@ abstract class MFormElements
             ->addElement('close-tab', null, null, $attributes);
     }
 
-    public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false): self
+    public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false): MForm
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) {
@@ -183,44 +183,44 @@ abstract class MFormElements
             ->addElement('close-collapse', null, null, $attributes);
     }
 
-    public function addAccordionElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = []): self
+    public function addAccordionElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = []): MForm
     {
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
-    public function addRepeaterElement(float|int|string $id, MForm $form, array $attributes = [], bool $debug = false): self
+    public function addRepeaterElement(float|int|string $id, MForm $form, array $attributes = [], bool $debug = false): MForm
     {
         return $this->addElement('repeater', $id, null, $attributes)
             ->addForm($form, false, $debug)
             ->addElement('close-repeater', $id, null, $attributes);
     }
 
-    public function addInputField(string $typ, float|int|string $id, array $attributes = null, string $defaultValue = null): self
+    public function addInputField(string $typ, float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addElement($typ, $id, null, $attributes, null, null, null, $defaultValue);
     }
 
-    public function addHiddenField(float|int|string $id, string $value = null, array $attributes = null): self
+    public function addHiddenField(float|int|string $id, string $value = null, array $attributes = null): MForm
     {
         return $this->addElement('hidden', $id, $value, $attributes);
     }
 
-    public function addTextField(float|int|string $id, array $attributes = null, string $defaultValue = null): self
+    public function addTextField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addInputField('text', $id, $attributes, $defaultValue);
     }
 
-    public function addTextAreaField(float|int|string $id, array $attributes = null, string $defaultValue = null): self
+    public function addTextAreaField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addInputField('textarea', $id, $attributes, $defaultValue);
     }
 
-    public function addTextReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): self
+    public function addTextReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): MForm
     {
         return $this->addElement('text-readonly', $id, $value, $attributes);
     }
 
-    public function addTextAreaReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): self
+    public function addTextAreaReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): MForm
     {
         return $this->addElement('textarea-readonly', $id, $value, $attributes);
     }
@@ -228,12 +228,12 @@ abstract class MFormElements
     /**
      * add select option fields
      */
-    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, string $defaultValue = null): self
+    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, string $defaultValue = null): MForm
     {
         return $this->addElement($typ, $id, null, $attributes, $options, null, null, $defaultValue);
     }
 
-    public function addSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 1, string $defaultValue = null): self
+    public function addSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 1, string $defaultValue = null): MForm
     {
         $this->addOptionField('select', $id, $attributes, $options, $defaultValue);
         if ($size > 1) {
@@ -242,7 +242,7 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addMultiSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 3, string $defaultValue = null): self
+    public function addMultiSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 3, string $defaultValue = null): MForm
     {
         $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue)
             ->setMultiple()
@@ -250,12 +250,12 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): self
+    public function addCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
     }
 
-    public function addToggleCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): self
+    public function addToggleCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         if (!is_array($attributes)) {
             $attributes = [];
@@ -264,13 +264,13 @@ abstract class MFormElements
         return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
     }
 
-    public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): self
+    public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
     }
 
     /** TODO
-     * public function addToggleRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): self
+     * public function addToggleRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
      * {
      * //$parallaxMForm->addRadioField("{$config['parallax_id']}.parallax-sticky-test", ['true' => 'on', 'false' => 'off'], ['label' => $config['label']['parallax_sticky'],'class' => 'btn-group', 'data-toggle'] );
      * //$parallaxMForm->addHtml('<div class="btn-group" data-toggle="buttons">
@@ -286,12 +286,12 @@ abstract class MFormElements
      * }
      */
 
-    public function addLinkField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): self
+    public function addLinkField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('link', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addLinklistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): self
+    public function addLinklistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('linklist', $id, null, $attributes, null, $parameter, $catId);
     }
@@ -302,161 +302,161 @@ abstract class MFormElements
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
-    public function addCustomLinkField(float|int|string $id, array $attributes = null, string $defaultValue = null): self
+    public function addCustomLinkField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $defaultValue);
     }
 
-    public function addMediaField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): self
+    public function addMediaField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('media', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addMedialistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): self
+    public function addMedialistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('medialist', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addImagelistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): self
+    public function addImagelistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('imglist', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function setLabel(string $label): self
+    public function setLabel(string $label): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'label', $label);
         return $this;
     }
 
-    public function setPlaceholder(string $placeholder): self
+    public function setPlaceholder(string $placeholder): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'placeholder', $placeholder);
         return $this;
     }
 
-    public function setFull(): self
+    public function setFull(): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'full', true);
         return $this;
     }
 
-    public function setFormItemColClass(string $class): self
+    public function setFormItemColClass(string $class): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'item-col-class', $class);
         return $this;
     }
 
-    public function setLabelColClass(string $class): self
+    public function setLabelColClass(string $class): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'label-col-class', $class);
         return $this;
     }
 
-    public function setAttributes(array $attributes): self
+    public function setAttributes(array $attributes): MForm
     {
         MFormAttributeHandler::setAttributes($this->item, $attributes);
         return $this;
     }
 
-    public function setAttribute($name, $value): self
+    public function setAttribute($name, $value): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, $name, $value);
         return $this;
     }
 
-    public function setDefaultValue(string $value): self
+    public function setDefaultValue(string $value): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'default-value', $value);
         return $this;
     }
 
-    public function setOptions(array $options): self
+    public function setOptions(array $options): MForm
     {
         MFormOptionHandler::setOptions($this->item, $options);
         return $this;
     }
 
-    public function setOption($key, $value): self
+    public function setOption($key, $value): MForm
     {
         MFormOptionHandler::addOption($this->item, $value, $key);
         return $this;
     }
 
-    public function setToggleOptions(array $options): self
+    public function setToggleOptions(array $options): MForm
     {
         MFormOptionHandler::toggleOptions($this->item, $options);
         return $this;
     }
 
-    public function setDisableOptions(array $keys): self
+    public function setDisableOptions(array $keys): MForm
     {
         MFormOptionHandler::disableOptions($this->item, $keys);
         return $this;
     }
 
-    public function setDisableOption($key): self
+    public function setDisableOption($key): MForm
     {
         MFormOptionHandler::disableOption($this->item, $key);
         return $this;
     }
 
-    public function setSqlOptions($query): self
+    public function setSqlOptions($query): MForm
     {
         MFormOptionHandler::setSqlOptions($this->item, $query);
         return $this;
     }
 
-    public function setMultiple(): self
+    public function setMultiple(): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'multiple', 'multiple');
         return $this;
     }
 
-    public function setSize($size): self
+    public function setSize($size): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'size', $size);
         return $this;
     }
 
-    public function setCategory($catId): self
+    public function setCategory($catId): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'catId', $catId);
         return $this;
     }
 
-    public function setParameters(array $parameter): self
+    public function setParameters(array $parameter): MForm
     {
         MFormParameterHandler::addParameters($this->item, $parameter);
         return $this;
     }
 
-    public function setParameter($name, $value): self
+    public function setParameter($name, $value): MForm
     {
         MFormParameterHandler::addParameter($this->item, $name, $value);
         return $this;
     }
 
-    public function setTooltipInfo(?string $value = null, string $icon = ''): self
+    public function setTooltipInfo(?string $value = null, string $icon = ''): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'info-tooltip', $value);
         MFormAttributeHandler::addAttribute($this->item, 'info-tooltip-icon', $icon);
         return $this;
     }
 
-    public function setTabIcon(string $icon): self
+    public function setTabIcon(string $icon): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'tab-icon', $icon);
         return $this;
     }
 
-    public function setCollapseInfo(?string $value = null, string $icon = ''): self
+    public function setCollapseInfo(?string $value = null, string $icon = ''): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'info-collapse', $value);
         MFormAttributeHandler::addAttribute($this->item, 'info-collapse-icon', $icon);
         return $this;
     }
 
-    public function pullRight(): self
+    public function pullRight(): MForm
     {
         MFormAttributeHandler::addAttribute($this->item, 'pull-right', 1);
         return $this;
@@ -467,7 +467,7 @@ abstract class MFormElements
         return $this->items;
     }
 
-    public function setItems($items): self
+    public function setItems($items): MForm
     {
         $this->items = $items;
         return $this;
