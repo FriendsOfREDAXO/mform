@@ -27,7 +27,7 @@ $mform = MForm::factory()
                         // radio element
                         ->addRadioField('radio2', [1 => 'test-1', 2 => 'test-2'], ['label' => 'Radio 2'])
                     )
-                )
+                ), false, 'Add repeater fields'
             )
         )
     );

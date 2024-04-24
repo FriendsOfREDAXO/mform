@@ -2,6 +2,13 @@
 
 ## Version 8-beta3
 
+- fix repeater parentId issue
+- added handling for cke5 move preparation
+- fix :id label issue
+- added the option to hide the repeater if empty
+
+## Version 8-beta3
+
 - added repeater examples
 - fix :id, move addInputs method to elements class
 

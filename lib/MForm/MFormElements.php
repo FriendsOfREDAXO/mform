@@ -191,8 +191,10 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
-    public function addRepeaterElement(float|int|string $id, MForm $form, array $attributes = [], bool $debug = false): MForm
+    public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, string $btnText = '', array $attributes = [], bool $debug = false): MForm
     {
+        $attributes['open'] = $open;
+        $attributes['btn_text'] = $btnText;
         return $this->addElement('repeater', $id, null, $attributes)
             ->addForm($form, false, $debug)
             ->addElement('close-repeater', $id, null, $attributes);

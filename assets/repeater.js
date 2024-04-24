@@ -149,6 +149,19 @@ window.repeater = () => {
                 });
             }
         },
+        rexPrepareCke5Move(element) {
+            let that = this;
+            if ($(element).find('.cke5-repeater').length > 0) {
+                // initialisiere jede cke5 textarea einzeiln
+                $(element).find('.cke5-repeater.cke5-repeater-init').each(function () {
+                    let thatElement = $(this);
+                    cke5_destroy(thatElement);
+                    setTimeout(function(){
+                        that.rexInitCke5(thatElement);
+                    }, 2)
+                });
+            }
+        },
         // fügt global für rex:selectCustomLink events ein listener hinzu
         // setzt bei trigger für das input feld den group element eintrag
         rexInitCustomLink() {
@@ -240,18 +253,20 @@ window.repeater = () => {
             this.groups[index][fieldsKey].splice(fieldIndex, 1);
             this.updateValues();
         },
-        moveGroup(from, to) {
+        moveGroup(from, to, idKey) {
             this.groups.splice(to, 0, this.groups.splice(from, 1)[0]);
             this.updateValues();
+            this.rexPrepareCke5Move($('#' + idKey));
         },
-        moveField(index, from, to, fieldsKey) {
+        moveField(index, from, to, fieldsKey, idKey) {
             this.groups[index][fieldsKey].splice(to, 0, this.groups[index][fieldsKey].splice(from, 1)[0]);
             this.updateValues();
+            this.rexPrepareCke5Move($('#' + idKey));
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
             let linkMap = openLinkMap(id).replace('redaxo://', '');
             $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {
-                if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
                     this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': linktext, 'id': linkurl};
                 } else {
                     this.groups[index][nameKey] = {'name': linktext, 'id': linkurl};
@@ -261,7 +276,7 @@ window.repeater = () => {
             return false;
         },
         removeLink(index, nameKey, fieldsKey, fieldIndex) {
-            if (fieldsKey !== undefined && fieldIndex !== undefined) {
+            if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
                 this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': '', 'id': ''};
             } else {
                 this.groups[index][nameKey] = {'name': '', 'id': ''};
@@ -282,14 +297,14 @@ window.repeater = () => {
         },
         viewMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                element = (fieldsKey !== undefined && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
+                element = (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
                 param = params + '&file_name=' + element.media,
                 media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
         deleteMedia(id, index, nameKey, fieldsKey, fieldIndex) {
-            if (fieldsKey !== undefined && fieldIndex !== undefined) {
+            if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
                 this.groups[index][fieldsKey][fieldIndex][nameKey] = '';
             } else {
                 this.groups[index][nameKey] = '';
@@ -298,7 +313,7 @@ window.repeater = () => {
         },
         onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex) {
             $(media).on('rex:selectMedia', (event, mediaName) => {
-                if (fieldsKey !== undefined && fieldIndex !== undefined) {
+                if (fieldsKey !== undefined && fieldsKey !== '' && fieldsKey !== '' && fieldIndex !== undefined) {
                     this.groups[index][fieldsKey][fieldIndex][nameKey] = mediaName;
                 } else {
                     this.groups[index][nameKey] = mediaName;

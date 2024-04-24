@@ -83,15 +83,20 @@ class MFormRepeaterHelper
                     switch ($mformItem->getType()) {
                         case 'repeater':
                             if ($items[$key+1] instanceof MForm) {
+                                $mformItem->addAttribute('parent_id', $parentId);
                                 // complete the repeater child tree
-                                $obj[$nameKey] = [self::prepareChildItems($items[$key+1], $repeaterId, $group, $groups, $parentId)];
+                                if (isset($mformItem->getAttributes()['open']) && $mformItem->getAttributes()['open'] === true) {
+                                    $obj[$nameKey] = [self::prepareChildItems($items[$key+1], $repeaterId, $group, $groups, $parentId)];
+                                } else {
+                                    $obj[$nameKey] = [];
+                                }
                             } else {
                                 $obj[$nameKey] = [];
                             }
                         case 'close-repeater';
                             $mformItem->addAttribute('group', 'field')
                                 ->addAttribute('groups', 'group.' . $nameKey)
-                                ->addAttribute('parent_id', $repeaterId);
+                                ->addAttribute('parent_id', $parentId);
                             break;
                         case 'media':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
@@ -111,7 +116,6 @@ class MFormRepeaterHelper
                             $obj[$nameKey] = ['list' => []];
                             break;
                         case 'textarea':
-                            self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             if (str_contains($mformItem->getClass(), 'cke5-editor')) {
                                 $mformItem->addAttribute('repeater_cke', 1);
                                 $mformItem->setClass($mformItem->getClass() . ' hidden');
