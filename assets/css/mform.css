@@ -358,7 +358,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs {
 
 section.repeater .repeater-group > .mform > fieldset:first-child,
 section.repeater .repeater-group header + .mform > .mform-tabs:first-child {
-    margin-top: -6px;
+    margin-top: -8px;
 }
 
 section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
