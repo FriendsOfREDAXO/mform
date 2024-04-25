@@ -358,16 +358,16 @@ section.repeater .repeater-group header + .mform > .mform-tabs {
 
 section.repeater .repeater-group > .mform > fieldset:first-child,
 section.repeater .repeater-group header + .mform > .mform-tabs:first-child {
-    margin-top: -18px;
+    margin-top: -6px;
+}
+
+section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
+    padding-bottom: 10px;
 }
 
 section.repeater .repeater-group header + .mform > .mform-tabs:last-child .tab-content {
     margin-bottom: -5px;
     padding: 15px 10px;
-}
-
-section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
-    padding-bottom: 10px;
 }
 
 section.repeater .repeater-group .button {
