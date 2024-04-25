@@ -1,11 +1,12 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 8-beta3
+## Version 8-beta4
 
 - fix repeater parentId issue
 - added handling for cke5 move preparation
 - fix :id label issue
 - added the option to hide the repeater if empty
+- css for repeater exchanged
 
 ## Version 8-beta3
 

@@ -108,7 +108,7 @@
     display: inline-block;
     margin-left: 15px;
     float: right;
-    font: normal normal 900 14px/1 "Font Awesome 6 Free",FontAwesome;
+    font: normal normal 900 14px/1 "Font Awesome 6 Free", FontAwesome;
     font-size: 15px;
 }
 
@@ -323,10 +323,6 @@ section.repeater .repeater-group:last-child {
     margin-bottom: 0;
 }
 
-section.repeater .repeater-group > .mform > fieldset:first-child {
-    margin-top: -1.5rem;
-}
-
 @media (prefers-color-scheme: dark) {
     section.repeater .repeater-group {
         border: 1px solid rgba(72, 72, 72, 0.2);
@@ -340,14 +336,38 @@ section.repeater .repeater-group > .mform > fieldset:first-child {
     }
 }
 
+section.repeater .repeater-group header > div {
+    display: block;
+    position: absolute;
+    right: 0;
+    width: 100px;
+    text-align: right;
+}
+
 section.repeater .repeater-group header {
+    position: relative;
     margin-bottom: 0.5rem;
     padding: 0.5rem;
     transition: background 0.3s ease-out;
+    min-height: 30px;
 }
 
-section.repeater .repeater-group:hover > header {
-    /*background: rgba(0, 0, 0, 0.03);*/
+section.repeater .repeater-group header + .mform > .mform-tabs {
+    margin-top: 20px;
+}
+
+section.repeater .repeater-group > .mform > fieldset:first-child,
+section.repeater .repeater-group header + .mform > .mform-tabs:first-child {
+    margin-top: -18px;
+}
+
+section.repeater .repeater-group header + .mform > .mform-tabs:last-child .tab-content {
+    margin-bottom: -5px;
+    padding: 15px 10px;
+}
+
+section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
+    padding-bottom: 10px;
 }
 
 section.repeater .repeater-group .button {
