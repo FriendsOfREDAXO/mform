@@ -245,11 +245,21 @@ window.repeater = () => {
         addFields(index, obj, fieldsKey, idKey) {
             this.groups[index][fieldsKey].push(JSON.parse(JSON.stringify(obj)));
         },
-        removeGroup(index) {
+        removeGroup(index, confirmDelete = false, confirmDeleteMsg = 'delete?') {
+            if (confirmDelete) {
+                if (!confirm(confirmDeleteMsg)) {
+                    return false;
+                }
+            }
             this.groups.splice(index, 1);
             this.updateValues();
         },
-        removeField(index, fieldIndex, fieldsKey) {
+        removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?') {
+            if (confirmDelete) {
+                if (!confirm(confirmDeleteMsg)) {
+                    return false;
+                }
+            }
             this.groups[index][fieldsKey].splice(fieldIndex, 1);
             this.updateValues();
         },

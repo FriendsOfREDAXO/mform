@@ -62,6 +62,9 @@ mform_module_update = Modul aktualisieren
 mform_module_updated = Modul "%s" wurde aktualisiert
 mform_module_created = Modul "%s" wurde installiert
 
+mform_repeater_remove_group_confirm_msg = löschen?
+mform_repeater_remove_field_confirm_msg = löschen?
+
 var_extern_link = Externe URL verlinken
 var_mailto_link = Email verlinken
 var_phone_link = Telefonnummer verlinken

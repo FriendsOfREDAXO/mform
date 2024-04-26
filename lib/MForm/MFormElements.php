@@ -191,10 +191,10 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
-    public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, string $btnText = '', array $attributes = [], bool $debug = false): MForm
+    public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false): MForm
     {
         $attributes['open'] = $open;
-        $attributes['btn_text'] = $btnText;
+        $attributes['confirm_delete'] = $confirmDelete;
         return $this->addElement('repeater', $id, null, $attributes)
             ->addForm($form, false, $debug)
             ->addElement('close-repeater', $id, null, $attributes);
@@ -271,6 +271,12 @@ abstract class MFormElements
 
     public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
+        return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
+    }
+
+    public function addRadioImageField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        $attributes['img_radio'] = true;
         return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
     }
 

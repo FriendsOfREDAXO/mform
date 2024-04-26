@@ -27,9 +27,9 @@ $mform = MForm::factory()
                         // radio element
                         ->addRadioField('radio2', [1 => 'test-1', 2 => 'test-2'], ['label' => 'Radio 2'])
                     )
-                ), false, 'Add repeater fields'
+                ), false, false, ['btn_text' => 'Repeater Level2 Hinzufügen']
             )
-        )
+        ), true, true, ['btn_text' => 'Repeater Level1 Hinzufügen', 'confirm_delete_msg' => 'Repeater Level1 löschen?']
     );
 
 echo $mform->show();
