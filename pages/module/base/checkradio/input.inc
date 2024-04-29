@@ -12,5 +12,15 @@ $mform = MForm::factory()
         // radio element
         ->addRadioField(2, [1 => 'test-1', 2 => 'test-2'], ['label' => 'Radio Buttons'])
     );
+
+//$options = [];
+//for ($i = 1; $i <= 20; $i++) {
+//    $options[$i] = ['img' => "../assets/backend/img/l$i.svg", 'label' => "Variante $i"];
+//}
+//
+//$mform->addFieldsetArea('', MForm::factory()
+//    ->addRadioImgInlineField(4, $options, ['label' => 'Layout Type'])
+//);
+
 // parse form
 echo $mform->show();

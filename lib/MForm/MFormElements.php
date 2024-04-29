@@ -274,10 +274,44 @@ abstract class MFormElements
         return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
     }
 
-    public function addRadioImageField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    /**
+     * @example
+     * $options = [];
+     * for ($i = 1; $i <= 20; $i++) {
+     *      $options[$i] = ['img' => "../theme/public/assets/backend/img/l$i.svg", 'label' => "Variant $i"];
+     * }
+     * $mform->addRadioImgInlineField(4, $options, ['label' => 'Layout Type']);
+     */
+    public function addRadioImgInlineField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
-        $attributes['img_radio'] = true;
-        return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
+        $newOptions = [];
+        foreach ($options as $key => $option) {
+            if (is_array($option) && isset($option['label']) && isset($option['img'])) {
+                $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
+            }
+        }
+        $this->addHtml('<div class="mform-inline-img-radios mform-inline-radios">');
+        $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
+        $this->addHtml('</div>');
+        return $this;
+    }
+
+    public function addRadioColorInlineField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        $newOptions = [];
+        foreach ($options as $key => $option) {
+            if (is_array($option) && isset($option['label']) && isset($option['color'])) {
+                if ($option['color'] == 'transparent') {
+                    $newOptions[$key] = "<span style=\"background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 0, 0, 1) 50%, rgba(255, 0, 0, 1) 100%);\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
+                } else {
+                    $newOptions[$key] = "<span style=\"background-color:{$option['color']}\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
+                }
+            }
+        }
+        $this->addHtml('<div class="mform-inline-color-radios mform-inline-radios">');
+        $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
+        $this->addHtml('</div>');
+        return $this;
     }
 
     /** TODO

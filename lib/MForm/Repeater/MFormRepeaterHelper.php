@@ -101,18 +101,20 @@ class MFormRepeaterHelper
                         case 'media':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('repeater_link', true);
-                            $obj[$nameKey] = "";
+                            $obj[$nameKey] = (!empty($mformItem->getDefaultValue())) ? $mformItem->getDefaultValue() : '';
                             break;
                         case 'link':
                         case 'custom-link':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('repeater_link', true);
+                            // TODO add default value
                             $obj[$nameKey] = ['name' => '', 'id' => ''];
                             break;
                         case 'medialist':
                         case 'linklist':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             # $mformItem->addAttribute('repeater_link', true);
+                        // TODO add default value
                             $obj[$nameKey] = ['list' => []];
                             break;
                         case 'textarea':
@@ -129,7 +131,7 @@ class MFormRepeaterHelper
                         default:
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('x-on:change', 'updateValues()');
-                            $obj[$nameKey] = "";
+                            $obj[$nameKey] = (!empty($mformItem->getDefaultValue())) ? $mformItem->getDefaultValue() : '';
                             break;
                     }
                 }

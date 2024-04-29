@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8-beta5
+
+- added delete confirmation option for repeater group and fields
+- added radio image / color inline field
+- default value support for repeater added
+
 ## Version 8-beta4
 
 - fix repeater parentId issue

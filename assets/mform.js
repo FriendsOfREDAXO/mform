@@ -4,16 +4,20 @@ $(document).on('rex:ready mblock:change', function () {
 });
 
 function initMFormElements(mform) {
-    // init tooltip
-    initMFormTooltip(mform);
-    // init toggle
-    initMFormToggle(mform);
-    // init tabs
-    initMFormTabs(mform);
-    // init collapse
-    initMFormCollapses(mform);
-    // init selectPicker
-    initMFormSelectPicker(mform);
+    setTimeout(function () {
+        // init tooltip
+        initMFormTooltip(mform);
+        // init toggle
+        initMFormToggle(mform);
+        // init tabs
+        initMFormTabs(mform);
+        // init collapse
+        initMFormCollapses(mform);
+        // init selectPicker
+        initMFormSelectPicker(mform);
+        // init radio img inlines
+        initMFormRadioImgInlines(mform);
+    },1)
 }
 
 function initMFormSelectPicker(mform) {
@@ -161,4 +165,21 @@ function toggleCollapseElement(element, type, init) {
     } else {
         element.collapse(type);
     }
+}
+
+function initMFormRadioImgInlines(mform) {
+    mform.find('.mform-inline-radios').each(function(){
+        let that = $(this);
+        $(this).find('input[type=radio]').each(function (){
+            $(this).on('change', function(){
+                that.find('label').removeClass('active');
+                if ($(this).prop('checked')) {
+                    $(this).parent().addClass('active');
+                }
+            });
+            if ($(this).prop('checked')) {
+                $(this).parent().addClass('active');
+            }
+        });
+    });
 }
