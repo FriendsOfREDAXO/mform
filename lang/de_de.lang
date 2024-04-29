@@ -90,3 +90,4 @@ mform_docs_customlink = Custom-Link-Widget
 mform_docs_imagelist = Imagelist-Widget
 mform_docs_wrapper = Wrapper und Layouts
 mform_docs_advanced = Erweitert
+mform_docs_repeater = Repeater

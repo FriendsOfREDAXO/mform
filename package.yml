@@ -10,21 +10,9 @@ page:
     icon: rex-icon fa-solid fa-diagram-next
     subpages:
         demo:
-            title: 'translate:reference_demo'
-            subpages:
-                demo_base: { title: 'translate:demo_base' }
-                demo_wrapper: { title: 'translate:demo_wrapper' }
-                demo_extended: { title: 'translate:demo_extended' }
-                demo_repeater: { title: 'translate:demo_repeater' }
-                demo_expert: { title: 'translate:demo_expert' }
-        changelog:
-            title: 'translate:changelog'
-            subPath: CHANGELOG.md
-            itemClass: pull-right
-        help:
-            title: 'translate:help'
-            subPath: README.md
-            itemClass: pull-right
+            title: 'translate:demo'
+            icon: rex-icon fa-desktop
+            perm: mform[demo]
 
 requires:
     php: '>=7.6'
