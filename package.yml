@@ -20,11 +20,11 @@ page:
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
-            itemclass: pull-right
+            itemClass: pull-right
         help:
             title: 'translate:help'
             subPath: README.md
-            itemclass: pull-right
+            itemClass: pull-right
 
 requires:
     php: '>=7.6'
