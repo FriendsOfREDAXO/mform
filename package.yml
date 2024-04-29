@@ -18,10 +18,7 @@ page:
             title: 'translate:demo'
             icon: rex-icon fa-desktop
             perm: mform[demo]
-        changelog:
-            title: 'translate:changelog'
-            subPath: CHANGELOG.md
-            itemclass: pull-right
+
 requires:
     php: '>=7.4'
     redaxo: '^5.10.0'

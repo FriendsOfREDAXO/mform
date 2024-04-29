@@ -212,3 +212,20 @@ $mform = MForm::factory()
 // parse form
 echo $mform->show();
 ```
+
+## Beispiele: Mehrsprachigkeit
+
+MForm unterstützt Mehrsprachigkeit der Formularbeschriftung auf verschidenen Ebenen.
+
+```php
+<?php
+$repeater = MForm::factory();
+
+$repeater->addTextField('test1', ['label' => ['en'=>'Label EN', 'de' => 'Label DE']]);
+$repeater->addTextField('test2', ['label' => rex_i18n::msg("test")]);
+
+echo $repeater->show();
+?>
+```
+
+In der letzteren Variante muss als Label ein Schlüssel für die Übersetzung übergeben werden. Dieser Schlüssel inkl. Übersetzung wird dann in der passenden `lang`-Datei hinterlegt, bspw. im `project`-Addon.
