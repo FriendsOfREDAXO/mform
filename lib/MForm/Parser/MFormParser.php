@@ -98,7 +98,7 @@ class MFormParser
 
             $output[] = '<section class="repeater" id="'.$repeaterId.'"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.json_encode($itemValue).');'.$addInitGroup.'\' id="x-repeater">';
             // add button
-            $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> Gruppe hinzufügen</a></template>';
+            $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add group').'</a></template>';
             $header = '
                 <header>
                     <div>
@@ -118,7 +118,7 @@ class MFormParser
             $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
         } else {
             $varId = trim(str_replace(['][','[',']'],['.','',''], $item->getVarId()));
-            $link = '<a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Field hinzufügen').'</a>';
+            $link = '<a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add field').'</a>';
 
             $confirm .= (isset($item->getAttributes()['confirm_delete_msg'])) ? ', \''.$item->getAttributes()['confirm_delete_msg'] .'\'' : ', \''.rex_i18n::msg('mform_repeater_remove_field_confirm_msg').'\'';
             $addInitFields = ($open) ? 'if('.$groups.'.length <= 0){addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")}' : '';
