@@ -70,9 +70,10 @@ class MFormParser
         // set obj
         $obj = json_encode($obj);
 
-        $confirm = '';
         if (isset($item->getAttributes()['confirm_delete']) && $item->getAttributes()['confirm_delete']) {
             $confirm = ', true';
+        } else {
+            $confirm = ', false';
         }
 
         // open section and repeater div
