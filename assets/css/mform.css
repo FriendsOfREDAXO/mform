@@ -304,16 +304,35 @@ body.rex-theme-dark .mform .collapsing {
 section.repeater .repeater-group {
     padding: 0.5rem 1.25rem 1.25rem 1.25rem;
     margin-bottom: 0.5rem;
-    transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    transition: box-shadow 0.3s ease-in-out;
 
     border: 1px solid rgba(100, 100, 100, 0.20);
     background: rgba(255, 255, 255, 0.09);
     box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+    position: relative;
+}
+
+section.repeater .repeater-group:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: auto;
+    width: 0;
+    content: '';
+    display: block;
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: width 0.1s ease-in-out;
+}
+
+.rex-theme-light section.repeater .repeater-group:hover::before,
+section.repeater .repeater-group:hover::before {
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 5px;
 }
 
 .rex-theme-light section.repeater .repeater-group:hover,
 section.repeater .repeater-group:hover {
-    border-left: 0.25rem solid rgba(0, 0, 0, 0.3);
     box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
 }
 
@@ -323,8 +342,10 @@ section.repeater .repeater-group:hover {
     box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
 }
 
+.rex-theme-dark section.repeater .repeater-group:hover::before {
+    background-color: rgba(255, 255, 255, 0.3);
+}
 .rex-theme-dark section.repeater .repeater-group:hover {
-    border-left: 0.25rem solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
 }
 
@@ -339,8 +360,10 @@ section.repeater .repeater-group:last-child {
         box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
     }
 
+    section.repeater .repeater-group:hover::before {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
     section.repeater .repeater-group:hover {
-        border-left: 0.25rem solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 5px 15px rgba(0, 0, 0, .22);
     }
 }
