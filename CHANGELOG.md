@@ -4,6 +4,7 @@
 
 - fix button style, ensure that buttons ever will display, added potential disable style for buttons
 - min and max count of blocks for repeater
+- rename `addRadioImgInlineField` to `addRadioImgField` and `addRadioColorInlineField` to `addRadioColorField`
 
 ## Version 8-beta5
 
