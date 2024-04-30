@@ -76,6 +76,12 @@ class MFormParser
             $confirm = ', false';
         }
 
+        $max = (!empty($item->getAttributes()['max'])) ? intval($item->getAttributes()['max']) : 0;
+        $min = (!empty($item->getAttributes()['min'])) ? intval($item->getAttributes()['min']) : 0;
+        if ($max > 0) {
+            $xifMax = " && $max > $groups.length";
+        }
+
         // open section and repeater div
         if (is_null($parentId)) {
             // at this point we have to compare item value and obj
@@ -103,15 +109,26 @@ class MFormParser
             $header = '
                 <header>
                     <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
-                            <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="button add"><i class="rex-icon fa-plus-circle"></i></a>
+                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
+                            <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
-                        <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.')" class="button remove"><i class="rex-icon fa-times"></i></a>
+                        <template x-if="'.$min.' < '.$groups.'.length">
+                            <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
+                        </template>
+                        <template x-if="'.$min.' > '.$groups.'.length">
+                            <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
+                        </template>
                         <template x-if="'.$repeaterId.'Index !== 0">
-                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$repeaterId.'\')" class="button move"><i class="rex-icon fa-chevron-up"></i></a>
-                        </template>    
+                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$repeaterId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
+                        </template>
+                        <template x-if="'.$repeaterId.'Index === 0">
+                            <a class="btn disabled"><i class="rex-icon fa-chevron-up"></i></a>
+                        </template>
                         <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
-                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$repeaterId.'\')" class="button move"><i class="rex-icon fa-chevron-down"></i></a>
+                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$repeaterId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
+                        </template>
+                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
+                            <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
                         </template>
                     </div>
                 </header>        
@@ -130,15 +147,26 @@ class MFormParser
             $header = '
                 <header>
                     <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
-                            <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="button add"><i class="rex-icon fa-plus-circle"></i></a>
+                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
+                            <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
-                        <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.')" class="button remove"><i class="rex-icon fa-times"></i></a>
+                        <template x-if="'.$min.' < '.$groups.'.length">
+                            <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
+                        </template>
+                        <template x-if="'.$min.' > '.$groups.'.length">
+                            <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
+                        </template>
                         <template x-if="'.$repeaterId.'Index !== 0">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="button move"><i class="rex-icon fa-chevron-up"></i></a>
+                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
+                        </template>
+                        <template x-if="'.$repeaterId.'Index === 0">
+                            <a class="btn disabled"><i class="rex-icon fa-chevron-up"></i></a>
                         </template>
                         <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="button move"><i class="rex-icon fa-chevron-down"></i></a>
+                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
+                        </template>
+                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
+                            <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
                         </template>
                     </div>
                 </header>
