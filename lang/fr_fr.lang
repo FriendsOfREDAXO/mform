@@ -1,0 +1,92 @@
+mform_name = MForm
+mform_title = MForm
+
+mform_change_message = MForm a été mis à jour. Veuillez noter les notes de mise à jour dans les notes de version et le journal des modifications.
+
+mform_demo = Collection d'exemples
+mform_demo_base = Exemples de base
+mform_demo_extended = Exemples avancés
+mform_demo_expert = Exemples d'experts
+mform_demo_community = Exemples FOS
+mform_demo_wrapper = Exemples d'enveloppe
+mform_reference_demo = Collection d'exemples
+mform_demo_repeater = Exemples de répétition
+mform_info = Info
+
+mform_modul_input = Module d'entrée
+mform_modul_output = Module de sortie
+
+mform_help = Aide
+mform_changelog = Journal des modifications
+mform_github = Dépôt MForm FOR Github
+
+mform_example_base_text = Éléments d'entrée de texte et cachés
+mform_example_base_select = Éléments de sélection et de sélection multiple
+mform_example_base_checkradio = Éléments de case à cocher et de radio
+mform_example_base_info = Éléments d'information structurels
+mform_example_base_system = Éléments de bouton système
+mform_example_base_widgets = Éléments de widget MForm
+mform_example_extended_attribute_method = Méthode d'attribut
+mform_example_extended_options_method = Méthode d'options
+mform_example_extended_parameter_method = Méthode de paramètre
+mform_example_extended_full_json_support = Support complet des valeurs JSON
+mform_example_extended_diverse_setter = Ajouter et divers setters
+mform_example_extended_wrapper = Éléments d'enveloppe
+mform_example_expert_html_form_elements = Nouveaux éléments de formulaire HTML5
+mform_example_expert_datalist = Listes de données pour les éléments d'entrée
+mform_example_expert_placeholder = Espace réservé
+mform_example_expert_debug_custom_theme = Mode débogage et thème personnalisé
+mform_example_wrapper_accordion = Élément d'enveloppe d'accordéon
+mform_example_wrapper_collapse = Élément d'enveloppe de réduction
+mform_example_wrapper_collapse_checkradio = Élément d'enveloppe de réduction de case à cocher radio
+mform_example_wrapper_collapse_select = Élément d'enveloppe de réduction de sélection
+mform_example_wrapper_columns = Élément d'enveloppe de grille/colonne
+mform_example_wrapper_inline = Éléments de formulaire en ligne
+mform_example_wrapper_tabs = Éléments d'enveloppe d'onglet
+mform_example_repeater_single_repeater = Répéteur 1 niveau (simple)
+mform_example_repeater_nested_repeater = Répéteur 2 niveaux (imbriqué)
+
+mform_example_description_base = Les "Exemples de base" incluent les appels de base des éléments MForm, sans aucun "extra", extensions et validations.
+mform_example_description_extended = Les "Exemples avancés" montrent comment les éléments MForm peuvent être étendus avec des attributs, des options, des paramètres, des étiquettes, etc. au-delà des "Exemples de base".
+mform_example_description_expert = Les "Exemples d'experts" montrent que MForm peut être utilisé pour plus que juste des normes.
+mform_example_description_community = Plus tard
+mform_example_description_wrapper = Les "Exemples d'enveloppe" montrent comment utiliser les éléments d'enveloppe MForm pour mettre en page et préparer de manière interactive les formulaires d'entrée.
+mform_example_description_repeater = Le "Répéteur" fonctionne comme les éléments d'enveloppe MForm, dans les exemples on voit l'utilisation à un ou deux niveaux de répétition de formulaire (imbriqué).
+
+mform_github = MForm chez FOR - aller sur github
+
+mform_install = Installer
+mform_update = Mettre à jour
+mform_module_install = Installer le module
+mform_module_update = Mettre à jour le module
+mform_module_updated = Le module "%s" a été mis à jour
+mform_module_created = Le module "%s" a été installé
+
+mform_repeater_remove_group_confirm_msg = supprimer ?
+mform_repeater_remove_field_confirm_msg = supprimer ?
+
+var_extern_link = Lien vers une URL externe
+var_mailto_link = Lien vers un email
+var_phone_link = Lien vers un numéro de téléphone
+
+yform_values_custom_link_description = 🧩 MForm : Fournit un widget de lien pour plusieurs types de liens. Liens média, externes, internes et e-mail
+yform_values_custom_link_media = Bouton de lien média
+yform_values_custom_link_media_types = Types de médias (séparés par des virgules)
+yform_values_custom_link_media_category = Catégorie de médias (ID)
+yform_values_custom_link_external = Bouton de lien externe
+yform_values_custom_link_mailto = Bouton de lien mailto
+yform_values_custom_link_intern = Bouton de lien interne
+yform_values_custom_link_link_category = Catégorie de lien
+yform_values_custom_link_phone = Bouton de lien téléphonique
+yform_values_imagelist_description = 🧩 MForm : Sélection d'images avec affichage direct / Glisser-déposer
+yform_values_custom_link_ylink = Widget de lien YForm (label_text::yform_table::column_display,label_text2::yform_table_2::column_display_2)
+
+# Docs
+
+mform_docs = Documentation
+mform_docs_basics = Bases
+mform_docs_redaxo = Widgets REDAXO
+mform_docs_customlink = Widget de lien personnalisé
+mform_docs_imagelist = Widget de liste d'images
+mform_docs_wrapper = Enveloppes et mises en page
+mform_docs_advanced = Avancé
