@@ -3,7 +3,9 @@
 
 switch ($this->getVar('type')) {
     case 'label':
-        echo '<label for="' . $this->getVar('id') . '">' . $this->getVar('value') . '</label>';
+        if ($this->getVar('value') !== '') {
+            echo '<label for="' . $this->getVar('id') . '">' . $this->getVar('value') . '</label>';
+        }
         break;
     case 'alert':
         echo '<div class="mform-alert alert ' . $this->getVar('class') . '">' . $this->getVar('output') . '</div>';
