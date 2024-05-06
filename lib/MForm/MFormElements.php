@@ -280,9 +280,9 @@ abstract class MFormElements
      * for ($i = 1; $i <= 20; $i++) {
      *      $options[$i] = ['img' => "../theme/public/assets/backend/img/l$i.svg", 'label' => "Variant $i"];
      * }
-     * $mform->addRadioImgInlineField(4, $options, ['label' => 'Layout Type']);
+     * $mform->addRadioImgField(4, $options, ['label' => 'Layout Type']);
      */
-    public function addRadioImgInlineField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioImgField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         $newOptions = [];
         foreach ($options as $key => $option) {
@@ -296,7 +296,7 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addRadioColorInlineField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioColorField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         $newOptions = [];
         foreach ($options as $key => $option) {

@@ -10,9 +10,13 @@ if ('' != $this->getElement('category')) {
     $widget_params['category'] = (int) $this->getElement('category');
 }
 $widget_params['preview'] = $this->getElement('preview');
-if ('' != $this->getElement('types')) {
-    $widget_params['types'] = trim($this->getElement('types'));
+
+$types = trim($this->getElement('types')) ?? '';
+if ('*' == $types) {
+    $types = '';
 }
+if ($types)
+    $widget_params['types'] = $types;
 
 $widget = rex_var_imglist::getWidget($buttonId, $name, $value, $widget_params);
 

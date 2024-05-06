@@ -322,13 +322,13 @@ section.repeater .repeater-group:before {
     content: '';
     display: block;
     background-color: rgba(0, 0, 0, 0.3);
-    transition: width 0.1s ease-in-out;
+    transition: width 0.25s ease-in-out;
 }
 
 .rex-theme-light section.repeater .repeater-group:hover::before,
 section.repeater .repeater-group:hover::before {
     background-color: rgba(0, 0, 0, 0.3);
-    width: 5px;
+    width: 3px;
 }
 
 .rex-theme-light section.repeater .repeater-group:hover,
@@ -372,7 +372,7 @@ section.repeater .repeater-group header > div {
     display: block;
     position: absolute;
     right: 0;
-    width: 100px;
+    width: 120px;
     text-align: right;
 }
 
@@ -397,26 +397,26 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     padding-bottom: 10px;
 }
 
-section.repeater .repeater-group header + .mform > .mform-tabs:last-child .tab-content {
+.repeater-group header + .mform > .mform-tabs:last-child .tab-content {
     margin-bottom: -5px;
     padding: 15px 10px;
 }
 
-section.repeater .repeater-group .button {
-    padding: 5px;
-    line-height: 1;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+.repeater-group header .btn {
+    padding: 1px;
     text-decoration: none;
 }
 
-section.repeater .repeater-group .button.move {
-    color: #3c4d60;
+.repeater-group header .btn.disabled {
+    opacity: .2;
 }
 
-section.repeater .repeater-group .button.remove {
+.repeater-group header .btn-red {
     color: #d9534f;
+}
+
+.repeater-group header .btn-red:hover {
+    color: #ff0800;
 }
 
 .mform-inline-img-radios label span {
