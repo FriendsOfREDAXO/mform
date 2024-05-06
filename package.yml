@@ -7,15 +7,20 @@ page:
     title: 'translate:title'
     pjax: true
     perm: admin[]
-    icon: rex-icon fa-solid fa-diagram-next
+    icon: rex-icon fa-diagram-next
     subpages:
+        docs:
+            title: 'translate:help'
+            icon: rex-icon fa-info-circle
+            perm: mform[docs]
+            hidden: true
         demo:
             title: 'translate:demo'
             icon: rex-icon fa-desktop
             perm: mform[demo]
 
 requires:
-    php: '>=7.6'
+    php: '>7.4'
     redaxo: '^5.17.0'
 
 conflicts:

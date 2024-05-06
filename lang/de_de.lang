@@ -9,8 +9,7 @@ mform_demo_extended = Erweiterte Beispiele
 mform_demo_expert = Experten Beispiele
 mform_demo_community = FOS Beispiele
 mform_demo_wrapper = Wrapper Beispiele
-mform_reference_demo = Beispielsammlung
-mform_demo_repeater = Repeater Beispiele
+mform_reference_demo = MForm Beispielsammlung
 mform_info = Info
 
 mform_modul_input = Modul Eingabe
@@ -43,15 +42,12 @@ mform_example_wrapper_collapse_select = Select Collapse Wrapper-Element
 mform_example_wrapper_columns = Grid/Column Wrapper-Element
 mform_example_wrapper_inline = Inline Formular-Elements
 mform_example_wrapper_tabs = Tab Wrapper-Elements
-mform_example_repeater_single_repeater = Repeater 1 Level (single)
-mform_example_repeater_nested_repeater = Repeater 2 Level (nested)
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
 mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.
 mform_example_description_expert = Die "Experten Beispiele" zeigen, dass MForm für mehr als nur für Standards genutzt werden kann.
 mform_example_description_community = Later
 mform_example_description_wrapper = Die "Wrapper Beispiele" zeigen auf, wie man mittels der MForm Wrapper-Elemente Input-Formulare sinnvoll layouten und interaktiv aufbereiten kann.
-mform_example_description_repeater = Der "Repeater" funktioniert wie die MForm Wrapper-Elemente, in den Beispielen sieht man die Verwendung auf einer oder zwei (nested) Formular-Repeater-Level.
 
 mform_github = MForm bei FOR - go to github
 
@@ -62,14 +58,11 @@ mform_module_update = Modul aktualisieren
 mform_module_updated = Modul "%s" wurde aktualisiert
 mform_module_created = Modul "%s" wurde installiert
 
-mform_repeater_remove_group_confirm_msg = löschen?
-mform_repeater_remove_field_confirm_msg = löschen?
-
 var_extern_link = Externe URL verlinken
 var_mailto_link = Email verlinken
 var_phone_link = Telefonnummer verlinken
 
-yform_values_custom_link_description = 🧩 MForm: Stellt ein Link-Widget für mehrere Link-Typen bereit. Medien-, externe, interne und E-Mail- Links
+yform_values_custom_link_description = 🧩 CustomLink-Widget aus MFrom. Stellt ein Link-Widget für mehrere Link-Typen bereit. Medien-, externe, interne und E-Mail- Links
 yform_values_custom_link_media = Media-Link Button
 yform_values_custom_link_media_types = Medien-Typen (komma-getrennt)
 yform_values_custom_link_media_category = Medien-Kategorie (ID)
@@ -78,8 +71,8 @@ yform_values_custom_link_mailto = Mailto-Link-Button
 yform_values_custom_link_intern = Interner-Link-Button
 yform_values_custom_link_link_category = Link-Kategorie
 yform_values_custom_link_phone = Telefon-Link-Button
-yform_values_imagelist_description = 🧩 MForm: Bildauswahl mit direkter Darstellung / Drag & Drop
-yform_values_custom_link_ylink = YForm-Link-Widget (label_text::yform_tabelle::anzeige_column,label_text2::yform_tabelle_2::anzeige_column_2)
+yform_values_imagelist_description = 🧩 Bildauswahl aus MForm. Mit direkter Darstellung / Drag & Drop
+yform_values_custom_link_ylink = 🧩 YForm-Link-Widget aus MForm. (label_text::yform_tabelle::anzeige_column,label_text2::yform_tabelle_2::anzeige_column_2)
 
 # Docs
 
