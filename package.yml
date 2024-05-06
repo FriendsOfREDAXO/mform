@@ -18,6 +18,12 @@ page:
             title: 'translate:demo'
             icon: rex-icon fa-desktop
             perm: mform[demo]
+            itemClass: pull-right
+        changelog:
+            title: 'translate:changelog'
+            subPath: "README.md"
+            icon: rex-icon fa-info-circle
+            itemClass: pull-right
 
 requires:
     php: '>7.4'
