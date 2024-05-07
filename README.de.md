@@ -69,7 +69,7 @@ Zur Ermittlung der benötigten Feld-Keys sollte man ggf. vorab einen Dump erzeug
 Zu beachten: Aus dem Mediafield 1 im urpsrünglichen MBlock-Modul wird: `'REX_MEDIA_1'`
 
 ```php
-// Initialisierung des Repeaters mit der Basis-ID des ursprünglichen MBlock-Abschnittes
+// Initialisierungs-ID des Repeaters mit der Basis-ID des ursprünglichen MBlock-Abschnittes
 $id = 1;
 // Erstellen einer neuen MForm-Instanz mit der Factory-Methode und direkte Integration eines Repeaters
 echo MForm::factory()
