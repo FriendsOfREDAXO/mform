@@ -12,7 +12,6 @@ Und das Highlight in der neuesten Version? Der brandneue Formular-Repeater! Dies
 
 Die beiliegende **Demo-Sammlung** erlaubt das sofortige Ausprobieren von Modul-Codes. Module können direkt installiert und getestet werden. Die Codes sind alle kommentiert.
 Und zuästlich gibt es eine ausführliche Doku 📒.
-Um die Liste der Features von MForm in einer logischen und übersichtlichen Reihenfolge zu organisieren, bietet es sich an, sie nach Kategorien wie Basisfunktionalitäten, erweiterte Gestaltungsoptionen und spezielle Widgets oder Funktionen zu gruppieren. Hier ist eine mögliche sortierte und strukturierte Aufstellung:
 
 ## Features
 
