@@ -1,28 +1,48 @@
 # MForm - REDAXO Addon für bessere Input-Formulare
 
-![Screenshot](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform7.png?raw=true)
+MForm die Erstellung von Modul-Eingaben einfacher. Mit MForm kann man nicht nur flott Formulare erstellen, sondern diese dank flexibler Templates auch optisch genau nach eigenen Wünschen gestalten. Man bekommt alle REDAXO-Standard-Formularelemente und einige Extra-Widgets, die sich spielend leicht in Module einfügen lassen.
 
-MForm ist ein REDAXO Addon, welches das Erstellen von Modul-Eingabeformularen erheblich erleichtert. Dabei nutzt MForm Templates welche es dem Administrator ermöglichen den Modul-Style seinen Vorstellungen anzupassen. MForm stellt alle gängigen Modul-Input-Formular-Elemente und zusätzlice Widgets bereit welche sich einfach einbinden lassen. MForm eweitert auch **YForm** und **rex_form** um zusätzliche Widgets, z.B. ein Custom-Link-Feld und Image-List für Galerien.
+**Aber da hört’s noch nicht auf!** 
+MForm pimpt auch YForm und rex_form mit zusätzlichen Widgets ordentlich auf. Benutzerdefiniertes Link-Feld oder eine schicke Image-List? Kein Problem, MForm hat die Lösung.
+
+## Neu in Version 8 ###
+Und das Highlight in der neuesten Version? Der brandneue Formular-Repeater! Dieses Feature ersetzt das alte MBlock AddOn und bietet die Möglichkeit, Formularelemente nicht nur zu wiederholen, sondern sie auch in mehreren Ebenen zu verschachteln – etwas, das mit MBlock so nicht machbar war. Damit kann man jetzt noch komplexere Formulare aufbauen. 
 
 Die beiliegende **Demo-Sammlung** erlaubt das sofortige Ausprobieren von Modul-Codes. Module können direkt installiert und getestet werden. Die Codes sind alle kommentiert.
+Und zuästlich gibt es eine ausführliche Doku 📒.
+Um die Liste der Features von MForm in einer logischen und übersichtlichen Reihenfolge zu organisieren, bietet es sich an, sie nach Kategorien wie Basisfunktionalitäten, erweiterte Gestaltungsoptionen und spezielle Widgets oder Funktionen zu gruppieren. Hier ist eine mögliche sortierte und strukturierte Aufstellung:
 
 ## Features
 
-- Erstellen von Moduleingaben per PHP
-- Ausgabe der Formulare anpassbar über Fragmente
-- Custom Widgets für Verlinkung (auch Yform) und Bilder
-- Factory die es ermöglicht Formularteile leicht auszulagern
-- REDAXO JSON Value Nutzung
-- Mehrspaltige Formulare
-- Inline-Formular-Elemente
-- Modul-Beispiele zur direkten Installation
-- HMTL5-Formular-Elemente
-- SQL-Felder
-- Collapse, Tabs
-- Accordions Wrapper Elemente Via Checkbox
-- Radio oder Select steuerbare Collapse Elemente
-- Durchgehende MBlock Kompatibilität
-- Datalists
+### Grundlegende Funktionalitäten
+- **Erstellen von Moduleingaben per PHP**: Die Basis, um mit MForm zu arbeiten.
+- **Mehrspaltige Formulare**: Layout-Optionen zur Strukturierung der Formulare.
+- **Inline-Formular-Elemente**: Für eine kompakte Formulargestaltung.
+- **HMTL5-Formular-Elemente**: Nutzung moderner Webstandards.
+- **Datalists**: Für verbesserte Eingabeoptionen in Formularen.
+
+### Erweiterte Gestaltung und Interaktivität
+- **Custom Widgets für Verlinkung (auch Yform) und Bilder**: Spezielle Widgets für häufig benötigte Funktionen.
+- **Factory die es ermöglicht Formularteile leicht auszulagern**: Vereinfacht die Wiederverwendung von Formularkomponenten.
+- **Collapse, Tabs, Accordions**: Elemente zur Gestaltung dynamischer, interaktiver Formulare.
+- **Wrapper Elemente Via Checkbox, Radio oder Select steuerbare Collapse Elemente**: Bietet interaktive Steuerungselemente für die Benutzerführung.
+- **Ausgabe der Formulare anpassbar über Fragmente**: Ermöglicht die flexible Gestaltung der Formulardarstellung.
+
+### Spezielle Funktionen
+- **Integrierter Formular-Repeater**: Ersetzt MBlock und erlaubt verschachtelte Formularelemente.
+- **REDAXO JSON Value Nutzung**: Integration von REDAXO spezifischen Datenstrukturen.
+- **SQL-Felder**: Direkte Einbindung von Datenbankabfragen.
+- **Durchgehende MBlock Kompatibilität**: Gewährleistet Kompatibilität mit bestehenden MBlock-Installationen.
+- **Modul-Beispiele zur direkten Installation**: Bietet sofort einsatzbereite Vorlagen für verschiedene Anwendungsfälle.
+
+## Formular-Repeater
+
+Der Formular-Repeater seit mform 8 ermöglicht es, Formularelemente dynamisch zu wiederholen und dabei eine Verschachtelung in mehreren Ebenen zu realisieren.
+
+### Migration von MBlock zu MForm 8 
+
+--- 
+
 
 **Hinweise**
 
@@ -37,75 +57,6 @@ MForm kann direkt über den Redaxo-Installer Installiert werden. [MForm Redaxo A
 2. Im Backend unter "Installer > Neue herunterladen" "MForm" suche und unter "Funktion" "ansehen" klicken
 3. Bei der aktuelle Version in der Liste unter "Funktion" "herunterladen" klicken
 4. Unter "AddOns" MForm installieren und aktivieren
-
-## Usage
-
-MForm muss im Modul-Input eines REDAXO Moduls als PHP Code notiert werden.
-
-### Instanziierung  
-
-```php
-// instantiate
-$MForm = MForm::factory();
-```
-
-Es können beliebig viele MForm Formulare erzeugt werden, welche je nach dem auch direkt als Element-Properties zu instazieren sind.
-
-```php
-// instantiate
-$MForm = MForm::factory() // init 
-    ->addFieldsetArea('My fieldset', MForm::factory() // use fieldset method and init new mform instance 
-            ->addTextField(1, ['label' => 'My input']) // add text field with rex_value_id 1 and label attribute
-    );
-```
-
-### Formularelemente
-
-Die wesentlichen Formularelemente die MForm bereitstellt werden durch Methoden hinzugefügt.
-
-```php
-$MForm = MForm::factory()
-    ->addHeadline("Headline") // add headline
-    ->addTextField(1, ['label' => 'Input', 'style' => 'width:200px']); // add text field with rex_value_id 1
-```
-
-Alle MForm Methoden erwarten optional Attribute, Parameter und Optionen. Diese können auch durch Setter nachträglich dem Element zugewiesen werden.
-
-```php
-// add text field
-$MForm = MForm::factory()
-    ->addTextField(1) // add text field with rex_value_id 1
-    ->setLabel('Text Field') 
-    ->setAttributes(['style' => 'width:200px', 'class' => 'test-field']);
-```
-
-Der `REX_VALUE-Key` muss jeder Formular-Input-Methode als Pflichtfeld übergeben werden. Informative Elemente benötigen keine ID.
-
-##### Full JSON Value Support
-
-MForm unterstützt `REX_VALUE-ARRAYs` wodurch es praktisch keine `REX_VALUE`-Limitierung mehr gibt. Zu beachten ist, dass jeder x.0 Key als Sting übergeben werden muss.
-
-```php
-// add text field
-$MForm = MForm::factory()
-    ->addTextField("1.0")
-    ->addTextField(1.1)
-    ->addTextField("1.2.Titel");
-```
-
-### Formular erzeugen
-
-Um das komponierte Formular erzeugen zu lassen muss muss die `show` Methode genutzt werden.
-
-```php
- // create output
-echo $MForm->show();
-
-// without var
-echo MForm::factory()
-    ->addTextField(1, ['label' => 'Input', 'style' => 'width:200px']) // add text field with rex_value_id 1
-    ->show();
-```
 
 ## Ausgabe
 
