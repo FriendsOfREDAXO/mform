@@ -41,13 +41,9 @@ Der Formular-Repeater seit mform 8 ermöglicht es, Formularelemente dynamisch zu
 
 ### Migration von MBlock zu MForm 8 
 
+In  Arbeit 
 --- 
 
-
-**Hinweise**
-
-- Der MForm Formular-Builder ist ausschließlich dafür geeignet REDAXO Modul-Input-Formulare zu generieren!
-- Aktuell ist das Imagelist-Widget nicht mblock-kompatibel
 
 ## Installation
 
