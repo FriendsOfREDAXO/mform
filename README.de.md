@@ -1,5 +1,7 @@
 # MForm - REDAXO Addon
 
+![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/mform8.png?raw=true)
+
 MForm die Erstellung von Modul-Eingaben einfacher. Mit MForm kann man nicht nur flott Formulare erstellen, sondern diese dank flexibler Templates auch optisch genau nach eigenen Wünschen gestalten. Man bekommt alle REDAXO-Standard-Formularelemente und einige Extra-Widgets, die sich spielend leicht in Module einfügen lassen.
 
 **Aber da hört’s noch nicht auf!** 
