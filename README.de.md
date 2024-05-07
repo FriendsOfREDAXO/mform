@@ -41,8 +41,53 @@ Der Formular-Repeater seit mform 8 ermöglicht es, Formularelemente dynamisch zu
 
 ### Migration von MBlock zu MForm 8 
 
-In  Arbeit 
---- 
+***MBlock-Modul*** 
+
+```php
+// Basis-ID für die Verwaltung der Formularelemente
+$id = 1;
+
+// Initialisierung von MForm
+$mform = new MForm();
+
+// Hinzufügen eines Feldsets
+$mform->addFieldsetArea('Team member');
+
+// Hinzufügen eines Textfelds, wobei dynamisch auf ein JSON-Format verwiesen wird
+$mform->addTextField("$id.0.name", array('label' => 'Name'));
+
+// Hinzufügen eines Medienfeldes, das durch MBlock in JSON gespeichert wird
+$mform->addMediaField(1, array('label' => 'Avatar'));
+
+// Ausgabe des Formulars mit MBlock, welches die dynamische Handhabung der Blöcke erlaubt
+echo MBlock::show($id, $mform->show(), array('min' => 2, 'max' => 4));
+```
+
+***Das gleiche Modul in MForm 8*** 
+
+Zur Ermittlung der benötigten Feld-Keys sollte man ggf. vorab einen Dump erzeugen. 
+Zu beachten: Aus dem Mediafield 1 im urpsrünglichen MBlock-Modul wird: `'REX_MEDIA_1'`
+
+```
+// Initialisierung des Repeaters mit der Basis-ID des ursprünglichen MBlock-Abschnittes
+$id = 1;
+// Erstellen einer neuen MForm-Instanz mit der Factory-Methode und direkte Integration eines Repeaters
+echo MForm::factory()
+    ->addRepeaterElement(
+        $id, 
+        MForm::factory()
+            ->addFieldsetArea('Team member', 
+                MForm::factory()
+                    ->addTextField('name', ['label' => 'Name'])
+                    ->addMediaField('REX_MEDIA_1', ['label' => 'Avatar'])
+            ),
+        true, 
+        true, 
+        ['min' => 2, 'max' => 4]
+    )
+    ->show();
+```
+
 
 
 ## Installation
