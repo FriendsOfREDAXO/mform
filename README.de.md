@@ -74,6 +74,23 @@ siehe [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGE
 - <http://www.redaxo.org>
 - <https://github.com/FriendsOfREDAXO>
 
+## Credits
+
 **Projekt-Lead**
 
 [Joachim Dörr](https://github.com/joachimdoerr)
+
+**2nd. Maintainer**
+
+[skerbis](https://github.com/skerbis)
+
+**Mform-Repeater**
+
+[Thorben eaCe](https://github.com/eaCe)
+
+**Docs & Testing**
+
+[alexplusde](https://github.com/alexplusde)
+
+
+
