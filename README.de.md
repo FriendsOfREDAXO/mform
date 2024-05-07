@@ -2,10 +2,10 @@
 
 ![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/mform8.png?raw=true)
 
-MForm die Erstellung von Modul-Eingaben einfacher. Mit MForm kann man nicht nur flott Formulare erstellen, sondern diese dank flexibler Templates auch optisch genau nach eigenen Wünschen gestalten. Man bekommt alle REDAXO-Standard-Formularelemente und einige Extra-Widgets, die sich spielend leicht in Module einfügen lassen.
+MForm erleichtert die Erstellung von REDAXO-Modul-Eingaben. Mit MForm kann man nicht nur Formulare erstellen, sondern diese dank flexibler Templates auch optisch genau nach eigenen Wünschen gestalten. Man kann alle REDAXO-Standard-Formularelemente erstellen und erhält einige Extra-Widgets, die sich leicht in Module einfügen lassen.
 
 **Aber da hört’s noch nicht auf!** 
-MForm pimpt auch YForm und rex_form mit zusätzlichen Widgets ordentlich auf. Benutzerdefiniertes Link-Feld oder eine schicke Image-List? Kein Problem, MForm hat die Lösung.
+MForm pimpt auch YForm und rex_form mit zusätzlichen Widgets auf. Benutzerdefiniertes Link-Feld oder eine schicke Image-List? Kein Problem, MForm hat die Lösung.
 
 ## Neu in Version 8 ###
 Und das Highlight in der neuesten Version? Der brandneue Formular-Repeater! Dieses Feature ersetzt das alte MBlock AddOn und bietet die Möglichkeit, Formularelemente nicht nur zu wiederholen, sondern sie auch in mehreren Ebenen zu verschachteln – etwas, das mit MBlock so nicht machbar war. Damit kann man jetzt noch komplexere Formulare aufbauen. 
@@ -38,7 +38,7 @@ Und zuästlich gibt es eine ausführliche Doku 📒.
 
 ## Formular-Repeater
 
-Der Formular-Repeater seit mform 8 ermöglicht es, Formularelemente dynamisch zu wiederholen und dabei eine Verschachtelung in mehreren Ebenen zu realisieren.
+Der Formular-Repeater ermöglicht es, Formularelemente dynamisch zu wiederholen und dabei eine Verschachtelung in mehreren Ebenen zu realisieren.
 
 ### Migration von MBlock zu MForm 8 
 
