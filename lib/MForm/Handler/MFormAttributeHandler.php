@@ -5,9 +5,9 @@
  * @license MIT
  */
 
-namespace MForm\Handler;
+namespace FriendsOfRedaxo\MForm\Handler;
 
-use MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 class MFormAttributeHandler
 {

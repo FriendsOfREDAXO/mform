@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8-beta7
+
+- IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`
+- new docs added - thanks @alxndr-w
+- added install button to collapse title for example modules
+
 ## Version 8-beta6
 
 - fix button style, ensure that buttons ever will display, added potential disable style for buttons

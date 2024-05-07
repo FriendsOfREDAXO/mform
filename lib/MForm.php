@@ -5,10 +5,14 @@
  * @license MIT
  */
 
-use MForm\DTO\MFormInputsConfig;
-use MForm\Inputs\MFormInputsInterface;
-use MForm\MFormElements;
-use MForm\Parser\MFormParser;
+namespace FriendsOfRedaxo;
+
+use FriendsOfRedaxo\MForm\MFormElements;
+use FriendsOfRedaxo\MForm\Parser\MFormParser;
+use rex_exception;
+use rex_factory_trait;
+use rex_logger;
+use rex_view;
 
 class MForm extends MFormElements
 {

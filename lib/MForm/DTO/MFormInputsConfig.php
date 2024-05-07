@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-namespace MForm\DTO;
+namespace FriendsOfRedaxo\MForm\DTO;
 
 class MFormInputsConfig
 {

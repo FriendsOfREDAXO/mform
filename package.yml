@@ -1,5 +1,5 @@
 package: mform
-version: '8.0.0-beta6'
+version: '8.0.0-beta7'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -9,11 +9,6 @@ page:
     perm: admin[]
     icon: rex-icon fa-diagram-next
     subpages:
-        docs:
-            title: 'translate:help'
-            icon: rex-icon fa-info-circle
-            perm: mform[docs]
-            hidden: true
         demo:
             title: 'translate:reference_demo'
             subpages:
@@ -22,6 +17,11 @@ page:
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_repeater: { title: 'translate:demo_repeater' }
                 demo_expert: { title: 'translate:demo_expert' }
+        docs:
+            title: 'translate:help'
+            icon: rex-icon fa-info-circle
+            perm: mform[docs]
+            hidden: true
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md

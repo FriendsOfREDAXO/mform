@@ -5,11 +5,9 @@
  * @license MIT
  */
 
-namespace MForm\Handler;
+namespace FriendsOfRedaxo\MForm\Handler;
 
-use MForm\DTO\MFormItem;
-
-use function is_array;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 class MFormParameterHandler
 {

@@ -5,11 +5,10 @@
  * @license MIT
  */
 
-namespace MForm\Utils;
+namespace FriendsOfRedaxo\MForm\Utils;
 
-
-use MForm;
-use MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 use function array_key_exists;
 use function count;
@@ -79,7 +78,6 @@ class MFormGroupExtensionHelper
         $group = false;
         $toggleAttributes = false;
 
-        /** @var MFormItem $item */
         foreach ($items as $key => $item) {
             if ($item instanceof MFormItem) {
                 switch ($item->getType()) {

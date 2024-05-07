@@ -5,11 +5,11 @@
  * @license MIT
  */
 
-namespace MForm\Inputs;
+namespace FriendsOfRedaxo\MForm\Inputs;
 
-use MForm;
-use MForm\DTO\MFormInputsConfig;
-use MForm\Utils\MFormModuleHelper;
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormInputsConfig;
+use FriendsOfRedaxo\MForm\Utils\MFormModuleHelper;
 
 abstract class MFormInputsAbstract
 {

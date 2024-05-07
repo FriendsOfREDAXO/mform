@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-namespace MForm\Utils;
+namespace FriendsOfRedaxo\MForm\Utils;
 
 use rex;
 

@@ -5,7 +5,7 @@
  * @license MIT
  */
 
-use MForm\Utils\MFormPageHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormPageHelper;
 
 // parse info fragment
 $fragment = new rex_fragment();

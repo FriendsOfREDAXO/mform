@@ -5,8 +5,7 @@
  * @license MIT
  */
 
-namespace MForm\Utils;
-
+namespace FriendsOfRedaxo\MForm\Utils;
 
 use rex_exception;
 use rex_fragment;
@@ -83,16 +82,19 @@ class MFormPageHelper
                         }
                     }
 
+                    $installLink = '';
                     // install or reset/update button
                     if (rex_module::forKey($key) instanceof rex_module || !is_null($moduleId)) {
-                        $content .= '<h3>' . rex_i18n::msg('mform_update') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . ' [id: ' . $moduleId . ']</i></h3>' . $installMsg . '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_update') . '</a>';
+                        $installLink = '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_update') . '</a>';
+                        $content .= '<h3>' . rex_i18n::msg('mform_update') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . ' [id: ' . $moduleId . ']</i></h3>' . $installMsg . $installLink;
                     } else {
-                        $content .= '<h3>' . rex_i18n::msg('mform_install') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . '</i></h3>' . $installMsg . '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_install') . '</a>';
+                        $installLink = '<a href="' . rex_url::currentBackendPage(['install' => $key]) . '" class="btn btn-primary">' . rex_i18n::msg('mform_module_install') . '</a>';
+                        $content .= '<h3>' . rex_i18n::msg('mform_install') . ' <i style="font-weight:200">' . rex_i18n::msg('mform_example_' . $key) . '</i></h3>' . $installMsg . $installLink;
                     }
 
                     // parse info fragment
                     $fragment = new rex_fragment();
-                    $fragment->setVar('title', rex_i18n::msg('mform_example_' . $key));
+                    $fragment->setVar('title', rex_i18n::msg('mform_example_' . $key) . '<span class="btn-group-xs pull-right">' . str_replace('btn-primary', 'btn-default', $installLink) . '</span>', false);
                     $fragment->setVar('content', '<div class="span" style="padding: 0 20px 10px 20px">' . $content . '</div>', false);
                     $fragment->setVar('collapse', true);
                     $fragment->setVar('collapsed', $installKey != $key);
@@ -101,34 +103,6 @@ class MFormPageHelper
                 }
             }
         }
-
-        /*
-        foreach (scandir(rex_path::addon('mform', 'pages/examples')) as $file) {
-            if (is_dir($file)) {
-                continue;
-            }
-
-            if (strpos($file, $type) !== false && strpos($file, 'output') === false) {
-
-                // add input
-                $content = '<h3>'.rex_i18n::msg('mform_modul_input').'</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mform', 'pages/examples/' . $file)));
-
-                if (file_exists(rex_path::addon('mform', 'pages/examples/' . pathinfo($file, PATHINFO_FILENAME) . '_output.ini'))) {
-                    // add output
-                    $content .= '<h3>'.rex_i18n::msg('mform_modul_output').'</h3>' . rex_string::highlight(file_get_contents(rex_path::addon('mform', 'pages/examples/' . pathinfo($file, PATHINFO_FILENAME) . '_output.ini')));
-                }
-
-                // parse info fragment
-                $fragment = new rex_fragment();
-                $fragment->setVar('title', rex_i18n::msg('mform_example_' . preg_replace('/\d+/u', '', pathinfo($file, PATHINFO_FILENAME))));
-                $fragment->setVar('content', '<div class="span" style="padding: 0 20px 10px 20px">' . $content . '</div>', false);
-                $fragment->setVar('collapse', true);
-                $fragment->setVar('collapsed', true);
-                $content = $fragment->parse('core/page/section.php');
-                $return .= $content;
-            }
-        }
-        */
         return $return;
     }
 }

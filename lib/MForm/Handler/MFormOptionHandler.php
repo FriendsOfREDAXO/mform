@@ -5,11 +5,11 @@
  * @license MIT
  */
 
-namespace MForm\Handler;
+namespace FriendsOfRedaxo\MForm\Handler;
 
 use Exception;
-use MForm\DTO\MFormItem;
-use MForm\Utils\MFormClang;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Utils\MFormClang;
 use rex_logger;
 use rex_sql;
 

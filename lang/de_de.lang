@@ -9,6 +9,7 @@ mform_demo_extended = Erweiterte Beispiele
 mform_demo_expert = Experten Beispiele
 mform_demo_community = FOS Beispiele
 mform_demo_wrapper = Wrapper Beispiele
+mform_demo_repeater = Repeater Beispiele
 mform_reference_demo = MForm Beispielsammlung
 mform_info = Info
 
@@ -42,12 +43,15 @@ mform_example_wrapper_collapse_select = Select Collapse Wrapper-Element
 mform_example_wrapper_columns = Grid/Column Wrapper-Element
 mform_example_wrapper_inline = Inline Formular-Elements
 mform_example_wrapper_tabs = Tab Wrapper-Elements
+mform_example_repeater_nested_repeater = Nested Repeater [2 Ebenen]
+mform_example_repeater_single_repeater = Single Repeater [1 Ebene]
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
 mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.
 mform_example_description_expert = Die "Experten Beispiele" zeigen, dass MForm für mehr als nur für Standards genutzt werden kann.
 mform_example_description_community = Later
 mform_example_description_wrapper = Die "Wrapper Beispiele" zeigen auf, wie man mittels der MForm Wrapper-Elemente Input-Formulare sinnvoll layouten und interaktiv aufbereiten kann.
+mform_example_description_repeater = Durch die "Repeater Beispiele" wird demonstiert, wie einfach ein Repeater Element funktioniert, prinzipiell lässt es sich wie die anderen Wrapper Elemente anlegen. Das gewrappte Formular kann durch den Repeater beliebig oft oder mit einem min. oder max. Blocklimit (genauso wie bisher mit MBlock) repliziert werden.
 
 mform_github = MForm bei FOR - go to github
 

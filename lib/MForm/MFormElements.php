@@ -1,22 +1,21 @@
 <?php
-
 /**
  * @author Joachim Doerr
  * @package redaxo5
  * @license MIT
  */
 
-namespace MForm;
+namespace FriendsOfRedaxo\MForm;
 
-use MForm;
-use MForm\DTO\MFormInputsConfig;
-use MForm\DTO\MFormItem;
-use MForm\Handler\MFormAttributeHandler;
-use MForm\Handler\MFormElementHandler;
-use MForm\Handler\MFormOptionHandler;
-use MForm\Handler\MFormParameterHandler;
-use MForm\Handler\MFormValueHandler;
-use MForm\Inputs\MFormInputsInterface;
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormInputsConfig;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Handler\MFormElementHandler;
+use FriendsOfRedaxo\MForm\Handler\MFormOptionHandler;
+use FriendsOfRedaxo\MForm\Handler\MFormParameterHandler;
+use FriendsOfRedaxo\MForm\Handler\MFormValueHandler;
+use FriendsOfRedaxo\MForm\Inputs\MFormInputsInterface;
 use rex_be_controller;
 
 use rex_path;

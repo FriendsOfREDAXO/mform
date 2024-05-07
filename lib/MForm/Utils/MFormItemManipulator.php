@@ -5,10 +5,10 @@
  * @license MIT
  */
 
-namespace MForm\Utils;
+namespace FriendsOfRedaxo\MForm\Utils;
 
-use MForm\DTO\MFormDefault;
-use MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\DTO\MFormDefault;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 use function count;
 use function is_array;

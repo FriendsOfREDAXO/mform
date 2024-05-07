@@ -5,10 +5,10 @@
  * @license MIT
  */
 
-namespace MForm\Repeater;
+namespace FriendsOfRedaxo\MForm\Repeater;
 
-use MForm;
-use MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 class MFormRepeaterHelper
 {

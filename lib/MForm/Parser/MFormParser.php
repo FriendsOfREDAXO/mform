@@ -5,19 +5,19 @@
  * @license MIT
  */
 
-namespace MForm\Parser;
+namespace FriendsOfRedaxo\MForm\Parser;
 
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
 use Exception;
-use MForm;
-use MForm\DTO\MFormElement;
-use MForm\DTO\MFormItem;
-use MForm\Handler\MFormAttributeHandler;
-use MForm\Repeater\MFormRepeaterHelper;
-use MForm\Utils\MFormGroupExtensionHelper;
-use MForm\Utils\MFormItemManipulator;
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormElement;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
 use rex_clang;
 use rex_extension;
 use rex_extension_point;
