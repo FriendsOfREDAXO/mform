@@ -1,183 +1,111 @@
-# MForm - REDAXO Addon for better input forms
+# MForm - REDAXO Addon
 
-![Screenshot](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform7.png?raw=true)
+![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/mform8.png?raw=true)
 
-MForm is a REDAXO Addon, which makes the creation of module input forms much easier. MForm uses templates which enable the administrator to customize the module appearance. MForm provides all common module input form elements and additonal widgets which can be easily integrated. MForm also extends **YForm** and **rex_form** with additional widgets, e.g. a custom link field and image list for galleries. 
+MForm facilitates the creation of REDAXO module inputs. With MForm, you can not only create forms, but also visually design them exactly to your own specifications thanks to flexible templates. It allows you to create all standard REDAXO form elements and includes several extra widgets that can be easily integrated into modules.
 
-The included **Demo library** allows you to try out module codes immediately. Modules can be installed and tested directly. The codes are all annotated. 
+**But it doesn’t stop there!** 
+MForm also enhances YForm and rex_form with additional widgets. Need a custom link field or a chic image list? No problem, MForm has you covered.
+
+## New in Version 8
+The highlight of the latest version? The brand-new Form Repeater! This feature replaces the old MBlock AddOn and offers the ability to not only repeat form elements but also nest them at multiple levels – something that was not possible with MBlock. This allows for the construction of even more complex forms.
+
+The included **demo collection** allows for immediate testing of module codes. Modules can be directly installed and tested. The codes are all commented.
+And additionally, there is a comprehensive documentation 📒.
 
 ## Features
 
-- Creation of module inputs via PHP
-- Output of forms customizable via fragments
-- Custom widgets for linking (also YForm) and images
-- Factory that allows form parts to be easily swapped out 
-- REDAXO JSON value handling
-- Multi-column forms
-- Inline form elements
-- Module examples for direct installation
-- HMTL5 form elements 
-- SQL fields
-- Collapse, Tabs 
-- Accordions Wrapper elements Via Checkbox 
-- Radio or Select controllable collapse elements
-- Full MBlock compatibility
-- Datalists 
+### Basic Functionalities
+- **Creation of module inputs via PHP**: The foundation for working with MForm.
+- **Multi-column forms**: Layout options for structuring the forms.
+- **Inline form elements**: For compact form design.
+- **HTML5 form elements**: Utilization of modern web standards.
+- **Datalists**: For enhanced input options in forms.
 
-**Notes**
+### Advanced Design and Interactivity
+- **Custom widgets for linking (including Yform) and images**: Special widgets for frequently needed functions.
+- **Factory that allows easy outsourcing of form parts**: Simplifies the reuse of form components.
+- **Collapse, Tabs, Accordions**: Elements for designing dynamic, interactive forms.
+- **Wrapper elements via Checkbox, Radio, or Select controlled collapse elements**: Provides interactive controls for user guidance.
+- **Form output customizable via fragments**: Allows for flexible design of the form presentation.
 
-* The MForm form builder is only designed to generate REDAXO module input forms!
-* Currently the imagelist widget is not mblock compatible
+### Special Features
+- **Integrated Form Repeater**: Replaces MBlock and allows nested form elements.
+- **REDAXO JSON Value Utilization**: Integration of REDAXO-specific data structures.
+- **SQL fields**: Direct integration of database queries.
+- **Continuous MBlock Compatibility**: Ensures compatibility with existing MBlock installations.
+- **Module examples for direct installation**: Provides ready-to-use templates for various use cases.
 
+## Form Repeater
 
-## Installation:
+The Form Repeater allows dynamic repetition of form elements while realizing nesting at multiple levels.
 
-MForm can be installed directly via the Redaxo installer. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
+### Migration from MBlock to MForm 8 
 
-1. log in to REDAXO
-2. in backend under "Installer > Download new" search "MForm" and under "Function" click "view"
-3. click on "download" in the list of the current version under "function
-4. install and activate MForm under "AddOns"
-
-
-## Usage
-
-MForm must be notated as PHP code in the module input of a REDAXO module.
-
-
-### Instancing 
+***MBlock Module*** 
 
 ```php
-// instantiate
-$MForm = MForm::factory();
+// Base ID for managing form elements
+$id = 1;
+
+// Initialize MForm
+$mform = new MForm();
+
+// Add a fieldset
+$mform->addFieldsetArea('Team member');
+
+// Add a text field, referring dynamically to a JSON format
+$mform->addTextField("$id.0.name", array('label' => 'Name'));
+
+// Add a media field saved by MBlock in JSON
+$mform->addMediaField(1, array('label' => 'Avatar'));
+
+// Output the form with MBlock, which allows dynamic handling of blocks
+echo MBlock::show($id, $mform->show(), array('min' => 2, 'max' => 4));
 ```
 
-Any number of MForm forms can be created, which can also be instantiated directly as element properties.
+***The same module in MForm 8*** 
+
+To determine the necessary field keys, a dump might be needed beforehand. 
+Note: From the original MBlock Mediafield 1, it becomes: `'REX_MEDIA_1'`
 
 ```php
-// instantiate
-$MForm = MForm::factory() // init 
-    ->addFieldsetArea('My fieldset', MForm::factory() // use fieldset method and init new mform instance 
-            ->addTextField(1, ['label' => 'My input']) // add text field with rex_value_id 1 and label attribute
-    );
-```
-
-### Form elements
-
-The main form elements provided by MForm are added by methods.
-
-```php
-$MForm = MForm::factory()
-    ->addHeadline("Headline") // add headline
-    ->addTextField(1, ['label' => 'Input', 'style' => 'width:200px']); // add text field with rex_value_id 1
-```
-
-All MForm methods expect optional attributes, parameters and options. These can also be subsequently assigned to the element by setters.
-
-```php
-// add text field
-$MForm = MForm::factory()
-    ->addTextField(1) // add text field with rex_value_id 1
-    ->setLabel('Text Field') 
-    ->setAttributes(['style' => 'width:200px', 'class' => 'test-field']);
-```
-The `REX_VALUE-Key` must be passed to each form input method as a mandatory field. Informational elements do not need an ID.
-
-##### Full JSON value support
-
-MForm supports `REX_VALUE-ARRAYs` so there is no longer any `REX_VALUE` limitation. Note that each x.0 key must be passed as a string.
-
-```php
-// add text field
-$MForm = MForm::factory()
-    ->addTextField("1.0")
-    ->addTextField(1.1)
-    ->addTextField("1.2.Titel");
-```
-
-### Compose form
-
-To generate the composed form, the `show` method must be used.
-
-```php
- // create output
-echo $MForm->show();
-
-// without var
+// Repeater initialization ID with the base ID of the original MBlock section
+$id = 1;
+// Create a new MForm instance with the factory method and directly integrate a repeater
 echo MForm::factory()
-    ->addTextField(1, ['label' => 'Input', 'style' => 'width:200px']) // add text field with rex_value_id 1
+    ->addRepeaterElement(
+        $id, 
+        MForm::factory()
+            ->addFieldsetArea('Team member', 
+                MForm::factory()
+                    ->addTextField('name', ['label' => 'Name'])
+                    ->addMediaField('REX_MEDIA_1', ['label' => 'Avatar'])
+            ),
+        true, 
+        true, 
+        ['min' => 2, 'max' => 4]
+    )
     ->show();
 ```
 
-### Element methods
 
-MForm provides the following element methods:
 
-* Structural wrapper elements
-  * `addFieldsetArea`
-  * `addCollapseElement`
-  * `addAccordionElement`
-  * `addTabElement`
-  * `addColumnElement`
-  * `addInlineElement`
-* Text input and hidden elements
-  * `addTextField`
-  * `addHiddenField`
-  * `addTextAreaField`
-  * `addTextReadOnlyField`
-  * `addTextAreaReadOnlyField`
-* Select elements
-  * `addSelectField`
-  * `addMultiSelectField`
-* Checkbox and radio elements
-  * `addCheckboxField`
-  * `addRadioField`
-* Informal elements
-  * `addHtml`
-  * `addHeadline`
-  * `addDescription`
-  * `addAlert`
-  * `addAlertDanger`, `addAlertError`
-  * `addAlertInfo`
-  * `addAlertSuccess`
-  * `addAlertWarning`
-* System button elements
-  * `addLinkField`
-  * `addLinklistField`
-  * `addMediaField`
-  * `addMedialistField`
-* Custom elements 
-  * `addCustomLinkField`
-  * `addImagelistField`
-  * `addInputField`
-* Special 'setter' methods
-  * `setAttribute`
-  * `setAttributes`
-  * `setCategory`
-  * `setCollapseInfo`
-  * `setDefaultValue`
-  * `setDisableOption`
-  * `setDisableOptions`
-  * `setFormItemColClass`
-  * `setFull`
-  * `setLabel`
-  * `setLabelColClass`
-  * `setMultiple`
-  * `setOption`
-  * `setOptions`
-  * `setParameter`
-  * `setParameters`
-  * `setPlaceholder`
-  * `setSize`
-  * `setSqlOptions`
-  * `setTabIcon`
-  * `setToggleOptions`
-  * `setTooltipInfo`
+## Installation
 
-## Output 
+MForm can be directly installed via the Redaxo Installer. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
 
-MForm uses the REDAXO variables provided by REDAXO. Either as classic or as JSON values. 
-See the [REDAXO doc / german](https://www.redaxo.org/doku/main/redaxo-variablen) for information.
+1. Log in to REDAXO
+2. In the backend under "Installer > Download new", search for "MForm" and click on "view" under "Function"
+3. In the current version list, click "download" under "Function"
+4. Install and activate MForm under "AddOns"
+
+## Output
+
+
+
+MForm utilizes REDAXO variables provided by REDAXO, either as classic or JSON values.
+For more information, see the [REDAXO Documentation](https://www.redaxo.org/doku/main/redaxo-variablen).
 
 ## License
 
@@ -185,19 +113,29 @@ MForm is licensed under the [MIT License](LICENSE.md).
 
 ## Changelog
 
-see [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGELOG.md)
+See [CHANGELOG.md](https://github.com/FriendsOfREDAXO/mform/blob/master/CHANGELOG.md)
 
 ## Author
 
 **Friends Of REDAXO**
 
-* http://www.redaxo.org
-* https://github.com/FriendsOfREDAXO
+- <http://www.redaxo.org>
+- <https://github.com/FriendsOfREDAXO>
 
-**Project lead**
+## Credits
+
+**Project Lead**
 
 [Joachim Dörr](https://github.com/joachimdoerr)
 
-**Mform-Repeater**
-Based on code from: [Thorben eaCe](https://github.com/eaCe?tab=repositories)
+**2nd Maintainer**
 
+[skerbis](https://github.com/skerbis)
+
+**Mform Repeater**
+
+[Thorben eaCe](https://github.com/eaCe)
+
+**Docs & Testing**
+
+[alexplusde](https://github.com/alexplusde)
