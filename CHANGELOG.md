@@ -5,6 +5,8 @@
 - IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`
 - new docs added - thanks @alxndr-w
 - added install button to collapse title for example modules
+- fixed multiple select default value issue
+- fixed select '0' value issue
 
 ## Version 8-beta6
 

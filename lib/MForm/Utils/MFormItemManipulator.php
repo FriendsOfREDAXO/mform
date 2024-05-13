@@ -32,9 +32,10 @@ class MFormItemManipulator
         }
 
         // is mode add and default value defined
-        if ('add' == $item->getMode() && $item->getDefaultValue()) {
+        if ('add' == $item->getMode() && ($item->getDefaultValue() || $item->getDefaultValue() == 0)) {
             // set default value for value html out
-            $item->setValue(htmlspecialchars($item->getDefaultValue()));
+            $string = htmlspecialchars((!empty($item->getDefaultValue())) ? $item->getDefaultValue() : '');
+            $item->setValue(($string != '' && $item->getDefaultValue() != '0') ? $string : $item->getDefaultValue());
         }
 
         // set element id - add var id for unique

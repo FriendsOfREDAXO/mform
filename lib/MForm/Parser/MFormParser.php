@@ -541,21 +541,22 @@ class MFormParser
         /* Selected fix @skerbis @dtpop @MC-PMOE */
         if ($item->multiple && null !== $item->stringValue) {
             $items_selected = json_decode($item->stringValue, true);
+            $items_default_value = explode(',', $item->getDefaultValue());
 
             $current = explode('][', trim($item->varId, '[]'));
 
             // JSON Values 1.x
-            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && in_array((string) $key, $items_selected[$current[1]])) {
+            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && (in_array((string) $key, $items_selected[$current[1]]) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value)))) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // JSON Values 1.x.x
-            } elseif (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string) $key, $items_selected[$current[1]][$current[2]])) {
+            } elseif (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string) $key, $items_selected[$current[1]][$current[2]]) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value))) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // REX_VAL
-            } elseif (!isset($current[1]) && isset($items_selected) && is_array($items_selected) && in_array((string) $key, $items_selected)) {
+            } elseif (!isset($current[1]) && isset($items_selected) && is_array($items_selected) && in_array((string) $key, $items_selected) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value))) {
                 $element->setAttributes($element->attributes . ' selected');
             }
         } else {
