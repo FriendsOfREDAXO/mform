@@ -233,7 +233,7 @@ class MFormParser
             $collapseButton->setType('collapse-button')
                 ->setClass((empty($item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
-                ->setValue($item->getLabel());
+                ->setValue((string) $item->getLabel());
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
         }
 
@@ -320,7 +320,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
+            ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
@@ -363,7 +363,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
+            ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setDatalist($datalist)
@@ -398,7 +398,7 @@ class MFormParser
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
-            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
+            ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes()));
@@ -491,7 +491,7 @@ class MFormParser
         $element->setId($item->getId())
             ->setVarId($item->getVarId())
             ->setType($item->getType())
-            ->setValue((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue())
+            ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setAttributes($itemAttributes)
             ->setClass($item->getClass())
             ->setOptions($optionElements);
@@ -517,7 +517,7 @@ class MFormParser
     {
         // create element
         $element = new MFormElement();
-        $element->setValue($key)// set option key
+        $element->setValue((string) $key)// set option key
         ->setLabel($value) // set option label
         ->setType($templateType);
 
@@ -608,7 +608,7 @@ class MFormParser
     {
         // create element
         $element = new MFormElement();
-        $element->setValue($key)
+        $element->setValue((string) $key)
             ->setId($item->getId())
             ->setVarId($item->getVarId())
             ->setType($item->getType())

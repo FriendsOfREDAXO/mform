@@ -21,8 +21,12 @@ class MFormItemManipulator
     public static function setVarAndIds(MFormItem $item): void
     {
         // set value for html out
-        if (!is_array($item->getValue())) {
-            $item->setValue(htmlspecialchars((!empty($item->getValue())) ? $item->getValue() : ''));
+        $value = $item->getValue();
+        if (!is_array($value)) {
+            $string = htmlspecialchars((!empty($item->getValue())) ? $item->getValue() : '');
+            if ($string !== '' && $item->getValue() !== 0) {
+                $item->setValue($string);
+            }
         } elseif (is_array($item->getVarId()) && 1 == count($item->getVarId())) {
             $item->setValue(htmlspecialchars($item->getStringValue()));
         }
