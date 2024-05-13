@@ -7,6 +7,7 @@
 - added install button to collapse title for example modules
 - fixed multiple select default value issue
 - fixed select '0' value issue
+- ensured full option functionality for description  
 
 ## Version 8-beta6
 
