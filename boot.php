@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+use FriendsOfRedaxo\MForm;
+
 if (rex_addon::exists('yform') &&
     rex_addon::get('yform')->isAvailable() &&
     rex_plugin::get('yform', 'manager')->isAvailable()) {
