@@ -70,8 +70,11 @@ To determine the necessary field keys, a dump might be needed beforehand.
 Note: From the original MBlock Mediafield 1, it becomes: `'REX_MEDIA_1'`
 
 ```php
+use FriendsOfRedaxo\MForm;
+
 // Repeater initialization ID with the base ID of the original MBlock section
 $id = 1;
+
 // Create a new MForm instance with the factory method and directly integrate a repeater
 echo MForm::factory()
     ->addRepeaterElement(
