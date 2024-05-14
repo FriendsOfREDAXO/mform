@@ -268,10 +268,10 @@ window.repeater = () => {
             this.updateValues();
             this.rexPrepareCke5Move($('#' + idKey));
         },
-        moveField(index, from, to, fieldsKey, idKey) {
+        moveField(index, from, to, fieldsKey, idKey, parentIdKey) {
             this.groups[index][fieldsKey].splice(to, 0, this.groups[index][fieldsKey].splice(from, 1)[0]);
             this.updateValues();
-            this.rexPrepareCke5Move($('#' + idKey));
+            this.rexPrepareCke5Move($('#' + parentIdKey));
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
             let linkMap = openLinkMap(id).replace('redaxo://', '');
