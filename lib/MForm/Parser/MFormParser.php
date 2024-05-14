@@ -78,6 +78,7 @@ class MFormParser
 
         $max = (!empty($item->getAttributes()['max'])) ? intval($item->getAttributes()['max']) : 0;
         $min = (!empty($item->getAttributes()['min'])) ? intval($item->getAttributes()['min']) : 0;
+        $xifMax = '';
         if ($max > 0) {
             $xifMax = " && $max > $groups.length";
         }
@@ -919,7 +920,15 @@ class MFormParser
     {
         if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
             foreach ($item->getAttributes() as $key => $value) {
-                $element->setAttribute($key, (string) $value);
+                if (is_array($value)) {
+                    foreach ($value as $vKey => $vValue) {
+                        if (!is_array($vValue)) {
+                            $element->setAttribute($vKey, (string) $vValue);
+                        }
+                    }
+                } else {
+                    $element->setAttribute($key, (string) $value);
+                }
             }
         }
         if (!is_null($id)) {

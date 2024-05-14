@@ -160,7 +160,7 @@ class rex_var_custom_link extends rex_var
                 if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
                     $ylinks .= '<li><a href="#" class="ylink" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
 
-                    if (str_contains($value, str_replace('_', '-', $link['table']))) {
+                    if (!is_null($value) && str_contains($value, str_replace('_', '-', $link['table']))) {
                         $valueName = self::getCustomLinkYFormLinkText($value, $link['table'], $link['column']);
                     }
                 }
