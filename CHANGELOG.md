@@ -11,6 +11,8 @@
 - some beauty changes
 - custom link name issue fixed
 - add english translations
+- add placeholder example
+- add outputs for each examples
 
 ## Version 8-beta6
 

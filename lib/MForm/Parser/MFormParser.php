@@ -195,7 +195,7 @@ class MFormParser
 
         // section end and form input
         if (!array_key_exists('parent_id', $item->getAttributes())) {
-            $this->elements[] = "<textarea name=\"REX_INPUT_VALUE".$item->getVarId()."\" class=\"hidden\" x-bind:value=\"value\">".$item->getValue()."</textarea>";
+            $this->elements[] = "<textarea name=\"REX_INPUT_VALUE".$item->getVarId()."\" class=\"hidden-o \" style='width:100%;height:200px' x-bind:value=\"value\">".$item->getValue()."</textarea>";
             $this->elements[] = "</div></section>";
         }
     }
