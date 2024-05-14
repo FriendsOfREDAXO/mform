@@ -1,4 +1,5 @@
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     ->addTabElement('Tab1', MForm::factory()

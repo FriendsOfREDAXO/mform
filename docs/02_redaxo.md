@@ -7,6 +7,7 @@ Rendert die REDAXO System-Elemente `REX_MEDIA_BUTTON`, `REX_LINK_BUTTON`, `REX_M
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area

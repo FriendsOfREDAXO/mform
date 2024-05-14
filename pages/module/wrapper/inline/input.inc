@@ -1,4 +1,5 @@
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     ->addInlineElement('Label', MForm::factory()

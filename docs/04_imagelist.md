@@ -6,6 +6,7 @@ Die ImageList ist ein Widget, das es ermöglicht, eine Liste von Bildern zu erst
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 echo MForm::factory()
     // add fieldset area

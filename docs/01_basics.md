@@ -12,6 +12,7 @@ Rendert Text- und Eingabe-Elemente wie `<input type="text">`, `<textarea>` oder 
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area
@@ -53,6 +54,7 @@ Rendert `<input type="checkbox">` oder `input type="radio">`-Elemente.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area
@@ -87,6 +89,7 @@ Rendert Überschriften, Alerts und andere HTML-Elemente.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area
@@ -122,6 +125,7 @@ Rendert `<select>`- und `<select multiple>`-Elemente.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area
@@ -200,6 +204,7 @@ Fügt ein Platzhalter-Attribut zu einem Textfeld hinzu.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // fieldset with placeholder
@@ -220,6 +225,7 @@ Setzt Datalists und Optionen für verschiedene Input-Elemente.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // fieldset

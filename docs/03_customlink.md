@@ -23,6 +23,7 @@ Jeder dieser Typen kann aktiviert oder deaktiviert werden. Per default sind folg
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 echo MForm::factory()
     // add fieldset area

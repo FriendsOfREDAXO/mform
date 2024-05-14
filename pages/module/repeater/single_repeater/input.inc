@@ -1,4 +1,5 @@
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // text input element
@@ -15,7 +16,7 @@ $mform = MForm::factory()
                 // radio element
                 ->addRadioField('radio1', [1 => 'test-1', 2 => 'test-2'], ['label' => 'Radio 1'])
             )
-        )
+        ) , true, true, ['default_count' => 3]
     );
 
 echo $mform->show();

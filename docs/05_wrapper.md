@@ -8,6 +8,7 @@ Stellt ein Accordion-Element dar, das sich bei Klick öffnet und schließt.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // fieldset
@@ -32,6 +33,7 @@ Stellt ein Collapse-Element dar, das sich bei Klick öffnet und schließt.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // fieldset
@@ -56,6 +58,7 @@ Stellt ein Collapse-Element dar, das sich in Abhängigkeit einer Checkbox- oder 
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // toggle radio
@@ -136,6 +139,7 @@ Stellt ein Grid-Element dar, das sich in mehrere Spalten aufteilen lässt.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     ->addColumnElement(6, // column
@@ -155,6 +159,7 @@ Stellt Inline-Elemente dar, die sich in einer Zeile nebeneinander anordnen.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     ->addInlineElement('Label', MForm::factory()
@@ -175,6 +180,7 @@ Stellt Tab-Elemente dar, die bei Klick den dargestellten Inhalt wechseln.
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     ->addTabElement('Tab1', MForm::factory()
