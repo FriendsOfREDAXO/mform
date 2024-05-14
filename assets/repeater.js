@@ -308,7 +308,7 @@ window.repeater = () => {
         viewMedia(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
                 element = (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
-                param = params + '&file_name=' + element.media,
+                param = params + '&file_name=' + element,
                 media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id);
             this.onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
