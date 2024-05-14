@@ -45,6 +45,7 @@ mform_example_wrapper_inline = Inline Formular-Elements
 mform_example_wrapper_tabs = Tab Wrapper-Elements
 mform_example_repeater_nested_repeater = Nested Repeater [2 Ebenen]
 mform_example_repeater_single_repeater = Single Repeater [1 Ebene]
+mform_example_repeater_widgets_repeater = MForm-Widget-Elemente im Repeater [2 Ebenen]
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
 mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.

@@ -8,12 +8,13 @@ mform_demo_base = Basic examples
 mform_demo_extended = Extended examples
 mform_demo_expert = Expert examples
 mform_demo_community = FOS examples
+mform_demo_wrapper = Wrapper examples
+mform_demo_repeater = Repeater examples
 mform_reference_demo = Sample collection
 mform_info = Info
 
 mform_modul_input = Module input
 mform_modul_output = Modul output
-
 
 mform_help = Help
 mform_changelog = Changelog
@@ -21,7 +22,7 @@ mform_github = MForm FOR – Github Repository
 
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
-mform_example_base_checkbox = Checkbox and radio elements
+mform_example_base_checkradio = Checkbox and radio elements
 mform_example_base_info = Structured info elements
 mform_example_base_system = System button elements
 mform_example_base_widgets = MForm widget elements
@@ -42,13 +43,18 @@ mform_example_wrapper_collapse_select = Select collapse wrapper element
 mform_example_wrapper_columns = Grid/column wrapper element
 mform_example_wrapper_inline = Inline form-elements
 mform_example_wrapper_tabs = Tab wrapper-elements
+mform_example_repeater_nested_repeater = Nested repeater [2 level]
+mform_example_repeater_single_repeater = Single repeater [1 level]
+mform_example_repeater_widgets_repeater = MForm widget elements in repeater [2 level]
 
 mform_example_description_base = The "basic examples" include the basic calls of the respective MForm element, without any "extras", extensions and validations.
 mform_example_description_extended = The "extended examples" show beyond the "basic examples", how to expand elements around attributes, options, parameters, labels, etc.
 mform_example_description_expert = The "expert examples" show that MForm can be used for more than just standards.
 mform_example_description_community = Later
+mform_example_description_wrapper = The "Wrapper Examples" demonstrate how to effectively layout and enhance input forms using MForm wrapper elements.
+mform_example_description_repeater = The "Repeater Examples" illustrate how simple it is to use a repeater element. Essentially, it can be created like the other wrapper elements. The wrapped form can be replicated using the repeater as many times as needed, with minimum or maximum block limits (similar to MBlock as before).
 
-mform_github = MForm FOR – Github Repository
+mform_github = MForm FOR – go to github
 
 mform_install = Install
 mform_update = Update
@@ -72,3 +78,14 @@ yform_values_custom_link_link_category = Link category
 yform_values_custom_link_phone = Phone link button
 yform_values_imagelist_description = Image selection/organization with image previews / drag & drop
 yform_values_custom_link_ylink = YFORM link widget (label_text::yform_table_name::column_to_display,label_text2::yform_table_name_2::column_to_display_2)
+
+# Docs
+
+mform_docs = Documentation
+mform_docs_basics = Basics
+mform_docs_redaxo = REDAXO Widgets
+mform_docs_customlink = Custom Link Widget
+mform_docs_imagelist = Imagelist Widget
+mform_docs_wrapper = Wrappers and Layouts
+mform_docs_advanced = Advanced
+mform_docs_repeater = Repeater

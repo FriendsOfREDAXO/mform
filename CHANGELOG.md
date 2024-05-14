@@ -2,12 +2,15 @@
 
 ## Version 8-beta7
 
-- IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`
+- **IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`**
 - new docs added - thanks @alxndr-w
 - added install button to collapse title for example modules
 - fixed multiple select default value issue
 - fixed select '0' value issue
-- ensured full option functionality for description  
+- ensured full option functionality for description
+- some beauty changes
+- custom link name issue fixed
+- add english translations
 
 ## Version 8-beta6
 
