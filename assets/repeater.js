@@ -190,7 +190,7 @@ window.repeater = () => {
         rexGetInputElement(input) {
             let nameKey = input.attr('item_name_key'),
                 element = this.rexGetInputIndexElement(input);
-            if (element[nameKey] === undefined) {
+            if (element === undefined || element[nameKey] === undefined) {
                 element[nameKey] = {'name': '', 'id': ''};
             }
             return element[nameKey];
@@ -199,7 +199,7 @@ window.repeater = () => {
             let that = this,
                 element = this.rexGetInputIndexElement(input),
                 nameKey = input.attr('item_name_key');
-            if (element[nameKey] === input.attr('data-value')) {
+            if (element !== undefined && element[nameKey] === input.attr('data-value')) {
                 input.prop('checked', true);
             }
             input.bootstrapMFormToggle('destroy').bootstrapMFormToggle();
