@@ -25,13 +25,13 @@ echo MForm::factory() // init mform
         // input datetime-local
         ->addInputField("datetime-local", 1.9, ['label'=>'Datetime-local field']) // Datum und Uhrzeit (ohne Zeitzone)
         // input date
-        ->addInputField("date", 1.10, ['label'=>'Date field']) // Datum
+        ->addInputField("date", "2.date", ['label'=>'Date field']) // Datum
         // input time
-        ->addInputField("time", 1.11, ['label'=>'Time field']) // Uhrzeit
+        ->addInputField("time", "2.time", ['label'=>'Time field']) // Uhrzeit
         // input month
-        ->addInputField("month", 1.12, ['label'=>'Month field']) // Monat
+        ->addInputField("month", "2.month", ['label'=>'Month field']) // Monat
         // input week
-        ->addInputField("week", 1.13, ['label'=>'Week field']) // Kalenderwoche
+        ->addInputField("week", "2.week", ['label'=>'Week field']) // Kalenderwoche
     )
     // parse form
     ->show();

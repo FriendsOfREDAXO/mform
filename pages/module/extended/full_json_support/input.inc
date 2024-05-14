@@ -1,5 +1,6 @@
 <?php
-// instanziieren
+use FriendsOfRedaxo\MForm;
+// initialize
 $mform = MForm::factory()
     // add fieldset area
     ->addFieldsetArea('Full json value support', MForm::factory()
