@@ -261,7 +261,7 @@ const YForm_selectData = (
   hidden_input.val(linkUrl)
   showed_input.val(label)
 
-  dispatchCustomLinkEvent(hidden_input, linkUrl, name);
+  dispatchCustomLinkEvent(hidden_input, linkUrl, label);
 }
 
 function randId() {
