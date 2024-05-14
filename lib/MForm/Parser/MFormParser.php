@@ -89,13 +89,15 @@ class MFormParser
             $itemValue = \rex_var::toArray($item->getValue());
             $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
 
-            foreach ($itemValue as $index0 => $level0) {
-                if (is_array($level0)) {
-                    foreach ($level0 as $index1 => $level1) {
-                        if (isset($keys[$index1]) && count($level1) == 1 &&
-                            isset($level1[0]) && is_array($level1[0]) &&
-                            empty($level1[0])) {
-                            $itemValue[$index0][$index1] = $this->obj[$index1];
+            if (is_array($itemValue)) {
+                foreach ($itemValue as $index0 => $level0) {
+                    if (is_array($level0)) {
+                        foreach ($level0 as $index1 => $level1) {
+                            if (isset($keys[$index1]) && count($level1) == 1 &&
+                                isset($level1[0]) && is_array($level1[0]) &&
+                                empty($level1[0])) {
+                                $itemValue[$index0][$index1] = $this->obj[$index1];
+                            }
                         }
                     }
                 }

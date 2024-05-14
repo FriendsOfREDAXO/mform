@@ -17,7 +17,7 @@ function initMFormElements(mform) {
         initMFormSelectPicker(mform);
         // init radio img inlines
         initMFormRadioImgInlines(mform);
-    },1)
+    }, 1)
 }
 
 function initMFormSelectPicker(mform) {
@@ -35,7 +35,7 @@ function initMFormTabs(mform) {
                 uid = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
             tab.attr('id', uid);
             $(this).attr('href', '#' + uid);
-            $('#uid').tab("show");
+            $('#' + uid).tab("show");
         });
     });
 }
@@ -140,7 +140,9 @@ function getParentMForm(element) {
 }
 
 function initMFormTooltip(mform) {
-    mform.tooltip('destroy');
+    if (mform.find('[data-toggle="tooltip"]').length) {
+        mform.tooltip('destroy');
+    }
     mform.find('[data-toggle="tooltip"]').tooltip();
 }
 
@@ -168,10 +170,10 @@ function toggleCollapseElement(element, type, init) {
 }
 
 function initMFormRadioImgInlines(mform) {
-    mform.find('.mform-inline-radios').each(function(){
+    mform.find('.mform-inline-radios').each(function () {
         let that = $(this);
-        $(this).find('input[type=radio]').each(function (){
-            $(this).on('change', function(){
+        $(this).find('input[type=radio]').each(function () {
+            $(this).on('change', function () {
                 that.find('label').removeClass('active');
                 if ($(this).prop('checked')) {
                     $(this).parent().addClass('active');
