@@ -85,7 +85,7 @@ class MFormParser
         // open section and repeater div
         if (is_null($parentId)) {
             // at this point we have to compare item value and obj
-            $itemValue = \rex_var::toArray($item->getValue());
+            $itemValue = \rex_var::toArray((string) $item->getValue());
             $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
 
             if (is_array($itemValue)) {
