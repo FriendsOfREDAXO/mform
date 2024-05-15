@@ -171,7 +171,9 @@ window.repeater = () => {
                 let element = that.rexGetInputElement(input);
                 element['name'] = linktext; // setzt linktext für den shown input "Articlename [id]" oder sonstiger form visible text
                 element['id'] = linkurl; // setzt die linkid oder die linkurl / das linkziel
-                that.updateValues(); // reload to value form inputs
+                setTimeout(function(){
+                    that.updateValues(); // reload to value form inputs
+                }, 5)
             });
         },
         rexGetInputIndexElement(input) {
@@ -281,7 +283,9 @@ window.repeater = () => {
                 } else {
                     this.groups[index][nameKey] = {'name': linktext, 'id': linkurl};
                 }
-                this.updateValues();
+                setTimeout(function() {
+                    this.updateValues();
+                }, 5);
             });
             return false;
         },
@@ -328,7 +332,9 @@ window.repeater = () => {
                 } else {
                     this.groups[index][nameKey] = mediaName;
                 }
-                this.updateValues();
+                setTimeout(function() {
+                    this.updateValues();
+                }, 5);
             });
         },
     }
