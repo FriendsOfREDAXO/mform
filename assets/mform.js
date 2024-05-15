@@ -141,7 +141,11 @@ function getParentMForm(element) {
 
 function initMFormTooltip(mform) {
     if (mform.find('[data-toggle="tooltip"]').length) {
-        mform.tooltip('destroy');
+        try {
+            mform.tooltip('destroy');
+        } catch (exc) {
+            // console.log(exc);
+        }
     }
     mform.find('[data-toggle="tooltip"]').tooltip();
 }
