@@ -19,8 +19,8 @@ $formtorepeat->addFieldsetArea('fieldset1', MForm::factory()
 
 $mform = MForm::factory();
 $mform->addTextField(1, ['label' => 'Headline']);
-
 $mform->addRepeaterElement(2, $formtorepeat);
+
 echo $mform->show();
 ```
 
