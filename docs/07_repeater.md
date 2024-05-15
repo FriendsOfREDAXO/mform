@@ -10,16 +10,17 @@ Repeater ist keine 1:1-Übernahme von MBlock, sondern ist ein neuer, moderner An
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
+
+$formtorepeat = MForm::factory();
+$formtorepeat->addFieldsetArea('fieldset1', MForm::factory()
+->addTextField('item', ['label' => 'List-Item'])
+);
 
 $mform = MForm::factory();
 $mform->addTextField(1, ['label' => 'Headline']);
 
-$repeater = MForm::factory();
-$repeater->addFieldsetArea('Test');
-$repeater->addTextField('item', ['label' => 'List-Item']);
-
-$mform->addRepeaterElement(2, $repeater);
-
+$mform->addRepeaterElement(2, $formtorepeat);
 echo $mform->show();
 ```
 
