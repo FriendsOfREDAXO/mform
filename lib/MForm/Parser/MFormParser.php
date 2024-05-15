@@ -43,10 +43,9 @@ use function strlen;
 class MFormParser
 {
     protected array $elements = [];
-
     protected array $values = [];
-
     protected array $obj = [];
+    protected bool $debug = false;
 
     /**
      * @var string
@@ -195,7 +194,11 @@ class MFormParser
 
         // section end and form input
         if (!array_key_exists('parent_id', $item->getAttributes())) {
-            $this->elements[] = "<textarea name=\"REX_INPUT_VALUE".$item->getVarId()."\" class=\"hidden-o \" style='width:100%;height:200px' x-bind:value=\"value\">".$item->getValue()."</textarea>";
+            if ($this->debug) {
+                $this->elements[] = "<textarea name=\"REX_INPUT_VALUE" . $item->getVarId() . "\" style='width:100%;height:200px' x-bind:value=\"value\">" . $item->getValue() . "</textarea>";
+            } else {
+                $this->elements[] = "<textarea name=\"REX_INPUT_VALUE" . $item->getVarId() . "\" class=\"hidden\" x-bind:value=\"value\">" . $item->getValue() . "</textarea>";
+            }
             $this->elements[] = "</div></section>";
         }
     }
@@ -1219,6 +1222,7 @@ class MFormParser
 
     public function parse(array $items, ?string $theme = null, bool $debug = false): string
     {
+        $this->debug = $debug;
         if (!is_null($theme) && $theme != $this->theme) {
             $this->theme = $theme;
         }
@@ -1230,8 +1234,8 @@ class MFormParser
         $items = MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items);
 
         // show for debug items
-        if ($debug) {
-            dump(['items' => $items, 'theme' => $this->theme, 'debug' => $debug]);
+        if ($this->debug) {
+            dump(['items' => $items, 'theme' => $this->theme]);
         }
 
         $this->parseFormFields($items);
