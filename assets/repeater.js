@@ -117,10 +117,10 @@ window.repeater = () => {
                     // triggert das klassische rex:ready event für den repeater item
                     $(element).trigger('rex:ready', [$(element)]);
                     // CUSTOM LINK PREPARE
-                    if ($(element).find('.custom-link').length > 0) {
-                        // fügt global für alle custom link elements ein listener hinzu der auf
-                        that.rexInitCustomLink();
-                    }
+                    // if ($(element).find('.custom-link').length > 0) {
+                    //     // fügt global für alle custom link elements ein listener hinzu der auf
+                    //     that.rexInitCustomLink();
+                    // }
                     // SELECT PICKER PREPARE
                     if ($(element).find('.repeater-selectpicker').length > 0) {
                         setTimeout(function () {
