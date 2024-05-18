@@ -105,7 +105,7 @@ class MFormParser
             $confirm .= (isset($item->getAttributes()['confirm_delete_msg'])) ? ', \''.$item->getAttributes()['confirm_delete_msg'] .'\'' : ', \''.rex_i18n::msg('mform_repeater_remove_group_confirm_msg').'\'';
             $addInitGroup = ($open) ? ' if('.$groups.'.length <= 0) { addGroup('.$obj.') };' : '';
 
-            $output[] = '<section class="repeater" id="'.$repeaterId.'"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.json_encode($itemValue).');'.$addInitGroup.'\' id="x-repeater">';
+            $output[] = '<section class="repeater" id="'.$repeaterId.'"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.json_encode($itemValue).');'.$addInitGroup.'\' @selectcustomlink.window="selectCustomLink($event.detail)" id="x-repeater">';
             // add button
             $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-primary mb-3" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add group').'</a></template>';
             $header = '
