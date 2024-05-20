@@ -70,6 +70,7 @@ class MFormAttributeHandler
             case 'default-value': // set default value for any fields
                 $item->setDefaultValue($value);
                 break;
+            case 'btn-class':
             case 'class': // set custom class
                 $item->setClass($value);
                 break;
