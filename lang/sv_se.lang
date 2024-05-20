@@ -14,6 +14,9 @@ mform_modul_output = Modul output
 
 mform_github = MForm FOR – Github Repository
 
+mform_repeater_remove_group_confirm_msg = Ta bort grupp?
+mform_repeater_remove_field_confirm_msg = Ta bort fält?
+
 mform_example_base_text = Text input and hidden elements
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkbox = Checkbox and radio elements

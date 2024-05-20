@@ -57,6 +57,9 @@ mform_example_description_repeater = The "Repeater Examples" illustrate how simp
 
 mform_github = MForm FOR – go to github
 
+mform_repeater_remove_group_confirm_msg = Remove group?
+mform_repeater_remove_field_confirm_msg = Remove field?
+
 mform_install = Install
 mform_update = Update
 mform_module_install = Module install

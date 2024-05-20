@@ -14,6 +14,9 @@ mform_modul_output = Modo de saída
 
 mform_github = MForm FOR – ir para github
 
+mform_repeater_remove_group_confirm_msg = Excluir grupo?
+mform_repeater_remove_field_confirm_msg = Excluir campo?
+
 mform_example_base_text = Entrada de texto e elementos ocultos
 mform_example_base_select = Selecionar e multiselecionar vários elementos
 mform_example_base_checkbox = Caixa de seleção e elementos de rádio

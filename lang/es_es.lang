@@ -15,6 +15,9 @@ mform_modul_output = Salida del módulo
 
 mform_github = MForm Github Docu Wiki
 
+mform_repeater_remove_group_confirm_msg = ¿Eliminar grupo?
+mform_repeater_remove_field_confirm_msg = ¿Eliminar campo?
+
 mform_example_base_text = Entrada de texto y elementos ocultos
 mform_example_base_select = Seleccionar y multiselectar elementos
 mform_example_base_checkbox = Casilla de verificación y elemento de radio
