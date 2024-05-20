@@ -8,6 +8,15 @@ if (typeof Alpine !== 'undefined') {
     })
 }
 
+// jQuery events in native events umwandeln um diese in Alpinejs zu verwenden
+$(window).on('rex:selectCustomLink', (event, linkurl, linktext, input) => {
+    window.dispatchEvent(new CustomEvent('selectcustomlink', {detail: {
+            linkurl: linkurl,
+            linktext: linktext,
+            input: input
+        }}));
+});
+
 // Alpinejs directive um pjax/jquery murks zu verhindern...
 function addAlpineDirective() {
     Alpine.directive('repeater', (el) => {
@@ -108,10 +117,10 @@ window.repeater = () => {
                     // triggert das klassische rex:ready event für den repeater item
                     $(element).trigger('rex:ready', [$(element)]);
                     // CUSTOM LINK PREPARE
-                    if ($(element).find('.custom-link').length > 0) {
-                        // fügt global für alle custom link elements ein listener hinzu der auf
-                        that.rexInitCustomLink();
-                    }
+                    // if ($(element).find('.custom-link').length > 0) {
+                    //     // fügt global für alle custom link elements ein listener hinzu der auf
+                    //     that.rexInitCustomLink();
+                    // }
                     // SELECT PICKER PREPARE
                     if ($(element).find('.repeater-selectpicker').length > 0) {
                         setTimeout(function () {
@@ -162,19 +171,12 @@ window.repeater = () => {
                 });
             }
         },
-        // fügt global für rex:selectCustomLink events ein listener hinzu
         // setzt bei trigger für das input feld den group element eintrag
-        rexInitCustomLink() {
-            let that = this;
-            $(window).on('rex:selectCustomLink', (event, linkurl, linktext, input) => {
-                // ermittle anhand des input den group element eintrag
-                let element = that.rexGetInputElement(input);
-                element['name'] = linktext; // setzt linktext für den shown input "Articlename [id]" oder sonstiger form visible text
-                element['id'] = linkurl; // setzt die linkid oder die linkurl / das linkziel
-                setTimeout(function(){
-                    that.updateValues(); // reload to value form inputs
-                }, 5)
-            });
+        selectCustomLink(data) {
+            let element = this.rexGetInputElement(data.input);
+            element['name'] = data.linktext; // setzt linktext für den shown input "Articlename [id]" oder sonstiger form visible text
+            element['id'] = data.linkurl; // setzt die linkid oder die linkurl / das linkziel
+            this.updateValues(); // reload to value form inputs
         },
         rexGetInputIndexElement(input) {
             let parent = input.closest('.repeater-group'),
@@ -241,11 +243,13 @@ window.repeater = () => {
         // addGroup und addFields sind dreh und angelpunkte für das versorgen der form input values durch alpine
         addGroup(obj) {
             this.groups.push(JSON.parse(JSON.stringify(obj))); // bottom
+            this.updateValues();
             // this.groups.unshift(obj); // top
         },
         // ermöglicht das dynamische anlegen der group elements fields ebenen struktur
         addFields(index, obj, fieldsKey, idKey) {
             this.groups[index][fieldsKey].push(JSON.parse(JSON.stringify(obj)));
+            this.updateValues();
         },
         removeGroup(index, confirmDelete = false, confirmDeleteMsg = 'delete?') {
             if (confirmDelete) {

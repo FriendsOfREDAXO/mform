@@ -27,10 +27,14 @@ echo $mform->show();
 ### Ausgabe-Modul
 
 ```php
+<?php
+$items = rex_var::toArray('REX_VALUE[2]');
+?>
+
 <h1>REX_VALUE[1]</h1>
 
 <ul>
-    <?php foreach (REX_VALUE[2] as $item) : ?>
+    <?php foreach ($items as $item) : ?>
         <li><?php echo $item['item']; ?></li>
     <?php endforeach; ?>
 </ul>
