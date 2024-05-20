@@ -337,8 +337,8 @@ section.repeater .repeater-group:hover {
 }
 
 .rex-theme-dark section.repeater .repeater-group {
-    border: 1px solid rgba(72, 72, 72, 0.2);
-    background: rgba(17, 17, 17, 0.55);
+    border: 1px solid rgba(17, 17, 17, 0.1);
+    background: rgba(17, 17, 17, 0.15);
     box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
 }
 
@@ -355,8 +355,8 @@ section.repeater .repeater-group:last-child {
 
 @media (prefers-color-scheme: dark) {
     section.repeater .repeater-group {
-        border: 1px solid rgba(72, 72, 72, 0.2);
-        background: rgba(17, 17, 17, 0.55);
+        border: 1px solid rgba(17, 17, 17, 0.1);
+        background: rgba(17, 17, 17, 0.15);
         box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
     }
 
