@@ -1,5 +1,16 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8
+
+- **Major Release and major changes included**
+- **IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`**
+- **New:** alpine repeater with 2 level support
+- **New:** Complete docs by Alexander Walther @alxndr-w
+- All demo modules now directly installable
+- **New:** addRadioImgField
+
+and much more
+
 ## Version 8-beta7
 
 - **IMPORTANT: breaking namespace change -> from `MForm` to `FriendsOfRedaxo\MForm`**
