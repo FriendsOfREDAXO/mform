@@ -44,7 +44,7 @@ class MFormOutputHelper
             if (str_starts_with($item['link'], 'rex://')) {
                 $articleId = (int) substr($item['link'], 6);
                 $item['customlink_url'] = rex_getUrl($articleId, rex_clang::getCurrentId());
-                $item['customlink_class'] = ' intern';
+                $item['customlink_class'] = ' internal';
 
                 if (empty($item['customlink_text'])) {
                     $art = rex_article::get($articleId, rex_clang::getCurrentId());
