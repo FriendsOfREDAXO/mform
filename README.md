@@ -42,6 +42,15 @@ The Form Repeater allows dynamic repetition of form elements while realizing nes
 
 ### Migration from MBlock to MForm 8 
 
+Der neue Repeater ist nur eingeschränkt mit MBlock kompatibel.
+
+Akuell funktionieren nicht bei einer Migration: 
+
+- CustomLinkField
+- addMediaListField
+- addLinkListField
+
+
 ***MBlock Module*** 
 
 ```php
@@ -104,7 +113,6 @@ MForm can be directly installed via the Redaxo Installer. [MForm Redaxo Addon Pa
 4. Install and activate MForm under "AddOns"
 
 ## Output
-
 
 
 MForm utilizes REDAXO variables provided by REDAXO, either as classic or JSON values.
