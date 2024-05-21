@@ -123,13 +123,22 @@ $link = explode("://", $img['link']);
 
 ### Custom Link auslesen
 
-MForm liefert eine Methode zum Auslesen und Auswerten der Custom-Links.
+MForm liefert zwei Methoden zum Auslesen und Auswerten der Custom-Links.
+
+`MForm\Utils\MFormOutputHelper::getCustomUrl(mixed $value, $lang)`
+
+und
+
 `MForm\Utils\MFormOutputHelper::prepareCustomLink(array $item, $externBlank = true)`
+
+getCustomUrl gibt zum angegebenen Value die URL in der gewünschten Sprache (optional) zurück.
+
+prepareCustomLink liefert ein Array 
 
 Die Methode nimmt ein Array für den Link  an und gibt ein  Array mit verarbeiteten Links zurück.
 
 ```php
-$link = '10';
+$link = 'rex://10';
 $linkdata = MForm\Utils\MFormOutputHelper::prepareCustomLink(['link' => $link], true);
 ```
 
@@ -137,46 +146,10 @@ Ergebnis:
 
 ```
 ^ array:5 [▼
-    "link" => "10"
+    "link" => "/artikel.html"
     "customlink_text" => "Artikelname"
     "customlink_url" => "/artikelname"
     "customlink_target" => ""
-    "customlink_class" => " intern"
+    "customlink_class" => " internal"
 ]
-```
-
-Benötigt man nur den Link oder möchte man mehr Erkennungsmöglichkeiten realisieren, kann man folgendes Beispiel verwenden.  
-
-Die nachfolgende Funktion dient dazu den von MForm / Mblock generierten CustomLink auszulesen und korrekt zu verlinken. Die Funktion kann in der Ausgabe eines Moduls genutzt werden oder ggf. im Theme- oder Projektaddon verwendet werden. Sie kann auch allgemein dazu verwendet werden, einen unbekannten Link zu identifizieren
-
-Die Funktion kann in der functions.php vom theme-AddOn oder in der boot.php vom project-AddOn hinterlegt werden:  
-
-```php
-// CustomLink-Funktion REX5 / mform / mblock
-
-if (!function_exists('getcustomLink')) {
-  function getcustomLink($url) {
-
-  // Wurde ein Wert für $url übergeben?
-  if ($url) {
-
-    // Prüfe ob es sich um eine URL handelt, dann weiter
-    if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) {
-    }
-
-    // Ist es eine Mediendatei?
-    if (file_exists(rex_path::media($url)) === true) {
-       $url = rex_url::media($url);
-    }
-    else {
-        // Ist es keine Mediendatei oder URL, dann als REDAXO-Artikel-ID behandeln
-        if (filter_var($url, FILTER_VALIDATE_URL) === FALSE and is_numeric($url)) {
-            $url = rex_getUrl($url);
-        }
-    }
-
-   return $url;
-   }
-  }
-}
 ```
