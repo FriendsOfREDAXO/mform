@@ -27,7 +27,7 @@ class MFormOutputHelper
 
     public static function prepareCustomLink(array $item, bool $externBlank = true): array
     {
-        // set url
+        // Set URL
         if (!isset($item['link']) || empty($item['link'])) {
             return $item;
         }
@@ -35,42 +35,71 @@ class MFormOutputHelper
         $item['customlink_url'] = $item['link'];
         $item['customlink_target'] = '';
 
-        // media file?
-        if (true === file_exists(rex_path::media($item['link']))) {
+        // Media file?
+        if (file_exists(rex_path::media($item['link']))) {
             $item['customlink_url'] = rex_url::media($item['link']);
             $item['customlink_class'] = ' media';
         } else {
-            // no media and no url and is numeric it must be an rex article id
-            if (false === filter_var($item['link'], FILTER_VALIDATE_URL) && is_numeric($item['link'])) {
-                $item['customlink_url'] = rex_getUrl($item['link'], rex_clang::getCurrentId());
+            // Check for rex:// URL
+            if (str_starts_with($item['link'], 'rex://')) {
+                $articleId = (int) substr($item['link'], 6);
+                $item['customlink_url'] = rex_getUrl($articleId, rex_clang::getCurrentId());
                 $item['customlink_class'] = ' intern';
 
                 if (empty($item['customlink_text'])) {
-                    $art = rex_article::get($item['link'], rex_clang::getCurrentId());
+                    $art = rex_article::get($articleId, rex_clang::getCurrentId());
                     if ($art) {
                         $item['customlink_text'] = $art->getName();
                     }
                 }
-            } else {
-                $item['customlink_class'] = ' extern';
+            }
+            else {
+                $item['customlink_class'] = ' external';
 
-                if (strpos($item['customlink_url'], 'tel:') === 0) {
+                if (str_starts_with($item['customlink_url'], 'tel:')) {
                     $item['customlink_class'] = 'tel';
-                } elseif (strpos($item['customlink_url'], 'mailto:') === 0) {
+                } elseif (str_starts_with($item['customlink_url'], 'mailto:')) {
                     $item['customlink_class'] = 'mail';
                 }
 
                 if ($externBlank) {
-                    $item['customlink_target'] = ' target="_blank"';
+                    $item['customlink_target'] = ' target="_blank" rel="noopener noreferrer"';
                 }
             }
         }
 
-        // no link text?
+        // No link text?
         if (empty($item['customlink_text'])) {
             $item['customlink_text'] = str_replace(['http://', 'https://'], '', $item['customlink_url']);
         }
 
         return $item;
     }
+
+    function getCustomUrl(mixed $value = null, ?string $lang = null): string
+    {
+        // Check if the value is null or empty
+        if (is_null($value) || $value === '') {
+            return '';
+        }
+
+        // Determine the language to use (current language if none provided)
+        $lang = $lang ?? rex_clang::getCurrentId();
+
+        // Check if the value is a REDAXO article (starts with rex://)
+        if (str_starts_with($value, 'rex://')) {
+            $articleId = (int) substr($value, 6); // Remove 'rex://' and convert the rest to an integer
+            return rex_getUrl($articleId, $lang);
+        }
+
+        // Check if the value is numeric
+        if (is_numeric($value)) {
+            $articleId = (int) $value;
+            return rex_getUrl($articleId, $lang);
+        }
+
+        // If the value is neither a REDAXO URL nor numeric, return the value
+        return $value;
+    }
+
 }
