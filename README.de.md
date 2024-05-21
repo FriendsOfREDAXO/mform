@@ -42,6 +42,14 @@ Der Formular-Repeater ermöglicht es, Formularelemente dynamisch zu wiederholen 
 
 ### Migration von MBlock zu MForm 8 
 
+Der neue Repeater ist nur eingeschränkt mit MBlock kompatibel.
+
+Akuell funktionieren nicht bei einer Migration: 
+
+- CustomLinkField
+- addMediaListField
+- addLinkListField
+
 ***MBlock-Modul*** 
 
 ```php
