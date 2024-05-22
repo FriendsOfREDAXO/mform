@@ -44,7 +44,7 @@ class MFormOutputHelper
             if (str_starts_with($item['link'], 'rex://')) {
                 $articleId = (int) substr($item['link'], 6);
                 $item['customlink_url'] = rex_getUrl($articleId, rex_clang::getCurrentId());
-                $item['customlink_class'] = ' internal';
+                $item['customlink_class'] = ' intern';
 
                 if (empty($item['customlink_text'])) {
                     $art = rex_article::get($articleId, rex_clang::getCurrentId());
@@ -53,7 +53,18 @@ class MFormOutputHelper
                     }
                 }
             }
-            else {
+            // No media and no URL and is numeric, it must be a rex article id
+            elseif (!filter_var($item['link'], FILTER_VALIDATE_URL) && is_numeric($item['link'])) {
+                $item['customlink_url'] = rex_getUrl($item['link'], rex_clang::getCurrentId());
+                $item['customlink_class'] = ' intern';
+
+                if (empty($item['customlink_text'])) {
+                    $art = rex_article::get($item['link'], rex_clang::getCurrentId());
+                    if ($art) {
+                        $item['customlink_text'] = $art->getName();
+                    }
+                }
+            } else {
                 $item['customlink_class'] = ' external';
 
                 if (str_starts_with($item['customlink_url'], 'tel:')) {
