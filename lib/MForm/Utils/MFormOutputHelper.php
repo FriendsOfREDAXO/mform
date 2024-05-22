@@ -56,7 +56,7 @@ class MFormOutputHelper
             // No media and no URL and is numeric, it must be a rex article id
             elseif (!filter_var($item['link'], FILTER_VALIDATE_URL) && is_numeric($item['link'])) {
                 $item['customlink_url'] = rex_getUrl($item['link'], rex_clang::getCurrentId());
-                $item['customlink_class'] = ' intern';
+                $item['customlink_class'] = ' internal';
 
                 if (empty($item['customlink_text'])) {
                     $art = rex_article::get($item['link'], rex_clang::getCurrentId());
