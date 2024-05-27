@@ -1,6 +1,6 @@
 # Custom-Link-Widget
 
-Das Custom MForm Custom-Link-Element ermöglicht es durch den Einsatz eines Feldes mehrere Link-Typen definieren zu können.  
+Das MForm Custom-Link-Element ermöglicht es durch den Einsatz eines Feldes mehrere Link-Typen definieren zu können.  
 
 Das Cusotm-Link-Element steht in MForm, YForm und auch als REX_VAR zur Verfügung.  
 
@@ -65,7 +65,7 @@ REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink
 
 ## Auslesen der YLinks per Outputfilter
 
-### YForm links
+### YForm Custom-Link-Value
 
 Um die  generierten Urls wie `rex_news://1` zu ersetzen, muss das folgende Skript in die `boot.php` des `project` AddOns eingefügt werden.
 Der Code für die Urls muss modifiziert werden.
@@ -99,7 +99,7 @@ rex_extension::register('OUTPUT_FILTER', function(\rex_extension_point $ep) {
 
 ```
 
-### Auslesen der Ylinks manuell
+### Auslesen der `ylink`-Werte manuell
 
 ```php
 $link = explode("://", $img['link']);
@@ -121,7 +121,7 @@ $link = explode("://", $img['link']);
       }
 ```
 
-### Custom Link auslesen
+### Custom-Link auslesen
 
 MForm liefert zwei Methoden zum Auslesen und Auswerten der Custom-Links.
 
@@ -154,19 +154,18 @@ Ergebnis:
 ]
 ```
 
-### Custom Links aus MBlock zum Repeater konvertieren
+### Custom-Link-Werte aus MBlock zum Repeater (MForm >=8) konvertieren
 
-Das Datenformat der CustomLinks im Repeater unterscheidet sich von MBlock. 
-Der nachfolgende Konverter hilft bei der Umstellung. 
-Der nachfolgende Code kann direkt im betreffenden Modul oder separat ausgeführt werden. 
-**Unbedingt ein Backup machen**
+Das Datenformat der CustomLinks im Repeater unterscheidet sich von MBlock. Der nachfolgende Konverter hilft bei der Umstellung. Kopiere den Code direkt in das betroffene Modul und passe ihn an, oder führe den Code separat aus.
 
-Es muss das Value angegeben werden in dem gesucht werden soll, die Bezeichnung des Feldes und die Modul-ID.
+> **Hinweis: Nicht vergessen, ein Backup zu machen, um im Fall eines Fehlers eine Wiederherstellung zu ermöglichen.** Insb. ein Backup der Tabelle `rex_article_slice` und ggf. `rex_article`, damit diese bei einer Wiederherstellung zusammenpassen.
+
+Es muss das Value angepasst werden in dem gesucht werden soll, die Bezeichnung des Feldes und die Modul-ID.
 
 ```php
 <?php
 // Define the parameters
-$column = 'value1'; // column
+$column = 'value1'; // column: value1, ..., value10
 $node = 'customlink'; //  node
 $moduleId = 48; // module_id
 
