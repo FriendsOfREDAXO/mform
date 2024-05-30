@@ -330,14 +330,15 @@ window.repeater = () => {
             this.updateValues();
         },
         onMediaSelect(media, index, nameKey, fieldsKey, fieldIndex) {
+            const that = this;
             $(media).on('rex:selectMedia', (event, mediaName) => {
                 if (fieldsKey !== undefined && fieldsKey !== '' && fieldsKey !== '' && fieldIndex !== undefined) {
-                    this.groups[index][fieldsKey][fieldIndex][nameKey] = mediaName;
+                    that.groups[index][fieldsKey][fieldIndex][nameKey] = mediaName;
                 } else {
-                    this.groups[index][nameKey] = mediaName;
+                    that.groups[index][nameKey] = mediaName;
                 }
                 setTimeout(function() {
-                    this.updateValues();
+                    that.updateValues();
                 }, 5);
             });
         },
