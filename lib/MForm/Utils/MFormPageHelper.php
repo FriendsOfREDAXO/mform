@@ -39,10 +39,10 @@ class MFormPageHelper
                     continue;
                 }
                 if (file_exists($modulesDirectory . '/input.inc')) {
-                    $content .= '<h3>' . rex_i18n::msg('mform_modul_input') . '</h3>' . rex_string::highlight(file_get_contents($modulesDirectory . '/input.inc'));
+                    $content .= '<h3>' . rex_i18n::msg('mform_modul_input') . '</h3><pre class="rex-code">' . highlight_string(file_get_contents($modulesDirectory . '/input.inc'), true) . '</pre>';
                 }
                 if (file_exists($modulesDirectory . '/output.inc')) {
-                    $content .= '<h3>' . rex_i18n::msg('mform_modul_output') . '</h3>' . rex_string::highlight(file_get_contents($modulesDirectory . '/output.inc'));
+                    $content .= '<h3>' . rex_i18n::msg('mform_modul_output') . '</h3><pre class="rex-code">' . highlight_string(file_get_contents($modulesDirectory . '/output.inc'), true) . '</pre>';
                 }
 
                 $path = explode('/', $modulesDirectory);
