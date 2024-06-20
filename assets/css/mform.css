@@ -419,6 +419,11 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     color: #ff0800;
 }
 
+.btn-mform-repeater {
+    margin-bottom: 15px;
+    margin-right: 5px;
+}
+
 .mform-inline-img-radios label span {
     position: absolute;
     top: 5px;
