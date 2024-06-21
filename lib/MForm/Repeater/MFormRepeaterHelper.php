@@ -150,7 +150,7 @@ class MFormRepeaterHelper
     private static function addWidgetAttributes(MFormItem $mformItem, string $repeaterId, string $group, string $groups, string|null $parentId): void
     {
         $nameKey = self::getNameKey($mformItem);
-        $mformItem->addAttribute('x-model', $group . '.' . $nameKey)
+        $mformItem->addAttribute('x-model.lazy', $group . '[\'' . $nameKey . '\']')
             ->addAttribute(':id', "'".$nameKey."-'+".$repeaterId."Index".((!empty($parentId))?"+'-'+".$parentId.'Index':''))
             ->addAttribute('group', $group)
             ->addAttribute('groups', $groups)
