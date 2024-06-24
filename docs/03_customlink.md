@@ -125,11 +125,11 @@ $link = explode("://", $img['link']);
 
 MForm liefert zwei Methoden zum Auslesen und Auswerten der Custom-Links.
 
-`MForm\Utils\MFormOutputHelper::getCustomUrl(mixed $value, $lang)`
+`FriendsOfRedaxo\MForm\Utils\MFormOutputHelper::getCustomUrl(mixed $value, $lang)`
 
 und
 
-`MForm\Utils\MFormOutputHelper::prepareCustomLink(array $item, $externBlank = true)`
+`FriendsOfRedaxo\MForm\Utils\MFormOutputHelper::prepareCustomLink(array $item, $externBlank = true)`
 
 getCustomUrl gibt zum angegebenen Value die URL in der gewünschten Sprache (optional) zurück.
 
@@ -139,7 +139,7 @@ Die Methode nimmt ein Array für den Link  an und gibt ein  Array mit verarbeite
 
 ```php
 $link = '10';
-$linkdata = MForm\Utils\MFormOutputHelper::prepareCustomLink(['link' => $link], true);
+$linkdata = FriendsOfRedaxo\MForm\Utils\MFormOutputHelper::prepareCustomLink(['link' => $link], true);
 ```
 
 Ergebnis:
