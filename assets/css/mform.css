@@ -420,7 +420,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
 }
 
 .btn-mform-repeater {
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     margin-right: 5px;
 }
 
@@ -428,6 +428,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     position: absolute;
     top: 5px;
     left: 5px;
+    max-width: 140px;
     padding: 2px 4px;
     font-size: 11px;
 }

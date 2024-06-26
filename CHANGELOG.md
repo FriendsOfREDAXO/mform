@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.0.3
+- add showWrapper functionality
+
 ## Version 8
 
 - **Major Release and major changes included**

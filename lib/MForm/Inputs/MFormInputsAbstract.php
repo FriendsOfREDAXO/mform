@@ -27,7 +27,7 @@ abstract class MFormInputsAbstract
     {
         $config = $this->config;
         foreach (['id', 'show', 'fieldset', 'label', 'description', 'inputs', 'defaultValue', 'subConfig'] as $key) {
-            if ($inputsConfig instanceof MFormInputsConfig && property_exists($inputsConfig, $key)) {
+            if ($inputsConfig instanceof MFormInputsConfig && property_exists($inputsConfig, $key) && isset($config[$key])) {
                 if (is_array($config[$key])) {
                     $config[$key] = MFormModuleHelper::mergeInputConfig($config[$key], $inputsConfig->$key);
                 } else {

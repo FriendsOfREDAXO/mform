@@ -1220,7 +1220,7 @@ class MFormParser
         }
     }
 
-    public function parse(array $items, ?string $theme = null, bool $debug = false): string
+    public function parse(array $items, ?string $theme = null, bool $showWrapper = true, bool $debug = false): string
     {
         $this->debug = $debug;
         if (!is_null($theme) && $theme != $this->theme) {
@@ -1240,13 +1240,17 @@ class MFormParser
 
         $this->parseFormFields($items);
 
-        // wrap elements
-        $element = new MFormElement();
-        $element->setOutput(implode('', $this->elements))
-            ->setType('wrapper');
-
-        // return output
-        return $this->parseElement($element, 'wrapper');
+        if ($showWrapper) {
+            // wrap elements
+            $element = new MFormElement();
+            $element->setOutput(implode('', $this->elements))
+                ->setType('wrapper');
+            // return output
+            $output = $this->parseElement($element, 'wrapper');
+        } else {
+            $output = implode('', $this->elements);
+        }
+        return $output;
     }
 
     private function getDefaultTemplateType(MFormItem $item, MFormElement $templateElement): string

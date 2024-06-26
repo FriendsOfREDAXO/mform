@@ -21,6 +21,8 @@ class MForm extends MFormElements
     private string $theme;
     private bool $debug;
 
+    private bool $showWrapper = true;
+
     function __construct(?string $theme = null, bool $debug = false)
     {
         $this->setTheme((!is_null($theme)) ? $theme : '');
@@ -34,7 +36,7 @@ class MForm extends MFormElements
         try {
             rex_set_session('mform_count', rex_session('mform_count') + 1);
             $parser = new MFormParser();
-            return $parser->parse($this->getItems(), ((!empty($this->theme)) ? $this->theme : null), $this->debug);
+            return $parser->parse($this->getItems(), ((!empty($this->theme)) ? $this->theme : null), $this->showWrapper, $this->debug);
         } catch (rex_exception $e) {
             rex_logger::logException($e);
             return rex_view::error($e->getMessage());
@@ -56,6 +58,12 @@ class MForm extends MFormElements
     public function setDebug(bool $debug): self
     {
         $this->debug = $debug;
+        return $this;
+    }
+
+    public function setShowWrapper(bool $showWrapper): self
+    {
+        $this->showWrapper = $showWrapper;
         return $this;
     }
 }

@@ -380,6 +380,7 @@ abstract class MFormElements
                 $filename = substr($filename, 0, strlen($filename) - 4);
             }
             $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
+//            dump($file);die;
             if (file_exists($file)) {
                 include_once $file;
                 /** @var MFormInputsInterface $inputs */
@@ -387,7 +388,7 @@ abstract class MFormElements
                 return $this->addForm($inputs->generateInputs());
             }
         }
-        return null;
+        return $this;
     }
 
     public function setLabel(string $label): MForm
