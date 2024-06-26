@@ -16,6 +16,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormOptionHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormParameterHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormValueHandler;
 use FriendsOfRedaxo\MForm\Inputs\MFormInputsInterface;
+use rex_addon;
 use rex_be_controller;
 
 use rex_path;
@@ -380,7 +381,11 @@ abstract class MFormElements
                 $filename = substr($filename, 0, strlen($filename) - 4);
             }
             $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
-//            dump($file);die;
+            if (\rex_addon::exists('mfragment') &&
+                rex_addon::get('mfragment')->isAvailable() &&
+                file_exists(rex_path::addon('mfragment/inputs', $filename . '.php'))) {
+                $file = rex_path::addon('mfragment/inputs', $filename . '.php');
+            }
             if (file_exists($file)) {
                 include_once $file;
                 /** @var MFormInputsInterface $inputs */
