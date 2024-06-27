@@ -72,7 +72,6 @@ class MFormRepeaterHelper
     public static function prepareChildItems($mform, string $repeaterId, string $group, string $groups, string|null $parentId): array
     {
         $obj = [];
-
         $items = $mform->getItems();
         foreach ($items as $key => $mformItem) {
             if ($mformItem instanceof MFormItem) {
@@ -135,7 +134,7 @@ class MFormRepeaterHelper
                             break;
                     }
                 }
-            } else if ($mformItem instanceof MForm && (isset($items[$key-1]) && $items[$key-1] instanceof MFormItem && $items[$key-1]->getType() !== 'repeater')) {
+            } else if (($mformItem instanceof MForm && !isset($items[$key-1])) || ($mformItem instanceof MForm && (isset($items[$key-1]) && $items[$key-1] instanceof MFormItem && $items[$key-1]->getType() !== 'repeater'))) {
                 $obj = array_merge($obj, self::prepareChildItems($mformItem, $repeaterId, $group, $groups, $parentId));
             }
         }

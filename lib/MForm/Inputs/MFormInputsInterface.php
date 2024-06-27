@@ -8,11 +8,10 @@
 namespace FriendsOfRedaxo\MForm\Inputs;
 
 use FriendsOfRedaxo\MForm;
-use FriendsOfRedaxo\MForm\DTO\MFormInputsConfig;
 
 interface MFormInputsInterface
 {
-    public function __construct(MForm $mform, MFormInputsConfig $inputsConfig = null);
+    public function __construct(MForm $mform, array $inputsConfig = []);
 
-    public function generateInputs(): MForm;
+    public function generateInputsForm(): MForm;
 }

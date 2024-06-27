@@ -8,7 +8,6 @@
 namespace FriendsOfRedaxo\MForm;
 
 use FriendsOfRedaxo\MForm;
-use FriendsOfRedaxo\MForm\DTO\MFormInputsConfig;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormElementHandler;
@@ -367,13 +366,10 @@ abstract class MFormElements
         return $this->addElement('imglist', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addInputs(float|int|string $id, string $filename, MFormInputsConfig $inputsConfig = null): ?MForm
+    public function addInputs(float|int|string|null $id, string $filename, array $inputsConfig = []): ?MForm
     {
-        if (null === $inputsConfig) {
-            $inputsConfig = new MFormInputsConfig($id);
-        } else {
-            $inputsConfig->id = $id;
-        }
+        if ($id === null) $id = '';
+        $inputsConfig['id'] = $id;
         if (!empty($filename)) {
             if (substr($filename,(strlen($filename) - 1), 1) == '/') $filename = substr($filename, 0, strlen($filename) - 1);
             $basename = pathinfo($filename, PATHINFO_BASENAME);
@@ -390,7 +386,7 @@ abstract class MFormElements
                 include_once $file;
                 /** @var MFormInputsInterface $inputs */
                 $inputs = new $basename($this, $inputsConfig);
-                return $this->addForm($inputs->generateInputs());
+                return $this->addForm($inputs->generateInputsForm());
             }
         }
         return $this;

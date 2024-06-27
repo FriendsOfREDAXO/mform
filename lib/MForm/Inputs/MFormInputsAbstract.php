@@ -8,7 +8,6 @@
 namespace FriendsOfRedaxo\MForm\Inputs;
 
 use FriendsOfRedaxo\MForm;
-use FriendsOfRedaxo\MForm\DTO\MFormInputsConfig;
 use FriendsOfRedaxo\MForm\Utils\MFormModuleHelper;
 
 abstract class MFormInputsAbstract
@@ -16,25 +15,15 @@ abstract class MFormInputsAbstract
     protected array $config = [];
     protected MForm $mform;
 
-    public function __construct(MForm $mform, MFormInputsConfig $inputsConfig = null)
+    public function __construct(MForm $mform, array $inputsConfig = [])
     {
         $this->mform = $mform;
         if (!is_null($inputsConfig))
             self::mergeConfig($inputsConfig);
     }
 
-    protected function mergeConfig(MFormInputsConfig $inputsConfig): void
+    protected function mergeConfig(array $inputsConfig = []): void
     {
-        $config = $this->config;
-        foreach (['id', 'show', 'fieldset', 'label', 'description', 'inputs', 'defaultValue', 'subConfig'] as $key) {
-            if ($inputsConfig instanceof MFormInputsConfig && property_exists($inputsConfig, $key) && isset($config[$key])) {
-                if (is_array($config[$key])) {
-                    $config[$key] = MFormModuleHelper::mergeInputConfig($config[$key], $inputsConfig->$key);
-                } else {
-                    $config[$key] = $inputsConfig->$key;
-                }
-            }
-        }
-        $this->config = $config;
+        $this->config = MFormModuleHelper::mergeInputConfig($this->config, $inputsConfig);
     }
 }
