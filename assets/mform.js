@@ -50,9 +50,10 @@ function initMFormCollapses(mform) {
     });
     // select collapse
     mform.find('select[data-toggle=collapse]').each(function () {
-        initMFormSelectCollapse($(this), true);
-        $(this).unbind().bind("change", function () {
-            initMFormSelectCollapse($(this), false);
+        let that = $(this);
+        initMFormSelectCollapse(that, true);
+        that.off('change.mform_toggle_collapse').on('change.mform_toggle_collapse', function () {
+            initMFormSelectCollapse(that, false);
         });
     });
     // radio collapse
