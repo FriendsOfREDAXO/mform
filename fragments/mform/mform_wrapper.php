@@ -19,11 +19,14 @@ switch ($this->getVar('type')) {
         break;
 
     // INLINE
-    case 'start-group-inline':
-        echo '<div class="form-inline-row">';
-        break;
     case 'inline':
-        echo '<div class="form-inline ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('label');
+        $options = $this->vars;
+        $options['notClosedFormGroup'] = true;
+        $options['notCloseInputWrapper'] = true;
+        $this->subfragment('mform/mform_default.php', $options);
+        break;
+    case 'close-inline':
+        echo '</div></div>';
         break;
 
     // COLLAPSE
@@ -63,10 +66,8 @@ switch ($this->getVar('type')) {
     case 'close-tab':
     case 'close-collapse':
     case 'close-column':
-    case 'close-inline':
     case 'close-group-collapse':
     case 'close-group-column':
-    case 'close-group-inline':
         echo '</div>';
         break;
     case 'close-group-tab':

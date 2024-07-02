@@ -18,10 +18,12 @@ class MFormModuleHelper
 
     public static function mergeInputConfig(array $defaultConfig = [], array $config = []): array
     {
-        foreach ($defaultConfig as $key => $value) {
-            if (isset($config[$key])) {
-                if (is_array($value)) $config[$key] = self::mergeInputConfig($value, $config[$key]);
+        foreach ($config as $key => $value) {
+            if (isset($defaultConfig[$key])) {
+                if (is_array($value)) $config[$key] = self::mergeInputConfig($defaultConfig[$key], $value);
                 $defaultConfig[$key] = $config[$key];
+            } else {
+                $defaultConfig[$key] = $value;
             }
         }
         return $defaultConfig;

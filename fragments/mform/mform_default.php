@@ -17,13 +17,7 @@ switch ($this->getVar('type')) {
 $labelWrapperOpen = '<div class="' . $this->getVar('labelColClass') . '">';
 $labelWrapperClose = '</div>';
 $inputWrapperOpen = '<div class="' . $this->getVar('formItemColClass') . '">';
-$inputWrapperClose = '</div>';
+$inputWrapperClose = ($this->getVar('notCloseInputWrapper')) ? '' : '</div>';
+$formGroupClose = ($this->getVar('notClosedFormGroup')) ? '' : '</div>';
 
-if ($this->getVar('inline')) {
-    $labelWrapperOpen = '';
-    $labelWrapperClose = '';
-    $inputWrapperOpen = '';
-    $inputWrapperClose = '';
-}
-
-echo '<div class="form-group ' . $this->getVar('class') . '">' . $labelWrapperOpen . $this->getVar('label') . $this->getVar('infoTooltip') . $this->getVar('infoCollapseButton') . $labelWrapperClose . $inputWrapperOpen . $this->getVar('element') . $inputWrapperClose . '</div>' . $this->getVar('infoCollapse');
+echo '<div class="form-group ' . $this->getVar('class') . '">' . $labelWrapperOpen . $this->getVar('label') . $this->getVar('infoTooltip') . $this->getVar('infoCollapseButton') . $labelWrapperClose . $inputWrapperOpen . $this->getVar('element') . $inputWrapperClose . $formGroupClose . $this->getVar('infoCollapse');
