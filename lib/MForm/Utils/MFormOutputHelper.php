@@ -87,18 +87,24 @@ class MFormOutputHelper
         return $item;
     }
 
-    function getCustomUrl(mixed $value = null, ?string $lang = null): string
+
+    public static function getCustomUrl(mixed $value = null, ?string $lang = null): string
     {
         // Check if the value is null or empty
         if (is_null($value) || $value === '') {
             return '';
         }
 
+        // If the value is an array, use the 'id' key for processing
+        if (is_array($value) && isset($value['id'])) {
+            $value = $value['id'];
+        }
+
         // Determine the language to use (current language if none provided)
         $lang = $lang ?? rex_clang::getCurrentId();
 
         // Check if the value is a REDAXO article (starts with rex://)
-        if (str_starts_with($value, 'rex://')) {
+        if (is_string($value) && str_starts_with($value, 'rex://')) {
             $articleId = (int) substr($value, 6); // Remove 'rex://' and convert the rest to an integer
             return rex_getUrl($articleId, $lang);
         }
@@ -112,5 +118,4 @@ class MFormOutputHelper
         // If the value is neither a REDAXO URL nor numeric, return the value
         return $value;
     }
-
 }
