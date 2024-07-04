@@ -46,7 +46,7 @@ Der neue Repeater ist nur eingeschränkt mit MBlock kompatibel.
 
 Akuell funktionieren nicht bei einer Migration: 
 
-- CustomLinkField
+- CustomLinkField // Converter: https://friendsofredaxo.github.io/tricks/addons/mform/custom_link_converter
 - addMediaListField
 - addLinkListField
 
