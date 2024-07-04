@@ -42,11 +42,11 @@ The Form Repeater allows dynamic repetition of form elements while realizing nes
 
 ### Migration from MBlock to MForm 8 
 
-Der neue Repeater ist nur eingeschränkt mit MBlock kompatibel.
+The new repeater is only compatible with MBlock to a limited extent.
 
-Akuell funktionieren nicht bei einer Migration: 
+It does not currently work during a migration: 
 
-- CustomLinkField
+- CustomLinkField // Converter: https://friendsofredaxo.github.io/tricks/addons/mform/custom_link_converter
 - addMediaListField
 - addLinkListField
 
