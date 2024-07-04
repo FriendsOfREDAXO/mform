@@ -131,11 +131,27 @@ und
 
 `FriendsOfRedaxo\MForm\Utils\MFormOutputHelper::prepareCustomLink(array $item, $externBlank = true)`
 
-getCustomUrl gibt zum angegebenen Value die URL in der gewünschten Sprache (optional) zurück.
+#### getCustomUrl 
 
-prepareCustomLink liefert ein Array 
+gibt zum angegebenen Value die URL in der gewünschten Sprache (optional) zurück.
 
-Die Methode nimmt ein Array für den Link  an und gibt ein  Array mit verarbeiteten Links zurück.
+Beispiel bei Verwendung des Repeaters
+
+```
+<?php
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+$items = rex_var::toArray('REX_VALUE[1]'); 
+?>
+<?php foreach ($items as $item): ?>
+<a href="<?=MFormOutputHelper::getCustomUrl($item['link'])?>"><?=$item['linktext']?></a><br>
+<?php endforeach; ?>
+```
+
+#### prepareCustomLink
+
+…liefert ein Array 
+
+Die Methode nimmt ein Array für den Link an und gibt ein Array mit verarbeiteten Links zurück.
 
 ```php
 $link = '10';
