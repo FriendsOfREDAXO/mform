@@ -104,8 +104,8 @@ class MFormOutputHelper
         $lang = $lang ?? rex_clang::getCurrentId();
 
         // Check if the value is a REDAXO article (starts with rex://)
-        if (is_string($value) && str_starts_with($value, 'rex://')) {
-            $articleId = (int) substr($value, 6); // Remove 'rex://' and convert the rest to an integer
+        if (is_string($value) && str_starts_with($value, 'rexaxo://')) {
+            $articleId = (int) substr($value, 9); // Remove 'rex://' and convert the rest to an integer
             return rex_getUrl($articleId, $lang);
         }
 
