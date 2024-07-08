@@ -25,14 +25,12 @@ abstract class MFormInputsAbstract
 
     protected function getContentFrom(int|string|null $id = null)
     {
-        $contentMForm = MForm::factory()->setShowWrapper(false);
-        if (!empty($this->config['contentMForms'])) {
-            $this->addContentMForms($contentMForm, $this->config['contentMForms']);
+        if (!empty($this->config['contentMForms']) && $this->config['contentMForms'] instanceof MForm) {
+            return $this->config['contentMForms'];
         } else {
-            // add Card
-            $contentMForm->addInputs($id, 'bootstrap/card', $this->config);
+            return MForm::factory()->setShowWrapper(false)
+                ->addInputs($id, 'bootstrap/card', $this->config);
         }
-        return $contentMForm;
     }
 
     protected function getConfigForm(int|string|null $id = null, array $keys = ['margin', 'padding', 'border'])

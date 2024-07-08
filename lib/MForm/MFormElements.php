@@ -386,7 +386,7 @@ abstract class MFormElements
                 include_once $file;
                 /** @var MFormInputsInterface $inputs */
                 $inputs = new $basename($this, $inputsConfig);
-                return $this->addForm($inputs->generateInputsForm());
+                $this->items = array_merge($this->items, $inputs->generateInputsForm()->getItems());
             }
         }
         return $this;
