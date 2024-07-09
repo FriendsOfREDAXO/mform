@@ -54,6 +54,8 @@ It does not currently work during a migration:
 ***MBlock Module*** 
 
 ```php
+use FriendsOfRedaxo\MForm;
+
 // Base ID for managing form elements
 $id = 1;
 
