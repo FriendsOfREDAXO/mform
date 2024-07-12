@@ -523,3 +523,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     transform: scale(1.25);
     border: 2px solid #79af8a;
 }
+
+.mform .checkbox.mform-toggle-checkbox {
+    padding-top: 0;
+}

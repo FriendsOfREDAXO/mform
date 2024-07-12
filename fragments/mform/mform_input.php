@@ -18,7 +18,11 @@ switch ($this->getVar('type')) {
         $wrapperClose = $this->getVar('label') . '</label></div>';
         break;
     case 'checkbox':
-        $wrapperOpen = '<div class="checkbox"><label class="description">';
+        if (str_contains($this->getVar('attributes'), 'data-mform-toggle')) {
+            $wrapperOpen = '<div class="checkbox mform-toggle-checkbox"><label class="description">';
+        } else {
+            $wrapperOpen = '<div class="checkbox"><label class="description">';
+        }
         $wrapperClose = ' ' . $this->getVar('label') . '</label></div>';
         break;
 }
