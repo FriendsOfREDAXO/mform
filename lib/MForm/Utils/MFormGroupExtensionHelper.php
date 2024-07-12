@@ -35,14 +35,6 @@ class MFormGroupExtensionHelper
     /**
      * @param MFormItem[] $items
      */
-    public static function addInlineGroupExtensionItems(array $items): array
-    {
-        return self::addGroupExtensionItems($items, 'inline');
-    }
-
-    /**
-     * @param MFormItem[] $items
-     */
     public static function addCollapseGroupExtensionItems(array $items): array
     {
         return self::addGroupExtensionItems($items, 'collapse');

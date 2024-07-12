@@ -1227,7 +1227,6 @@ class MFormParser
             $this->theme = $theme;
         }
 
-        $items = MFormGroupExtensionHelper::addInlineGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addColumnGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addTabGroupExtensionItems($items);
         $items = MFormGroupExtensionHelper::addCollapseGroupExtensionItems($items);
