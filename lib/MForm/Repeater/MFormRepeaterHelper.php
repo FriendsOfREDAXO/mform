@@ -164,6 +164,16 @@ class MFormRepeaterHelper
             ->addAttribute('parent_id', $parentId)
             ->addAttribute('item_name_key', $nameKey);
 
+        if (count($mformItem->getToggleOptions()) > 0) {
+            $toggleOptions = $mformItem->getToggleOptions();
+            foreach ($toggleOptions as $key => $toggleOption) {
+                if (!is_array($toggleOption)) {
+                    $toggleOptions[$key] = [$toggleOption, "'" . $toggleOption . "-'+" . $repeaterId . "Index" . ((!empty($parentId)) ? "+'-'+" . $parentId . 'Index' : '')];
+                }
+            }
+            $mformItem->setToggleOptions($toggleOptions);
+        }
+
         if (isset($mformItem->getAttributes()['data-toggle-item'])) {
             $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId)) ? "+'-'+" . $parentId . 'Index' : ''));
         }

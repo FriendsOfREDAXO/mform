@@ -519,7 +519,7 @@ class MFormParser
     /**
      * @description helper method to create option elements
      */
-    private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string $toggle = ''): string
+    private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string|array $toggle = ''): string
     {
         // create element
         $element = new MFormElement();
@@ -528,7 +528,17 @@ class MFormParser
         ->setType($templateType);
 
         if (!empty($toggle)) {
-            $element->setAttributes($this->parseAttributes(['data-toggle-item' => $toggle]));
+            $attributes = [];
+            if (is_array($toggle) && count($toggle) == 2) {
+                $attributes[':data-toggle-item'] = $toggle[1];
+                $toggle = null;
+            }
+            if (is_string($toggle)) {
+                $attributes['data-toggle-item'] = $toggle;
+            }
+            if (count($attributes) > 0) {
+                $element->setAttributes($this->parseAttributes($attributes));
+            }
         }
 
         $itemValue = $item->getValue();
