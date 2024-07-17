@@ -56,15 +56,16 @@ window.repeater = () => {
         // die methode wird durch alpine x-init aufgerufen
         rexInitFieldElement(idKey) {
             let that = this;
-            that.rexPreInitElements($('#' + idKey + ' > .mform'));
-            that.rexInitElements($('#' + idKey + ' > .mform'));
+            // console.log('idKey: ' + idKey);
+            that.rexPreInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
+            that.rexInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
         },
         // feuert das rex:ready event für den inhalt des repeater items idKey auf group ebene
         // die methode wird durch alpine x-init aufgerufen
         rexInitGroupElement(idKey) {
             let that = this;
-            that.rexPreInitElements($('#' + idKey + ' > .mform > *'));
-            that.rexInitElements($('#' + idKey + ' > .mform > *'));
+            that.rexPreInitElements($('#' + idKey).find('.form-group'));
+            that.rexInitElements($('#' + idKey).find('.form-group'));
         },
         // wird vor rex:ready für ein repeater item ausgeführt
         rexPreInitElements(elements) {
@@ -94,6 +95,7 @@ window.repeater = () => {
                     }
                     // PREPARE CKE5
                     // der editor soll nicht durch das rex:ready event initialisiert werden
+                    // console.log($(element));
                     if ($(element).find('.cke5-editor') !== undefined) {
                         $(element).find('.cke5-editor').each(function () {
                             if (typeof cke5_destroy !== 'function') {
@@ -171,6 +173,17 @@ window.repeater = () => {
                 });
             }
         },
+        rexDestroyCke5(element) {
+            let that = this;
+            if ($(element).find('.cke5-repeater').length > 0) {
+                // initialisiere jede cke5 textarea einzeiln
+                $(element).find('.cke5-repeater').each(function () {
+                    let thatElement = $(this);
+                    cke5_destroy(thatElement);
+                });
+            }
+        },
+        // fügt global für rex:selectCustomLink events ein listener hinzu
         // setzt bei trigger für das input feld den group element eintrag
         selectCustomLink(data) {
             let element = this.rexGetInputElement(data.input);
@@ -261,11 +274,13 @@ window.repeater = () => {
             this.updateValues();
         },
         removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?') {
+            // console.log([index, fieldIndex, fieldsKey]);
             if (confirmDelete) {
                 if (!confirm(confirmDeleteMsg)) {
                     return false;
                 }
             }
+            // this.rexDestroyCke5($('#' + idKey))
             this.groups[index][fieldsKey].splice(fieldIndex, 1);
             this.updateValues();
         },

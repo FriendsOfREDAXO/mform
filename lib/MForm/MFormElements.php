@@ -121,13 +121,14 @@ abstract class MFormElements
         return $this->addAlert('success', $value);
     }
 
-    public function addForm(callable|MForm|string $form = null, bool $parse = false, bool $debug = false): MForm
+    public function addForm(callable|MForm|string $form = null, bool $parse = false, bool $debug = false, bool $showWrapper = false): MForm
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
         }
         if ($form instanceof MForm) {
             $form->setDebug($debug);
+            $form->setShowWrapper($showWrapper);
             if (!$parse) {
                 $this->items[] = $form;
                 return $this;
@@ -177,7 +178,11 @@ abstract class MFormElements
         if (!is_array($attributes)) {
             $attributes = [];
         }
-        $attributes = array_merge($attributes, ['data-group-accordion' => (int) $accordion, 'data-group-hide-toggle-links' => $hideToggleLinks, 'data-group-open-collapse' => $openCollapse]);
+        $attributes = array_merge($attributes, [
+            'data-group-accordion' => (int)$accordion,
+            'data-group-hide-toggle-links' => $hideToggleLinks,
+            'data-group-open-collapse' => $openCollapse
+        ]);
 
         return $this->addElement('collapse', null, null, $attributes)
             ->setLabel($label)
