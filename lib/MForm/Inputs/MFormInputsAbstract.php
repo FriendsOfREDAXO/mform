@@ -25,17 +25,19 @@ abstract class MFormInputsAbstract
 
     protected function getContentFrom(int|string|null $id = null)
     {
-        if (!empty($this->config['contentMForms']) && $this->config['contentMForms'] instanceof MForm) {
-            return $this->config['contentMForms'];
+        if (!empty($this->config['contentMForm']) && $this->config['contentMForm'] instanceof MForm) {
+            return $this->config['contentMForm']->setShowWrapper(false);
         } else {
             return MForm::factory()->setShowWrapper(false)
                 ->addInputs($id, 'bootstrap/card', $this->config);
         }
     }
 
-    protected function getConfigForm(int|string|null $id = null, array $keys = ['margin', 'padding', 'border'])
+    protected function getConfigForm(int|string|null $id = null)
     {
         $configForm = MForm::factory()->setShowWrapper(false);
+        if (!isset($this->config['configKeys']) || !is_array($this->config['configKeys'])) return $configForm;
+        $keys = $this->config['configKeys'];
         if (in_array('bgImg', $keys) && isset($this->config['bgImg']) && $this->config['bgImg'] === true) {
             $configForm->addMediaField($id.'bgImg', ['preview' => 1], null, ['label' => $this->config['bgImgLabel']]);
             $keys = array_diff($keys, ['bgImg']);
@@ -55,21 +57,5 @@ abstract class MFormInputsAbstract
     protected function mergeConfig(array $inputsConfig = []): void
     {
         $this->config = MFormModuleHelper::mergeInputConfig($this->config, $inputsConfig);
-    }
-
-    protected function addContentMForms(MForm $mform, MForm|array $mforms): MForm
-    {
-        if ($mforms instanceof MForm) {
-            $mform->addForm($mforms);
-        } else {
-            if (count($mforms) > 0) {
-                foreach ($mforms as $form) {
-                    if ($mforms instanceof MForm) {
-                        $mform->addForm($form);
-                    }
-                }
-            }
-        }
-        return $mform;
     }
 }
