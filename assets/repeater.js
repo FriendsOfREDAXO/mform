@@ -295,15 +295,16 @@ window.repeater = () => {
             this.rexPrepareCke5Move($('#' + parentIdKey));
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
-            let linkMap = openLinkMap(id).replace('redaxo://', '');
+            let linkMap = openLinkMap(id),
+                that = this;
             $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {
                 if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
-                    this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': linktext, 'id': linkurl};
+                    this.groups[index][fieldsKey][fieldIndex][nameKey] = {'name': linktext, 'id': linkurl.replace('redaxo://', '')};
                 } else {
-                    this.groups[index][nameKey] = {'name': linktext, 'id': linkurl};
+                    this.groups[index][nameKey] = {'name': linktext, 'id': linkurl.replace('redaxo://', '')};
                 }
                 setTimeout(function() {
-                    this.updateValues();
+                    that.updateValues();
                 }, 5);
             });
             return false;
