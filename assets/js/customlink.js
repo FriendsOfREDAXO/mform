@@ -41,45 +41,45 @@ function customlink_init_widget(element) {
 
         // ylink
         element
-          .find('.input-group-btn a.ylink')
-          .unbind()
-          .bind('click', function () {
+            .find('.input-group-btn a.ylink')
+            .unbind()
+            .bind('click', function () {
+                let id = element.data('id'),
+                    table = $(this).data('table'),
+                    column = $(this).data('column'),
+                    pool = newPoolWindow(
+                        'index.php?page=yform/manager/data_edit&table_name=' +
+                        table +
+                        '&rex_yform_manager_opener[id]=' +
+                        id +
+                        '&rex_yform_manager_opener[field]=' +
+                        column +
+                        '&rex_yform_manager_opener[multiple]=0'
+                    )
+
+                clearInterval(timer)
+                closeDropDown(id)
+
+                window.addEventListener('rex:YForm_selectData_' + id, (event) => {
+                    event.preventDefault()
+                    const id = event.detail.id
+                    const label = event.detail.value
+                    YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+                })
+
+                $(pool).on('rex:YForm_selectData', function (event, id, label) {
+                    event.preventDefault()
+                    YForm_selectData(id, label, pool, hidden_input, showed_input, table)
+                })
+
+                return false
+            })
+
+        // media element
+        element.find('a.media_link').unbind().bind('click', function () {
             let id = element.data('id'),
-              table = $(this).data('table'),
-              column = $(this).data('column'),
-              pool = newPoolWindow(
-                'index.php?page=yform/manager/data_edit&table_name=' +
-                  table +
-                  '&rex_yform_manager_opener[id]=' +
-                  id +
-                  '&rex_yform_manager_opener[field]=' +
-                  column +
-                  '&rex_yform_manager_opener[multiple]=0'
-              )
-
-            clearInterval(timer)
-            closeDropDown(id)
-
-            window.addEventListener('rex:YForm_selectData_' + id, (event) => {
-              event.preventDefault()
-              const id = event.detail.id
-              const label = event.detail.value
-              YForm_selectData(id, label, pool, hidden_input, showed_input, table)
-            })
-
-            $(pool).on('rex:YForm_selectData', function (event, id, label) {
-              event.preventDefault()
-              YForm_selectData(id, label, pool, hidden_input, showed_input, table)
-            })
-
-            return false
-          })
-
-    // media element
-    element.find('a.media_link').unbind().bind('click', function () {
-        let id = element.data('id'),
-            value = hidden_input.val(),
-            args = '';
+                value = hidden_input.val(),
+                args = '';
 
             clearInterval(timer);
             closeDropDown(id);
@@ -244,24 +244,24 @@ function dispatchCustomLinkEvent(element, linkurl, linktext) {
 }
 
 const YForm_selectData = (
-  id,
-  label,
-  pool,
-  hidden_input,
-  showed_input,
-  table
+    id,
+    label,
+    pool,
+    hidden_input,
+    showed_input,
+    table
 ) => {
-  pool.close()
+    pool.close()
 
-  value = hidden_input.val()
-  text = showed_input.val()
+    value = hidden_input.val()
+    text = showed_input.val()
 
-  let linkUrl = table.split('_').join('-') + '://' + id
+    let linkUrl = table.split('_').join('-') + '://' + id
 
-  hidden_input.val(linkUrl)
-  showed_input.val(label)
+    hidden_input.val(linkUrl)
+    showed_input.val(label)
 
-  dispatchCustomLinkEvent(hidden_input, linkUrl, label);
+    dispatchCustomLinkEvent(hidden_input, linkUrl, label);
 }
 
 function randId() {
@@ -269,7 +269,7 @@ function randId() {
 }
 
 function randInt() {
-    return parseInt((Math.random() * 1000000000000) + (Math.random()*1000000000000/Math.random()));
+    return parseInt((Math.random() * 1000000000000) + (Math.random() * 1000000000000 / Math.random()));
 }
 
 function closeDropDown(id) {

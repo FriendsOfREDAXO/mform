@@ -1,5 +1,10 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.1.0
+- Repeater issues with addLinkField, addCustomLinkField, addMediaField, addInputs, addToggleCheckboxField, addCollapseElement, setToggleOptions solved
+- Repeater CustomLink yForm link option issue solved
+- Fix radio collapse not work in repeater issue 
+
 ## Version 8.0.3
 - add showWrapper functionality
 

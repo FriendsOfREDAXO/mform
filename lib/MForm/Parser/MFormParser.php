@@ -639,10 +639,17 @@ class MFormParser
             $element->setId($item->getId() . $count);
         }
         // add data toggle
-        if (count($item->getToggleOptions()) > 0) {
-            $attributes['data-toggle-item'] = (array_key_exists($key, $item->getToggleOptions())) ? $item->getToggleOptions()[$key] : '';
+        if (count($item->getToggleOptions()) > 0 && array_key_exists($key, $item->getToggleOptions())) {
+            $toggle = $item->getToggleOptions();
+            if (is_array($item->getToggleOptions()[$key]) && count($item->getToggleOptions()[$key]) == 2) {
+                $attributes[':data-toggle-item'] = $item->getToggleOptions()[$key][1];
+                $toggle = null;
+            }
+            if (is_string($item->getToggleOptions()[$key])) {
+                $attributes['data-toggle-item'] = $item->getToggleOptions()[$key];
+            }
         }
-        if (isset($attributes['data-toggle-item'])) {
+        if (isset($attributes['data-toggle-item']) || isset($attributes[':data-toggle-item'])) {
             if ('checkbox' == $item->getType()) {
                 $attributes = array_merge(['data-checkbox-toggle' => 'collapse'], $attributes);
             }
