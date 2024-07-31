@@ -159,13 +159,13 @@ class MFormParser
                             <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
                         </template>
                         <template x-if="'.$repeaterId.'Index !== 0">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
+                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.'_'.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
                         </template>
                         <template x-if="'.$repeaterId.'Index === 0">
                             <a class="btn disabled"><i class="rex-icon fa-chevron-up"></i></a>
                         </template>
                         <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
+                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.'_'.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
                         </template>
                         <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
                             <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
@@ -175,7 +175,7 @@ class MFormParser
             ';
 #                        <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\''.')" class="button remove"><i class="rex-icon fa-times"></i></a>
 
-            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group second-level-repeater" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
+            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group second-level-repeater" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index, \''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
         }
         // open repeater group
         // header buttons

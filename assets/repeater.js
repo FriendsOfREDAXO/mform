@@ -54,7 +54,7 @@ window.repeater = () => {
         },
         // feuert das rex:ready event für den inhalt des repeater items idKey auf fields ebene
         // die methode wird durch alpine x-init aufgerufen
-        rexInitFieldElement(idKey) {
+        rexInitFieldElement(idKey, parentIdKey) {
             let that = this;
             // console.log('idKey: ' + idKey);
             that.rexPreInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
@@ -292,7 +292,8 @@ window.repeater = () => {
         moveField(index, from, to, fieldsKey, idKey, parentIdKey) {
             this.groups[index][fieldsKey].splice(to, 0, this.groups[index][fieldsKey].splice(from, 1)[0]);
             this.updateValues();
-            this.rexPrepareCke5Move($('#' + parentIdKey));
+            this.rexPrepareCke5Move($('#' + idKey + '_' + from));
+            this.rexPrepareCke5Move($('#' + idKey + '_' + to));
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
             let linkMap = openLinkMap(id),
