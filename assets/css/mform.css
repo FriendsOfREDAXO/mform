@@ -430,6 +430,12 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     margin-right: 5px;
 }
 
+.mform-icon-radios input[type=radio],
+.mform-inline-icon-radios input[type=radio],
+.mform-inline-img-radios input[type=radio] {
+    display: none;
+}
+
 .mform-inline-img-radios label span {
     position: absolute;
     top: 5px;
@@ -486,6 +492,53 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     padding-right: 5px;
 }
 
+.mform-icon-radios .radio label,
+.mform-inline-icon-radios .radio label {
+    border: 2px solid rgba(94, 94, 94, 0.3);
+    position: relative;
+    margin-right: 5px;
+    padding: 0 5px;
+    opacity: 0.67;
+}
+
+.mform-icon-radios .radio label span,
+.mform-inline-icon-radios .radio label span {
+    position: relative;
+    top: -3px;
+}
+
+.mform-icon-radios .radio label i,
+.mform-inline-icon-radios .radio label i {
+    transition: 100ms all;
+    width: 25px;
+    height: 18px;
+    display: inline-block;
+    font-size: 20px;
+    margin: 5px 0;
+}
+
+.mform-icon-radios label.active,
+.mform-inline-icon-radios label.active {
+    border: 4px solid #79af8a;
+    box-shadow: 0 0 5px 5px rgba(0, 0, 0, .03);
+    opacity: 0.97;
+}
+
+.mform-icon-radios .form-group .radio,
+.mform-inline-icon-radios .form-group .radio {
+    position: relative;
+    padding-left: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+    font-weight: normal;
+    cursor: pointer;
+    display: block;
+}
+
+.mform-inline-icon-radios .form-group .radio {
+    display: inline-block;
+}
+
 .mform-inline-color-radios .form-group .radio {
     position: relative;
     padding-left: 0;
@@ -524,6 +577,6 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     border: 2px solid #79af8a;
 }
 
-.mform .checkbox.mform-toggle-checkbox {
-    padding-top: 0;
+.mform .checkbox .mform-toggle {
+    margin-top: -7px;
 }

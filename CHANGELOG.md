@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.0.5
+- Add new icon radio input element field `addIconRadioField`
+- fix some repeater issues with cke5 and collapses
+
 ## Version 8.0.4
 - Repeater issues with addLinkField, addCustomLinkField, addMediaField, addInputs, addToggleCheckboxField, addCollapseElement, setToggleOptions solved
 - Repeater CustomLink yForm link option issue solved

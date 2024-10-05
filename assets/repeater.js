@@ -56,7 +56,6 @@ window.repeater = () => {
         // die methode wird durch alpine x-init aufgerufen
         rexInitFieldElement(idKey, parentIdKey) {
             let that = this;
-            // console.log('idKey: ' + idKey);
             that.rexPreInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
             that.rexInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
         },
@@ -117,12 +116,9 @@ window.repeater = () => {
             if (elements.length > 0) {
                 elements.each(function (index, element) {
                     // triggert das klassische rex:ready event für den repeater item
-                    $(element).trigger('rex:ready', [$(element)]);
-                    // CUSTOM LINK PREPARE
-                    // if ($(element).find('.custom-link').length > 0) {
-                    //     // fügt global für alle custom link elements ein listener hinzu der auf
-                    //     that.rexInitCustomLink();
-                    // }
+                    setTimeout(function(){
+                        $(element).trigger('rex:ready', [$(element)]);
+                    });
                     // SELECT PICKER PREPARE
                     if ($(element).find('.repeater-selectpicker').length > 0) {
                         setTimeout(function () {
@@ -162,11 +158,17 @@ window.repeater = () => {
         },
         rexPrepareCke5Move(element) {
             let that = this;
+            console.log('rexPrepareCke5Move');
+            console.log(element);
+            console.log(element.find('.cke5-repeater').length);
+
             if ($(element).find('.cke5-repeater').length > 0) {
+
                 // initialisiere jede cke5 textarea einzeiln
                 $(element).find('.cke5-repeater.cke5-repeater-init').each(function () {
                     let thatElement = $(this);
                     cke5_destroy(thatElement);
+                    console.log('destroy cke5');
                     setTimeout(function(){
                         that.rexInitCke5(thatElement);
                     }, 2)
@@ -264,23 +266,28 @@ window.repeater = () => {
             this.groups[index][fieldsKey].push(JSON.parse(JSON.stringify(obj)));
             this.updateValues();
         },
-        removeGroup(index, confirmDelete = false, confirmDeleteMsg = 'delete?') {
+        removeGroup(index, confirmDelete = false, confirmDeleteMsg = 'delete?', idKey) {
             if (confirmDelete) {
                 if (!confirm(confirmDeleteMsg)) {
                     return false;
                 }
             }
+            // damit es keine probleme mit den instanzen gibt müssen diese sauber entfernt werden
+            this.rexDestroyCke5($('#' + idKey))
+            $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
             this.groups.splice(index, 1);
             this.updateValues();
         },
-        removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?') {
+        removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?', idKey) {
             // console.log([index, fieldIndex, fieldsKey]);
             if (confirmDelete) {
                 if (!confirm(confirmDeleteMsg)) {
                     return false;
                 }
             }
-            // this.rexDestroyCke5($('#' + idKey))
+            // damit es keine probleme mit den instanzen gibt müssen diese sauber entfernt werden
+            this.rexDestroyCke5($('#' + idKey))
+            $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
             this.groups[index][fieldsKey].splice(fieldIndex, 1);
             this.updateValues();
         },
@@ -288,10 +295,14 @@ window.repeater = () => {
             this.groups.splice(to, 0, this.groups.splice(from, 1)[0]);
             this.updateValues();
             this.rexPrepareCke5Move($('#' + idKey));
+            $('#' + idKey).trigger('rex:change', [$('#' + idKey)]);
         },
         moveField(index, from, to, fieldsKey, idKey, parentIdKey) {
             this.groups[index][fieldsKey].splice(to, 0, this.groups[index][fieldsKey].splice(from, 1)[0]);
             this.updateValues();
+            $('#' + idKey + '_' + from).trigger('rex:change', [$('#' + idKey + '_' + from)]);
+            $('#' + idKey + '_' + to).trigger('rex:change', [$('#' + idKey + '_' + to)]);
+
             this.rexPrepareCke5Move($('#' + idKey + '_' + from));
             this.rexPrepareCke5Move($('#' + idKey + '_' + to));
         },

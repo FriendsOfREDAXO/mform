@@ -115,7 +115,7 @@ class MFormParser
                             <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
                         <template x-if="'.$min.' < '.$groups.'.length">
-                            <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
+                            <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.', \''.$repeaterId.'\')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
                         </template>
                         <template x-if="'.$min.' > '.$groups.'.length">
                             <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
@@ -153,7 +153,7 @@ class MFormParser
                             <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
                         <template x-if="'.$min.' < '.$groups.'.length">
-                            <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
+                            <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.', \''.$group.'_'.$parentId."_".$repeaterId.'_\' + '.$repeaterId.'Index)" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
                         </template>
                         <template x-if="'.$min.' > '.$groups.'.length">
                             <a class="btn disabled"><i class="rex-icon fa-times"></i></a>

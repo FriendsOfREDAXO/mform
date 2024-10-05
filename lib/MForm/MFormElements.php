@@ -138,41 +138,41 @@ abstract class MFormElements
         return $this->addHtml($form);
     }
 
-    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false): MForm
+    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
-            ->addForm($form, $parse)
+            ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-fieldset', null, null, $attributes);
     }
 
-    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false): MForm
+    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
             $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
         }
         return $this->addElement('column', null, null, $attributes)
-            ->addForm($form, $parse)
+            ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-column', null, null, $attributes);
     }
 
-    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false): MForm
+    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         return $this->addElement('inline', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form, $parse)
+            ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-inline', null, null, $attributes);
     }
 
-    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false): MForm
+    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form, $parse)
+            ->addForm($form, $parse, $showWrapper)
             ->addElement('close-tab', null, null, $attributes);
     }
 
-    public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false): MForm
+    public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false, bool $showWrapper = false): MForm
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) {
@@ -186,7 +186,7 @@ abstract class MFormElements
 
         return $this->addElement('collapse', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form, $parse)
+            ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-collapse', null, null, $attributes);
     }
 
@@ -195,12 +195,12 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
-    public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false): MForm
+    public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false, bool $showWrapper = false): MForm
     {
         $attributes['open'] = $open;
         $attributes['confirm_delete'] = $confirmDelete;
         return $this->addElement('repeater', $id, null, $attributes)
-            ->addForm($form, false, $debug)
+            ->addForm($form, false, $debug, $showWrapper)
             ->addElement('close-repeater', $id, null, $attributes);
     }
 
@@ -295,6 +295,26 @@ abstract class MFormElements
             }
         }
         $this->addHtml('<div class="mform-inline-img-radios mform-inline-radios">');
+        $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
+        $this->addHtml('</div>');
+        return $this;
+    }
+
+    /**
+     * @example
+     * $options = [];
+     * $options[$i] = ['icon' => "fa fa-icon-0", 'label' => "Label Icon-0"];
+     * $mform->addRadioImgField(4, $options, ['label' => 'Label Text']);
+     */
+    public function addIconRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        $newOptions = [];
+        foreach ($options as $key => $option) {
+            if (is_array($option) && isset($option['label']) && isset($option['icon'])) {
+                $newOptions[$key] = "<i class=\"{$option['icon']}\"></i><span> {$option['label']}</span>";
+            }
+        }
+        $this->addHtml('<div class="mform-inline-icon-radios mform-inline-radios">');
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
         $this->addHtml('</div>');
         return $this;
