@@ -307,7 +307,8 @@ class MFormParser
         $element->setOutput((is_string($item->getValue())?$item->getValue():''))
             ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setClass($item->getClass()) // set output to replace in template
-            ->setType($item->getType());
+            ->setType($item->getType())
+            ->setFull($item->isFull());
 
         // add to output element array
         $this->elements[] = $this->parseElement($element, 'base');
