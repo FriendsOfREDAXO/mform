@@ -909,9 +909,9 @@ class MFormParser
                         if (str_contains($onclick, 'addREXMedialist(')) $method = 'addMedialist';
                         if (str_contains($onclick, 'deleteREXMedialist(')) $method = 'deleteMedialist';
                         if (str_contains($onclick, 'viewREXMedialist(')) $method = 'viewMedialist';
-                        $linkAttributes = "$method('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                        $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
                         if (!is_null($attributes['parent_id'])) {
-                            $linkAttributes = "$method('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                            $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
                         }
                     }
                     $link->setAttribute('click.prevent', $linkAttributes);
