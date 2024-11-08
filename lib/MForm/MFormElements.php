@@ -15,6 +15,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormOptionHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormParameterHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormValueHandler;
 use FriendsOfRedaxo\MForm\Inputs\MFormInputsInterface;
+use FriendsOfRedaxo\MForm\Utils\MFormLayoutPreviewHelper;
 use rex_addon;
 use rex_be_controller;
 
@@ -290,7 +291,11 @@ abstract class MFormElements
     {
         $newOptions = [];
         foreach ($options as $key => $option) {
-            if (is_array($option) && isset($option['label']) && isset($option['img'])) {
+            if (isset($option['config'])) {
+                $layoutHelper = new MFormLayoutPreviewHelper();
+                $svg = $layoutHelper->generateLayoutPreview($option['config']);
+                $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['label']) && isset($option['img'])) {
                 $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
             }
         }
@@ -306,7 +311,7 @@ abstract class MFormElements
      * $options[$i] = ['icon' => "fa fa-icon-0", 'label' => "Label Icon-0"];
      * $mform->addRadioImgField(4, $options, ['label' => 'Label Text']);
      */
-    public function addIconRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioIconField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         $newOptions = [];
         foreach ($options as $key => $option) {
@@ -402,7 +407,7 @@ abstract class MFormElements
                 $filename = substr($filename, 0, strlen($filename) - 4);
             }
             $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
-            if (\rex_addon::exists('mfragment') &&
+            if (rex_addon::exists('mfragment') &&
                 rex_addon::get('mfragment')->isAvailable() &&
                 file_exists(rex_path::addon('mfragment/inputs', $filename . '.php'))) {
                 $file = rex_path::addon('mfragment/inputs', $filename . '.php');
@@ -479,7 +484,19 @@ abstract class MFormElements
 
     public function setToggleOptions(array $options): MForm
     {
-        MFormOptionHandler::toggleOptions($this->item, $options);
+        $item = $this->item;
+        if ($this->item->getType() == 'html') {
+            $prevItem = $this->items[(count($this->items) - 1)];
+            switch ($prevItem->getType())
+            {
+                case 'radio':
+                case 'checkbox':
+                case 'select':
+                    $item = $prevItem;
+                    break;
+            }
+        }
+        MFormOptionHandler::toggleOptions($item, $options);
         return $this;
     }
 
