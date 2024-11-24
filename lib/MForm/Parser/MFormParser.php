@@ -691,6 +691,10 @@ class MFormParser
         $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'))
             ->setElement($radioElements)
             ->setType($this->getDefaultTemplateType($item, $templateElement));
+        if (!empty($item->getAttributes()['form-group-class'])) {
+            $templateElement->setClass($item->getAttributes()['form-group-class']);
+            unset($item->getAttributes()['form-group-class']);
+        }
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');

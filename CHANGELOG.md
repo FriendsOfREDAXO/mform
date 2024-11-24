@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.0.6
+- add form-group-class attribute  
+
 ## Version 8.0.5
 - Add new icon radio input element field `addIconRadioField`
 - fix some repeater issues with cke5 and collapses
