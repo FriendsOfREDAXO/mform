@@ -24,6 +24,7 @@ use rex_extension_point;
 use rex_fragment;
 use rex_i18n;
 use rex_logger;
+use rex_var;
 use rex_var_custom_link;
 use rex_var_imglist;
 use rex_var_link;
@@ -85,7 +86,7 @@ class MFormParser
         // open section and repeater div
         if (is_null($parentId)) {
             // at this point we have to compare item value and obj
-            $itemValue = \rex_var::toArray((string) $item->getValue());
+            $itemValue = rex_var::toArray((string) $item->getValue());
             $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
 
             if (is_array($itemValue)) {

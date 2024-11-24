@@ -167,7 +167,7 @@ class MFormRepeaterHelper
     {
         if (empty($nameKey)) $nameKey = self::getNameKey($mformItem);
         $mformItem->addAttribute('x-model', $group . '[\'' . $nameKey . '\']')
-            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((!empty($parentId))?"+'-".$parentId."-'+".$parentId.'Index':''))
+            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((!empty($parentId) && $parentId != $repeaterId)?"+'-".$parentId."-'+".$parentId.'Index':''))
             ->addAttribute('group', $group)
             ->addAttribute('groups', $groups)
             ->addAttribute('repeaterId', $repeaterId)
@@ -178,17 +178,17 @@ class MFormRepeaterHelper
             $toggleOptions = $mformItem->getToggleOptions();
             foreach ($toggleOptions as $key => $toggleOption) {
                 if (!is_array($toggleOption)) {
-                    $toggleOptions[$key] = [$toggleOption, "'" . $toggleOption . "-'+" . $repeaterId . "Index" . ((!empty($parentId)) ? "+'-'+" . $parentId . 'Index' : '')];
+                    $toggleOptions[$key] = [$toggleOption, "'" . $toggleOption . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : '')];
                 }
             }
             $mformItem->setToggleOptions($toggleOptions);
         }
 
         if (isset($mformItem->getAttributes()['data-toggle-item'])) {
-            $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId)) ? "+'-'+" . $parentId . 'Index' : ''));
+            $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
         }
         if (isset($mformItem->getAttributes()['data-group-collapse-id'])) {
-            $mformItem->addAttribute(':data-group-collapse-id', "'" . $mformItem->getAttributes()['data-group-collapse-id'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId)) ? "+'-'+" . $parentId . 'Index' : ''));
+            $mformItem->addAttribute(':data-group-collapse-id', "'" . $mformItem->getAttributes()['data-group-collapse-id'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
         }
     }
 }

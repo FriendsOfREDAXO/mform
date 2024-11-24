@@ -2,6 +2,8 @@
 
 ## Version 8.0.6
 - add form-group-class attribute  
+- add html to svg converter
+- fix toggle issues with repeater
 
 ## Version 8.0.5
 - Add new icon radio input element field `addIconRadioField`
