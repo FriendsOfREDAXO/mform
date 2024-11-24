@@ -1,14 +1,18 @@
 <?php
+
 namespace FriendsOfRedaxo\MForm\Utils;
 
-class MFormLayoutPreviewHelper {
+class MFormLayoutPreviewHelper
+{
     private $builder;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->builder = new LayoutPreviewBuilder();
     }
 
-    public function generateLayoutPreview($config) {
+    public function generateLayoutPreview($config)
+    {
         $this->builder
             ->setAspectRatio($config['aspectRatio'] ?? '16:9')
             ->setBackgroundColor($config['backgroundColor'] ?? '#ffffff');
@@ -27,7 +31,8 @@ class MFormLayoutPreviewHelper {
                                     $this->builder->addElement(
                                         $nestedElement['type'],
                                         $nestedElement['position'] ?? 'left',
-                                        $nestedElement['aspectRatio'] ?? '1:1'
+                                        $nestedElement['aspectRatio'] ?? '1:1',
+                                        $nestedElement
                                     );
                                 }
                             }
@@ -36,11 +41,22 @@ class MFormLayoutPreviewHelper {
                             $this->builder->addElement(
                                 $element['type'],
                                 $element['position'] ?? 'left',
-                                $element['aspectRatio'] ?? '1:1'
+                                $element['aspectRatio'] ?? '1:1',
+                                $element
                             );
                         }
                     }
                 }
+            }
+        }
+
+        if (isset($config['arrows'])) {
+            foreach ($config['arrows'] as $arrow) {
+                $this->builder->addArrow(
+                    $arrow['position'],
+                    $arrow['size'],
+                    $arrow['color']
+                );
             }
         }
 

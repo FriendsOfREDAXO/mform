@@ -15,6 +15,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormOptionHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormParameterHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormValueHandler;
 use FriendsOfRedaxo\MForm\Inputs\MFormInputsInterface;
+use FriendsOfRedaxo\MForm\Utils\HtmlToSvgConverter;
 use FriendsOfRedaxo\MForm\Utils\MFormLayoutPreviewHelper;
 use rex_addon;
 use rex_be_controller;
@@ -196,6 +197,9 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
+    /**
+     * ['btn_text' => 'Add Repeater Item', 'btn_class' => 'btn-default', 'confirm_delete_msg' => 'Do you really want to delete this item?']
+     */
     public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false, bool $showWrapper = false): MForm
     {
         $attributes['open'] = $open;
@@ -290,18 +294,29 @@ abstract class MFormElements
     public function addRadioImgField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         $newOptions = [];
+
         foreach ($options as $key => $option) {
             if (isset($option['config'])) {
                 $layoutHelper = new MFormLayoutPreviewHelper();
                 $svg = $layoutHelper->generateLayoutPreview($option['config']);
                 $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['image'])) {
+                $newOptions[$key] = $option['image'] . "<span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['svgIconSet'])) {
+                $converter = new HtmlToSvgConverter();
+                $attr = [
+                    'width' => '110px',
+                    'height' => '110px'
+                ];
+                $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
+                $newOptions[$key] = $img . "<span>{$option['label']}</span>";
             } else if (is_array($option) && isset($option['label']) && isset($option['img'])) {
                 $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
             }
         }
-        $this->addHtml('<div class="mform-inline-img-radios mform-inline-radios">');
+        $attributes['form-group-class'] = 'mform-inline-img-radios mform-inline-radios';
+
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
-        $this->addHtml('</div>');
         return $this;
     }
 
@@ -319,9 +334,11 @@ abstract class MFormElements
                 $newOptions[$key] = "<i class=\"{$option['icon']}\"></i><span> {$option['label']}</span>";
             }
         }
-        $this->addHtml('<div class="mform-inline-icon-radios mform-inline-radios">');
+        $attributes['form-group-class'] = 'mform-inline-icon-radios mform-inline-radios';
+
+        //        $this->addHtml('<div class="mform-inline-icon-radios mform-inline-radios">');
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
-        $this->addHtml('</div>');
+//        $this->addHtml('</div>');
         return $this;
     }
 
@@ -337,9 +354,11 @@ abstract class MFormElements
                 }
             }
         }
-        $this->addHtml('<div class="mform-inline-color-radios mform-inline-radios">');
+        $attributes['form-group-class'] = 'mform-inline-color-radios mform-inline-radios';
+
+//        $this->addHtml('<div class="mform-inline-color-radios mform-inline-radios">');
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
-        $this->addHtml('</div>');
+//        $this->addHtml('</div>');
         return $this;
     }
 
