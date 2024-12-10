@@ -1,6 +1,5 @@
-$(document).on('rex:ready mblock:change', function () {
-    let mform = $('.mform');
-    initMFormElements(mform);
+$(document).on('rex:ready mblock:change', function (event, element) {
+    initMFormElements($(element));
 });
 
 function initMFormElements(mform) {
@@ -51,8 +50,8 @@ function initMFormCollapses(mform) {
     // select collapse
     mform.find('select[data-toggle=collapse]').each(function () {
         let that = $(this);
-        initMFormSelectCollapse(that, true);
-        that.off('change.mform_toggle_collapse').on('change.mform_toggle_collapse', function () {
+        initMFormSelectCollapse($(this), true);
+        $(this).off('change.mform_toggle_collapse').on('change.mform_toggle_collapse', function () {
             initMFormSelectCollapse(that, false);
         });
     });
@@ -91,19 +90,35 @@ function initMFormLinkCollapse(element, accordion) {
 }
 
 function initMFormRadioCollapse(element, init) {
-    let parent = getParentMForm(element),
-        collapseId = element.parents('.form-group').find('input[type=radio]:checked').data('toggle-item');
-    if (collapseId !== undefined) {
-        element.parents('.form-group').find('input[type=radio]').each(function () {
-            if ($(this).is(":checked") && $(this).data('toggle-item') === collapseId) {
-                if ($(this).data('toggle-item') !== '')
-                    toggleCollapseElement(parent.find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'show', init);
-            } else {
-                if ($(this).data('toggle-item') !== '')
-                    toggleCollapseElement(parent.find('.collapse[data-group-collapse-id=' + $(this).data('toggle-item') + ']'), 'hide', init);
+    let parent = getParentMForm(element);
+    let checkedRadios = element.parents('.form-group').find('input[type=radio]:checked');
+    let collapseIds = new Set(); // Set für unique collapse IDs
+
+    checkedRadios.each(function() {
+        let toggleItem = $(this).data('toggle-item');
+        if (toggleItem !== undefined && toggleItem !== '') {
+            collapseIds.add(toggleItem);
+        }
+    });
+
+    element.parents('.form-group').find('input[type=radio]').each(function() {
+        let toggleItem = $(this).data('toggle-item');
+        if (toggleItem === undefined || toggleItem === '') return;
+
+        let target = parent.find('.collapse[data-group-collapse-id=' + toggleItem + ']');
+
+        if ($(this).is(":checked")) {
+            if (!target.hasClass('in')) {
+                toggleCollapseElement(target, 'show', init);
             }
-        });
-    }
+        } else {
+            if (!collapseIds.has(toggleItem)) {
+                if (target.hasClass('in')) {
+                    toggleCollapseElement(target, 'hide', init);
+                }
+            }
+        }
+    });
 }
 
 function initMFormSelectCollapse(element, init) {
@@ -175,11 +190,11 @@ function toggleCollapseElement(element, type, init) {
 }
 
 function initMFormRadioImgInlines(mform) {
-    mform.find('.mform-inline-radios').each(function () {
+    mform.find('div.radio').each(function () {
         let that = $(this);
         $(this).find('input[type=radio]').each(function () {
             $(this).on('change', function () {
-                that.find('label').removeClass('active');
+                that.parent().find('label').removeClass('active');
                 if ($(this).prop('checked')) {
                     $(this).parent().addClass('active');
                 }

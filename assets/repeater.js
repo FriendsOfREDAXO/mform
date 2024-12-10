@@ -56,18 +56,19 @@ window.repeater = () => {
         // die methode wird durch alpine x-init aufgerufen
         rexInitFieldElement(idKey, parentIdKey) {
             let that = this;
-            that.rexPreInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
-            that.rexInitElements($('#' + idKey + '.second-level-repeater').find('.form-group'));
+            that.rexPreInit($('#' + idKey + '.second-level-repeater'));
+            that.rexInit($('#' + idKey + '.second-level-repeater'));
         },
         // feuert das rex:ready event für den inhalt des repeater items idKey auf group ebene
         // die methode wird durch alpine x-init aufgerufen
         rexInitGroupElement(idKey) {
             let that = this;
-            that.rexPreInitElements($('#' + idKey).find('.form-group'));
-            that.rexInitElements($('#' + idKey).find('.form-group'));
+            that.rexPreInit($('#' + idKey));
+            that.rexInit($('#' + idKey));
         },
         // wird vor rex:ready für ein repeater item ausgeführt
-        rexPreInitElements(elements) {
+        rexPreInit(element) {
+            let elements = element.find('.form-group');
             if (elements.length > 0) {
                 elements.each(function (index, element) {
                     // PREPARE SELECTPICKER
@@ -111,8 +112,9 @@ window.repeater = () => {
         },
         // führt rex:ready für ein repeater item aus
         // prepariert nachträglich sonderelemente oder widgets wie custom-links und cke5
-        rexInitElements(elements) {
-            let that = this;
+        rexInit(element) {
+            let that = this,
+                elements = element.find('.form-group');
             if (elements.length > 0) {
                 elements.each(function (index, element) {
                     // triggert das klassische rex:ready event für den repeater item

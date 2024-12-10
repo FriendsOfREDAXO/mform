@@ -476,7 +476,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     border: 2px solid rgba(94, 94, 94, 0.3);
 }
 
-.mform-inline-img-radios .form-group .radio {
+.mform-inline-img-radios.form-group .radio {
     position: relative;
     display: inline-block;
     padding-left: 0;
@@ -524,8 +524,8 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     opacity: 0.97;
 }
 
-.mform-icon-radios .form-group .radio,
-.mform-inline-icon-radios .form-group .radio {
+.mform-icon-radios.form-group .radio,
+.mform-inline-icon-radios.form-group .radio {
     position: relative;
     padding-left: 0;
     margin-bottom: 0;
@@ -535,11 +535,11 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     display: block;
 }
 
-.mform-inline-icon-radios .form-group .radio {
+.mform-inline-icon-radios.form-group .radio {
     display: inline-block;
 }
 
-.mform-inline-color-radios .form-group .radio {
+.mform-inline-color-radios.form-group .radio {
     position: relative;
     padding-left: 0;
     padding-right: 5px;
@@ -550,11 +550,11 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     cursor: pointer;
 }
 
-.mform-inline-color-radios .form-group .radio > label {
+.mform-inline-color-radios.form-group .radio > label {
     padding-left: 0;
 }
 
-.mform-inline-color-radios .form-group .radio > label span {
+.mform-inline-color-radios.form-group .radio > label span {
     transform: scale(1);
     position: relative;
     display: block;
@@ -564,19 +564,32 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     border: 1px solid rgba(150, 150, 150, 0.5);
 }
 
-.mform-inline-color-radios .form-group .radio > label:hover span {
+.mform-inline-color-radios.form-group .radio > label:hover span {
     transform: scale(1.25);
 }
 
-.mform-inline-color-radios .form-group .radio input {
+.mform-inline-color-radios.form-group .radio input {
     display: none;
 }
 
-.mform-inline-color-radios .form-group .radio input[type=radio]:checked + span {
+.mform-inline-color-radios.form-group .radio input[type=radio]:checked + span {
     transform: scale(1.25);
     border: 2px solid #79af8a;
 }
 
 .mform .checkbox .mform-toggle {
     margin-top: -7px;
+}
+
+.collapse-group > .collapse > .form-group {
+    margin-bottom: 15px !important;
+}
+
+@media (prefers-color-scheme:dark) {
+    body:not(.rex-theme-light) .tab-content .form-control[disabled],
+    body:not(.rex-theme-light) .tab-content .form-control[readonly],
+    fieldset[disabled] body:not(.rex-theme-light) .tab-content .form-control {
+        background-color: rgba(27, 35, 44, 0.8);
+        border-color: rgba(21, 28, 34, 0.8);
+    }
 }
