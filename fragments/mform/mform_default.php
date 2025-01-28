@@ -7,6 +7,9 @@ switch ($this->getVar('type')) {
         $this->setVar('labelColClass', 'col-sm-2 control-label');
         $this->setVar('formItemColClass', 'col-sm-10');
         break;
+    case 'default_custom':
+        /* $this->getVar('labelColClass') and $this->getVar('formItemColClass') already have the correct values from the call. */
+        break;
     case 'default_full':
     case 'default_custom_full':
         $this->setVar('labelColClass', 'col-sm-12');
