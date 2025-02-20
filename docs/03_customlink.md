@@ -177,28 +177,62 @@ Ein vollständiges Link-Array kann folgende Werte enthalten:
 
 ## Auslesen der YLinks
 
-Analog zur vorherigen Version mit dem neuen Namespace:
+## Auslesen der YLinks per Outputfilter
+
+### YForm Custom-Link-Value
+
+Um die  generierten Urls wie `rex_news://1` zu ersetzen, muss das folgende Skript in die `boot.php` des `project` AddOns eingefügt werden.
+Der Code für die Urls muss modifiziert werden.
 
 ```php
-use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+rex_extension::register('OUTPUT_FILTER', function(\rex_extension_point $ep) {
+    return preg_replace_callback(
+        '@((rex_news|rex_person))://(\d+)(?:-(\d+))?/?@i',
+        function ($matches) {
+            // table = $matches[1]
+            // id = $matches[3]
+            $url = '';
+            switch ($matches[1]) {
+                case 'news':
+                    // Example, if the Urls are generated via Url-AddOn  
+                    $id = $matches[3];
+                    if ($id) {
+                       return rex_getUrl('', '', ['news' => $id]); 
+                    }
+                    break;
+                case 'person':
+                    // ein anderes Beispiel 
+                    $url = '/index.php?person='.$matches[3];
+                    break;
+            }
+            return $url;
+        },
+        $ep->getSubject()
+    );
+}, rex_extension::NORMAL);
 
+```
+
+### Auslesen der `ylink`-Werte manuell
+
+```php
 $link = explode("://", $img['link']);
 
-if (count($link) > 1) {
-    // its a table link
-    // url AddOn
-    $url = rex_getUrl('', '', [$link[0] => $link[1]]); // key muss im url addon übereinstimmen
-} else {
-    $extUrl = parse_url($link[0]);
+      if (count($link) > 1) {
+          // its a table link
+          // url AddOn
+        $url = rex_getUrl('', '', [$link[0] => $link[1]]); // key muss im url addon übereinstimmen
+      } else {
+          $extUrl = parse_url($link[0]);
 
-    if (isset($extUrl['scheme']) && ($extUrl['scheme'] == 'http' || $extUrl['scheme'] == 'https')) {
-        // its an external link 
-        $url = $link[0];
-    } else {
-        // internal id
-        $url = rex_getUrl($link[0]);
-    }
-}
+          if (isset($extUrl['scheme']) && ($extUrl['scheme'] == 'http' || $extUrl['scheme'] == 'https')) {
+              // its an external link 
+              $url = $link[0];
+          } else {
+              // internal id
+              $url = rex_getUrl($link[0]);
+          }
+      }
 ```
 
 ### Custom-Link-Werte aus MBlock zum Repeater (MForm >=8) konvertieren
