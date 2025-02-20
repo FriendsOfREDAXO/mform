@@ -40,9 +40,9 @@ class MFormOutputHelper
             $item['customlink_url'] = rex_url::media($item['link']);
             $item['customlink_class'] = ' media';
         } else {
-            // Check for rex:// URL
-            if (str_starts_with($item['link'], 'rex://')) {
-                $articleId = (int) substr($item['link'], 6);
+            // Check for redaxo:// URL
+            if (str_starts_with($item['link'], 'redaxo://')) {
+                $articleId = (int) substr($item['link'], 9);
                 $item['customlink_url'] = rex_getUrl($articleId, rex_clang::getCurrentId());
                 $item['customlink_class'] = ' intern';
 
