@@ -72,6 +72,72 @@ $mform = MForm::factory()
 echo $mform->show();
 ```
 
+**Varianten**
+
+addRadioImgField
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+// init mform
+$mform = MForm::factory()
+    // add fieldset area
+    ->addFieldsetArea('Radio Image Field', MForm::factory()
+        // add radio image field
+        ->addRadioImgField(4, [
+            'layout1' => ['img' => '../theme/public/assets/backend/img/layout1.svg', 'label' => 'Layout 1'],
+            'layout2' => ['img' => '../theme/public/assets/backend/img/layout2.svg', 'label' => 'Layout 2'],
+            'layout3' => ['img' => '../theme/public/assets/backend/img/layout3.svg', 'label' => 'Layout 3']
+        ], ['label' => 'Choose Layout'])
+    );
+
+// parse form
+echo $mform->show();
+```
+
+addRadioIconField
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+// init mform
+$mform = MForm::factory()
+    // add fieldset area
+    ->addFieldsetArea('Radio Icon Field', MForm::factory()
+        // add radio icon field
+        ->addRadioIconField(5, [
+            'grid' => ['icon' => 'fa fa-th', 'label' => 'Grid View'],
+            'list' => ['icon' => 'fa fa-list', 'label' => 'List View'],
+            'fullscreen' => ['icon' => 'fa fa-expand', 'label' => 'Fullscreen']
+        ], ['label' => 'Choose Display Mode'])
+    );
+
+// parse form
+echo $mform->show();
+```
+
+addRadioColorField
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+// init mform
+$mform = MForm::factory()
+    // add fieldset area
+    ->addFieldsetArea('Radio Color Field', MForm::factory()
+        // add radio color field
+        ->addRadioColorField(6, [
+            'red' => ['color' => '#ff0000', 'label' => 'Red'],
+            'green' => ['color' => '#00ff00', 'label' => 'Green'],
+            'blue' => ['color' => '#0000ff', 'label' => 'Blue'],
+            'transparent' => ['color' => 'transparent', 'label' => 'Transparent']
+        ], ['label' => 'Choose Color'])
+    );
+
+// parse form
+echo $mform->show();
+```
+
 **Modul-Ausgabe**
 
 ```php
