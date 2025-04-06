@@ -48,7 +48,20 @@ abstract class MFormInputsAbstract
         }
         foreach ($keys as $key) {
             if (!empty($this->config[$key]) && is_array($this->config[$key])) {
-                $configForm->addRadioImgField($id . $key, $this->config[$key], ['label' => $this->config[$key . 'Label']], $this->config[$key . 'DefaultValue']);
+
+                if (isset($this->config[$key . 'Toggle']) && $this->config[$key . 'Toggle'] === true) {
+                    $configForm->addToggleCheckboxField( $id . $key . 'Custom', [1 => (!empty($this->config[$key . 'ToggleLabel'])) ? $this->config[$key . 'ToggleLabel'] : 'Custom "'.$key.'"'], ['label' => $this->config[$key . 'Label'], 'data-toggle-item' => 'collapse' . $key]);
+                    $configForm->addForm(MForm::factory()
+                        ->addCollapseElement('link', MForm::factory()
+                            ->addRadioImgField($id . $key, $this->config[$key], ['label' => ''], $this->config[$key . 'DefaultValue'])
+                            , false, true, ['data-group-collapse-id' => 'collapse' . $key]
+                        )
+                    );
+                } else {
+                    $configForm
+                        ->addRadioImgField($id . $key, $this->config[$key], ['label' => $this->config[$key . 'Label']], $this->config[$key . 'DefaultValue'])
+                    ;
+                }
             }
         }
         return $configForm;

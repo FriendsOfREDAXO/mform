@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.0.7
+- add toggle wrapper for inputs element
+
 ## Version 8.0.6
 - add form-group-class attribute  
 - add html to svg converter
