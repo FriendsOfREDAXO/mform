@@ -21,8 +21,16 @@ function initMFormElements(mform) {
 
 function initMFormSelectPicker(mform) {
     mform.find('.selectpicker').each(function () {
+        // Stellen Sie sicher, dass der Wert '0' korrekt behandelt wird
+        var selectedValue = $(this).attr('data-selected');
+        
         $(this).selectpicker('destroy');
         $(this).selectpicker();
+        
+        // Wenn selectedValue '0' ist, manuell den ausgewählten Wert setzen
+        if (selectedValue === '0' || selectedValue === 0) {
+            $(this).val('0').selectpicker('refresh');
+        }
     });
 }
 
