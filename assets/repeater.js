@@ -275,7 +275,7 @@ window.repeater = () => {
                 }
             }
             // damit es keine probleme mit den instanzen gibt müssen diese sauber entfernt werden
-            this.rexDestroyCke5($('#' + idKey))
+            this.rexDestroyCke5($('#' + idKey + '_' + index))
             $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
             this.groups.splice(index, 1);
             this.updateValues();
