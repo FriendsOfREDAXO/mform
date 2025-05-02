@@ -916,7 +916,7 @@ class MFormParser
                         if (str_contains($onclick, 'deleteREXMedialist(')) $method = 'deleteMedialist';
                         if (str_contains($onclick, 'viewREXMedialist(')) $method = 'viewMedialist';
                         $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                        if (!is_null($attributes['parent_id'])) {
+                        if (!is_null($attributes['parent_id']) && $attributes['parent_id'] != $attributes['repeaterId']) {
                             $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
                         }
                     }
