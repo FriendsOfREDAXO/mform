@@ -69,6 +69,6 @@ abstract class MFormInputsAbstract
 
     protected function mergeConfig(array $inputsConfig = []): void
     {
-        $this->config = MFormModuleHelper::mergeInputConfig($this->config, $inputsConfig);
+        $this->config = MFormModuleHelper::mergeInputConfig($this->config, $inputsConfig, 0);
     }
 }
