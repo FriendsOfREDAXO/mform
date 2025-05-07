@@ -47,6 +47,8 @@ window.repeater = () => {
                 this.value = JSON.stringify(this.groups);
             }
 
+            let that = this;
+
             this.$nextTick(() => {
                 // blended loader spinner aus
                 // this.$alpineLoader.classList.remove('rex-visible');
@@ -59,12 +61,34 @@ window.repeater = () => {
             that.rexPreInit($('#' + idKey + '.second-level-repeater'));
             that.rexInit($('#' + idKey + '.second-level-repeater'));
         },
+        // Neue Methode für Tabs
+        initTabElements(element) {
+            let tabs = $(element).find('.mform-tabs');
+            if (tabs.length > 0) {
+                tabs.each(function() {
+                    let wrapper = $(this);
+                    $(this).find('ul[role=tablist] a').unbind().bind('click', function() {
+                        let tab = wrapper.find('div[data-tab-group-nav-tab-id=' + $(this).data('tab-item') + ']'),
+                            uid = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+                        tab.attr('id', uid);
+                        $(this).attr('href', '#' + uid);
+                        $('#' + uid).tab("show");
+                    });
+                });
+            }
+        },
         // feuert das rex:ready event für den inhalt des repeater items idKey auf group ebene
         // die methode wird durch alpine x-init aufgerufen
         rexInitGroupElement(idKey) {
             let that = this;
             that.rexPreInit($('#' + idKey));
             that.rexInit($('#' + idKey));
+
+            // Tabs speziell initialisieren
+            this.$nextTick(() => {
+                that.initTabElements($('#' + idKey));
+            });
+
         },
         // wird vor rex:ready für ein repeater item ausgeführt
         rexPreInit(element) {
