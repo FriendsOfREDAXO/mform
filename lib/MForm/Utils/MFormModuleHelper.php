@@ -16,11 +16,15 @@ class MFormModuleHelper
 {
     public static array $msg = array();
 
-    public static function mergeInputConfig(array $defaultConfig = [], array $config = []): array
+    public static function mergeInputConfig(array $defaultConfig = [], array $config = [], int $maxMergeDepth = PHP_INT_MAX, int $currentDepth = 0): array
     {
         foreach ($config as $key => $value) {
             if (isset($defaultConfig[$key])) {
-                if (is_array($value)) $config[$key] = self::mergeInputConfig($defaultConfig[$key], $value);
+                if (is_array($value) && $currentDepth < $maxMergeDepth) {
+                    // Merge rekursiv nur wenn wir unter der maximalen Rekursionstiefe sind
+                    $config[$key] = self::mergeInputConfig($defaultConfig[$key], $value, $maxMergeDepth, $currentDepth + 1);
+                }
+                // Sonst überschreiben wir einfach den Wert
                 $defaultConfig[$key] = $config[$key];
             } else {
                 $defaultConfig[$key] = $value;
