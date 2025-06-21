@@ -644,3 +644,76 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     margin-bottom: 0;
     cursor: pointer;
 }
+
+/* Multiple Checkboxes Groups Styles */
+.mform-multiple-checkboxes .mform-checkbox-groups {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.mform-checkbox-group {
+    border-bottom: 1px solid #eee;
+    padding: 15px;
+}
+
+.mform-checkbox-group:last-child {
+    border-bottom: none;
+}
+
+.mform-checkbox-group-title {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 5px;
+}
+
+.mform-checkbox-group-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 5px;
+}
+
+.mform-checkbox-group-options .checkbox {
+    margin-bottom: 5px;
+}
+
+.mform-checkbox-group-options .checkbox label {
+    font-weight: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* Dark theme support for multiple checkboxes */
+@media (prefers-color-scheme: dark) {
+    .mform-multiple-checkboxes .mform-checkbox-groups {
+        background-color: #2c3e50;
+        border-color: #34495e;
+    }
+    
+    .mform-checkbox-group {
+        border-bottom-color: #34495e;
+    }
+    
+    .mform-checkbox-group-title {
+        color: #ecf0f1;
+        border-bottom-color: #34495e;
+    }
+}
+
+/* REDAXO dark theme */
+body.rex-theme-dark .mform-multiple-checkboxes .mform-checkbox-groups {
+    background-color: #202b35;
+    border-color: #151c22;
+}
+
+body.rex-theme-dark .mform-checkbox-group {
+    border-bottom-color: #151c22;
+}
+
+body.rex-theme-dark .mform-checkbox-group-title {
+    color: rgba(255, 255, 255, 0.75);
+    border-bottom-color: #151c22;
+}

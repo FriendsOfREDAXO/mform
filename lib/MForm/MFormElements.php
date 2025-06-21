@@ -264,6 +264,31 @@ abstract class MFormElements
         return $this;
     }
 
+    /**
+     * @example
+     * $options = ['opt1' => 'Option 1', 'opt2' => 'Option 2', 'opt3' => 'Option 3'];
+     * $mform->addSortableMultiSelectField(1, $options, ['label' => 'Sortable Options']);
+     */
+    public function addSortableMultiSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 5, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for sortable multiselect
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-sortable-multiselect' 
+            : 'form-control mform-sortable-multiselect';
+            
+        // Add data attribute to enable sortable functionality
+        $attributes['data-sortable'] = 'true';
+        
+        $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue)
+            ->setMultiple()
+            ->setSize($size);
+        return $this;
+    }
+
     public function addCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
@@ -313,6 +338,56 @@ abstract class MFormElements
 
         $this->addOptionField('checkbox', $id, $attributes, $newOptions, $defaultValue);
         return $this;
+    }
+
+    /**
+     * @example
+     * $checkboxGroups = [
+     *     'group1' => ['label' => 'Features', 'options' => ['feat1' => 'Feature 1', 'feat2' => 'Feature 2']],
+     *     'group2' => ['label' => 'Settings', 'options' => ['set1' => 'Setting 1', 'set2' => 'Setting 2']]
+     * ];
+     * $mform->addMultipleCheckboxField(4, $checkboxGroups, ['label' => 'Multiple Groups']);
+     */
+    public function addMultipleCheckboxField(float|int|string $id, array $groups = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for multiple checkboxes
+        $attributes['form-group-class'] = 'mform-multiple-checkboxes';
+        
+        // Build HTML for multiple checkbox groups
+        $html = '<div class="mform-checkbox-groups">';
+        
+        if (is_array($groups)) {
+            foreach ($groups as $groupKey => $group) {
+                $groupLabel = isset($group['label']) ? $group['label'] : $groupKey;
+                $groupOptions = isset($group['options']) ? $group['options'] : [];
+                
+                $html .= '<div class="mform-checkbox-group" data-group="' . htmlspecialchars($groupKey) . '">';
+                $html .= '<h5 class="mform-checkbox-group-title">' . htmlspecialchars($groupLabel) . '</h5>';
+                $html .= '<div class="mform-checkbox-group-options">';
+                
+                foreach ($groupOptions as $optionKey => $optionLabel) {
+                    $checkboxId = $id . '_' . $groupKey . '_' . $optionKey;
+                    $checkboxName = 'REX_VALUE[' . $id . '][' . $groupKey . '][' . $optionKey . ']';
+                    
+                    $html .= '<div class="checkbox">';
+                    $html .= '<label>';
+                    $html .= '<input type="checkbox" name="' . $checkboxName . '" value="1" id="' . $checkboxId . '">';
+                    $html .= ' ' . htmlspecialchars($optionLabel);
+                    $html .= '</label>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div></div>';
+            }
+        }
+        
+        $html .= '</div>';
+        
+        return $this->addHtml($html);
     }
 
     public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm

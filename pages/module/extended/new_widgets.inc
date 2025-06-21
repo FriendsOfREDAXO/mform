@@ -27,5 +27,56 @@ $mform->addFieldsetArea('Checkbox with Images', MForm::factory()
     ->addCheckboxImgField(5, $checkboxOptions, ['label' => 'Select Multiple Options'])
 );
 
+// Sortable multiselect options
+$sortableOptions = [
+    'opt1' => 'First Option',
+    'opt2' => 'Second Option', 
+    'opt3' => 'Third Option',
+    'opt4' => 'Fourth Option',
+    'opt5' => 'Fifth Option',
+    'opt6' => 'Sixth Option'
+];
+
+// add sortable multiselect fieldset area
+$mform->addFieldsetArea('Sortable MultiSelect', MForm::factory()
+    ->addSortableMultiSelectField(6, $sortableOptions, ['label' => 'Drag to Reorder Options'])
+);
+
+// Multiple checkbox groups
+$checkboxGroups = [
+    'features' => [
+        'label' => 'Website Features',
+        'options' => [
+            'blog' => 'Blog System',
+            'gallery' => 'Photo Gallery', 
+            'contact' => 'Contact Forms',
+            'newsletter' => 'Newsletter'
+        ]
+    ],
+    'settings' => [
+        'label' => 'Technical Settings',
+        'options' => [
+            'ssl' => 'SSL Certificate',
+            'cdn' => 'CDN Integration',
+            'cache' => 'Advanced Caching',
+            'backup' => 'Auto Backup'
+        ]
+    ],
+    'integrations' => [
+        'label' => 'Third-party Integrations',
+        'options' => [
+            'analytics' => 'Google Analytics',
+            'maps' => 'Google Maps',
+            'social' => 'Social Media',
+            'payment' => 'Payment Gateway'
+        ]
+    ]
+];
+
+// add multiple checkboxes fieldset area
+$mform->addFieldsetArea('Multiple Checkbox Groups', MForm::factory()
+    ->addMultipleCheckboxField(7, $checkboxGroups, ['label' => 'Select from Multiple Categories'])
+);
+
 // parse form
 echo $mform->show();

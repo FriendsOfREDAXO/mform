@@ -1,0 +1,171 @@
+/**
+ * MForm Sortable MultiSelect Styles
+ * Styling for sortable multiselect widget
+ */
+
+.mform-sortable-wrapper {
+    margin-bottom: 15px;
+}
+
+.mform-sortable-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+}
+
+.mform-sortable-panel {
+    flex: 1;
+    min-width: 200px;
+}
+
+.mform-controls-panel {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    justify-content: center;
+    padding-top: 25px;
+}
+
+.mform-available-panel label,
+.mform-selected-panel label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.mform-available-options {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.mform-sortable-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 150px;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #fff;
+}
+
+.mform-sortable-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    cursor: move;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.mform-sortable-item:last-child {
+    border-bottom: none;
+}
+
+.mform-sortable-item:hover {
+    background-color: #f8f9fa;
+}
+
+.mform-sortable-item.selected {
+    background-color: #007bff;
+    color: white;
+}
+
+.mform-sortable-item.selected:hover {
+    background-color: #0056b3;
+}
+
+.mform-item-handle {
+    margin-right: 8px;
+    color: #6c757d;
+    font-size: 12px;
+    cursor: grab;
+}
+
+.mform-item-handle:active {
+    cursor: grabbing;
+}
+
+.mform-sortable-item.selected .mform-item-handle {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mform-item-text {
+    flex: 1;
+}
+
+.mform-add-option,
+.mform-remove-option {
+    min-width: 80px;
+    white-space: nowrap;
+}
+
+/* Dragging state */
+.mform-sortable-item[draggable="true"]:hover .mform-item-handle {
+    color: #007bff;
+}
+
+.mform-sortable-item.selected[draggable="true"]:hover .mform-item-handle {
+    color: rgba(255, 255, 255, 1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .mform-sortable-controls {
+        flex-direction: column;
+    }
+    
+    .mform-controls-panel {
+        flex-direction: row;
+        padding-top: 0;
+        justify-content: center;
+    }
+    
+    .mform-sortable-panel {
+        min-width: auto;
+    }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+    .mform-sortable-list {
+        background-color: #2c3e50;
+        border-color: #34495e;
+    }
+    
+    .mform-sortable-item {
+        border-bottom-color: #34495e;
+        color: #ecf0f1;
+    }
+    
+    .mform-sortable-item:hover {
+        background-color: #34495e;
+    }
+    
+    .mform-item-handle {
+        color: #95a5a6;
+    }
+}
+
+/* REDAXO dark theme */
+body.rex-theme-dark .mform-sortable-list {
+    background-color: #202b35;
+    border-color: #151c22;
+}
+
+body.rex-theme-dark .mform-sortable-item {
+    border-bottom-color: #151c22;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+body.rex-theme-dark .mform-sortable-item:hover {
+    background-color: #151c22;
+}
+
+body.rex-theme-dark .mform-item-handle {
+    color: rgba(255, 255, 255, 0.5);
+}

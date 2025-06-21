@@ -23,6 +23,9 @@ if (rex::isBackend()) {
     // datetime picker
     rex_view::addCssFile($this->getAssetsUrl('css/mform-datetime.css'));
     rex_view::addJsFile($this->getAssetsUrl('js/mform-datetime.js'));
+    // sortable multiselect
+    rex_view::addCssFile($this->getAssetsUrl('css/mform-sortable.css'));
+    rex_view::addJsFile($this->getAssetsUrl('js/mform-sortable.js'));
     // add mform js / css
     rex_view::addJsFile($this->getAssetsUrl('js/alpinejs.js'), [rex_view::JS_DEFERED => 'defer']);
     rex_view::addJsFile($this->getAssetsUrl('repeater.js'));
