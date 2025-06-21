@@ -20,6 +20,9 @@ if (rex::isBackend()) {
     rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
     rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
     rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
+    // datetime picker
+    rex_view::addCssFile($this->getAssetsUrl('css/mform-datetime.css'));
+    rex_view::addJsFile($this->getAssetsUrl('js/mform-datetime.js'));
     // add mform js / css
     rex_view::addJsFile($this->getAssetsUrl('js/alpinejs.js'), [rex_view::JS_DEFERED => 'defer']);
     rex_view::addJsFile($this->getAssetsUrl('repeater.js'));

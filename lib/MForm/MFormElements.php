@@ -278,6 +278,43 @@ abstract class MFormElements
         return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
     }
 
+    /**
+     * @example
+     * $options = [];
+     * for ($i = 1; $i <= 6; $i++) {
+     *      $options[$i] = ['img' => "../theme/public/assets/backend/img/option$i.jpg", 'label' => "Option $i"];
+     * }
+     * $mform->addCheckboxImgField(4, $options, ['label' => 'Select Options']);
+     */
+    public function addCheckboxImgField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        $newOptions = [];
+
+        foreach ($options as $key => $option) {
+            if (isset($option['config'])) {
+                $layoutHelper = new MFormLayoutPreviewHelper();
+                $svg = $layoutHelper->generateLayoutPreview($option['config']);
+                $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['image'])) {
+                $newOptions[$key] = $option['image'] . "<span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['svgIconSet'])) {
+                $converter = new HtmlToSvgConverter();
+                $attr = [
+                    'width' => '110px',
+                    'height' => '110px'
+                ];
+                $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
+                $newOptions[$key] = $img . "<span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['label']) && isset($option['img'])) {
+                $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
+            }
+        }
+        $attributes['form-group-class'] = 'mform-inline-img-checkboxes mform-inline-checkboxes';
+
+        $this->addOptionField('checkbox', $id, $attributes, $newOptions, $defaultValue);
+        return $this;
+    }
+
     public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
@@ -378,6 +415,65 @@ abstract class MFormElements
      * return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
      * }
      */
+
+    /**
+     * @example
+     * $mform->addDateTimeField(1, ['label' => 'Event Date'], 'Y-m-d H:i');
+     * $mform->addDateTimeField(2, ['label' => 'Date Only', 'data-enable-time' => 'false'], 'Y-m-d');
+     */
+    public function addDateTimeField(float|int|string $id, array $attributes = null, string $dateFormat = 'Y-m-d H:i', string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for datetime picker
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-datetime-picker' 
+            : 'form-control mform-datetime-picker';
+            
+        // Set date format as data attribute
+        $attributes['data-date-format'] = $dateFormat;
+        
+        // Set other datetime picker options as data attributes
+        if (!isset($attributes['data-enable-time'])) {
+            $attributes['data-enable-time'] = 'true';
+        }
+        
+        return $this->addInputField('text', $id, $attributes, $defaultValue);
+    }
+
+    /**
+     * @example
+     * $mform->addDateField(1, ['label' => 'Birth Date']);
+     */
+    public function addDateField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        $attributes['data-enable-time'] = 'false';
+        return $this->addDateTimeField($id, $attributes, 'Y-m-d', $defaultValue);
+    }
+
+    /**
+     * @example
+     * $mform->addTimeField(1, ['label' => 'Meeting Time']);
+     */
+    public function addTimeField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        $attributes['data-no-calendar'] = 'true';
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-datetime-picker time-only' 
+            : 'form-control mform-datetime-picker time-only';
+            
+        return $this->addDateTimeField($id, $attributes, 'H:i', $defaultValue);
+    }
 
     public function addLinkField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
