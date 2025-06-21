@@ -2,6 +2,14 @@
 
 use FriendsOfRedaxo\MForm;
 
+echo '<div class="alert alert-info">
+<h4>DateTime Picker Requirement</h4>
+<p>The DateTime picker widgets require the <strong>flatpickr.js</strong> library to be included in your project.</p>
+<p>Add the following to your template head:</p>
+<pre>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/flatpickr"&gt;&lt;/script&gt;</pre>
+</div>';
+
 // init mform
 $mform = MForm::factory()
     // add fieldset area for datetime fields
