@@ -264,6 +264,31 @@ abstract class MFormElements
         return $this;
     }
 
+    /**
+     * @example
+     * $options = ['opt1' => 'Option 1', 'opt2' => 'Option 2', 'opt3' => 'Option 3'];
+     * $mform->addSortableMultiSelectField(1, $options, ['label' => 'Sortable Options']);
+     */
+    public function addSortableMultiSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 5, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for sortable multiselect
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-sortable-multiselect' 
+            : 'form-control mform-sortable-multiselect';
+            
+        // Add data attribute to enable sortable functionality
+        $attributes['data-sortable'] = 'true';
+        
+        $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue)
+            ->setMultiple()
+            ->setSize($size);
+        return $this;
+    }
+
     public function addCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
@@ -276,6 +301,93 @@ abstract class MFormElements
         }
         $attributes['data-mform-toggle'] = 'toggle';
         return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
+    }
+
+    /**
+     * @example
+     * $options = [];
+     * for ($i = 1; $i <= 6; $i++) {
+     *      $options[$i] = ['img' => "../theme/public/assets/backend/img/option$i.jpg", 'label' => "Option $i"];
+     * }
+     * $mform->addCheckboxImgField(4, $options, ['label' => 'Select Options']);
+     */
+    public function addCheckboxImgField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        $newOptions = [];
+
+        foreach ($options as $key => $option) {
+            if (isset($option['config'])) {
+                $layoutHelper = new MFormLayoutPreviewHelper();
+                $svg = $layoutHelper->generateLayoutPreview($option['config']);
+                $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['image'])) {
+                $newOptions[$key] = $option['image'] . "<span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['svgIconSet'])) {
+                $converter = new HtmlToSvgConverter();
+                $attr = [
+                    'width' => '110px',
+                    'height' => '110px'
+                ];
+                $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
+                $newOptions[$key] = $img . "<span>{$option['label']}</span>";
+            } else if (is_array($option) && isset($option['label']) && isset($option['img'])) {
+                $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
+            }
+        }
+        $attributes['form-group-class'] = 'mform-inline-img-checkboxes mform-inline-checkboxes';
+
+        $this->addOptionField('checkbox', $id, $attributes, $newOptions, $defaultValue);
+        return $this;
+    }
+
+    /**
+     * @example
+     * $checkboxGroups = [
+     *     'group1' => ['label' => 'Features', 'options' => ['feat1' => 'Feature 1', 'feat2' => 'Feature 2']],
+     *     'group2' => ['label' => 'Settings', 'options' => ['set1' => 'Setting 1', 'set2' => 'Setting 2']]
+     * ];
+     * $mform->addMultipleCheckboxField(4, $checkboxGroups, ['label' => 'Multiple Groups']);
+     */
+    public function addMultipleCheckboxField(float|int|string $id, array $groups = null, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for multiple checkboxes
+        $attributes['form-group-class'] = 'mform-multiple-checkboxes';
+        
+        // Build HTML for multiple checkbox groups
+        $html = '<div class="mform-checkbox-groups">';
+        
+        if (is_array($groups)) {
+            foreach ($groups as $groupKey => $group) {
+                $groupLabel = isset($group['label']) ? $group['label'] : $groupKey;
+                $groupOptions = isset($group['options']) ? $group['options'] : [];
+                
+                $html .= '<div class="mform-checkbox-group" data-group="' . htmlspecialchars($groupKey) . '">';
+                $html .= '<h5 class="mform-checkbox-group-title">' . htmlspecialchars($groupLabel) . '</h5>';
+                $html .= '<div class="mform-checkbox-group-options">';
+                
+                foreach ($groupOptions as $optionKey => $optionLabel) {
+                    $checkboxId = $id . '_' . $groupKey . '_' . $optionKey;
+                    $checkboxName = 'REX_VALUE[' . $id . '][' . $groupKey . '][' . $optionKey . ']';
+                    
+                    $html .= '<div class="checkbox">';
+                    $html .= '<label>';
+                    $html .= '<input type="checkbox" name="' . $checkboxName . '" value="1" id="' . $checkboxId . '">';
+                    $html .= ' ' . htmlspecialchars($optionLabel);
+                    $html .= '</label>';
+                    $html .= '</div>';
+                }
+                
+                $html .= '</div></div>';
+            }
+        }
+        
+        $html .= '</div>';
+        
+        return $this->addHtml($html);
     }
 
     public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
@@ -378,6 +490,65 @@ abstract class MFormElements
      * return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
      * }
      */
+
+    /**
+     * @example
+     * $mform->addDateTimeField(1, ['label' => 'Event Date'], 'Y-m-d H:i');
+     * $mform->addDateTimeField(2, ['label' => 'Date Only', 'data-enable-time' => 'false'], 'Y-m-d');
+     */
+    public function addDateTimeField(float|int|string $id, array $attributes = null, string $dateFormat = 'Y-m-d H:i', string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        // Add specific CSS class for datetime picker
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-datetime-picker' 
+            : 'form-control mform-datetime-picker';
+            
+        // Set date format as data attribute
+        $attributes['data-date-format'] = $dateFormat;
+        
+        // Set other datetime picker options as data attributes
+        if (!isset($attributes['data-enable-time'])) {
+            $attributes['data-enable-time'] = 'true';
+        }
+        
+        return $this->addInputField('text', $id, $attributes, $defaultValue);
+    }
+
+    /**
+     * @example
+     * $mform->addDateField(1, ['label' => 'Birth Date']);
+     */
+    public function addDateField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        $attributes['data-enable-time'] = 'false';
+        return $this->addDateTimeField($id, $attributes, 'Y-m-d', $defaultValue);
+    }
+
+    /**
+     * @example
+     * $mform->addTimeField(1, ['label' => 'Meeting Time']);
+     */
+    public function addTimeField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    {
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+        
+        $attributes['data-no-calendar'] = 'true';
+        $attributes['class'] = isset($attributes['class']) 
+            ? $attributes['class'] . ' mform-datetime-picker time-only' 
+            : 'form-control mform-datetime-picker time-only';
+            
+        return $this->addDateTimeField($id, $attributes, 'H:i', $defaultValue);
+    }
 
     public function addLinkField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
