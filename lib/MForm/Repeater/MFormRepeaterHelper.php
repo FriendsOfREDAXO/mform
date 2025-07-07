@@ -73,6 +73,7 @@ class MFormRepeaterHelper
     {
         $obj = [];
         $items = $mform->getItems();
+//        dump($items);die;
         foreach ($items as $key => $mformItem) {
             if ($mformItem instanceof MFormItem) {
                 $nameKey = self::getNameKey($mformItem);
@@ -183,6 +184,12 @@ class MFormRepeaterHelper
             }
             $mformItem->setToggleOptions($toggleOptions);
         }
+
+//        if($nameKey == '') {
+//            dump($mformItem);
+//        }
+
+//        dump([$repeaterId, $parentId]);
 
         if (isset($mformItem->getAttributes()['data-toggle-item'])) {
             $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
