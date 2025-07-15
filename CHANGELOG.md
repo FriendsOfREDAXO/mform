@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.0.8
+- add simple anchor link support for custom link
+
 ## Version 8.0.7
 - add toggle wrapper for inputs element
 

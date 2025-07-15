@@ -80,7 +80,7 @@ class rex_var_custom_link extends rex_var
             }
 
             $args = [];
-            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'external_prefix', 'ylink'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'anchor', 'external_prefix', 'ylink'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
@@ -147,6 +147,7 @@ class rex_var_custom_link extends rex_var
         $emailClass = (isset($args['mailto']) && 0 == $args['mailto']) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && 0 == $args['phone']) ? ' hidden' : $class;
+        $anchorClass = (isset($args['anchor']) && 0 == $args['anchor']) ? ' hidden' : $class;
         $externalPrefix = (isset($args['external_prefix']) && 0 == $args['external_prefix']) ? $args['external_prefix'] : 'https://';
         $args = self::prepareYLinkArg($args);
         $ylinks = '';
@@ -180,14 +181,22 @@ class rex_var_custom_link extends rex_var
         <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
         <a href="#" class="btn btn-popup email_link ' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
         <a href="#" class="btn btn-popup phone_link ' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
+        <a href="#" class="btn btn-popup anchor_link ' . $anchorClass . '" id="mform_anchor_' . $id . '" title="Anker zu Slice setzen"><i class="rex-icon fa-anchor"></i></a>
         <a href="#" class="btn btn-popup delete_link ' . $class . '" id="mform_delete_' . $id . '" title="' . rex_i18n::msg('var_link_delete') . '"><i class="rex-icon rex-icon-delete-link"></i></a>
         ';
 
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
+        
+        // Anchor-Funktionalität aktivieren, wenn entsprechender Arg gesetzt ist
+        $anchorData = '';
+        if (isset($args['anchor']) && $args['anchor'] === 'enable') {
+            $anchorData = ' data-anchor="enable"';
+        }
+        
         return str_replace(
             '<div class="input-group">',
-            '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . ' data-extern-link-prefix="' . $externalPrefix . '" data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
+            '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . $anchorData . ' data-extern-link-prefix="' . $externalPrefix . '" data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',
             $fragment->parse('core/form/widget.php'),
         );
     }

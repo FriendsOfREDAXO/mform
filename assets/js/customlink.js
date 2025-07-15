@@ -235,6 +235,40 @@ function customlink_init_widget(element) {
             dispatchCustomLinkEvent(hidden_input, '', '');
             return false;
         });
+
+        // anchor link element
+        element.find('a.anchor_link').unbind().bind('click', function () {
+            let id = element.data('id'),
+                value = hidden_input.val(),
+                text = showed_input.val();
+
+            clearInterval(timer);
+            closeDropDown(id);
+
+            // Extract current anchor ID if present
+            if (value == '' || value.indexOf('#') < 0) {
+                value = '#';
+            }
+
+            let anchor_link = prompt('Anker-ID (mit #)', value);
+
+            hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
+
+            if (anchor_link !== '#' && anchor_link !== "" && anchor_link !== undefined && anchor_link != null) {
+                // Ensure anchor starts with #
+                if (!anchor_link.startsWith('#')) {
+                    anchor_link = '#' + anchor_link;
+                }
+                hidden_input.val(anchor_link);
+                showed_input.val('Anker: ' + anchor_link);
+            }
+            if (anchor_link == null) {
+                hidden_input.val(value);
+                showed_input.val(text);
+            }
+            dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
+            return false;
+        });
     }
 }
 
