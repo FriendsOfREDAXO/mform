@@ -388,6 +388,7 @@ section.repeater .repeater-group header {
     padding: 0.5rem;
     transition: background 0.3s ease-out;
     min-height: 30px;
+    z-index: 1;
 }
 
 section.repeater .repeater-group header + .mform > .mform-tabs {
