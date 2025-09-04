@@ -410,10 +410,7 @@ window.repeater = () => {
         },
         viewMedialist(id, index, nameKey, fieldsKey, fieldIndex) {
             let params = '',
-                element = (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
-                selectedMedia = element && element.list && element.list.length > 0 ? element.list[0] : '',
-                param = params + '&file_name=' + selectedMedia,
-                media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id);
+                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id);
             this.onMedialistSelect(media, index, nameKey, fieldsKey, fieldIndex);
             return false;
         },
