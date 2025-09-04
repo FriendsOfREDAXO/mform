@@ -396,5 +396,66 @@ window.repeater = () => {
                 }, 5);
             });
         },
+        openMedialist(id, index, nameKey, fieldsKey, fieldIndex) {
+            let params = '',
+                media = newPoolWindow('index.php?page=mediapool/media' + params + '&opener_input_field=' + id);
+            this.onMedialistSelect(media, index, nameKey, fieldsKey, fieldIndex);
+            return false;
+        },
+        addMedialist(id, index, nameKey, fieldsKey, fieldIndex) {
+            let params = '',
+                media = newPoolWindow('index.php?page=mediapool/upload&opener_input_field=' + id + params);
+            this.onMedialistSelect(media, index, nameKey, fieldsKey, fieldIndex);
+            return false;
+        },
+        viewMedialist(id, index, nameKey, fieldsKey, fieldIndex) {
+            let params = '',
+                element = (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) ? this.groups[index][fieldsKey][fieldIndex][nameKey] : this.groups[index][nameKey],
+                selectedMedia = element && element.list && element.list.length > 0 ? element.list[0] : '',
+                param = params + '&file_name=' + selectedMedia,
+                media = newPoolWindow('index.php?page=mediapool/media' + param + '&opener_input_field=' + id);
+            this.onMedialistSelect(media, index, nameKey, fieldsKey, fieldIndex);
+            return false;
+        },
+        deleteMedialist(id, index, nameKey, fieldsKey, fieldIndex) {
+            if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
+                this.groups[index][fieldsKey][fieldIndex][nameKey] = {list: []};
+            } else {
+                this.groups[index][nameKey] = {list: []};
+            }
+            this.updateValues();
+        },
+        onMedialistSelect(media, index, nameKey, fieldsKey, fieldIndex) {
+            const that = this;
+            $(media).on('rex:selectMedia', (event, mediaName) => {
+                let targetElement;
+                if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
+                    targetElement = that.groups[index][fieldsKey][fieldIndex][nameKey];
+                } else {
+                    targetElement = that.groups[index][nameKey];
+                }
+                
+                // Ensure we have a proper medialist structure
+                if (!targetElement || !targetElement.list) {
+                    targetElement = {list: []};
+                }
+                
+                // Add the selected media to the list if not already present
+                if (!targetElement.list.includes(mediaName)) {
+                    targetElement.list.push(mediaName);
+                }
+                
+                // Update the groups array
+                if (fieldsKey !== undefined && fieldsKey !== '' && fieldIndex !== undefined) {
+                    that.groups[index][fieldsKey][fieldIndex][nameKey] = targetElement;
+                } else {
+                    that.groups[index][nameKey] = targetElement;
+                }
+                
+                setTimeout(function() {
+                    that.updateValues();
+                }, 5);
+            });
+        },
     }
 }
