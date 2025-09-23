@@ -259,6 +259,78 @@ window.repeater = () => {
                 that.updateValues();
             })
         },
+        rexReinitializeAll(container) {
+            let that = this;
+            console.log('rexReinitializeAll called for:', container);
+            
+            // Schritt 1: Alle Widgets zurücksetzen und für Neuinitialisierung vorbereiten
+            that.rexResetWidgets(container);
+            
+            // Schritt 2: Mit kurzem Delay alle Widgets neu initialisieren
+            setTimeout(() => {
+                that.rexReinitWidgets(container);
+            }, 50);
+        },
+        
+        rexResetWidgets(container) {
+            let that = this;
+            
+            // CKE5 Editoren zerstören
+            container.find('.cke5-repeater.cke5-repeater-init').each(function() {
+                let $editor = $(this);
+                if (typeof cke5_destroy === 'function') {
+                    cke5_destroy($editor);
+                }
+                $editor.removeClass('cke5-repeater-init');
+            });
+            
+            // Toggle-Elemente zurücksetzen
+            container.find('.repeater-toggle.repeater-toggle-init').each(function() {
+                let $toggle = $(this);
+                if ($toggle.data('bs.toggle')) {
+                    $toggle.bootstrapMFormToggle('destroy');
+                }
+                $toggle.removeClass('repeater-toggle-init');
+            });
+            
+            // Selectpicker zurücksetzen
+            container.find('.repeater-selectpicker.select-repeater-init').each(function() {
+                let $select = $(this);
+                if ($select.data('selectpicker')) {
+                    $select.selectpicker('destroy');
+                }
+                $select.removeClass('select-repeater-init');
+            });
+            
+            // Alpine.js Repeater Instanzen in Sub-Repeatern zurücksetzen
+            container.find('[x-data*="repeater"]').each(function() {
+                // Alpine Komponente neu triggern
+                if (this._x_dataStack) {
+                    // Alpine.js interne Datenstruktur zurücksetzen wenn möglich
+                    delete this._x_dataStack;
+                }
+            });
+        },
+        
+        rexReinitWidgets(container) {
+            let that = this;
+            
+            // Komplette Neuinitialisierung wie beim ersten Laden
+            that.rexPreInit(container);
+            that.rexInit(container);
+            
+            // Zusätzlich: Alpine.js Repeater in Sub-Containern reaktivieren
+            container.find('[x-data*="repeater"]').each(function() {
+                let $element = $(this);
+                // Alpine Repeater Ready Event triggern
+                $element[0].dispatchEvent(new CustomEvent('repeater:ready'));
+            });
+            
+            // Tabs neu initialisieren
+            that.initTabElements(container);
+            
+            console.log('rexReinitWidgets completed for:', container);
+        },
         rexInitCke5(cke5Area) {
             let that = this;
             cke5_destroy(cke5Area);
@@ -320,8 +392,11 @@ window.repeater = () => {
         moveGroup(from, to, idKey) {
             this.groups.splice(to, 0, this.groups.splice(from, 1)[0]);
             this.updateValues();
-            this.rexPrepareCke5Move($('#' + idKey));
             $('#' + idKey).trigger('rex:change', [$('#' + idKey)]);
+            // Komplette Neuinitialisierung aller Widgets nach dem Verschieben
+            setTimeout(() => {
+                this.rexReinitializeAll($('#' + idKey));
+            }, 150);
         },
         moveField(index, from, to, fieldsKey, idKey, parentIdKey) {
             this.groups[index][fieldsKey].splice(to, 0, this.groups[index][fieldsKey].splice(from, 1)[0]);
@@ -329,8 +404,11 @@ window.repeater = () => {
             $('#' + idKey + '_' + from).trigger('rex:change', [$('#' + idKey + '_' + from)]);
             $('#' + idKey + '_' + to).trigger('rex:change', [$('#' + idKey + '_' + to)]);
 
-            this.rexPrepareCke5Move($('#' + idKey + '_' + from));
-            this.rexPrepareCke5Move($('#' + idKey + '_' + to));
+            // Komplette Neuinitialisierung aller Widgets nach dem Verschieben
+            setTimeout(() => {
+                this.rexReinitializeAll($('#' + idKey + '_' + from));
+                this.rexReinitializeAll($('#' + idKey + '_' + to));
+            }, 150);
         },
         addLink(id, index, nameKey, fieldsKey, fieldIndex) {
             let linkMap = openLinkMap(id),
