@@ -8,10 +8,12 @@
 if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'ytemplates'));
     
-    // Register media usage for yform versions >= 5.0.0-beta1 or when manager plugin is available
     $yform = rex_addon::get('yform');
-    if (version_compare($yform->getVersion(), '5.0.0-beta1', '>=') || 
-        rex_plugin::get('yform', 'manager')->isAvailable()) {
+    if (version_compare($yform->getVersion(), '5.0.0-beta1', '<')) {
+        if (rex_plugin::get('yform', 'manager')->isAvailable()) {
+            rex_extension::register('MEDIA_IS_IN_USE', "FriendsOfRedaxo\\MformYformHelper::isMediaInUse");
+        }
+    } else {
         rex_extension::register('MEDIA_IS_IN_USE', "FriendsOfRedaxo\\MformYformHelper::isMediaInUse");
     }
 }
