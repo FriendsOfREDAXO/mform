@@ -983,7 +983,7 @@ class MFormParser
         // default manipulations
         $this->executeDefaultManipulations($item, false, false);
 
-        foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable'] as $key => $value) {
+        foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable', 'anchor' => 'enable'] as $key => $value) {
             $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
             $key = ('extern' == $key) ? 'external' : $key;
             $key = ('tel' == $key) ? 'phone' : $key;
