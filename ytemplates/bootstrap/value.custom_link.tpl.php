@@ -3,7 +3,7 @@
 $buttonId = $counter;
 $categoryId = 0;
 $name = $this->getFieldName();
-$value = htmlspecialchars($this->getValue() ?: '');
+$value = htmlspecialchars($this->getValue() ?? '');
 $parameters = [
     'media' => (1 == $this->getElement('media')),
     'mailto' => (1 == $this->getElement('mailto')),
