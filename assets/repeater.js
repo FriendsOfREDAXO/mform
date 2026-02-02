@@ -378,9 +378,10 @@ window.repeater = () => {
             
             // Nach dem Löschen alle Repeater-Items neu initialisieren
             // damit Alpine.js die korrekten Array-Indizes verwendet
-            this.$nextTick(() => {
+            // Konsistentes Timing mit moveGroup/moveField (150ms)
+            setTimeout(() => {
                 this.rexReinitializeAll($('#' + idKey));
-            });
+            }, 150);
         },
         removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?', idKey) {
             // console.log([index, fieldIndex, fieldsKey]);
@@ -389,6 +390,9 @@ window.repeater = () => {
                     return false;
                 }
             }
+            // Parent-Container vor dem Löschen ermitteln, damit er nach DOM-Update noch verfügbar ist
+            let parentContainer = $('#' + idKey).closest('.repeater-group');
+            
             // damit es keine probleme mit den instanzen gibt müssen diese sauber entfernt werden
             this.rexDestroyCke5($('#' + idKey))
             $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
@@ -397,12 +401,12 @@ window.repeater = () => {
             
             // Nach dem Löschen alle Field-Items im Parent neu initialisieren
             // damit Alpine.js die korrekten Array-Indizes verwendet
-            this.$nextTick(() => {
-                let parentContainer = $('#' + idKey).closest('.repeater-group');
-                if (parentContainer.length) {
+            // Konsistentes Timing mit moveGroup/moveField (150ms)
+            setTimeout(() => {
+                if (parentContainer && parentContainer.length) {
                     this.rexReinitializeAll(parentContainer);
                 }
-            });
+            }, 150);
         },
         moveGroup(from, to, idKey) {
             this.groups.splice(to, 0, this.groups.splice(from, 1)[0]);
