@@ -375,6 +375,12 @@ window.repeater = () => {
             $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
             this.groups.splice(index, 1);
             this.updateValues();
+            
+            // Nach dem Löschen alle Repeater-Items neu initialisieren
+            // damit Alpine.js die korrekten Array-Indizes verwendet
+            this.$nextTick(() => {
+                this.rexReinitializeAll($('#' + idKey));
+            });
         },
         removeField(index, fieldIndex, fieldsKey, confirmDelete = false, confirmDeleteMsg = 'delete?', idKey) {
             // console.log([index, fieldIndex, fieldsKey]);
@@ -388,6 +394,15 @@ window.repeater = () => {
             $('#' + idKey).trigger('rex:destroy', [$('#' + idKey)]);
             this.groups[index][fieldsKey].splice(fieldIndex, 1);
             this.updateValues();
+            
+            // Nach dem Löschen alle Field-Items im Parent neu initialisieren
+            // damit Alpine.js die korrekten Array-Indizes verwendet
+            this.$nextTick(() => {
+                let parentContainer = $('#' + idKey).closest('.repeater-group');
+                if (parentContainer.length) {
+                    this.rexReinitializeAll(parentContainer);
+                }
+            });
         },
         moveGroup(from, to, idKey) {
             this.groups.splice(to, 0, this.groups.splice(from, 1)[0]);
