@@ -79,8 +79,10 @@ class MFormParser
         $max = (!empty($item->getAttributes()['max'])) ? intval($item->getAttributes()['max']) : 0;
         $min = (!empty($item->getAttributes()['min'])) ? intval($item->getAttributes()['min']) : 0;
         $xifMax = '';
+        $xifMaxOnly = 'true';
         if ($max > 0) {
             $xifMax = " && $max > $groups.length";
+            $xifMaxOnly = "$max > $groups.length";
         }
 
         // open section and repeater div
@@ -112,8 +114,8 @@ class MFormParser
             $header = '
                 <header>
                     <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
-                            <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
+                        <template x-if="'.$xifMaxOnly.'">
+                            <a href="#" @click.prevent=\'addGroup('.$obj.', '.$repeaterId.'Index)\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
                         <template x-if="'.$min.' < '.$groups.'.length">
                             <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.', \''.$repeaterId.'\')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
@@ -134,7 +136,7 @@ class MFormParser
                             <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
                         </template>
                     </div>
-                </header>        
+                </header>
         ';
             $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
         } else {
@@ -150,8 +152,8 @@ class MFormParser
             $header = '
                 <header>
                     <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
-                            <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
+                        <template x-if="'.$xifMaxOnly.'">
+                            <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'", '.$repeaterId.'Index)\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
                         </template>
                         <template x-if="'.$min.' < '.$groups.'.length">
                             <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.', \''.$group.'_'.$parentId."_".$repeaterId.'_\' + '.$repeaterId.'Index)" class="btn btn-red"><i class="rex-icon fa-times"></i></a>

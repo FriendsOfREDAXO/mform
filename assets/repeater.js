@@ -354,14 +354,27 @@ window.repeater = () => {
         },
         // ermöglicht das dynamische anlegen der group elements struktur
         // addGroup und addFields sind dreh und angelpunkte für das versorgen der form input values durch alpine
-        addGroup(obj) {
-            this.groups.push(JSON.parse(JSON.stringify(obj))); // bottom
+        addGroup(obj, afterIndex = null) {
+            const newGroup = JSON.parse(JSON.stringify(obj));
+            if (afterIndex !== null && afterIndex >= 0 && afterIndex < this.groups.length) {
+                // Insert after the specified index
+                this.groups.splice(afterIndex + 1, 0, newGroup);
+            } else {
+                // Default: push to end
+                this.groups.push(newGroup);
+            }
             this.updateValues();
-            // this.groups.unshift(obj); // top
         },
         // ermöglicht das dynamische anlegen der group elements fields ebenen struktur
-        addFields(index, obj, fieldsKey, idKey) {
-            this.groups[index][fieldsKey].push(JSON.parse(JSON.stringify(obj)));
+        addFields(index, obj, fieldsKey, idKey, afterIndex = null) {
+            const newField = JSON.parse(JSON.stringify(obj));
+            if (afterIndex !== null && afterIndex >= 0 && afterIndex < this.groups[index][fieldsKey].length) {
+                // Insert after the specified index
+                this.groups[index][fieldsKey].splice(afterIndex + 1, 0, newField);
+            } else {
+                // Default: push to end
+                this.groups[index][fieldsKey].push(newField);
+            }
             this.updateValues();
         },
         removeGroup(index, confirmDelete = false, confirmDeleteMsg = 'delete?', idKey) {
