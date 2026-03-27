@@ -20,6 +20,9 @@ class MFormParameterHandler
             case 'full':
                 $item->setFull(true);
                 break;
+            case 'notice':
+                $item->setNotice((string) $value);
+                break;
             default:
                 $item->parameter[$name] = $value;
                 break;

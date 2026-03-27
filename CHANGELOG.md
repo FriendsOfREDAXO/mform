@@ -1,5 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 8.1.6
+- fix: `notice` Attribut kann nun auch über den Parameter-Array übergeben werden (z.B. `addMediaField`, `addTextField` etc.) – schließt #389
+
 ## Version 8.0.8
 - add simple anchor link support for custom link
 
