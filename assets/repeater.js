@@ -27,6 +27,14 @@ function addAlpineDirective() {
 }
 
 window.repeater = () => {
+    let _uidCounter = 0;
+    function _generateUid() {
+        return '_' + Date.now().toString(36) + '_' + (++_uidCounter);
+    }
+    function _ensureUid(obj) {
+        if (obj && typeof obj === 'object' && !obj._uid) obj._uid = _generateUid();
+        return obj;
+    }
     return {
         groups: [],
         value: '',
@@ -44,7 +52,16 @@ window.repeater = () => {
 
             if (this.initialValue) {
                 this.groups = this.initialValue;
-                this.value = JSON.stringify(this.groups);
+                // Ensure every item (and nested sub-items) has a stable _uid
+                this.groups.forEach(group => {
+                    _ensureUid(group);
+                    Object.values(group).forEach(val => {
+                        if (Array.isArray(val)) {
+                            val.forEach(item => _ensureUid(item));
+                        }
+                    });
+                });
+                this.value = JSON.stringify(this.groups, (key, val) => key === '_uid' ? undefined : val);
             }
 
             let that = this;
@@ -350,29 +367,26 @@ window.repeater = () => {
         // manipuliert anhand der group element einträge die formular input values
         updateValues(idKey = '0') {
             // Gruppen werden als String im value-Model gespeichert...
-            this.value = JSON.stringify(this.groups);
+            // Strip internal _uid keys before persisting
+            this.value = JSON.stringify(this.groups, (key, val) => key === '_uid' ? undefined : val);
         },
         // ermöglicht das dynamische anlegen der group elements struktur
         // addGroup und addFields sind dreh und angelpunkte für das versorgen der form input values durch alpine
         addGroup(obj, afterIndex = null) {
-            const newGroup = JSON.parse(JSON.stringify(obj));
+            const newGroup = _ensureUid(JSON.parse(JSON.stringify(obj)));
             if (afterIndex !== null && afterIndex >= 0 && afterIndex < this.groups.length) {
-                // Insert after the specified index
                 this.groups.splice(afterIndex + 1, 0, newGroup);
             } else {
-                // Default: push to end
                 this.groups.push(newGroup);
             }
             this.updateValues();
         },
         // ermöglicht das dynamische anlegen der group elements fields ebenen struktur
         addFields(index, obj, fieldsKey, idKey, afterIndex = null) {
-            const newField = JSON.parse(JSON.stringify(obj));
+            const newField = _ensureUid(JSON.parse(JSON.stringify(obj)));
             if (afterIndex !== null && afterIndex >= 0 && afterIndex < this.groups[index][fieldsKey].length) {
-                // Insert after the specified index
                 this.groups[index][fieldsKey].splice(afterIndex + 1, 0, newField);
             } else {
-                // Default: push to end
                 this.groups[index][fieldsKey].push(newField);
             }
             this.updateValues();

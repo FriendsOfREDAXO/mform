@@ -78,10 +78,8 @@ class MFormParser
 
         $max = (!empty($item->getAttributes()['max'])) ? intval($item->getAttributes()['max']) : 0;
         $min = (!empty($item->getAttributes()['min'])) ? intval($item->getAttributes()['min']) : 0;
-        $xifMax = '';
         $xifMaxOnly = 'true';
         if ($max > 0) {
-            $xifMax = " && $max > $groups.length";
             $xifMaxOnly = "$max > $groups.length";
         }
 
@@ -138,7 +136,7 @@ class MFormParser
                     </div>
                 </header>
         ';
-            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
+            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$group.'._uid"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
         } else {
             $varId = trim(str_replace(['][','[',']'],['.','',''], $item->getVarId()));
             $link = '<a href="#" type="button" class="btn btn-mform-repeater'.$btnClass.'" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add field').'</a>';
@@ -178,7 +176,7 @@ class MFormParser
             ';
 #                        <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\''.')" class="button remove"><i class="rex-icon fa-times"></i></a>
 
-            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group second-level-repeater" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index, \''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
+            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$group.'._uid"><div class="repeater-group second-level-repeater" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index, \''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
         }
         // open repeater group
         // header buttons
