@@ -93,7 +93,7 @@ class MFormRepeaterHelper
                             } else {
                                 $obj[$nameKey] = [];
                             }
-                        case 'close-repeater';
+                        case 'close-repeater':
                             $mformItem->addAttribute('group', 'field')
                                 ->addAttribute('groups', 'group.' . $nameKey)
                                 ->addAttribute('parent_id', $parentId);

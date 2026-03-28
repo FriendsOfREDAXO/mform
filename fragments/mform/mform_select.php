@@ -2,9 +2,9 @@
 /** @var rex_fragment $this */
 
 switch ($this->getVar('type')) {
-    case 'multiselect';
+    case 'multiselect':
         $this->setVar('attributes', $this->getVar('attributes') . ' multiple', false);
-    case 'select';
+    case 'select':
         foreach (rex_view::getJsFiles() as $file) {
             if (str_contains($file, 'bootstrap-select')
                 && !str_contains($this->getVar('class'), 'selectpicker')
