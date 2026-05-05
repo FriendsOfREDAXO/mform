@@ -14,10 +14,12 @@ use Exception;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
+use rex_addon;
 use rex_clang;
 use rex_extension;
 use rex_extension_point;
@@ -53,155 +55,158 @@ class MFormParser
      */
     protected string $theme = 'mform';
 
-    private function openRepeaterElement(MFormItem $item, string $key, array $items): void
+    private function openRepeaterElement(MFormItem $item, string $key, array $items, array &$skipKeys = []): void
     {
-        $this->executeDefaultManipulations($item, false, false);
-        $groups = (array_key_exists('groups', $item->getAttributes())) ? $item->getAttributes()['groups'] : 'groups';
-        $group = (array_key_exists('group', $item->getAttributes())) ? $item->getAttributes()['group'] : 'group';
-        $open = (array_key_exists('open', $item->getAttributes())) ? $item->getAttributes()['open'] : true;
-        $repeaterId = (array_key_exists('repeater_id', $item->getAttributes())) ? $item->getAttributes()['repeater_id'] : uniqid('uid');
-        $parentId = (array_key_exists('parent_id', $item->getAttributes())) ? $item->getAttributes()['parent_id'] : null;
-        $btnClass = (isset($item->getAttributes()['btn_class'])) ? ' ' . $item->getAttributes()['btn_class'] : ' btn-primary';
-        $buttonName = (array_key_exists('btn_text', $item->getAttributes())) ? $item->getAttributes()['btn_text'] : null;
-
-        $obj = MFormRepeaterHelper::prepareChildMForms($items, $key, $repeaterId, $group, $groups, (is_null($parentId)) ? $repeaterId : $parentId);
-        $this->obj = $obj;
-
-        // set obj
-        $obj = json_encode($obj);
-
-        if (isset($item->getAttributes()['confirm_delete']) && $item->getAttributes()['confirm_delete']) {
-            $confirm = ', true';
-        } else {
-            $confirm = ', false';
-        }
-
-        $max = (!empty($item->getAttributes()['max'])) ? intval($item->getAttributes()['max']) : 0;
-        $min = (!empty($item->getAttributes()['min'])) ? intval($item->getAttributes()['min']) : 0;
-        $xifMax = '';
-        if ($max > 0) {
-            $xifMax = " && $max > $groups.length";
-        }
-
-        // open section and repeater div
-        if (is_null($parentId)) {
-            // at this point we have to compare item value and obj
-            $itemValue = rex_var::toArray((string) $item->getValue());
-            $keys = MFormRepeaterHelper::getRepeaterChildKeys($items, $key);
-
-            if (is_array($itemValue)) {
-                foreach ($itemValue as $index0 => $level0) {
-                    if (is_array($level0)) {
-                        foreach ($level0 as $index1 => $level1) {
-                            if (isset($keys[$index1]) && count($level1) == 1 &&
-                                isset($level1[0]) && is_array($level1[0]) &&
-                                empty($level1[0])) {
-                                $itemValue[$index0][$index1] = $this->obj[$index1];
-                            }
-                        }
-                    }
-                }
-            }
-
-            $confirm .= (isset($item->getAttributes()['confirm_delete_msg'])) ? ', \''.$item->getAttributes()['confirm_delete_msg'] .'\'' : ', \''.rex_i18n::msg('mform_repeater_remove_group_confirm_msg').'\'';
-            $addInitGroup = ($open) ? ' if('.$groups.'.length <= 0) { addGroup('.$obj.') };' : '';
-
-            $output[] = '<section class="repeater" id="'.$repeaterId.'"><div x-data="repeater()" x-repeater @repeater:ready.once=\'setInitialValue('.htmlspecialchars(json_encode($itemValue), ENT_QUOTES, 'UTF-8').');'.$addInitGroup.'\' @selectcustomlink.window="selectCustomLink($event.detail)" id="x-repeater">';
-            // add button
-            $output[] = '<template x-if="'.$groups.'.length <= 0"><a href="#" type="button" class="btn btn-mform-repeater '.$btnClass.'" @click.prevent=\'addGroup('.$obj.')\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add group').'</a></template>';
-            $header = '
-                <header>
-                    <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
-                            <a href="#" @click.prevent=\'addGroup('.$obj.')\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
-                        </template>
-                        <template x-if="'.$min.' < '.$groups.'.length">
-                            <a href="#" @click.prevent="removeGroup('.$repeaterId.'Index'.$confirm.', \''.$repeaterId.'\')" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
-                        </template>
-                        <template x-if="'.$min.' > '.$groups.'.length">
-                            <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index !== 0">
-                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$repeaterId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index === 0">
-                            <a class="btn disabled"><i class="rex-icon fa-chevron-up"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
-                            <a href="#" @click.prevent="moveGroup('.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$repeaterId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
-                            <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
-                        </template>
-                    </div>
-                </header>        
-        ';
-            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group" :id="\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitGroupElement(\''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
-        } else {
-            $varId = trim(str_replace(['][','[',']'],['.','',''], $item->getVarId()));
-            $link = '<a href="#" type="button" class="btn btn-mform-repeater'.$btnClass.'" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\'><i class="rex-icon fa-plus-circle"></i> '.((!empty($buttonName))?$buttonName:'Add field').'</a>';
-
-            $confirm .= (isset($item->getAttributes()['confirm_delete_msg'])) ? ', \''.$item->getAttributes()['confirm_delete_msg'] .'\'' : ', \''.rex_i18n::msg('mform_repeater_remove_field_confirm_msg').'\'';
-            $addInitFields = ($open) ? 'if('.$groups.'.length <= 0){addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")}' : '';
-
-            $output[] = '<template x-if="'.$groups.'.length <= 0" x-init=\''.$addInitFields.'\'>';
-            $output[] = $link;
-            $output[] = '</template>';
-            $header = '
-                <header>
-                    <div>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length'.$xifMax.'">
-                            <a href="#" @click.prevent=\'addFields('.$parentId.'Index, '.$obj.', "'.$varId.'", "'.$group.$parentId."_".$repeaterId.'")\' class="btn"><i class="rex-icon fa-plus-circle"></i></a>
-                        </template>
-                        <template x-if="'.$min.' < '.$groups.'.length">
-                            <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\''.$confirm.', \''.$group.'_'.$parentId."_".$repeaterId.'_\' + '.$repeaterId.'Index)" class="btn btn-red"><i class="rex-icon fa-times"></i></a>
-                        </template>
-                        <template x-if="'.$min.' > '.$groups.'.length">
-                            <a class="btn disabled"><i class="rex-icon fa-times"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index !== 0">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index-1, \''.$varId.'\', \''.$group.'_'.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-up"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index === 0">
-                            <a class="btn disabled"><i class="rex-icon fa-chevron-up"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index+1 < '.$groups.'.length">
-                            <a href="#" @click.prevent="moveField('.$parentId.'Index, '.$repeaterId.'Index, '.$repeaterId.'Index+1, \''.$varId.'\', \''.$group.'_'.$parentId."_".$repeaterId.'\', \''.$parentId.'\')" class="btn"><i class="rex-icon fa-chevron-down"></i></a>
-                        </template>
-                        <template x-if="'.$repeaterId.'Index+1 == '.$groups.'.length">
-                            <a class="btn btn-grey disabled"><i class="rex-icon fa-chevron-down"></i></a>
-                        </template>
-                    </div>
-                </header>
-            ';
-#                        <a href="#" @click.prevent="removeField('.$parentId.'Index, '.$repeaterId.'Index, \''.$varId.'\', \''.$group.$parentId."_".$repeaterId.'\''.')" class="button remove"><i class="rex-icon fa-times"></i></a>
-
-            $output[] = '<template x-for="('.$group.', '.$repeaterId.'Index) in '.$groups.'" :key="'.$repeaterId.'Index"><div class="repeater-group second-level-repeater" :id="\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index" :iteration="'.$repeaterId.'Index" x-init="rexInitFieldElement(\''.$group.'_'.$parentId."_' + '".$repeaterId."_' + ".$repeaterId.'Index, \''.$group."_' + '".$repeaterId."_' + ".$repeaterId.'Index);">';
-        }
-        // open repeater group
-        // header buttons
-        $output[] = $header;
-
-        // add to output element array
-        $this->elements[] = implode("",$output);
-
+        $this->openFlexRepeaterElement($item, $key, $items, $skipKeys);
     }
 
     private function closeRepeaterElement(MFormItem $item): void
     {
-        $this->executeDefaultManipulations($item, false, false);
-        // add to output element array
-        $this->elements[] = "</div></template>";
+        $this->closeFlexRepeaterElement($item);
+    }
 
-        // section end and form input
-        if (!array_key_exists('parent_id', $item->getAttributes())) {
-            if ($this->debug) {
-                $this->elements[] = "<textarea name=\"REX_INPUT_VALUE" . $item->getVarId() . "\" style='width:100%;height:200px' x-bind:value=\"value\">" . $item->getValue() . "</textarea>";
+    private function openFlexRepeaterElement(MFormItem $item, string $key, array $items, array &$skipKeys = []): void
+    {
+        // Wichtig: Keine Default-Manipulationen fuer den Flex-Repeater selbst.
+        // setVarAndIds() escaped String-Werte per htmlspecialchars(); das wuerde
+        // den JSON-String des Repeaters ungueltig machen (json_decode => [] beim Reload).
+
+        $attrs = $item->getAttributes();
+        $varId = $item->getVarId();
+
+        $repeaterId = 'mfr_' . uniqid('', false);
+
+        if (is_array($varId)) {
+            $fieldName = 'REX_INPUT_VALUE[' . implode('][', $varId) . ']';
+        } else {
+            $varIdString = (string) $varId;
+            if (0 === strpos($varIdString, '[')) {
+                $fieldName = 'REX_INPUT_VALUE' . $varIdString;
             } else {
-                $this->elements[] = "<textarea name=\"REX_INPUT_VALUE" . $item->getVarId() . "\" class=\"hidden\" x-bind:value=\"value\">" . $item->getValue() . "</textarea>";
+                $fieldName = 'REX_INPUT_VALUE[' . $varIdString . ']';
             }
-            $this->elements[] = "</div></section>";
         }
+
+        $currentValue = $item->getValue();
+        if (is_array($currentValue)) {
+            $jsonValue = json_encode($currentValue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        } elseif (is_string($currentValue) && '' !== $currentValue) {
+            $decoded = json_decode($currentValue, true);
+            $jsonValue = is_array($decoded) ? $currentValue : '[]';
+        } else {
+            $jsonValue = '[]';
+        }
+
+        $btnText = $attrs['btn_text'] ?? rex_i18n::msg('mform_flex_repeater_add');
+        $btnClass = ' ' . ($attrs['btn_class'] ?? 'btn-primary');
+        $label = '';
+        if (!empty($item->getLabel())) {
+            $itemLabel = $item->getLabel();
+            if (is_array($itemLabel)) {
+                $firstLabel = reset($itemLabel);
+                $labelStr = (string) ($firstLabel ?? '');
+            } else {
+                $labelStr = (string) $itemLabel;
+            }
+            $label = '<label class="control-label mfr-label">' . htmlspecialchars($labelStr, ENT_QUOTES) . '</label>';
+        }
+
+        $min = (int) ($attrs['min'] ?? 0);
+        $max = (int) ($attrs['max'] ?? 0);
+        $collapsed = !isset($attrs['collapsed']) || $attrs['collapsed'] ? 'true' : 'false';
+        $firstOpen = !isset($attrs['first_open']) || $attrs['first_open'] ? 'true' : 'false';
+        $showToggleAll = !isset($attrs['show_toggle_all']) || $attrs['show_toggle_all'] ? 'true' : 'false';
+        $open = isset($attrs['open']) && $attrs['open'] ? 'true' : 'false';
+        $defaultCount = isset($attrs['default_count']) ? (int) $attrs['default_count'] : 0;
+        $confirmDelete = isset($attrs['confirm_delete']) ? (int) ((bool) $attrs['confirm_delete']) : 0;
+        $confirmDeleteMsg = isset($attrs['confirm_delete_msg'])
+            ? (string) $attrs['confirm_delete_msg']
+            : (string) rex_i18n::msg('mform_repeater_remove_group_confirm_msg');
+
+        $addonDebug = (int) ((bool) rex_addon::get('mform')->getConfig('debug', false));
+
+        $innerForm = null;
+        foreach ($items as $k => $itm) {
+            if ($k > $key && $itm instanceof MForm) {
+                $innerForm = $itm;
+                $skipKeys[] = $k;
+                break;
+            }
+        }
+
+        $templateHtml = '';
+        if (null !== $innerForm) {
+            $templateHtml = MFormFlexRepeaterRenderer::renderTemplate($innerForm, 1);
+        }
+
+        $this->elements[] = sprintf(
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d">%s',
+            htmlspecialchars($repeaterId, ENT_QUOTES),
+            htmlspecialchars($fieldName, ENT_QUOTES),
+            $min,
+            $max,
+            $collapsed,
+            $firstOpen,
+            $showToggleAll,
+            $open,
+            $defaultCount,
+            $confirmDelete,
+            htmlspecialchars($confirmDeleteMsg, ENT_QUOTES),
+            $addonDebug,
+            $label
+        );
+
+        $toggleAllButton = sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-toggle-all" title="%s"><i class="rex-icon fa-square-o"></i> %s</button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES)
+        );
+
+        $this->elements[] = sprintf(
+            '<div class="mfr-toolbar mfr-toolbar-top">%s<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button></div>',
+            ('true' === $showToggleAll) ? $toggleAllButton : '',
+            htmlspecialchars($btnClass, ENT_QUOTES),
+            htmlspecialchars($btnText, ENT_QUOTES)
+        );
+
+        $this->elements[] = '<div class="mfr-items-list"></div>';
+
+        $this->elements[] = sprintf(
+            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button><button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body">%s</div></div></template>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_up'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_down'), ENT_QUOTES),
+            htmlspecialchars($btnText, ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_visibility'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_remove'), ENT_QUOTES),
+            $templateHtml
+        );
+
+        $this->elements[] = sprintf(
+            '<div class="mfr-toolbar mfr-toolbar-bottom">%s<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button></div>',
+            ('true' === $showToggleAll) ? $toggleAllButton : '',
+            htmlspecialchars($btnClass, ENT_QUOTES),
+            htmlspecialchars($btnText, ENT_QUOTES)
+        );
+
+        if ($this->debug) {
+            $this->elements[] = sprintf(
+                '<textarea name="%s" class="mfr-value" style="width:100%%;height:150px;font-family:monospace;font-size:12px">%s</textarea>',
+                htmlspecialchars($fieldName, ENT_QUOTES),
+                htmlspecialchars((string) $jsonValue, ENT_QUOTES)
+            );
+        } else {
+            $this->elements[] = sprintf(
+                '<input type="hidden" name="%s" class="mfr-value" value="%s">',
+                htmlspecialchars($fieldName, ENT_QUOTES),
+                htmlspecialchars((string) $jsonValue, ENT_QUOTES)
+            );
+        }
+    }
+
+    private function closeFlexRepeaterElement(MFormItem $item): void
+    {
+        $this->elements[] = '</div><!-- /mfr-container -->';
     }
 
 
@@ -712,6 +717,7 @@ class MFormParser
      */
     private function generateMediaElement(MFormItem $item): void
     {
+        $dom = new DOMDocument();
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
@@ -751,10 +757,14 @@ class MFormParser
             case 'medialist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIALIST';
                 $id = $this->getWidgetId($item);
-                /** @var rex_var_medialist|rex_var_imglist $class */
-                $class = 'rex_var_' . $item->getType();
                 $value = (!is_string($item->getValue())) ? '' : $item->getValue();
-                $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
+                if ('medialist' === $item->getType()) {
+                    $html = \rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
+                } else {
+                    /** @var rex_var_imglist $class */
+                    $class = 'rex_var_' . $item->getType();
+                    $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
+                }
 
                 $dom = new DOMDocument();
                 @$dom->loadHTML(utf8_decode($html));
@@ -789,6 +799,7 @@ class MFormParser
      */
     private function generateLinkElement(MFormItem $item): void
     {
+        $dom = new DOMDocument();
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
@@ -833,7 +844,7 @@ class MFormParser
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = \rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
@@ -1095,7 +1106,12 @@ class MFormParser
     {
         try {
             if (count($items) > 0) {
+                $skipKeys = [];
                 foreach ($items as $key => $item) {
+
+                    if (in_array($key, $skipKeys, true)) {
+                        continue;
+                    }
 
                     if ($item instanceof MForm) {
                         $mformItem = new MFormItem();
@@ -1108,7 +1124,7 @@ class MFormParser
                         switch ($item->getType()) {
                             // OPEN REPEATER
                             case 'repeater':
-                                $this->openRepeaterElement($item, $key, $items);
+                                $this->openRepeaterElement($item, $key, $items, $skipKeys);
                                 break;
                             // CLOSE REPEATER
                             case 'close-repeater':

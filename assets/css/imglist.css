@@ -1,65 +1,114 @@
+:root {
+    --mform-widget-bg: #ffffff;
+    --mform-widget-border: #d9e1ea;
+    --mform-widget-muted: #6c7a88;
+    --mform-widget-selected: #3f8bd8;
+    --mform-widget-selected-shadow: rgba(63, 139, 216, .22);
+    --mform-widget-placeholder: rgba(221, 231, 242, .7);
+    --mform-widget-gap: .55rem;
+}
+
 .rex-js-widget-imglist select.form-control {
     display: none;
 }
 
-.rex-js-widget-imglist ul {
+.rex-js-widget-imglist ul.thumbnail-list {
     list-style: none;
     margin: 0;
-    height: 160px;
-    padding: 5px;
-    overflow-y: scroll;
+    padding: .65rem;
+    overflow-y: auto;
+    background: var(--mform-widget-bg);
+    border: 1px solid var(--mform-widget-border);
+    border-radius: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: var(--mform-widget-gap);
+    min-height: 220px;
+    max-height: 320px;
+}
+
+.rex-js-widget-imglist.is-empty ul.thumbnail-list::before {
+    content: 'Noch keine Medien ausgewaehlt';
+    width: 100%;
+    color: var(--mform-widget-muted);
+    font-size: 12px;
+    line-height: 1.5;
+    padding: .2rem .1rem;
 }
 
 .rex-js-widget-imglist ul li {
-    margin: 0 5px 5px 0;
+    margin: 0;
     padding: 0;
-    float: left;
-    width: 100px;
-    height: 100px;
+    width: 104px;
+    height: 104px;
     box-sizing: border-box;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-.rex-js-widget-imglist ul li img {
-    -webkit-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-    -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s
+.rex-js-widget-imglist ul li:hover {
+    transform: translateY(-1px);
 }
 
-.rex-js-widget-imglist ul li.selected img {
-    border-color: #66afe9;
-    outline: 0;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.085), 0 0 8px rgba(102, 175, 233, 0.8);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.085), 0 0 8px rgba(102, 175, 233, 0.8)
+.rex-js-widget-imglist ul li:focus {
+    outline: none;
+    border-color: var(--mform-widget-selected);
+    box-shadow: 0 0 0 3px var(--mform-widget-selected-shadow);
+}
+
+.rex-js-widget-imglist ul li.selected {
+    border-color: var(--mform-widget-selected);
+    box-shadow: 0 0 0 3px var(--mform-widget-selected-shadow);
 }
 
 .rex-js-widget-imglist ul li.li-placeholder {
-    background: rgba(243, 246, 251, .6);
-    border: 1px solid rgba(221, 221, 221, .6);
+    background: var(--mform-widget-placeholder);
+    border: 1px dashed var(--mform-widget-selected);
 }
 
 .rex-js-widget-imglist ul li .thumbnail {
     object-fit: cover;
     object-position: center;
-    height: 100px;
-    width: 100px;
+    height: 100%;
+    width: 100%;
+    display: block;
+    border: 0;
 }
 
-.rex-js-widget-imglist ul:before, /* for modern browsers */
-.rex-js-widget-imglist ul:after {
-    content: "";
-    display: table;
+.form-control.thumbnail-list.ui-sortable {
+    height: auto;
+    min-height: 220px;
 }
 
-.rex-js-widget-imglist ul:after {
-    clear: both;
-}
-
-.rex-js-widget-imglist ul { /* for IE6,7 */
-    zoom: 1;
-}
-/* Stretch height of ImageList */
-.form-control.thumbnail-list.ui-sortable {height: auto; min-height: 220px;}
-
-.custom-imglist .input-group-addon, .input-group-btn {
+.custom-imglist .input-group-addon,
+.custom-imglist .input-group-btn {
     vertical-align: top;
+}
+
+.custom-imglist .input-group-btn > .btn {
+    min-width: 34px;
+}
+
+body.rex-theme-dark {
+    --mform-widget-bg: #1f2830;
+    --mform-widget-border: #3b4a57;
+    --mform-widget-muted: #9dafc1;
+    --mform-widget-selected: #5ea7f2;
+    --mform-widget-selected-shadow: rgba(94, 167, 242, .22);
+    --mform-widget-placeholder: rgba(65, 86, 106, .7);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        --mform-widget-bg: #1f2830;
+        --mform-widget-border: #3b4a57;
+        --mform-widget-muted: #9dafc1;
+        --mform-widget-selected: #5ea7f2;
+        --mform-widget-selected-shadow: rgba(94, 167, 242, .22);
+        --mform-widget-placeholder: rgba(65, 86, 106, .7);
+    }
 }

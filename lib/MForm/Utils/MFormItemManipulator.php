@@ -23,39 +23,29 @@ class MFormItemManipulator
         // set value for html out
         $value = $item->getValue();
         if (!is_array($value)) {
-            // Spezialbehandlung für '0' als String oder Zahl
-            if ($value === '0' || $value === 0) {
-                // '0' bleibt unverändert
-            } else {
-                $string = htmlspecialchars((!empty($item->getValue())) ? $item->getValue() : '');
-                if ($string !== '') {
-                    $item->setValue($string);
-                }
+            // '0' stays unchanged; null/empty string: no setValue call needed
+            if ($value !== '0' && $value !== null && $value !== '') {
+                $item->setValue(htmlspecialchars($value));
             }
-        } elseif (is_array($item->getVarId()) && 1 == count($item->getVarId())) {
+        } elseif (is_array($item->getVarId()) && 1 === count($item->getVarId())) {
             $item->setValue(htmlspecialchars($item->getStringValue()));
         }
 
         // is mode add and default value defined
-        if ('add' == $item->getMode() && ($item->getDefaultValue() || $item->getDefaultValue() === '0' || $item->getDefaultValue() === 0)) {
-            // Spezialbehandlung für Default-Wert '0'
-            if ($item->getDefaultValue() === '0' || $item->getDefaultValue() === 0) {
-                $item->setValue($item->getDefaultValue());
-            } else {
-                $string = htmlspecialchars((!empty($item->getDefaultValue())) ? $item->getDefaultValue() : '');
-                if ($string !== '') {
-                    $item->setValue($string);
-                } else {
-                    $item->setValue($item->getDefaultValue());
-                }
-            }
+        // getDefaultValue() always returns string (never int, never null)
+        $defaultValue = $item->getDefaultValue();
+        if ($item->getMode() === 'add' && $defaultValue !== '') {
+            $item->setValue(htmlspecialchars($defaultValue));
         }
 
         // set element id - add var id for unique
-        $item->setId($item->getId() . '_' . implode('_', $item->getVarId()));
-
-        // set varId to exchagne
-        $item->setVarId('[' . implode('][', $item->getVarId()) . ']');
+        // Guard: varId may already be a string if setVarAndIds was called twice on the same item
+        $varId = $item->getVarId();
+        if (is_array($varId)) {
+            $item->setId($item->getId() . '_' . implode('_', $varId));
+            // set varId to exchange
+            $item->setVarId('[' . implode('][', $varId) . ']');
+        }
     }
 
     /**

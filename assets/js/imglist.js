@@ -1,19 +1,26 @@
-let mform_img_list = '.rex-js-widget-imglist';
+const mform_img_list = '.rex-js-widget-imglist';
 
 $(document).on('rex:ready', function (e, container) {
     setTimeout(function () {
-        if (container.find(mform_img_list).length) {
+        if (container && container.find(mform_img_list).length) {
             container.find(mform_img_list).each(function () {
                 imglist_init_widget($(this));
                 imglist_list_items_action($(this));
                 imglist_widget_actions($(this));
+                imglist_update_empty_state($(this));
             });
         }
     }, 2);
 });
 
 function imglist_init_widget(element) {
-    let n = element.find('select').attr('id').match(/\d+/g),
+    const selectId = element.find('select').attr('id');
+    if (!selectId) return;
+
+    const matches = selectId.match(/\d+/g);
+    if (!matches || !matches[0]) return;
+
+    let n = matches[0],
         widget_id = element.attr('data-widget-id');
 
     if (n !== widget_id) {
@@ -22,105 +29,92 @@ function imglist_init_widget(element) {
         widget_id = n;
     }
 
-    element.find('ul.thumbnail-list').sortable({
+    const list = element.find('ul.thumbnail-list');
+    if (list.data('ui-sortable')) {
+        list.sortable('destroy');
+    }
+
+    list.sortable({
         opacity: 0.6,
         cursor: 'move',
-        placeholder: "li-placeholder",
+        placeholder: 'li-placeholder',
         start: function (event, ui) {
             if (ui.item.find('img').length) {
                 imglist_hide_tooltip(element, ui.item.find('img'));
             }
         },
         stop: function () {
-            // refresh input
             imglist_write_input(element);
+            imglist_update_empty_state(element);
         }
     });
 }
 
 function writeREXMedialist(id) {
-    let letitgo = true,
-        element;
+    let letitgo = true;
+    let element;
 
     $(mform_img_list).each(function () {
-        // if the the widget id a imglist?
         if ($(this).attr('data-widget-id') == id) {
-            // yes don't let it go ;)
             letitgo = false;
-            // and selt element for the next steps
             element = $(this);
         }
     });
 
     if (letitgo) {
-        // default widget action for input write
         writeREX(id, 'REX_MEDIALIST_', 'REX_MEDIALIST_SELECT_');
     } else {
-        // add li by write event from list
         imglist_add_img_by_last_list_item(element);
     }
     return false;
 }
 
 function imglist_widget_actions(element) {
-    let widget_id = element.attr('data-widget-id'),
-        param = element.attr('data-params');
+    const widget_id = element.attr('data-widget-id');
+    const param = element.attr('data-params');
 
-    // REMOVE BUTTON
-    element.find('.btn-popup.delete').on('click', function () {
-        let selected = element.find('ul.thumbnail-list > li.selected'),
-            next_selected = selected.next(),
-            prev_selected = selected.prev();
+    element.find('.btn-popup.delete').off('click.mformImglist').on('click.mformImglist', function () {
+        const selected = element.find('ul.thumbnail-list > li.selected');
+        const next_selected = selected.next();
+        const prev_selected = selected.prev();
 
         if (selected.length) {
-            // remove option
             element.find('select option').each(function () {
-                console.log($(this).attr('data-key') + '===' + selected.attr('data-key'));
                 if ($(this).attr('data-key') === selected.attr('data-key')) {
                     $(this).remove();
                 }
             });
 
-            // remove element
             selected.remove();
 
-            // set new selected item
             if (next_selected.length) {
                 imglist_list_items_select(element, next_selected);
             } else if (prev_selected.length) {
                 imglist_list_items_select(element, prev_selected);
             }
 
-            // refresh input
             imglist_write_input(element);
+            imglist_update_empty_state(element);
 
-            // refresh sortable
             element.find('ul.thumbnail-list').sortable('refresh');
         }
         return false;
     });
 
-    // OPEN BUTTON
-    element.find('.btn-popup.open').on('click', function () {
+    element.find('.btn-popup.open').off('click.mformImglist').on('click.mformImglist', function () {
         openREXMedialist(widget_id, param);
         return false;
     });
 
-    // ADD BUTTON
-    element.find('.btn-popup.add').on('click', function () {
+    element.find('.btn-popup.add').off('click.mformImglist').on('click.mformImglist', function () {
         addREXMedialist(widget_id, param);
         return false;
     });
 
-    // VIEW BUTTON
-    element.find('.btn-popup.view').on('click', function () {
+    element.find('.btn-popup.view').off('click.mformImglist').on('click.mformImglist', function () {
         viewREXMedialist(widget_id, param);
         return false;
     });
-    // element.find('.btn-popup.open').attr('onclick', 'openREXMedialist(' + parseInt(widget_id) + ',\'' + param + '\');return false');
-    // element.find('.btn-popup.add').attr('onclick', 'addREXMedialist(' + parseInt(widget_id) + ',\'' + param + '\');return false');
-    // element.find('.btn-popup.view').attr('onclick', 'viewREXMedialist(' + parseInt(widget_id) + ',\'' + param + '\');return false');
-    // element.find('.btn-popup.delete').attr('onclick', 'deleteREXImagelist(' + parseInt(widget_id) + ',\'' + param + '\');return false');
 }
 
 // function deleteREXImagelist(widget_id, param) {
@@ -128,43 +122,49 @@ function imglist_widget_actions(element) {
 // }
 
 function imglist_add_img_by_last_list_item(element) {
-    let widget_id = element.attr('data-widget-id'),
-        go_go_go = false;
+    let go_go_go = false;
+    const options = element.find('select option');
+    const listItems = element.find('ul.thumbnail-list li');
+    const startIndex = Math.max(0, listItems.length);
 
-    for (let i = 0; i < element.find('select option').length; i++) {
-        if ((element.find('ul.thumbnail-list li').length - 1) < i) {
-            // add new element
-            let item = element.find('select option').eq(i);
+    for (let i = startIndex; i < options.length; i++) {
+        if ((listItems.length - 1) < i) {
+            const item = options.eq(i);
             item.attr('data-key', i);
 
-            let extension = item.val().replace(/^.*\./, ''),
-                url = 'index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=';
-            let isVideo = ['mp4', 'webm', 'ogg'].includes(extension);
+            const file = item.val();
+            const extension = file.replace(/^.*\./, '').toLowerCase();
+            const encodedFile = encodeURIComponent(file);
+            let url = 'index.php?rex_media_type=rex_medialistbutton_preview&rex_media_file=';
+            const isVideo = ['mp4', 'webm', 'ogg'].includes(extension);
             if (extension === 'svg' || isVideo) {
                 url = '/media/';
             }
-            let media = isVideo ? `<video playsinline autoplay muted loop class="thumbnail"><source src="${url}${item.val()}" type="video/${extension}"></video>` : `<img class="thumbnail" src="${url}${item.val()}" title="${item.val()}" />`;
+            const source = isVideo ? (url + file) : (url + encodedFile);
+            const media = isVideo
+                ? `<video playsinline autoplay muted loop class="thumbnail"><source src="${source}" type="video/${extension}"></video>`
+                : `<img class="thumbnail" src="${source}" title="${file}" />`;
 
-            let new_li = $(`<li data-key="${i}" value="${item.val()}" data-value="${item.val()}">${media}</li>`);
+            const new_li = $(`<li data-key="${i}" value="${file}" data-value="${file}" tabindex="0" role="button" aria-label="${file}">${media}</li>`);
 
             imglist_add_tooltip(element, new_li.find('img'));
-
-            // add li img element
             element.find('ul.thumbnail-list').append(new_li);
-            go_go_go = true; // go forward
+            go_go_go = true;
         }
     }
-    if (go_go_go) {
-        // refresh input
-        imglist_write_input(element);
 
-        // refresh sortable
+    if (go_go_go) {
+        imglist_write_input(element);
+        imglist_update_empty_state(element);
         element.find('ul.thumbnail-list').sortable('refresh');
     }
 }
 
 function imglist_list_items_action(element) {
-    element.find('ul.thumbnail-list').on('click', 'li', function () {
+    const list = element.find('ul.thumbnail-list');
+    list.off('click.mformImglist keydown.mformImglist');
+
+    list.on('click.mformImglist', 'li', function () {
         let selected = ($(this).data('selected') === 1);
         $(this).parent().find('li').removeClass('selected').data('selected', 0);
         element.find('select option:selected').prop('selected', false).data('selected', 0);
@@ -174,6 +174,19 @@ function imglist_list_items_action(element) {
         }
         if ($(this).find('img').length) {
             imglist_hide_tooltip(element, $(this).find('img'));
+        }
+    });
+
+    list.on('keydown.mformImglist', 'li', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            $(this).trigger('click');
+            return;
+        }
+
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            e.preventDefault();
+            element.find('.btn-popup.delete').trigger('click');
         }
     });
 
@@ -219,4 +232,9 @@ function imglist_write_input(element) {
     } else {
         element.find('input').val('');
     }
+}
+
+function imglist_update_empty_state(element) {
+    const hasItems = element.find('ul.thumbnail-list li').length > 0;
+    element.toggleClass('is-empty', !hasItems);
 }

@@ -16,7 +16,157 @@ function initMFormElements(mform) {
         initMFormSelectPicker(mform);
         // init radio img inlines
         initMFormRadioImgInlines(mform);
+        // init conditional fieldsets
+        initMFormConditionals(mform);
     }, 1)
+}
+
+function initMFormConditionals(mform) {
+    var targets = mform.find('.mform-conditional-target[data-mform-conditional-source]');
+    if (!targets.length) {
+        return;
+    }
+
+    function normalizeOperator(rawOperator) {
+        var op = (rawOperator || '=').toString().trim().toLowerCase();
+        if (op === '==' || op === 'eq' || op === 'equals') return '=';
+        if (op === '!==') return '!=';
+        return op;
+    }
+
+    function findSourceFields(source) {
+        var sourceStr = (source || '').toString().trim();
+        if (!sourceStr.length) return $();
+
+        var candidates = [
+            sourceStr,
+            'REX_INPUT_VALUE[' + sourceStr + ']',
+            'REX_INPUT_VALUE[' + sourceStr + '][]'
+        ];
+
+        return mform.find(':input').filter(function () {
+            var name = this.name || '';
+            var id = this.id || '';
+
+            if (sourceStr.charAt(0) === '#') {
+                return ('#' + id) === sourceStr;
+            }
+
+            if (id === sourceStr) return true;
+            if (candidates.indexOf(name) !== -1) return true;
+            if (name.endsWith('[' + sourceStr + ']')) return true;
+            if (name.endsWith('[' + sourceStr + '][]')) return true;
+            return false;
+        });
+    }
+
+    function getFieldValue(fields) {
+        if (!fields.length) return '';
+
+        var first = fields.first();
+        var type = (first.attr('type') || '').toLowerCase();
+        var tag = (first.prop('tagName') || '').toLowerCase();
+
+        if (type === 'radio') {
+            var checkedRadio = fields.filter(':checked').first();
+            return checkedRadio.length ? String(checkedRadio.val()) : '';
+        }
+
+        if (type === 'checkbox') {
+            if (fields.length > 1) {
+                return fields.filter(':checked').map(function () {
+                    return String($(this).val());
+                }).get();
+            }
+            return first.is(':checked') ? String(first.val() || '1') : '';
+        }
+
+        if (tag === 'select' && first.prop('multiple')) {
+            return first.val() || [];
+        }
+
+        return String(first.val() || '');
+    }
+
+    function isEmptyValue(value) {
+        if (Array.isArray(value)) return value.length === 0;
+        return value === null || value === undefined || String(value).trim() === '';
+    }
+
+    function compareValue(sourceValue, compareValue, operator) {
+        var op = normalizeOperator(operator);
+        var sourceText = Array.isArray(sourceValue) ? sourceValue.join(',') : String(sourceValue);
+        var compareText = String(compareValue || '');
+
+        if (op === 'empty') return isEmptyValue(sourceValue);
+        if (op === '!empty') return !isEmptyValue(sourceValue);
+
+        if (op === 'contains') {
+            if (Array.isArray(sourceValue)) return sourceValue.indexOf(compareText) !== -1;
+            return sourceText.indexOf(compareText) !== -1;
+        }
+
+        if (op === 'in') {
+            var compareItems = compareText.split(',').map(function (item) {
+                return item.trim();
+            }).filter(function (item) {
+                return item.length > 0;
+            });
+            if (Array.isArray(sourceValue)) {
+                return sourceValue.some(function (item) {
+                    return compareItems.indexOf(String(item)) !== -1;
+                });
+            }
+            return compareItems.indexOf(sourceText) !== -1;
+        }
+
+        if (op === '>' || op === '<') {
+            var sourceNum = parseFloat(sourceText);
+            var compareNum = parseFloat(compareText);
+            if (!Number.isNaN(sourceNum) && !Number.isNaN(compareNum)) {
+                return op === '>' ? sourceNum > compareNum : sourceNum < compareNum;
+            }
+            return op === '>' ? sourceText > compareText : sourceText < compareText;
+        }
+
+        if (op === '!=') return sourceText !== compareText;
+        return sourceText === compareText;
+    }
+
+    function applyConditional(target) {
+        var source = target.data('mform-conditional-source');
+        var operator = target.data('mform-conditional-operator') || '=';
+        var compare = target.data('mform-conditional-value') || '';
+        var action = (target.data('mform-conditional-action') || 'show').toString().toLowerCase();
+        var fields = findSourceFields(source);
+
+        if (!fields.length) {
+            target.show();
+            return;
+        }
+
+        var matched = compareValue(getFieldValue(fields), compare, operator);
+        var shouldShow = action === 'hide' ? !matched : matched;
+
+        target.toggleClass('mform-conditional-hidden', !shouldShow);
+        if (shouldShow) {
+            target.show();
+        } else {
+            target.hide();
+        }
+    }
+
+    function evaluateAllConditionals() {
+        targets.each(function () {
+            applyConditional($(this));
+        });
+    }
+
+    mform.off('.mformConditional').on('change.mformConditional input.mformConditional', ':input', function () {
+        evaluateAllConditionals();
+    });
+
+    evaluateAllConditionals();
 }
 
 function initMFormSelectPicker(mform) {
