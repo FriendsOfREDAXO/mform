@@ -16,6 +16,7 @@ Version 9 focuses on a more robust and editor-friendly form workflow.
 - **Copy/Paste for Flex Repeater** – `copy_paste => true` on `addRepeaterElement()`: copy a single item to session storage, paste it as a new entry at the bottom
 - Better TinyMCE compatibility in repeater actions (add/move/sort/remove)
 - New Linklist/Medialist repeater widget with robust popup synchronization
+- Medialist widget now supports a built-in view switch (list/grid) via toolbar toggle
 - New `addCustomLinkMultipleField(...)` API – repeater-based multi-link field; single format stays unchanged
 - New Conditional Fields Builder API via `addConditionalFieldsetArea(...)`
 - **New YForm Value Types** provided by mform:

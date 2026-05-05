@@ -37,6 +37,12 @@
     gap: .3rem;
 }
 
+.mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: .45rem;
+}
+
 .mform-list-widget.is-empty .mform-list-items::before {
     content: 'Keine Eintraege ausgewaehlt';
     color: var(--mfl-muted);
@@ -52,6 +58,69 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.mform-list-widget.mform-list-widget-medialist .mform-list-items li {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+}
+
+.mform-list-widget.mform-list-widget-medialist .mform-list-item-media {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--mfl-border);
+    border-radius: 4px;
+    background: #fff;
+    flex: 0 0 36px;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mform-list-widget.mform-list-widget-medialist .mform-list-item-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.mform-list-widget.mform-list-widget-medialist .mform-list-item-ext {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--mfl-muted);
+    text-transform: uppercase;
+}
+
+.mform-list-widget.mform-list-widget-medialist .mform-list-item-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-items li {
+    white-space: normal;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .45rem;
+    word-break: break-word;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-item-media {
+    width: 100%;
+    height: 72px;
+    flex-basis: 72px;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-item-label {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .mform-list-widget .mform-list-items li:hover {
@@ -70,6 +139,10 @@
 }
 
 .mform-list-widget .mform-list-toolbar .btn {
+    min-width: 32px;
+}
+
+.mform-list-widget .mform-list-toolbar .mform-list-btn-view-toggle {
     min-width: 32px;
 }
 

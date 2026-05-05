@@ -7,6 +7,10 @@
 - Repeater-Symbole und Bedienung vereinheitlicht (konsistentes Auf-/Zuklappen inkl. Nested-Repeatern)
 - TinyMCE-Kompatibilität verbessert (stabileres Save/Destroy/Reinit bei Add/Move/Sort/Remove)
 - Neues Linklist/Medialist-Repeater-Widget mit robuster Übernahme aus Linkmap/Mediapool-Popups
+- Medialist-Widget erweitert: View-Switch zwischen Listen- und Rasteransicht (`view`, `view_switch`)
+- Medialist-Widget verbessert: Toggle wieder als Symbol-Button in der Toolbar
+- Medialist-Widget verbessert: echte Datei-Previews analog zur `imagelist` (statt reinem Dateityp-Text)
+- Medialist-Widget fix: Preview-URLs korrekt aufbereitet (HTML-Entity-Decode für `rex_medialistbutton_preview`)
 - Neue API: `addCustomLinkMultipleField(...)` fuer mehrere Custom-Links (repeater-basiert), Single-Format bleibt unveraendert
 - Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
 - Neue Demo-Module ergänzt, u. a. für Conditional Fields Builder und erweiterte Repeater-Szenarien

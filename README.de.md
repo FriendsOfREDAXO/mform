@@ -16,6 +16,7 @@ Version 9 legt den Fokus auf einen robusteren und redaktionsfreundlichen Workflo
 - **Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` an `addRepeaterElement()`: einzelnes Item kopieren, als neues Element am Ende einfügen
 - TinyMCE-Kompatibilität im Repeater verbessert (Add/Move/Sort/Remove)
 - Neues Linklist/Medialist-Repeater-Widget mit robuster Popup-Übernahme
+- Medialist-Widget mit integriertem View-Switch (Liste/Raster) per Toolbar-Button
 - Neue API `addCustomLinkMultipleField(...)` – Repeater-basiertes Multi-Link-Feld; Single-Format bleibt unveraendert
 - Neue Conditional-API über `addConditionalFieldsetArea(...)`
 - **Neue YForm Value-Types** aus dem mform-Paket:

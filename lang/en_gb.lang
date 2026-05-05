@@ -29,6 +29,7 @@ mform_example_base_widgets = MForm widget elements
 mform_example_extended_attribute_method = Attributes method
 mform_example_extended_options_method = Options method
 mform_example_extended_conditional_fields = Conditional Fields [addConditionalFieldsetArea]
+mform_example_extended_conditional_fields_builder = Conditional Fields Builder [addConditionalFieldsetArea]
 mform_example_extended_parameter_method = Parameter method
 mform_example_extended_full_json_support = Full JSON value support
 mform_example_extended_diverse_setter = Add and diverse setter
@@ -78,6 +79,8 @@ mform_flex_repeater_copy = Copy
 mform_flex_repeater_paste = Paste (at end)
 mform_flex_repeater_paste_after = Paste after
 mform_repeater_remove_field_confirm_msg = Remove field?
+mform_list_widget_view_grid = Grid view
+mform_list_widget_view_list = List view
 
 mform_install = Install
 mform_update = Update
