@@ -288,3 +288,54 @@ Optionale Aktion:
 
 - Standard ist `show` (Bereich zeigen, wenn Bedingung erfüllt ist)
 - Mit dem letzten Parameter `action = 'hide'` wird das Verhalten invertiert
+
+## Beispiel: Templates / Defaults per Key
+
+Fuer wiederkehrende Form-Defaults (z. B. Standard-Einstellungen, Basisfelder) kann ein Template-Key verwendet werden.
+Die Template-Definition liegt dabei z. B. im `project`-Addon, die Verwendung bleibt in Modulen sehr schlank.
+
+### 1) Template im project-Addon registrieren
+
+Beispiel in `redaxo/src/addons/project/boot.php`:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\Project\MFormTemplate\CardDefaultsTemplate;
+
+MForm::registerTemplate('card_defaults', CardDefaultsTemplate::class);
+```
+
+### 2) Template im Modul verwenden
+
+Neue Form direkt aus einem Key:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::fromTemplate('card_defaults')
+    ->addTextField('title', ['label' => 'Titel'])
+    ->show();
+```
+
+Oder auf eine bestehende Form anwenden:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addTextField('headline', ['label' => 'Headline'])
+    ->applyTemplate('card_defaults', ['module' => 'team_cards'])
+    ->addTextAreaField('text', ['label' => 'Text']);
+
+echo $mform->show();
+```
+
+Hinweise:
+
+- Der Key ist frei waehlbar (`card_defaults`, `hero_defaults`, `teaser_defaults`, ...).
+- Ueber `$context` koennen projektseitig Varianten gesteuert werden.
+- Ohne passende Registrierung per `MForm::registerTemplate(...)` bleibt die Form unveraendert.

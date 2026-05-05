@@ -118,6 +118,7 @@ mform_docs_imagelist = Imagelist-Widget
 mform_docs_wrapper = Wrapper und Layouts
 mform_docs_advanced = Erweitert
 mform_docs_repeater = Repeater
+mform_docs_templates = Templates und Defaults
 mform_docs_toc = Inhaltsverzeichnis
 mform_docs_toc_filter = Filter
 mform_docs_search_placeholder = Dokumentation durchsuchen
