@@ -6,6 +6,7 @@
 - Repeater-Symbole und Bedienung vereinheitlicht (konsistentes Auf-/Zuklappen inkl. Nested-Repeatern)
 - TinyMCE-Kompatibilität verbessert (stabileres Save/Destroy/Reinit bei Add/Move/Sort/Remove)
 - Neues Linklist/Medialist-Repeater-Widget mit robuster Übernahme aus Linkmap/Mediapool-Popups
+- Neue API: `addCustomLinkMultipleField(...)` fuer mehrere Custom-Links (repeater-basiert), Single-Format bleibt unveraendert
 - Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
 - Neue Demo-Module ergänzt, u. a. für Conditional Fields Builder und erweiterte Repeater-Szenarien
 - Dokumentation erweitert (Repeater, Output-Filter, Conditional Fields)

@@ -36,6 +36,15 @@ $mform = MForm::factory()
         ->addImagelistField(7, ['label' => 'Bildliste'])
         ->addLinklistField(8, ['category' => 1], null, ['label' => 'Verwandte Artikel'])
         ->addMedialistField(9, ['types' => 'pdf,zip,jpg,png'], null, ['label' => 'Dateiliste'])
+        ->addCustomLinkMultipleField(13, [
+            'label' => 'Weitere Links (Multiple)',
+            'btn_add' => 'Link hinzufügen',
+            'data-intern' => 'enable',
+            'data-extern' => 'enable',
+            'data-media' => 'enable',
+            'data-mailto' => 'enable',
+            'data-tel' => 'enable',
+        ])
     )
     ->addCollapseElement('Erweiterte Einstellungen', MForm::factory()
         ->addTextAreaField(10, ['label' => 'Hinweistext'])

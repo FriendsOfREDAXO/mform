@@ -68,6 +68,10 @@ mform_flex_repeater_move_up = Move up
 mform_flex_repeater_move_down = Move down
 mform_flex_repeater_visibility = Active / Inactive (Output)
 mform_flex_repeater_remove = Remove
+
+mform_cl_multi_add = Add link
+mform_cl_multi_remove = Remove
+mform_cl_multi_move = Move
 mform_flex_repeater_toggle = Expand / Collapse
 mform_repeater_remove_field_confirm_msg = Remove field?
 

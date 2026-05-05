@@ -687,3 +687,95 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
         border-color: rgba(21, 28, 34, 0.8);
     }
 }
+
+/* -------------------------------------------------------
+ * Custom Link Multi Widget (.mform-cl-multi)
+ * ------------------------------------------------------- */
+
+.mform-cl-multi {
+    display: block;
+}
+
+.mform-cl-multi-list {
+    margin-bottom: 6px;
+}
+
+.mform-cl-multi-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    background: #f7f9fb;
+    border: 1px solid #dde4ec;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
+.mform-cl-multi-item .rex-js-widget-customlink {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.mform-cl-multi-item .rex-js-widget-customlink .custom-link.input-group {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    margin-bottom: 0;
+}
+
+.mform-cl-multi-handle {
+    cursor: grab;
+    color: #aaa;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.mform-cl-multi-handle:active {
+    cursor: grabbing;
+}
+
+.mform-cl-multi-remove {
+    flex-shrink: 0;
+    border: 0 !important;
+    background: transparent !important;
+    color: #c0392b !important;
+    padding: 2px 6px;
+}
+
+.mform-cl-multi-remove:hover {
+    color: #922b21 !important;
+}
+
+.mform-cl-multi-add {
+    margin-top: 2px;
+}
+
+/* Dark mode */
+body.rex-theme-dark .mform-cl-multi-item {
+    background: #1f2830;
+    border-color: #3a4753;
+}
+
+body.rex-theme-dark .mform-cl-multi-handle {
+    color: #5a6a78;
+}
+
+body.rex-theme-dark .mform-cl-multi-remove {
+    color: #e57373 !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mform-cl-multi-item {
+        background: #1f2830;
+        border-color: #3a4753;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cl-multi-handle {
+        color: #5a6a78;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cl-multi-remove {
+        color: #e57373 !important;
+    }
+}
+}

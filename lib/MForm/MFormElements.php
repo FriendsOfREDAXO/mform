@@ -438,6 +438,20 @@ abstract class MFormElements
         return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $defaultValue);
     }
 
+    /**
+     * Add a multiple custom-link field as own list widget.
+     *
+     * Each item is a fully-initialized custom link widget.
+     * Data is stored as a JSON array of link strings in a single hidden input.
+     *
+     * @param float|int|string $id Field id / value slot (1-10)
+     * @param array<string, mixed>|null $attributes Additional attributes (label, btn_add, data-intern, data-media, ...)
+     */
+    public function addCustomLinkMultipleField(float|int|string $id, array $attributes = null): MForm
+    {
+        return $this->addElement('custom-link-multi', $id, null, $attributes);
+    }
+
     public function addMediaField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
     {
         return $this->addElement('media', $id, null, $attributes, null, $parameter, $catId);

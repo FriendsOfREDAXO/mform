@@ -6,6 +6,10 @@ $(document).on('rex:ready', function (e, container) {
             customlink_init_widget($(this).find('.input-group.custom-link'));
         });
     }
+    // Init multi custom-link widgets
+    $(container).find('.rex-js-cl-multi').each(function () {
+        customLinkMultiInit($(this));
+    });
 });
 
 function customlink_init_widget(element) {
@@ -335,4 +339,88 @@ function closeDropDown(id) {
     if (dropdown.is(':visible')) {
         dropdown.dropdown('toggle');
     }
+}
+
+/* -------------------------------------------------------
+ * Custom Link Multi Widget
+ * ------------------------------------------------------- */
+
+function customLinkMultiSerialize(multiWidget) {
+    let values = [];
+    multiWidget.find('.mform-cl-multi-item').each(function () {
+        let val = $(this).find('.rex-js-widget-customlink input[type=hidden]').val();
+        // Accept any value including empty strings, but skip undefined
+        if (typeof val !== 'undefined') {
+            values.push(val || '');
+        }
+    });
+    multiWidget.find('> input.mform-cl-multi-value').val(JSON.stringify(values));
+}
+
+function customLinkMultiBindItem($item, multiWidget) {
+    // Re-serialize whenever a custom-link value changes inside this item
+    $item.find('.rex-js-widget-customlink input[type=hidden]').on('change.clmulti', function () {
+        customLinkMultiSerialize(multiWidget);
+    });
+    // Remove button
+    $item.find('.mform-cl-multi-remove').off('click.clmulti').on('click.clmulti', function (e) {
+        e.preventDefault();
+        $item.remove();
+        customLinkMultiSerialize(multiWidget);
+    });
+}
+
+function customLinkMultiInit(multiWidget) {
+    if (multiWidget.data('clmulti-init')) return;
+    multiWidget.data('clmulti-init', true);
+
+    // Bind existing items
+    multiWidget.find('.mform-cl-multi-item').each(function () {
+        customLinkMultiBindItem($(this), multiWidget);
+    });
+
+    // Add button
+    multiWidget.find('.mform-cl-multi-add').off('click.clmulti').on('click.clmulti', function (e) {
+        e.preventDefault();
+        let template = multiWidget.data('template');
+        if (!template) return;
+
+        let idx = 'clm' + randId();
+        // Replace all occurrences of the placeholder ID
+        let itemHtml = template.split('CMLIDX').join(idx);
+
+        let $item = $(
+            '<div class="mform-cl-multi-item">' +
+            '<span class="mform-cl-multi-handle" title="Verschieben"><i class="rex-icon fa-bars"></i></span>' +
+            itemHtml +
+            '<a href="#" class="btn btn-popup mform-cl-multi-remove" title="Entfernen"><i class="rex-icon rex-icon-delete-link"></i></a>' +
+            '</div>'
+        );
+
+        multiWidget.find('.mform-cl-multi-list').append($item);
+
+        // Init the newly added custom-link widget
+        $(document).trigger('rex:ready', [$item]);
+        customLinkMultiBindItem($item, multiWidget);
+        customLinkMultiSerialize(multiWidget);
+    });
+
+    // Listen to rex:selectCustomLink events to keep JSON in sync
+    $(window).on('rex:selectCustomLink.clmulti', function (e, linkurl, linktext, input) {
+        let ownerMulti = $(input).closest('.rex-js-cl-multi');
+        if (ownerMulti.is(multiWidget)) {
+            customLinkMultiSerialize(multiWidget);
+        }
+    });
+
+    // Sync on form submit
+    multiWidget.closest('form').off('submit.clmulti').on('submit.clmulti', function () {
+        customLinkMultiSerialize(multiWidget);
+    });
+
+    // Sortable via move-up/move-down on drag handle click (simple swap)
+    multiWidget.on('mousedown.clmulti', '.mform-cl-multi-handle', function (e) {
+        // Only drag-to-reorder is complex; skip for now – dragging not wired without dragula/sortable
+        // A future improvement can add sortable library here
+    });
 }
