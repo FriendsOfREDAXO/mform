@@ -56,7 +56,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 ```php
 // Neu (v9): kürzeste Form im Modul-Output
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
 
 // Äquivalent mit prepareItemsForOutput (v8-kompatibel)
 $raw   = json_decode(html_entity_decode('REX_VALUE[id=1]', ENT_QUOTES | ENT_HTML5, 'UTF-8'), true) ?? [];

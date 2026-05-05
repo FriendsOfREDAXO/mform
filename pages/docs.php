@@ -10,6 +10,20 @@
 
 $addon = rex_addon::get('mform');
 
+$backendLanguage = rex_i18n::getLanguage();
+$readmeCandidates = [
+    'README.' . $backendLanguage . '.md',
+    'README.' . explode('_', $backendLanguage)[0] . '.md',
+    'README.md',
+];
+$readmeFile = 'README.md';
+foreach ($readmeCandidates as $candidate) {
+    if (file_exists($addon->getPath($candidate))) {
+        $readmeFile = $candidate;
+        break;
+    }
+}
+
 // ── Doc-Seiten definieren ─────────────────────────────────────────────────────
 $mform_doc_pages = [
     'basics' => [
@@ -51,6 +65,11 @@ $mform_doc_pages = [
         'title' => rex_i18n::msg('mform_docs_templates'),
         'icon'  => 'rex-icon fa-clone',
         'file'  => 'docs/09_templates.md',
+    ],
+    'readme' => [
+        'title' => rex_i18n::msg('mform_docs_readme'),
+        'icon'  => 'rex-icon fa-book',
+        'file'  => $readmeFile,
     ],
     'changelog' => [
         'title' => rex_i18n::msg('mform_changelog'),

@@ -1,5 +1,5 @@
 <?php
-$sections = rex_var::toArray('REX_VALUE[id=2]');
+$sections = \FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper::decode('REX_VALUE[id=2]');
 ?>
 
 <h1>REX_VALUE[1]</h1>

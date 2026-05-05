@@ -238,7 +238,7 @@ class MFormRepeaterHelper
      * filter out disabled (offline) items and strip the internal __disabled key.
      *
      * Example:
-     *   $rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+     *   $rows = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
      *
      * @param string $rexValue The raw REX_VALUE string (already substituted by REDAXO)
      * @return array<int, array<string, mixed>> Filtered and cleaned items
@@ -249,7 +249,11 @@ class MFormRepeaterHelper
             return [];
         }
 
-        $decoded = json_decode(html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+        $normalizedValue = html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Default-Rex-Output kann JSON durch nl2br() mit <br>-Tags anreichern.
+        $normalizedValue = preg_replace('/<br\s*\/?>/i', "\n", $normalizedValue) ?? $normalizedValue;
+
+        $decoded = json_decode($normalizedValue, true);
 
         if (!is_array($decoded)) {
             return [];

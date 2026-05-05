@@ -119,6 +119,7 @@ mform_docs_wrapper = Wrappers and Layouts
 mform_docs_advanced = Advanced
 mform_docs_repeater = Repeater
 mform_docs_templates = Templates and Defaults
+mform_docs_readme = README
 mform_docs_toc = Table of Contents
 mform_docs_toc_filter = Filter
 mform_docs_search_placeholder = Search documentation
