@@ -13,6 +13,7 @@
 - Medialist-Widget fix: Preview-URLs korrekt aufbereitet (HTML-Entity-Decode für `rex_medialistbutton_preview`)
 - Neue API: `addCustomLinkMultipleField(...)` fuer mehrere Custom-Links (repeater-basiert), Single-Format bleibt unveraendert
 - Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
+- Neues Template-API: `MForm::registerTemplate($key, $class)`, `MForm::fromTemplate($key)` und `->applyTemplate($key)` ueber interne Registry (projektweite Defaults wiederverwendbar)
 - Neue Demo-Module ergänzt, u. a. für Conditional Fields Builder und erweiterte Repeater-Szenarien
 - Dokumentation erweitert (Repeater, Output-Filter, Conditional Fields)
 - **Neu: Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` am `addRepeaterElement()`

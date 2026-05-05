@@ -9,6 +9,7 @@ namespace FriendsOfRedaxo;
 
 use FriendsOfRedaxo\MForm\MFormElements;
 use FriendsOfRedaxo\MForm\Parser\MFormParser;
+use FriendsOfRedaxo\MFormTemplate\TemplateRegistry;
 use rex_exception;
 use rex_factory_trait;
 use rex_logger;
@@ -47,6 +48,58 @@ class MForm extends MFormElements
     {
         $class = static::getFactoryClass();
         return new $class(null, $debug);
+    }
+
+    /**
+     * Erstellt ein MForm anhand eines Template-Keys.
+     *
+     * Templates koennen projektseitig ueber MForm::registerTemplate()
+     * registriert werden.
+     *
+     * @param array<string, mixed> $context
+     */
+    public static function fromTemplate(string $key, array $context = [], bool $debug = false): MForm
+    {
+        return self::factory($debug)->applyTemplate($key, $context);
+    }
+
+    /**
+     * Registriert eine Template-Klasse fuer einen Key.
+     *
+    * @param class-string<\FriendsOfRedaxo\MFormTemplate\TemplateInterface> $templateClass
+     */
+    public static function registerTemplate(string $key, string $templateClass): void
+    {
+        TemplateRegistry::register($key, $templateClass);
+    }
+
+    /**
+     * Entfernt einen registrierten Template-Key.
+     */
+    public static function unregisterTemplate(string $key): void
+    {
+        TemplateRegistry::unregister($key);
+    }
+
+    /**
+     * Prueft, ob ein Template-Key registriert ist.
+     */
+    public static function hasTemplate(string $key): bool
+    {
+        return TemplateRegistry::has($key);
+    }
+
+    /**
+     * Wendet ein registriertes Template auf die aktuelle Form an.
+     *
+     * @param array<string, mixed> $context
+     */
+    public function applyTemplate(string $key, array $context = []): self
+    {
+        /** @var self $resolved */
+        $resolved = TemplateRegistry::apply($this, $key, $context);
+
+        return $resolved;
     }
 
     public function setTheme(string $theme): self

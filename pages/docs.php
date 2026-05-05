@@ -47,6 +47,11 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-repeat',
         'file'  => 'docs/07_repeater.md',
     ],
+    'templates' => [
+        'title' => rex_i18n::msg('mform_docs_templates'),
+        'icon'  => 'rex-icon fa-clone',
+        'file'  => 'docs/09_templates.md',
+    ],
     'changelog' => [
         'title' => rex_i18n::msg('mform_changelog'),
         'icon'  => 'rex-icon fa-list',
