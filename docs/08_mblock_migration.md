@@ -62,7 +62,7 @@ echo MForm::factory()
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+$items = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
 
 foreach ($items as $item) {
     echo '<h3>' . rex_escape($item['title'] ?? '') . '</h3>';
@@ -486,7 +486,7 @@ echo $main->show();
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$cards = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+$cards = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
 
 foreach ($cards as $card) {
     $title = (string) ($card['header'] ?? '');

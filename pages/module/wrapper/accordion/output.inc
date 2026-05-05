@@ -1,2 +1,2 @@
 <?php
-dump(rex_var::toArray('REX_VALUE[id=1]'));
+dump(\FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper::decode('REX_VALUE[id=1]'));
