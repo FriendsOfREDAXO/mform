@@ -989,11 +989,11 @@ class MFormParser
 
         foreach ($varId as $key => $val) {
             if (!is_numeric($val)) {
-                $varId[$key] = random_int(0, strlen($val) * random_int(0, getrandmax()));
+                $varId[$key] = abs(crc32($val));
             }
         }
 
-        return implode('', $varId);
+        return (string) abs(crc32(implode('', $varId)));
     }
 
     private function generateCustomLinkElement(MFormItem $item): void

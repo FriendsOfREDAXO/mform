@@ -264,6 +264,12 @@ body.rex-theme-dark .mform .collapsing {
     background: #eaf1f8;
 }
 
+.mform .custom-link.input-group .btn.btn-popup.active {
+    background: #d0e8fa;
+    color: #1a6ca8;
+    border-left-color: #b0d0ef;
+}
+
 .mform .custom-link.input-group.is-empty input.form-control[readonly] {
     color: #7c8997;
 }
@@ -282,6 +288,12 @@ body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup {
 body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup:hover,
 body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup:focus {
     background: #30404d;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup.active {
+    background: #1a3a55;
+    color: #7ec8f4;
+    border-left-color: #2a5070;
 }
 
 body.rex-theme-dark .mform .custom-link.input-group.is-empty input.form-control[readonly] {
@@ -329,6 +341,12 @@ body.rex-theme-dark .mform .custom-link.input-group.is-empty input.form-control[
     body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup:hover,
     body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup:focus {
         background: #30404d;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup.active {
+        background: #1a3a55;
+        color: #7ec8f4;
+        border-left-color: #2a5070;
     }
 
     body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group.is-empty input.form-control[readonly] {

@@ -19,10 +19,45 @@ function customlink_init_widget(element) {
         showed_input = element.find('input[type=text]'),
         value, text, args, timer, repeaterLink = (showed_input.attr('repeater_link') === '1');
 
+    function updateActiveButton(value) {
+        let v = String(value || '');
+        element.find('.btn-popup').removeClass('active');
+        if (!v || v.trim() === '') return;
+
+        if (v.startsWith('mailto:')) {
+            element.find('a.email_link').addClass('active');
+        } else if (v.startsWith('tel:')) {
+            element.find('a.phone_link').addClass('active');
+        } else if (v.startsWith('#')) {
+            element.find('a.anchor_link').addClass('active');
+        } else if (v.startsWith('redaxo://')) {
+            element.find('a.intern_link').addClass('active');
+        } else {
+            // Check ylinks first
+            let matched = false;
+            element.find('.ylink').each(function () {
+                let table = $(this).data('table');
+                if (table && v.startsWith(table.split('_').join('-') + '://')) {
+                    element.find('.input-group-btn [data-toggle="dropdown"]').addClass('active');
+                    matched = true;
+                    return false;
+                }
+            });
+            if (!matched) {
+                if (/^https?:\/\//.test(v) || /^[a-z][a-z0-9+\-.]*:\/\//.test(v)) {
+                    element.find('a.external_link').addClass('active');
+                } else {
+                    element.find('a.media_link').addClass('active');
+                }
+            }
+        }
+    }
+
     function setLinkValue(linkUrl, linkText) {
         hidden_input.val(linkUrl || '');
         showed_input.val(linkText || '');
         element.toggleClass('is-empty', !(linkUrl && String(linkUrl).trim() !== ''));
+        updateActiveButton(linkUrl);
         dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
     }
 
@@ -55,6 +90,7 @@ function customlink_init_widget(element) {
         element.data('id', id)
         element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
         element.toggleClass('is-empty', !(hidden_input.val() && String(hidden_input.val()).trim() !== ''));
+        updateActiveButton(hidden_input.val());
 
         // ylink
         element
@@ -187,6 +223,9 @@ function customlink_init_widget(element) {
             let mailto_link = promptValue('Mail', value, 'mailto:');
 
             if (mailto_link !== 'mailto:' && mailto_link !== "" && mailto_link !== undefined && mailto_link != null) {
+                if (!String(mailto_link).startsWith('mailto:')) {
+                    mailto_link = 'mailto:' + mailto_link;
+                }
                 setLinkValue(mailto_link, mailto_link);
             }
             if (mailto_link == null) {
@@ -209,6 +248,9 @@ function customlink_init_widget(element) {
             let tel_link = promptValue('Telephone', value, 'tel:');
 
             if (tel_link !== 'tel:' && tel_link !== "" && tel_link !== undefined && tel_link != null) {
+                if (!String(tel_link).startsWith('tel:')) {
+                    tel_link = 'tel:' + tel_link;
+                }
                 setLinkValue(tel_link, tel_link);
             }
             if (tel_link == null) {

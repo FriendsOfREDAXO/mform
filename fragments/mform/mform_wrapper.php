@@ -30,7 +30,7 @@ switch ($this->getVar('type')) {
         break;
 
     // COLLAPSE
-    case 'collapse-button';
+    case 'collapse-button':
         echo '<a class="btn btn-white btn-block ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</a>';
         break;
     case 'start-group-collapse':
