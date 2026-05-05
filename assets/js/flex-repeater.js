@@ -10,7 +10,7 @@
  * @author MForm Contributors
  * @license MIT
  */
-/* global Sortable, tinymce, $, initMFormElements, saveTinyEditorContent */
+/* global Sortable, tinymce, $, initMFormElements, saveTinyEditorContent, cke5_get_editors */
 
 (function () {
     'use strict';
@@ -211,6 +211,11 @@
             }
             textarea.classList.remove('mce-initialized');
         });
+        el.querySelectorAll('.cke5-editor').forEach(function (textarea) {
+            if (!textarea.id) {
+                textarea.id = uid('cke5');
+            }
+        });
         if (typeof $ !== 'undefined') {
             const $el = $(el);
             $el.trigger('rex:ready', [$el]);
@@ -236,6 +241,12 @@
         if (tag === 'textarea' && field.id && typeof tinymce !== 'undefined') {
             const editor = tinymce.get(field.id);
             if (editor) return editor.getContent();
+        }
+        if (tag === 'textarea' && field.id && field.classList.contains('cke5-editor') && typeof cke5_get_editors === 'function') {
+            const editors = cke5_get_editors();
+            if (editors && editors[field.id] && typeof editors[field.id].getData === 'function') {
+                return editors[field.id].getData();
+            }
         }
         return field.value !== undefined ? field.value : '';
     }
@@ -896,8 +907,8 @@
             itemEl.querySelectorAll('[data-mfr-field]').forEach((field) => {
                 if (field.closest('.mfr-nested-repeater')) return;
                 const tag = field.tagName.toLowerCase();
-                // TinyMCE-Textareas werden über den globalen AddEditor-Listener behandelt
-                if (tag === 'textarea' && field.classList.contains('tiny-editor')) return;
+                // Rich-Text-Textareas werden über globale Editor-Listener behandelt
+                if (tag === 'textarea' && (field.classList.contains('tiny-editor') || field.classList.contains('cke5-editor'))) return;
                 const evtType = (tag === 'select' || field.type === 'checkbox' || field.type === 'radio') ? 'change' : 'input';
                 field.addEventListener(evtType, () => {
                     // Titel aktuell halten
@@ -1364,6 +1375,73 @@
 
     // Sofort versuchen (falls tinymce schon geladen)
     setupGlobalTinyMCEListener();
+
+    // -------------------------------------------------------------------------
+    // Globaler CKE5-Listener (einmalig, kein Leak)
+    // -------------------------------------------------------------------------
+
+    let _cke5ListenerRegistered = false;
+
+    function bindMfrCke5Editor(editor, editorId) {
+        if (!editor || !editorId) return;
+
+        const textarea = document.getElementById(editorId);
+        if (!textarea) return;
+
+        const itemEl = textarea.closest('.mfr-item');
+        const nestedItemEl = textarea.closest('.mfr-nested-item');
+
+        if (nestedItemEl) {
+            const nestedEl = textarea.closest('.mfr-nested-repeater');
+            if (!nestedEl || !nestedEl._mfrNestedInstance) return;
+            const instance = nestedEl._mfrNestedInstance;
+            editor.model.document.on('change:data', function () {
+                const idx = instance._indexOf(nestedItemEl);
+                if (idx === -1) return;
+                if (!instance.data[idx]) instance.data[idx] = {};
+                instance.data[idx][textarea.dataset.mfrField] = editor.getData();
+                instance._updateTitle(nestedItemEl, instance.data[idx], idx);
+                instance.onChange && instance.onChange();
+            });
+            return;
+        }
+
+        if (itemEl) {
+            const containerEl = textarea.closest('.mfr-container');
+            if (!containerEl || !containerEl._mfrInstance) return;
+            const instance = containerEl._mfrInstance;
+            editor.model.document.on('change:data', function () {
+                const idx = instance._indexOf(itemEl);
+                if (idx === -1) return;
+                if (!instance.data[idx]) instance.data[idx] = {};
+                instance.data[idx][textarea.dataset.mfrField] = editor.getData();
+                instance._setTitle(itemEl, instance.data[idx], idx);
+                instance.syncValue();
+            });
+        }
+    }
+
+    function setupGlobalCke5Listener() {
+        if (_cke5ListenerRegistered) return;
+        if (typeof $ === 'undefined') return;
+
+        $(window).on('rex:cke5IsInit.mfr', function (_evt, editor, editorId) {
+            bindMfrCke5Editor(editor, editorId);
+        });
+
+        if (typeof cke5_get_editors === 'function') {
+            const editors = cke5_get_editors();
+            if (editors && typeof editors === 'object') {
+                Object.keys(editors).forEach(function (editorId) {
+                    bindMfrCke5Editor(editors[editorId], editorId);
+                });
+            }
+        }
+
+        _cke5ListenerRegistered = true;
+    }
+
+    setupGlobalCke5Listener();
 
     // -------------------------------------------------------------------------
     // Globaler Form-Submit-Handler (einmalig für alle Repeater)
