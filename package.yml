@@ -9,6 +9,9 @@ page:
     perm: admin[]
     icon: rex-icon fa-diagram-next
     subpages:
+        docs:
+            title: 'translate:docs'
+            icon: rex-icon fa-book
         demo:
             title: 'translate:reference_demo'
             subpages:
@@ -17,9 +20,7 @@ page:
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_repeater: { title: 'translate:demo_repeater' }
                 demo_expert: { title: 'translate:demo_expert' }
-        docs:
-            title: 'translate:docs'
-            icon: rex-icon fa-book
+
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
