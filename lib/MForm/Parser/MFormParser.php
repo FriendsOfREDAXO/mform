@@ -1099,6 +1099,46 @@ class MFormParser
         return $html;
     }
 
+    private function generateCustomLinkMultiElement(MFormItem $item): void
+    {
+        $this->executeDefaultManipulations($item, false, false);
+
+        // Forward custom-link type-toggle args to inner widget
+        foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable', 'anchor' => 'enable'] as $key => $value) {
+            $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
+            $key = ('extern' == $key) ? 'external' : $key;
+            $key = ('tel' == $key) ? 'phone' : $key;
+            $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
+        }
+        foreach (['data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
+            if (isset($item->getAttributes()[$data])) {
+                $item->setParameter(array_merge($item->getParameter(), [$key => $item->getAttributes()[$data]]));
+            }
+        }
+
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'));
+
+        $parameter = $item->getParameter();
+        if (isset($item->getAttributes()['btn_add'])) {
+            $parameter['btn_add'] = $item->getAttributes()['btn_add'];
+        }
+
+        $value = (!is_string($item->getValue())) ? '' : $item->getValue();
+        $html = \rex_var_custom_link_multi::getWidget(
+            $item->getVarId(),
+            'REX_INPUT_VALUE' . $item->getVarId(),
+            $value,
+            $parameter
+        );
+
+        $templateElement->setElement($html)
+            ->setNotice($item->getNotice())
+            ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+    }
+
     /**
      * @param MFormItem[] $items
      */
@@ -1205,6 +1245,9 @@ class MFormParser
                                 break;
                             case 'custom-link':
                                 $this->generateCustomLinkElement($item);
+                                break;
+                            case 'custom-link-multi':
+                                $this->generateCustomLinkMultiElement($item);
                                 break;
                             case 'media':
                             case 'medialist':

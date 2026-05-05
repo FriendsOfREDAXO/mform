@@ -35,6 +35,34 @@ echo MForm::factory()
     ->show();
 ```
 
+## Multiple-Variante (Repeater-basiert)
+
+Fuer mehrere Custom-Links in einem Feld kann die neue Repeater-API genutzt werden.
+Die bestehende Single-Variante bleibt unveraendert.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addFieldsetArea('Links', MForm::factory()
+        ->addCustomLinkMultipleField('links', [
+            'label' => 'Mehrere Links',
+            'btn_add' => 'Link hinzufügen',
+            'data-intern' => 'enable',
+            'data-extern' => 'enable',
+            'data-media' => 'enable',
+            'data-mailto' => 'enable',
+            'data-tel' => 'enable',
+        ])
+    )
+    ->show();
+```
+
+Hinweis zur Speicherung:
+- `addCustomLinkField(...)` speichert wie bisher einen einzelnen Link-String.
+- `addCustomLinkMultipleField(...)` speichert ein JSON-Array von Link-Strings, z.B. `["redaxo://1","mailto:a@b.com"]`.
+
 ## Modul-Ausgabe
 
 ```php

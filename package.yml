@@ -33,4 +33,5 @@ requires:
 
 conflicts:
     packages:
+        mblock: '>=0.0.0'
         ui_tools: '<1.0.0'
