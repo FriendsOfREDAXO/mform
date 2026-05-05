@@ -3,6 +3,7 @@
 ## Version 9.0.0
 - Neuer Flex-Repeater als Standardpfad, inkl. stabiler Initialisierung in dynamischen Backend-Kontexten
 - Repeater-UI erweitert: Aktiv/Inaktiv-Status pro Item (Auge), Ausgabe-Filter für deaktivierte Items und verbesserte Toggle-All-Logik
+- Statusanzeige im Repeater-Header aktualisiert: gefuellter Punkt (gruen = aktiv, rot = offline)
 - Repeater-Symbole und Bedienung vereinheitlicht (konsistentes Auf-/Zuklappen inkl. Nested-Repeatern)
 - TinyMCE-Kompatibilität verbessert (stabileres Save/Destroy/Reinit bei Add/Move/Sort/Remove)
 - Neues Linklist/Medialist-Repeater-Widget mit robuster Übernahme aus Linkmap/Mediapool-Popups
@@ -10,6 +11,14 @@
 - Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
 - Neue Demo-Module ergänzt, u. a. für Conditional Fields Builder und erweiterte Repeater-Szenarien
 - Dokumentation erweitert (Repeater, Output-Filter, Conditional Fields)
+- **Neu: Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` am `addRepeaterElement()`
+  - Copy-Button pro Item speichert Daten im `sessionStorage`
+  - Einfügen-Button fügt das kopierte Item als neues Element am Ende ein
+  - Clipboard bleibt nach Seitenreload erhalten; `__disabled`-Status wird nicht übernommen
+- **Neu: YForm Value-Type `custom_link_multi`** – Mehrere Custom-Links in einem YForm-Feld (JSON-Array), identisches Widget wie `addCustomLinkMultipleField()`
+- **Neu: YForm Value-Type `custom_link`** – Anker-Button über `anchor: 0` ausblendbar; Bug im Classic-Template (`extern` → `external`) behoben
+- **Neu: `MFormRepeaterHelper::decode()`** – bequemes Dekodieren von Repeater-Werten ohne Offline-Items
+- Navigations- und Titelkonsistenz im Backend verbessert
 
 ## Version 8.1.6
 - fix: `notice` Attribut kann nun auch über den Parameter-Array übergeben werden (z.B. `addMediaField`, `addTextField` etc.) – schließt #389

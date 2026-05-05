@@ -231,6 +231,33 @@ class MFormRepeaterHelper
         }));
     }
 
+    /**
+     * Decodes a REX_VALUE JSON string and returns only enabled repeater items.
+     *
+     * Use this in module output code instead of rex_var::toArray() to automatically
+     * filter out disabled (offline) items and strip the internal __disabled key.
+     *
+     * Example:
+     *   $rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+     *
+     * @param string $rexValue The raw REX_VALUE string (already substituted by REDAXO)
+     * @return array<int, array<string, mixed>> Filtered and cleaned items
+     */
+    public static function decode(string $rexValue): array
+    {
+        if ('' === $rexValue) {
+            return [];
+        }
+
+        $decoded = json_decode(html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        return self::prepareItemsForOutput($decoded);
+    }
+
     public static function prepareItemsForOutput(array $items): array
     {
         $result = [];

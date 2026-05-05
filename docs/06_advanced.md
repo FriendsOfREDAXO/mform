@@ -23,7 +23,11 @@ MForm stellt folgende Element-Methoden bereit:
   - `addMultiSelectField`
 - Checkbox- und Radio-Elemente
   - `addCheckboxField`
+  - `addToggleCheckboxField`
   - `addRadioField`
+  - `addRadioImgField`
+  - `addRadioIconField`
+  - `addRadioColorField`
 - Informelle-Elemente
   - `addHtml`
   - `addHeadline`
@@ -40,8 +44,12 @@ MForm stellt folgende Element-Methoden bereit:
   - `addMedialistField`
 - Custom-Elemente
   - `addCustomLinkField`
+  - `addCustomLinkMultipleField`
   - `addImagelistField`
   - `addInputField`
+- Repeater
+  - `addRepeaterElement`
+  - `addFlexRepeaterElement`
 - Spezielle `setter`-Methoden
   - `setAttribute`
   - `setAttributes`
@@ -60,6 +68,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `setParameter`
   - `setParameters`
   - `setPlaceholder`
+  - `setShowWrapper`
   - `setSize`
   - `setSqlOptions`
   - `setTabIcon`

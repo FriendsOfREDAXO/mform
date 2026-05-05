@@ -1,6 +1,6 @@
 # MForm vereinfacht Moduleingaben
 
-Verwendene MForm-Elemente in deinem Modul, indem du diese Beispiele kopierst und anpasst.
+Verwende MForm-Elemente in deinem Modul, indem du diese Beispiele kopierst und anpasst.
 
 ## Text-Input- und Hidden-Elemente
 
@@ -282,6 +282,30 @@ $mform = MForm::factory()
             ->setPlaceholder('Test Placeholder')
     );
 // parse form
+echo $mform->show();
+```
+
+### Notice / Hinweistext
+
+Fügt einen Hinweistext (Help-Block) unterhalb eines Feldes ein. Funktioniert bei allen Eingabe-Feldern über das `notice`-Attribut.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addFieldsetArea('Hinweistexte', MForm::factory()
+        ->addTextField(1, [
+            'label'  => 'URL',
+            'notice' => 'Bitte die vollständige URL inkl. https:// angeben.',
+        ])
+        ->addMediaField(2, ['label' => 'Bild', 'notice' => 'Empfohlene Größe: 1920 × 800 px'])
+        ->addSelectField(3, ['de' => 'Deutsch', 'en' => 'Englisch'], [
+            'label'  => 'Sprache',
+            'notice' => 'Bestimmt die Ausgabe-Sprache des Moduls.',
+        ])
+    );
+
 echo $mform->show();
 ```
 

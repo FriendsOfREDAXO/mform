@@ -11,11 +11,18 @@ MForm also enhances YForm and rex_form with additional widgets. Need a custom li
 Version 9 focuses on a more robust and editor-friendly form workflow.
 
 - New Flex Repeater runtime with stable behavior in dynamic backend contexts
-- New item activation state in repeater (eye icon) to keep entries editable but exclude them from output
+- New item activation state in repeater (eye icon): keep entries editable but exclude them from frontend output
+  - Item status is now visible directly in the header via a filled status dot (green = active, red = offline)
+- **Copy/Paste for Flex Repeater** – `copy_paste => true` on `addRepeaterElement()`: copy a single item to session storage, paste it as a new entry at the bottom
 - Better TinyMCE compatibility in repeater actions (add/move/sort/remove)
 - New Linklist/Medialist repeater widget with robust popup synchronization
+- New `addCustomLinkMultipleField(...)` API – repeater-based multi-link field; single format stays unchanged
 - New Conditional Fields Builder API via `addConditionalFieldsetArea(...)`
-- Extended demo collection (including conditional field scenarios)
+- **New YForm Value Types** provided by mform:
+  - `custom_link` – now supports `anchor: 0` to hide the anchor button; bug in classic template fixed
+  - `custom_link_multi` – multiple links per YForm field, stored as JSON array
+- **New helper `MFormRepeaterHelper::decode()`** – decode repeater values without offline items in one call
+- Extended demo collection (Conditional Fields, Copy/Paste Repeater)
 - Expanded documentation for repeater output filtering and conditional field usage
 
 ## Features
@@ -45,70 +52,25 @@ Version 9 focuses on a more robust and editor-friendly form workflow.
 
 The Form Repeater allows dynamic repetition of form elements while realizing nesting at multiple levels.
 
-### Migration from MBlock to MForm 8 
-
-The new repeater is only compatible with MBlock to a limited extent.
-
-It does not currently work during a migration: 
-
-- CustomLinkField // Converter: https://friendsofredaxo.github.io/tricks/addons/mform/custom_link_converter
-- addMediaListField
-- addLinkListField
-
-
-***MBlock Module*** 
-
 ```php
 use FriendsOfRedaxo\MForm;
 
-// Base ID for managing form elements
-$id = 1;
-
-// Initialize MForm
-$mform = new MForm();
-
-// Add a fieldset
-$mform->addFieldsetArea('Team member');
-
-// Add a text field, referring dynamically to a JSON format
-$mform->addTextField("$id.0.name", array('label' => 'Name'));
-
-// Add a media field saved by MBlock in JSON
-$mform->addMediaField(1, array('label' => 'Avatar'));
-
-// Output the form with MBlock, which allows dynamic handling of blocks
-echo MBlock::show($id, $mform->show(), array('min' => 2, 'max' => 4));
-```
-
-***The same module in MForm 8*** 
-
-To determine the necessary field keys, a dump might be needed beforehand. 
-Note: From the original MBlock Mediafield 1, it becomes: `'REX_MEDIA_1'`
-
-```php
-use FriendsOfRedaxo\MForm;
-
-// Repeater initialization ID with the base ID of the original MBlock section
-$id = 1;
-
-// Create a new MForm instance with the factory method and directly integrate a repeater
 echo MForm::factory()
     ->addRepeaterElement(
-        $id, 
+        1,
         MForm::factory()
-            ->addFieldsetArea('Team member', 
-                MForm::factory()
-                    ->addTextField('name', ['label' => 'Name'])
-                    ->addMediaField('REX_MEDIA_1', ['label' => 'Avatar'])
+            ->addFieldsetArea('Team member', MForm::factory()
+                ->addTextField('name', ['label' => 'Name'])
+                ->addMediaField('image', ['label' => 'Avatar'])
             ),
-        true, 
-        true, 
-        ['min' => 2, 'max' => 4]
+        true,
+        true,
+        ['min' => 1, 'max' => 10]
     )
     ->show();
 ```
 
-
+> **MBlock migration:** See [docs/08_mblock_migration.md](docs/08_mblock_migration.md) for a step-by-step migration to MForm 9.
 
 ## Installation
 

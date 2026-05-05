@@ -4,6 +4,8 @@ Das Repeater-Feld ermöglicht es Ihnen, eine Gruppe von Feldern zu erstellen, di
 
 Repeater ist keine 1:1-Übernahme von MBlock, sondern ist ein neuer, moderner Ansatz, um wiederholende Inhalte zu erstellen. Es ist ein eigenständiges Element, das in MForm integriert ist.
 
+> Migration von bestehenden MBlock-Modulen: siehe [08_mblock_migration.md](08_mblock_migration.md).
+
 ## Beispiele
 
 ### Eingabe-Modul
@@ -30,8 +32,8 @@ echo $mform->show();
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$items = rex_var::toArray('REX_VALUE[2]');
-$items = MFormRepeaterHelper::prepareItemsForOutput($items);
+// decode() filtert deaktivierte Items und entfernt __disabled automatisch
+$items = MFormRepeaterHelper::decode('REX_VALUE[2]');
 ?>
 
 <h1>REX_VALUE[1]</h1>
@@ -42,6 +44,26 @@ $items = MFormRepeaterHelper::prepareItemsForOutput($items);
     <?php endforeach; ?>
 </ul>
 ```
+
+### `MFormRepeaterHelper::decode()` vs `prepareItemsForOutput()`
+
+Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
+
+| Methode | Verwendung |
+|---------|-----------|
+| `decode(string $rexValue)` | **Empfohlen** – übernimmt JSON-Dekodierung, Entity-Dekodierung und Item-Filterung in einem Schritt. |
+| `prepareItemsForOutput(array $items)` | Wenn der Array bereits dekodiert vorliegt (z. B. aus einer DB-Abfrage). |
+
+```php
+// Neu (v9): kürzeste Form im Modul-Output
+$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output=json]');
+
+// Äquivalent mit prepareItemsForOutput (v8-kompatibel)
+$raw   = json_decode(html_entity_decode('REX_VALUE[id=1]', ENT_QUOTES | ENT_HTML5, 'UTF-8'), true) ?? [];
+$rows  = MFormRepeaterHelper::prepareItemsForOutput($raw);
+```
+
+Beide Wege verarbeiten verschachtelte Repeater rekursiv und unterstützen das `__disabled`-Flag korrekt.
 
 ---
 
@@ -97,8 +119,7 @@ echo $mform->show();
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$sections = rex_var::toArray('REX_VALUE[2]');
-$sections = MFormRepeaterHelper::prepareItemsForOutput($sections);
+$sections = MFormRepeaterHelper::decode('REX_VALUE[2]');
 ?>
 
 <h1><?= rex_escape('REX_VALUE[1]') ?></h1>
@@ -139,14 +160,14 @@ $sections = MFormRepeaterHelper::prepareItemsForOutput($sections);
 - Repeater-Items sind standardmäßig reduziert, das erste Item bleibt geöffnet.
 - Im Header jedes Items gibt es einen "Danach hinzufügen"-Button.
 - Im Header jedes Items gibt es ein Auge-Icon zum Aktivieren/Deaktivieren für die Ausgabe.
-- Ist ein Item deaktiviert, bleibt es im Backend editierbar, wird aber in der Ausgabe über `MFormRepeaterHelper::prepareItemsForOutput()` entfernt.
+- Ist ein Item deaktiviert, bleibt es im Backend editierbar, wird aber in der Ausgabe über `MFormRepeaterHelper::decode()` (oder alternativ `prepareItemsForOutput()`) entfernt.
 - Im Repeater-Toolbar gibt es optional einen "Alle auf / zu"-Button.
 
 ### Aktiv/Inaktiv (Auge) und Ausgabe
 
 - Das Auge-Icon steuert den Status pro Item (aktiv/inaktiv).
 - Inaktive Items werden als Metadaten mit dem Schlüssel `__disabled` im Repeater-JSON gespeichert.
-- Für die Ausgabe sollte der Repeater-Array immer über `MFormRepeaterHelper::prepareItemsForOutput()` laufen.
+- Für die Ausgabe sollte der Repeater-Wert bevorzugt über `MFormRepeaterHelper::decode()` laufen.
 - Die Methode entfernt inaktive Items rekursiv (auch in nested Repeatern) und entfernt den Metaschlüssel aus der Ausgabe.
 
 Verfügbare Optionen im Repeater-Array:
@@ -159,3 +180,60 @@ Verfügbare Optionen im Repeater-Array:
 
 - MForm lädt SortableJS nur, wenn `window.Sortable` noch nicht vorhanden ist.
 - Wenn ein anderes Addon Sortable bereits global bereitstellt, wird diese Instanz verwendet.
+
+---
+
+## Kopieren / Einfügen (`copy_paste`)
+
+Mit der Option `copy_paste => true` erhält jedes Item einen **Kopieren-Button** und die Toolbar einen **Einfügen-Button**.
+
+### Verhalten
+
+| Aktion | Beschreibung |
+|--------|--------------|
+| **Kopieren** (Item-Button) | Speichert alle Felder des Items als JSON in `sessionStorage`. Der `__disabled`-Status wird dabei nicht übernommen. |
+| **Danach einfügen** (Item-Button) | Fügt eine Kopie direkt **nach** dem aktuellen Item ein. |
+| **Paste (at end)** (Toolbar) | Fügt eine Kopie am **Ende** des Repeaters ein. |
+| **Clipboard-Persistenz** | Das Clipboard bleibt nach einem Seitenreload erhalten (`sessionStorage`). Erst beim Schließen des Browser-Tabs wird es geleert. |
+
+> Der Paste-Button ist initial unsichtbar. Er erscheint, sobald ein Item kopiert wurde – oder sofort beim Laden der Seite, falls noch ein Clipboard-Eintrag vorhanden ist.
+
+### Beispiel
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$rowForm = MForm::factory()
+    ->addTextField('title', ['label' => 'Titel'])
+    ->addSelectField('style', ['neutral' => 'Neutral', 'primary' => 'Primary'], ['label' => 'Stil'])
+;
+
+$mform = MForm::factory()
+    ->addRepeaterElement(1, $rowForm, true, true, [
+        'label'       => 'Zeilen',
+        'btn_text'    => 'Zeile hinzufügen',
+        'copy_paste'  => true,  // ← Kopieren/Einfügen aktivieren
+        'collapsed'   => true,
+        'first_open'  => true,
+    ])
+;
+
+echo $mform->show();
+```
+
+### Vollständige Optionsübersicht
+
+| Option | Typ | Standard | Beschreibung |
+|--------|-----|---------|--------------|
+| `label` | string | `''` | Bezeichnung über dem Repeater |
+| `btn_text` | string | `'Add'` | Text des Hinzufügen-Buttons |
+| `collapsed` | bool | `true` | Items initial zugeklappt |
+| `first_open` | bool | `true` | Erstes Item trotz `collapsed` offen |
+| `show_toggle_all` | bool | `true` | „Alle auf/zu"-Button in Toolbar |
+| `min` | int | `0` | Mindestanzahl Items |
+| `max` | int | `0` | Maximalanzahl Items (0 = unbegrenzt) |
+| `confirm_delete` | bool | `false` | Löschen mit Bestätigung |
+| `confirm_delete_msg` | string | `''` | Text der Bestätigungsmeldung |
+| `copy_paste` | bool | `false` | Kopieren/Einfügen-Funktion aktivieren |
+

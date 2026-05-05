@@ -18,10 +18,8 @@ page:
                 demo_repeater: { title: 'translate:demo_repeater' }
                 demo_expert: { title: 'translate:demo_expert' }
         docs:
-            title: 'translate:help'
-            icon: rex-icon fa-info-circle
-            perm: mform[docs]
-            hidden: true
+            title: 'translate:docs'
+            icon: rex-icon fa-book
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
