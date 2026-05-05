@@ -197,16 +197,54 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
+    public function addConditionalFieldsetArea(
+        float|int|string $sourceField,
+        string $operator = '=',
+        string $compareValue = '',
+        string $legend = '',
+        callable|MForm|string $form = null,
+        array $attributes = [],
+        bool $parse = false,
+        bool $showWrapper = false,
+        string $action = 'show'
+    ): MForm {
+        $class = trim(($attributes['class'] ?? '') . ' mform-conditional-target');
+        $attributes['class'] = $class;
+        $attributes['data-mform-conditional-source'] = (string) $sourceField;
+        $attributes['data-mform-conditional-operator'] = $operator;
+        $attributes['data-mform-conditional-value'] = $compareValue;
+        $attributes['data-mform-conditional-action'] = $action;
+
+        return $this->addFieldsetArea($legend, $form, $attributes, $parse, $showWrapper);
+    }
+
     /**
      * ['btn_text' => 'Add Repeater Item', 'btn_class' => 'btn-default', 'confirm_delete_msg' => 'Do you really want to delete this item?']
      */
     public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false, bool $showWrapper = false): MForm
     {
-        $attributes['open'] = $open;
-        $attributes['confirm_delete'] = $confirmDelete;
-        return $this->addElement('repeater', $id, null, $attributes)
-            ->addForm($form, false, $debug, $showWrapper)
-            ->addElement('close-repeater', $id, null, $attributes);
+        // Legacy-API kompatibel halten, intern aber neuen Repeater nutzen.
+        $options = $attributes;
+        $options['open'] = $open;
+        $options['confirm_delete'] = $confirmDelete;
+
+        if (isset($attributes['default_count']) && !isset($options['min'])) {
+            $options['default_count'] = (int) $attributes['default_count'];
+        }
+
+        return $this->addFlexRepeaterElement($id, $form, $options);
+    }
+
+    /**
+     * JSON-basierter Repeater ohne Alpine.js.
+     *
+     * @param array<string, mixed> $options
+     */
+    public function addFlexRepeaterElement(float|int|string $id, MForm $form, array $options = []): MForm
+    {
+        return $this->addElement('repeater', $id, null, $options)
+            ->addForm($form, false, false, false)
+            ->addElement('close-repeater', $id, null, $options);
     }
 
     public function addInputField(string $typ, float|int|string $id, array $attributes = null, string $defaultValue = null): MForm

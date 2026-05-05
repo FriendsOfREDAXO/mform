@@ -12,6 +12,8 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
 class MFormRepeaterHelper
 {
+    private const DISABLED_KEY = '__disabled';
+
     public static function getRepeaterChildKeys(array $items, $key): array
     {
         $next = false;
@@ -197,5 +199,69 @@ class MFormRepeaterHelper
         if (isset($mformItem->getAttributes()['data-group-collapse-id'])) {
             $mformItem->addAttribute(':data-group-collapse-id', "'" . $mformItem->getAttributes()['data-group-collapse-id'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
         }
+    }
+
+    public static function isItemEnabled(array $item): bool
+    {
+        if (!array_key_exists(self::DISABLED_KEY, $item)) {
+            return true;
+        }
+
+        $value = $item[self::DISABLED_KEY];
+        if (is_bool($value)) {
+            return !$value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (int) $value !== 1;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+            return !in_array($normalized, ['1', 'true', 'yes', 'on'], true);
+        }
+
+        return !$value;
+    }
+
+    public static function filterEnabledItems(array $items): array
+    {
+        return array_values(array_filter($items, static function ($item): bool {
+            return is_array($item) && self::isItemEnabled($item);
+        }));
+    }
+
+    public static function prepareItemsForOutput(array $items): array
+    {
+        $result = [];
+
+        foreach (self::filterEnabledItems($items) as $item) {
+            unset($item[self::DISABLED_KEY]);
+
+            foreach ($item as $key => $value) {
+                if (is_array($value) && self::isRepeaterItemList($value)) {
+                    $item[$key] = self::prepareItemsForOutput($value);
+                }
+            }
+
+            $result[] = $item;
+        }
+
+        return $result;
+    }
+
+    private static function isRepeaterItemList(array $value): bool
+    {
+        if ([] === $value) {
+            return true;
+        }
+
+        foreach ($value as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

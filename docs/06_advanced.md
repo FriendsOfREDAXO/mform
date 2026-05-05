@@ -6,6 +6,7 @@ MForm stellt folgende Element-Methoden bereit:
 
 - Strukturelle Wrapper-Elemente
   - `addFieldsetArea`
+    - `addConditionalFieldsetArea`
   - `addCollapseElement`
   - `addAccordionElement`
   - `addTabElement`
@@ -229,3 +230,52 @@ echo $repeater->show();
 ```
 
 In der letzteren Variante muss als Label ein Schlüssel für die Übersetzung übergeben werden. Dieser Schlüssel inkl. Übersetzung wird dann in der passenden `lang`-Datei hinterlegt, bspw. im `project`-Addon.
+
+## Beispiel: Conditional Fields Builder
+
+Mit `addConditionalFieldsetArea` lassen sich Bereiche anhand eines Quellfeldes ein- und ausblenden.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addFieldsetArea('Basis', MForm::factory()
+        ->addSelectField(1, [
+            'text' => 'Text',
+            'image' => 'Bild',
+            'video' => 'Video',
+        ], ['label' => 'Content-Typ'])
+        ->addToggleCheckboxField(2, [1 => 'Erweiterte Optionen aktivieren'], ['label' => 'Erweitert'])
+    )
+    ->addConditionalFieldsetArea(1, '=', 'text', 'Text-Optionen', MForm::factory()
+        ->addTextField(3, ['label' => 'Text-Headline'])
+        ->addTextAreaField(4, ['label' => 'Text-Inhalt'])
+    )
+    ->addConditionalFieldsetArea(1, '=', 'image', 'Bild-Optionen', MForm::factory()
+        ->addMediaField(5, null, null, ['label' => 'Hauptbild'])
+        ->addTextField(6, ['label' => 'Alt-Text'])
+    )
+    ->addConditionalFieldsetArea(2, '=', '1', 'Erweiterte Optionen', MForm::factory()
+        ->addTextField(7, ['label' => 'CSS-Klasse'])
+        ->addTextField(8, ['label' => 'Anker-ID'])
+    );
+
+echo $mform->show();
+```
+
+Unterstützte Operatoren:
+
+- `=` / `==`
+- `!=`
+- `>`
+- `<`
+- `contains`
+- `in` (kommagetrennte Vergleichswerte)
+- `empty`
+- `!empty`
+
+Optionale Aktion:
+
+- Standard ist `show` (Bereich zeigen, wenn Bedingung erfüllt ist)
+- Mit dem letzten Parameter `action = 'hide'` wird das Verhalten invertiert

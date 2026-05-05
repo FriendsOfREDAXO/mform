@@ -1,0 +1,96 @@
+:root {
+    --mfl-bg: #fff;
+    --mfl-border: #d6dee7;
+    --mfl-muted: #6f7d8a;
+    --mfl-item-bg: #f8fafc;
+    --mfl-item-bg-hover: #edf3f8;
+    --mfl-item-selected: #4a98dc;
+    --mfl-item-selected-bg: rgba(74, 152, 220, .12);
+}
+
+.mform-list-widget {
+    border: 1px solid var(--mfl-border);
+    border-radius: 6px;
+    background: var(--mfl-bg);
+    padding: .55rem;
+}
+
+.mform-list-widget .mform-list-shell {
+    margin-bottom: .5rem;
+}
+
+.mform-list-widget .mform-list-select {
+    display: none;
+}
+
+.mform-list-widget .mform-list-items {
+    list-style: none;
+    margin: 0;
+    padding: .35rem;
+    border: 1px solid var(--mfl-border);
+    border-radius: 5px;
+    min-height: 84px;
+    max-height: 220px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+}
+
+.mform-list-widget.is-empty .mform-list-items::before {
+    content: 'Keine Eintraege ausgewaehlt';
+    color: var(--mfl-muted);
+    font-size: 12px;
+}
+
+.mform-list-widget .mform-list-items li {
+    padding: .35rem .5rem;
+    background: var(--mfl-item-bg);
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mform-list-widget .mform-list-items li:hover {
+    background: var(--mfl-item-bg-hover);
+}
+
+.mform-list-widget .mform-list-items li.is-selected {
+    border-color: var(--mfl-item-selected);
+    background: var(--mfl-item-selected-bg);
+}
+
+.mform-list-widget .mform-list-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+
+.mform-list-widget .mform-list-toolbar .btn {
+    min-width: 32px;
+}
+
+body.rex-theme-dark {
+    --mfl-bg: #202a33;
+    --mfl-border: #3b4b58;
+    --mfl-muted: #9eb0c1;
+    --mfl-item-bg: #27323d;
+    --mfl-item-bg-hover: #30404c;
+    --mfl-item-selected: #63adf3;
+    --mfl-item-selected-bg: rgba(99, 173, 243, .15);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        --mfl-bg: #202a33;
+        --mfl-border: #3b4b58;
+        --mfl-muted: #9eb0c1;
+        --mfl-item-bg: #27323d;
+        --mfl-item-bg-hover: #30404c;
+        --mfl-item-selected: #63adf3;
+        --mfl-item-selected-bg: rgba(99, 173, 243, .15);
+    }
+}

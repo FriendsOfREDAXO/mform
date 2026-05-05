@@ -16,7 +16,7 @@ $mform = MForm::factory()
                 // radio element
                 ->addRadioField('radio1', [1 => 'test-1', 2 => 'test-2'], ['label' => 'Radio 1'])
             )
-        ) , true, true, ['default_count' => 3]
+        ) , true, true, ['default_count' => 3, 'collapsed' => true, 'first_open' => true, 'show_toggle_all' => true]
     );
 
 echo $mform->show();

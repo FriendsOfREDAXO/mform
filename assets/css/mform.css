@@ -233,6 +233,61 @@ body.rex-theme-dark .mform .collapsing {
 
 }
 
+.mform .custom-link.input-group {
+    border: 1px solid #d8e0e8;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.mform .custom-link.input-group input.form-control[readonly] {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    min-height: 36px;
+}
+
+.mform .custom-link.input-group .input-group-btn {
+    white-space: nowrap;
+}
+
+.mform .custom-link.input-group .btn.btn-popup {
+    border: 0;
+    border-left: 1px solid #e3e8ee;
+    background: #f7f9fb;
+    min-width: 34px;
+    min-height: 36px;
+}
+
+.mform .custom-link.input-group .btn.btn-popup:hover,
+.mform .custom-link.input-group .btn.btn-popup:focus {
+    background: #eaf1f8;
+}
+
+.mform .custom-link.input-group.is-empty input.form-control[readonly] {
+    color: #7c8997;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group {
+    border-color: #3a4753;
+    background: #1f2830;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup {
+    border-left-color: #344150;
+    background: #27323d;
+    color: #c9d4df;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup:hover,
+body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup:focus {
+    background: #30404d;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group.is-empty input.form-control[readonly] {
+    color: #9fb0c0;
+}
+
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .mform .mform-tabs .nav-tabs {
         /*background-color: rgba(0, 0, 0, 0.15);*/
@@ -258,6 +313,26 @@ body.rex-theme-dark .mform .collapsing {
     body.rex-has-theme:not(.rex-theme-light) .sortitem .mform .mform-headline.grey-legend-background h3,
     body.rex-has-theme:not(.rex-theme-light) .sortitem .mform fieldset.grey-legend-background > legend {
         background-color: #ececec;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group {
+        border-color: #3a4753;
+        background: #1f2830;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup {
+        border-left-color: #344150;
+        background: #27323d;
+        color: #c9d4df;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup:hover,
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup:focus {
+        background: #30404d;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group.is-empty input.form-control[readonly] {
+        color: #9fb0c0;
     }
 
     body.rex-has-theme:not(.rex-theme-light) .mform .btn-white {

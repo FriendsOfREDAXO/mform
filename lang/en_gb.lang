@@ -46,7 +46,9 @@ mform_example_wrapper_inline = Inline form-elements
 mform_example_wrapper_tabs = Tab wrapper-elements
 mform_example_repeater_nested_repeater = Nested repeater [2 level]
 mform_example_repeater_single_repeater = Single repeater [1 level]
+mform_example_repeater_tinymce_nested_repeater = Nested Repeater with TinyMCE [2 levels]
 mform_example_repeater_widgets_repeater = MForm widget elements in repeater [2 level]
+mform_example_repeater_full_feature_lab = Full feature test lab [collapse, widgets, image-radio, repeater]
 
 mform_example_description_base = The "basic examples" include the basic calls of the respective MForm element, without any "extras", extensions and validations.
 mform_example_description_extended = The "extended examples" show beyond the "basic examples", how to expand elements around attributes, options, parameters, labels, etc.
@@ -58,6 +60,15 @@ mform_example_description_repeater = The "Repeater Examples" illustrate how simp
 mform_github = MForm FOR – go to github
 
 mform_repeater_remove_group_confirm_msg = Remove group?
+
+mform_flex_repeater_add = Add
+mform_flex_repeater_add_after = Add after
+mform_flex_repeater_toggle_all = Toggle all
+mform_flex_repeater_move_up = Move up
+mform_flex_repeater_move_down = Move down
+mform_flex_repeater_visibility = Active / Inactive (Output)
+mform_flex_repeater_remove = Remove
+mform_flex_repeater_toggle = Expand / Collapse
 mform_repeater_remove_field_confirm_msg = Remove field?
 
 mform_install = Install
