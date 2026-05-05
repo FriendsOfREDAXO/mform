@@ -4,6 +4,9 @@ namespace FriendsOfRedaxo\MForm\Utils;
 
 use Exception;
 
+/**
+ * Baut einfache SVG-Layoutvorschauen aus Sections, Spalten und Platzhalter-Elementen.
+ */
 class LayoutPreviewBuilder
 {
     private $svgWidth = 800;
@@ -257,6 +260,9 @@ class LayoutPreviewBuilder
         return $maxHeight + ($isNested ? 0 : 10); // Extra padding nur für Haupt-Sections
     }
 
+    /**
+     * Rendert das aktuell aufgebaute Layout als Base64-Data-URL.
+     */
     public function render()
     {
         // Berechne die maximale Höhe basierend auf dem Seitenverhältnis
@@ -299,6 +305,9 @@ class LayoutPreviewBuilder
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
+    /**
+     * Rendert eine Section rekursiv und liefert deren benoetigte Hoehe zurueck.
+     */
     private function renderSection(&$svg, $section, $offsetX, $offsetY, $isNested = false, $parentWidth = null)
     {
         $currentX = $offsetX;
@@ -345,6 +354,9 @@ class LayoutPreviewBuilder
         $this->currentContext = ['main'];
     }
 
+    /**
+     * Erzeugt den SVG-Markup-Block fuer ein einzelnes Platzhalter-Element.
+     */
     private function generateElement($type, $x, $y, $width, $height, $description = '', $arrow = false)
     {
         $element = '';

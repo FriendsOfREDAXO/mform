@@ -4,6 +4,9 @@ namespace FriendsOfRedaxo\MForm\Utils;
 
 use DOMDocument;
 
+/**
+ * Konvertiert einfachen HTML/SVG-nahen Markup in ein eigenstaendiges SVG.
+ */
 class HtmlToSvgConverter {
     private $dom;
     private $svg;
@@ -17,11 +20,17 @@ class HtmlToSvgConverter {
         libxml_use_internal_errors(true);
     }
 
+    /**
+     * Gibt das erzeugte SVG direkt als Base64-Data-URL zurueck.
+     */
     public function convertToBase64($html, $attributes = []) {
         $svg = $this->convert($html, $attributes);
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
+    /**
+     * Verpackt das erzeugte SVG in ein img-Tag fuer die direkte Ausgabe.
+     */
     public function convertToImgTag($html, $attributes = []) {
         $dataUrl = $this->convertToBase64($html, array_merge([
             'viewBox' => '0 0 2780 2780'
@@ -44,6 +53,9 @@ class HtmlToSvgConverter {
         return sprintf('<img src="%s"%s />', $dataUrl, $htmlAttributes);
     }
 
+    /**
+     * Baut aus dem uebergebenen Markup ein vollstaendiges SVG-Dokument.
+     */
     public function convert($html, $attributes = []) {
         $this->svg = new DOMDocument('1.0', 'UTF-8');
         $this->svg->formatOutput = true;
@@ -79,6 +91,9 @@ class HtmlToSvgConverter {
         return $this->svg->saveXML();
     }
 
+    /**
+     * Extrahiert unterstuetzte SVG-Tags aus dem HTML-Fragment und haengt sie an das Ziel-Element an.
+     */
     private function processHTML($html, $parent) {
         $elementTypes = 'rect|circle|ellipse|line|polyline|polygon|path|text|g|image';
         $pattern = "/<($elementTypes)([^>]*)(?:>(.*?)<\/\\1>|\/?>)/s";

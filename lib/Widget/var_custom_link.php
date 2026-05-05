@@ -188,9 +188,9 @@ class rex_var_custom_link extends rex_var
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
         
-        // Anchor-Funktionalität aktivieren, wenn entsprechender Arg gesetzt ist
+        // Anchor fuer alle Widgets aktivieren, solange der Button nicht explizit ausgeblendet wurde.
         $anchorData = '';
-        if (isset($args['anchor']) && $args['anchor'] === 'enable') {
+        if (!isset($args['anchor']) || 0 != $args['anchor']) {
             $anchorData = ' data-anchor="enable"';
         }
         

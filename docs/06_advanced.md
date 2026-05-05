@@ -289,6 +289,139 @@ Optionale Aktion:
 - Standard ist `show` (Bereich zeigen, wenn Bedingung erfüllt ist)
 - Mit dem letzten Parameter `action = 'hide'` wird das Verhalten invertiert
 
+## Beispiel: LayoutPreviewBuilder mit addRadioImgField
+
+`LayoutPreviewBuilder` ist in mform vor allem fuer grafische Auswahlfelder gedacht. Der typische Einsatz ist `addRadioImgField()`, bei dem jede Option eine automatisch erzeugte Layoutvorschau bekommt.
+
+Direkte Nutzung, wenn eine Vorschau manuell erzeugt und als Bild ausgegeben werden soll:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm\Utils\LayoutPreviewBuilder;
+
+$preview = (new LayoutPreviewBuilder())
+    ->setAspectRatio('16:9')
+    ->setBackgroundColor('#ffffff')
+    ->addColumn('1/2')
+    ->addElement('image', 'left', '4:3', ['description' => 'Bild'])
+    ->addColumn('1/2')
+    ->addElement('text', 'left', '4:3', ['description' => 'Text'])
+    ->addElement('button', 'left', '3:1', ['description' => 'CTA'])
+    ->render();
+
+echo '<img src="' . $preview . '" alt="Layoutvorschau">';
+```
+
+Im Addon ist aber meist dieser Weg gemeint: `addRadioImgField()` erwartet pro Option eine `config`, die intern ueber `MFormLayoutPreviewHelper` und `LayoutPreviewBuilder` in ein Vorschaubild umgesetzt wird.
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+$options = [
+    'layout_a' => [
+        'label' => 'Bild links, Text rechts',
+        'config' => [
+            'aspectRatio' => '16:9',
+            'backgroundColor' => '#ffffff',
+            'columns' => [
+                [
+                    'width' => '1/2',
+                    'elements' => [
+                        ['type' => 'image', 'aspectRatio' => '4:3', 'description' => 'Bild'],
+                    ],
+                ],
+                [
+                    'width' => '1/2',
+                    'elements' => [
+                        ['type' => 'text', 'aspectRatio' => '4:3', 'description' => 'Text'],
+                        ['type' => 'button', 'aspectRatio' => '3:1', 'description' => 'Button'],
+                    ],
+                ],
+            ],
+        ],
+    ],
+    'layout_b' => [
+        'label' => 'Text ueber Bild',
+        'config' => [
+            'aspectRatio' => '4:5',
+            'backgroundColor' => '#ffffff',
+            'columns' => [
+                [
+                    'width' => 'full',
+                    'elements' => [
+                        ['type' => 'text', 'aspectRatio' => '3:1', 'description' => 'Headline'],
+                        ['type' => 'image', 'aspectRatio' => '4:3', 'description' => 'Visual'],
+                    ],
+                ],
+            ],
+        ],
+    ],
+];
+
+echo MForm::factory()
+    ->addRadioImgField(1, $options, ['label' => 'Layout-Auswahl'])
+    ->show();
+```
+
+## Beispiel: HtmlToSvgConverter mit addRadioImgField
+
+`HtmlToSvgConverter` ist ebenfalls vor allem fuer `addRadioImgField()` interessant. Statt einer Layout-Konfiguration kann eine Option ein `svgIconSet` enthalten. mform erzeugt daraus intern ein `img`-Tag fuer die Radio-Option.
+
+Direkte Nutzung, wenn SVG-Markup manuell in ein Bild umgewandelt werden soll:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm\Utils\HtmlToSvgConverter;
+
+$markup = '
+    <rect x="40" y="40" width="520" height="300" style="fill:#f8f9fa;stroke:#ced4da;stroke-width:4px"></rect>
+    <text x="300" y="190" style="font-size:42px;font-weight:700;text-align:center;fill:#495057">Demo</text>
+';
+
+$converter = new HtmlToSvgConverter();
+
+echo $converter->convertToImgTag($markup, [
+    'viewBox' => '0 0 600 380',
+    'width' => '180px',
+    'height' => '114px',
+    'alt' => 'SVG-Vorschau',
+]);
+```
+
+Der uebliche mform-Anwendungsfall ist aber ein Radio-Image-Feld mit `svgIconSet` pro Option:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+$options = [
+    'teaser' => [
+        'label' => 'Teaser',
+        'svgIconSet' => '
+            <rect x="20" y="20" width="240" height="160" style="fill:#0d6efd"></rect>
+            <text x="140" y="105" style="font-size:28px;font-weight:700;text-align:center;fill:#ffffff">T</text>
+        ',
+    ],
+    'accordion' => [
+        'label' => 'Accordion',
+        'svgIconSet' => '
+            <rect x="20" y="20" width="240" height="36" style="fill:#e9ecef"></rect>
+            <rect x="20" y="72" width="240" height="36" style="fill:#e9ecef"></rect>
+            <rect x="20" y="124" width="240" height="36" style="fill:#e9ecef"></rect>
+        ',
+    ],
+];
+
+echo MForm::factory()
+    ->addRadioImgField(2, $options, ['label' => 'Darstellung'])
+    ->show();
+```
+
 ## Beispiel: Templates / Defaults per Key
 
 Fuer wiederkehrende Form-Defaults (z. B. Standard-Einstellungen, Basisfelder) kann ein Template-Key verwendet werden.
