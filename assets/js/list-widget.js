@@ -95,6 +95,8 @@ function mformListWidgetInit(widget) {
         mformListWriteHidden(widget);
     });
 
+    mformListApplyView(widget, type, ids.baseId);
+
     list.off('click.mformListWidget').on('click.mformListWidget', 'li', function () {
         mformListSelect(widget, $(this).data('index'));
     });
@@ -117,6 +119,11 @@ function mformListWidgetInit(widget) {
             }
             mformListRender(widget, type);
             mformListWriteHidden(widget);
+            return false;
+        }
+
+        if (action === 'toggle-view' && type === 'medialist') {
+            mformListToggleView(widget, ids.baseId);
             return false;
         }
 
@@ -150,6 +157,62 @@ function mformListWidgetInit(widget) {
 
         return false;
     });
+}
+
+function mformListGetStoredView(baseId) {
+    if (!baseId) return null;
+    try {
+        const value = window.localStorage.getItem('mformListWidgetView:' + String(baseId));
+        return value === 'grid' || value === 'list' ? value : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function mformListSetStoredView(baseId, view) {
+    if (!baseId) return;
+    try {
+        window.localStorage.setItem('mformListWidgetView:' + String(baseId), view);
+    } catch (e) {
+        // ignore
+    }
+}
+
+function mformListApplyView(widget, type, baseId) {
+    if (type !== 'medialist') {
+        return;
+    }
+
+    const stored = mformListGetStoredView(baseId);
+    let view = stored || String(widget.attr('data-view') || 'list').toLowerCase();
+    if (view !== 'grid' && view !== 'list') {
+        view = 'list';
+    }
+
+    widget.attr('data-view', view);
+    widget.toggleClass('is-grid-view', view === 'grid');
+    widget.toggleClass('is-list-view', view !== 'grid');
+
+    const btn = widget.find('.mform-list-btn[data-action="toggle-view"]');
+    const icon = btn.find('i');
+    const titleList = String(btn.attr('data-title-list') || 'List view');
+    const titleGrid = String(btn.attr('data-title-grid') || 'Grid view');
+
+    if (view === 'grid') {
+        icon.removeClass('fa-th fa-th-large').addClass('fa-list');
+        btn.attr('title', titleList);
+    } else {
+        icon.removeClass('fa-list fa-th').addClass('fa-th-large');
+        btn.attr('title', titleGrid);
+    }
+}
+
+function mformListToggleView(widget, baseId) {
+    const current = String(widget.attr('data-view') || 'list').toLowerCase();
+    const next = current === 'grid' ? 'list' : 'grid';
+    widget.attr('data-view', next);
+    mformListSetStoredView(baseId, next);
+    mformListApplyView(widget, 'medialist', baseId);
 }
 
 function mformListEnsureIds(widget, type) {
@@ -206,9 +269,21 @@ function mformListBuildOptionsFromHidden(widget, type) {
     if (!parts.length) return;
 
     const options = [];
+    const previewBase = String(widget.attr('data-preview-base') || '');
     parts.forEach(function (value) {
         const text = type === 'linklist' ? ('Artikel ' + value) : value;
-        options.push($('<option/>').attr('value', value).text(text));
+        const option = $('<option/>').attr('value', value).text(text);
+        if (type === 'medialist') {
+            const dotPos = value.lastIndexOf('.');
+            const ext = dotPos > -1 ? value.substring(dotPos + 1).toLowerCase() : 'file';
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'].indexOf(ext) !== -1;
+            option.attr('data-ext', ext);
+            option.attr('data-is-image', isImage ? '1' : '0');
+            if (isImage && previewBase) {
+                option.attr('data-preview', previewBase + encodeURIComponent(value));
+            }
+        }
+        options.push(option);
     });
 
     select.empty();
@@ -239,8 +314,37 @@ function mformListRender(widget, type) {
         const li = $('<li/>')
             .attr('data-index', index)
             .attr('tabindex', '0')
-            .toggleClass('is-selected', selected)
-            .text(option.text() || option.val());
+            .toggleClass('is-selected', selected);
+
+        if (type === 'medialist') {
+            const label = String(option.text() || option.val() || '');
+            const previewBase = String(widget.attr('data-preview-base') || '');
+            let preview = String(option.attr('data-preview') || '');
+            const ext = String(option.attr('data-ext') || 'file').toUpperCase();
+            const isImage = String(option.attr('data-is-image') || '0') === '1';
+
+            if (!preview && isImage && previewBase) {
+                preview = previewBase + encodeURIComponent(String(option.val() || ''));
+            }
+
+            const media = $('<span/>').addClass('mform-list-item-media');
+            if (preview) {
+                media.append(
+                    $('<img/>')
+                        .addClass('mform-list-item-thumb')
+                        .attr('src', preview)
+                        .attr('alt', '')
+                        .attr('loading', 'lazy')
+                );
+            } else {
+                media.append($('<span/>').addClass('mform-list-item-ext').text(ext));
+            }
+
+            li.append(media).append($('<span/>').addClass('mform-list-item-label').text(label));
+        } else {
+            li.text(option.text() || option.val());
+        }
+
         list.append(li);
     });
 }

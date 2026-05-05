@@ -90,8 +90,45 @@ foreach ($links as $link) {
     'types'    => 'gif,jpg',
     'preview'  => 1,
     'category' => 4,
+    'view'     => 'grid', // Startansicht: list|grid
+    'view_switch' => 1,   // Toggle-Button für Listen-/Rasteransicht anzeigen
 ])
 ```
+
+#### View-Switch beim `addMedialistField`
+
+Der View-Switch gilt nur für das MForm-Medialist-Widget (`addMedialistField`).
+
+- `view`: Startansicht des Widgets (`list` oder `grid`, Standard: `list`)
+- `view_switch`: Schaltet den Toggle-Button in der Toolbar ein/aus (Standard: `1`)
+
+Beispiel ohne Umschalt-Button (feste Rasteransicht):
+
+```php
+->addMedialistField(2, [
+    'label'       => 'Bildliste',
+    'view'        => 'grid',
+    'view_switch' => 0,
+])
+```
+
+Hinweis:
+
+- Die gewählte Ansicht wird pro Widget im Browser gespeichert und beim nächsten Laden wiederhergestellt.
+- Das Speicherformat der Werte bleibt unverändert (`REX_MEDIALIST`, kommagetrennte Dateinamen).
+
+#### Preview-Verhalten beim `addMedialistField`
+
+Die Medialist-Vorschau orientiert sich am Verhalten der `imagelist`:
+
+- Bilddateien (`jpg`, `jpeg`, `png`, `gif`, `webp`, `svg`, `avif`) werden als Thumbnail gerendert.
+- Nicht-Bilddateien werden als Dateityp-Badge angezeigt (z. B. `PDF`).
+- Die Preview-URL wird intern über `rex_medialistbutton_preview` erzeugt und korrekt entity-dekodiert,
+  damit keine ungültigen `&amp;`-URLs im `<img src>` landen.
+
+Hinweis fuer bestehende Installationen:
+
+- Wenn nach einem Update noch keine Thumbnails erscheinen, Backend-Assets einmal hart neu laden (Cache leeren).
 
 ### `addLinkField` / `addLinklistField`
 
