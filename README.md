@@ -7,11 +7,16 @@ MForm facilitates the creation of REDAXO module inputs. With MForm, you can not 
 **But it doesn’t stop there!** 
 MForm also enhances YForm and rex_form with additional widgets. Need a custom link field or a chic image list? No problem, MForm has you covered.
 
-## New in Version 8
-The highlight of the latest version? The brand-new Form Repeater! This feature replaces the old MBlock AddOn and offers the ability to not only repeat form elements but also nest them at multiple levels – something that was not possible with MBlock. This allows for the construction of even more complex forms.
+## New in Version 9
+Version 9 focuses on a more robust and editor-friendly form workflow.
 
-The included **demo collection** allows for immediate testing of module codes. Modules can be directly installed and tested. The codes are all commented.
-And additionally, there is a comprehensive documentation 📒.
+- New Flex Repeater runtime with stable behavior in dynamic backend contexts
+- New item activation state in repeater (eye icon) to keep entries editable but exclude them from output
+- Better TinyMCE compatibility in repeater actions (add/move/sort/remove)
+- New Linklist/Medialist repeater widget with robust popup synchronization
+- New Conditional Fields Builder API via `addConditionalFieldsetArea(...)`
+- Extended demo collection (including conditional field scenarios)
+- Expanded documentation for repeater output filtering and conditional field usage
 
 ## Features
 
