@@ -1,75 +1,143 @@
 
-# REDAXO System-Elemente
+# Media- & Link-Elemente
 
-Rendert die REDAXO System-Elemente `REX_MEDIA_BUTTON`, `REX_LINK_BUTTON`, `REX_MEDIALIST_BUTTON`, `REX_LINKLIST_BUTTON`.
+MForm stellt Felder für Medien und Links bereit. Dabei gibt es zwei Kategorien:
+
+| Methode | Widget | Speicherformat |
+|---|---|---|
+| `addMediaField()` | REDAXO Core (`rex_var_media`) | Dateiname (`REX_MEDIA`) |
+| `addLinkField()` | REDAXO Core (`rex_var_link`) | Artikel-ID (`REX_LINK`) |
+| `addMedialistField()` | **MForm-Widget** (`rex_var_custom_medialist`) | Kommagetrennte Dateinamen (`REX_MEDIALIST`) |
+| `addLinklistField()` | **MForm-Widget** (`rex_var_custom_linklist`) | Kommagetrennte Artikel-IDs (`REX_LINKLIST`) |
+| `addImagelistField()` | REDAXO Core (`rex_var_imglist`) | Kommagetrennte Dateinamen |
+| `addCustomLinkField()` | **MForm-Widget** | Link-String (`REX_VALUE`) |
+| `addCustomLinkMultipleField()` | **MForm-Widget** | JSON-Array von Link-Strings (`REX_VALUE`) |
+
+> **Hinweis:** `addMedialistField()` und `addLinklistField()` wurden in Version 9 durch eigene MForm-Widgets ersetzt.  
+> Diese bieten ein modernes Listen-UI mit Drag-and-Drop-Sortierung und sind vollständig Repeater-kompatibel.  
+> Das Speicherformat bleibt identisch zum nativen REDAXO-Format – bestehende Module funktionieren ohne Änderung weiter.
 
 ## Modul-Eingabe
 
 ```php
 <?php
 use FriendsOfRedaxo\MForm;
-// init mform
-$mform = MForm::factory()
-    // add fieldset area
-    ->addFieldsetArea('Media file elements', MForm::factory()
-        // some media fields
-        ->addMediaField(1, array('label'=>'Image'))
-        ->addMedialistField(1, array('label'=>'Image list'))
-        ->addImagelistField(2, ['label' => 'Image List'])
+
+echo MForm::factory()
+    ->addFieldsetArea('Medien', MForm::factory()
+        // natives REDAXO Core-Widget
+        ->addMediaField(1, ['label' => 'Einzelbild'])
+        // MForm eigenes Listen-Widget (Repeater-kompatibel)
+        ->addMedialistField(2, ['label' => 'Bildliste'])
+        // wie addMedialistField, optimiert für reine Bildlisten
+        ->addImagelistField(3, ['label' => 'Imagelist'])
     )
-    // add second fieldset area
-    ->addFieldsetArea('Link elements', MForm::factory()
-        // some link elements
-        ->addLinkField(1,array('label'=>'Link'))
-        ->addLinklistField(1,array('label'=>'Link list'))
-        ->addCustomLinkField(1, ['label' => 'Custom Link', 'data-intern' => 'enable', 'data-extern' => 'enable', 'data-media' => 'enable', 'data-mailto' => 'enable', 'data-tel' => 'enable'])
-    );
-// parse form
-echo $mform->show();
+    ->addFieldsetArea('Links', MForm::factory()
+        // natives REDAXO Core-Widget
+        ->addLinkField(1, ['label' => 'Link'])
+        // MForm eigenes Listen-Widget (Repeater-kompatibel)
+        ->addLinklistField(2, ['label' => 'Linkliste'])
+        // Custom-Link: intern, extern, Media, Mailto, Tel in einem Feld
+        ->addCustomLinkField(3, ['label' => 'Custom Link', 'data-intern' => 'enable', 'data-extern' => 'enable', 'data-media' => 'enable', 'data-mailto' => 'enable', 'data-tel' => 'enable'])
+        // Custom-Link-Multi: mehrere Links, gespeichert als JSON-Array
+        ->addCustomLinkMultipleField(4, ['label' => 'Mehrere Links', 'btn_add' => 'Link hinzufügen'])
+    )
+    ->show();
 ```
 
 ## Modul-Ausgabe
 
 ```php
 <?php
-dump('REX_MEDIA[id=1]');
-dump('REX_MEDIALIST[id=1]');
-dump('REX_MEDIALIST[id=2]');
-dump('REX_LINK[id=1]');
-dump('REX_LINKLIST[id=1]');
-dump('REX_VALUE[id=1]');
+// Einzelmedium
+$media = rex_media::get('REX_MEDIA[id=1]');
+
+// Medialist – kommagetrennte Dateinamen
+$mediaList = array_filter(explode(',', 'REX_MEDIALIST[id=2]'));
+
+// Link – Artikel-ID
+$article = rex_article::get((int) 'REX_LINK[id=1]');
+
+// Linklist – kommagetrennte Artikel-IDs
+$linkList = array_filter(explode(',', 'REX_LINKLIST[id=2]'));
+
+// Custom Link
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+$url = MFormOutputHelper::getCustomUrl('REX_VALUE[id=3]');
+
+// Custom Link Multi – JSON-Array dekodieren
+$rawLinks = html_entity_decode('REX_VALUE[id=4]', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$links = json_decode($rawLinks, true) ?? [];
+foreach ($links as $link) {
+    $url = MFormOutputHelper::getCustomUrl($link);
+}
 ```
 
 ## Parameter
 
-Die System-Elemente können mit Parametern versehen werden, z.B. um die Vorschau zu aktivieren oder die Kategorie eines Medienpool-Auswahlfelds festzulegen.
+### `addMediaField` / `addMedialistField`
 
 ```php
-// init mform
-$mform = MForm::factory()
-    // add fieldset area
-    ->addFieldsetArea('System Elements with Parameters', MForm::factory()
-        // use media field method with parameter property
-        ->addMediaField(1, ['types'=>'png', 'preview'=>1, 'category'=>2, 'label'=>'Image'])
-        // use set parameter method
-        ->addMediaField(2)
-            ->setLabel('Image')
-            ->setParameter('preview', 1)
-            ->setParameter('category', 2)
-            ->setParameter('type', 'png')
-        // use set parameters method
-        ->addMediaField(3)
-            ->setLabel('Image')
-            ->setParameters(['types'=>'png', 'preview'=>1, 'category'=>2])
-        // use media list method with parameter property
-        ->addMedialistField(1, ['types'=>'gif,jpg', 'preview'=>1, 'category'=>4, 'label'=>'Image list'])
-        // use set parameters for link field
-        ->addLinkField(1)
-            ->setParameters(['label'=>'Link', 'category'=>3])
-        // and for linklist field
-        ->addLinklistField(1, ['label'=>'Link list'])
-            ->setParameter('category', 2)
-    );
-// parse form
-echo $mform->show();
+->addMediaField(1, [
+    'label'    => 'Bild',
+    'types'    => 'png,jpg,svg',  // Dateitypen filtern
+    'preview'  => 1,              // Vorschau anzeigen
+    'category' => 2,              // Medienkategorie vorauswählen
+])
+
+->addMedialistField(2, [
+    'label'    => 'Bildliste',
+    'types'    => 'gif,jpg',
+    'preview'  => 1,
+    'category' => 4,
+])
 ```
+
+### `addLinkField` / `addLinklistField`
+
+```php
+->addLinkField(1, ['label' => 'Link', 'category' => 3])
+->addLinklistField(2, ['label' => 'Linkliste', 'category' => 2])
+```
+
+Alternativ über `setParameter()`:
+
+```php
+->addMediaField(3)
+    ->setLabel('Bild')
+    ->setParameter('preview', 1)
+    ->setParameter('category', 2)
+    ->setParameter('types', 'png')
+
+->addLinklistField(4)
+    ->setLabel('Linkliste')
+    ->setParameters(['label' => 'Linkliste', 'category' => 2])
+```
+
+### `addCustomLinkField` – alle Typen
+
+```php
+->addCustomLinkField(1, [
+    'label'      => 'Link',
+    'data-intern'  => 'enable',
+    'data-extern'  => 'enable',
+    'data-media'   => 'enable',
+    'data-mailto'  => 'enable',
+    'data-tel'     => 'enable',
+    'anchor'       => 0,   // Anker-Button ausblenden
+])
+```
+
+Ylink (eigene Tabellen als Link-Quelle):
+
+```php
+$ylink = [['name' => 'Länder', 'table' => 'rex_ycountries', 'column' => 'de_de']];
+->addCustomLinkField(1, ['label' => 'Custom', 'data-intern' => 'disable', 'data-extern' => 'enable', 'ylink' => $ylink])
+```
+
+### Als REX_VAR
+
+```html
+REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink="Countries::rex_ycountries::de_de"]
+```
+

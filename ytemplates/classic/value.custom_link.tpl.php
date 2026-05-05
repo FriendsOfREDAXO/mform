@@ -7,9 +7,10 @@ $value = htmlspecialchars($this->getValue());
 $parameters = [
     'media' => (1 == $this->getElement('media')),
     'mailto' => (1 == $this->getElement('mailto')),
-    'external' => (1 == $this->getElement('extern')),
+    'external' => (1 == $this->getElement('external')),
     'intern' => (1 == $this->getElement('intern')),
     'phone' => (1 == $this->getElement('phone')),
+    'anchor' => (0 == $this->getElement('anchor')) ? 0 : null,
     'types' => $this->getElement('types'),
     'category' => $this->getElement('category'),
     'media_category' => $this->getElement('media_category'),

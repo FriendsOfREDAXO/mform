@@ -91,6 +91,117 @@ echo $mform->show();
 REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink="Countries::rex_ycountries::de_de,CountriesEN::rex_ycountries::en_gb"]
 ```
 
+## YForm-Value-Types
+
+### custom_link (Einzelner Link)
+
+Das MForm-Paket stellt den YForm-Value-Type `custom_link` bereit. Er kann im YForm-Manager oder per PHP-API genutzt werden.
+
+```php
+$yform->setValueField('custom_link', [
+    'name'    => 'link',
+    'label'   => 'Link',
+    'intern'  => 1,
+    'extern'  => 1,
+    'media'   => 1,
+    'mailto'  => 1,
+    'phone'   => 0,
+    'anchor'  => 0,  // Anker-Button ausblenden
+]);
+```
+
+Tableset-Beispiel:
+```json
+{
+  "type_id": "value",
+  "type_name": "custom_link",
+  "name": "link",
+  "label": "Link",
+  "intern": "1",
+  "external": "1",
+  "media": "1",
+  "anchor": "0"
+}
+```
+
+### custom_link_multi (Mehrere Links, JSON-Array)
+
+Mit dem Value-Type `custom_link_multi` können Redakteure mehrere Links in einem einzigen YForm-Feld verwalten.  
+Die Daten werden als JSON-Array gespeichert, z. B. `["redaxo://1","mailto:a@b.com","https://example.com"]`.
+
+```php
+$yform->setValueField('custom_link_multi', [
+    'name'    => 'links',
+    'label'   => 'Links',
+    'intern'  => 1,
+    'extern'  => 1,
+    'media'   => 1,
+    'mailto'  => 1,
+    'phone'   => 0,
+    'anchor'  => 0,      // Anker-Button ausblenden
+    'btn_add' => 'Link hinzufügen',  // optionale Button-Beschriftung
+    'notice'  => 'Bis zu 5 Links möglich.',
+]);
+```
+
+Tableset-Beispiel:
+```json
+{
+  "type_id": "value",
+  "type_name": "custom_link_multi",
+  "name": "links",
+  "label": "Links",
+  "intern": "1",
+  "external": "1",
+  "media": "1",
+  "mailto": "1",
+  "btn_add": "Link hinzufügen"
+}
+```
+
+#### Ausgabe im Modul
+
+```php
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+$rawValue = $dataset->getValue('links'); // JSON-String aus Datenbank
+$linksRaw = html_entity_decode($rawValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$links = json_decode($linksRaw, true) ?? [];
+
+foreach ($links as $link) {
+    $url  = MFormOutputHelper::getCustomUrl($link);
+    $data = MFormOutputHelper::prepareCustomLink(['link' => $link], true);
+    echo '<a href="' . rex_escape($url) . '"' . $data['customlink_target'] . '>'
+        . rex_escape($data['customlink_text'])
+        . '</a>';
+}
+```
+
+---
+
+## Anchor-Link-Unterstützung
+
+Das Custom-Link-Widget enthält einen **Anker-Button**, mit dem Redakteure direkt auf einen Slice/Artikel-Abschnitt verlinken können (setzt einen `#`-Fragment-Anker).
+
+Standardmäßig ist der Button sichtbar. Er kann über das `anchor`-Attribut (Wert `0`) ausgeblendet werden:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addFieldsetArea('Links', MForm::factory()
+        // Standard: Anker-Button sichtbar
+        ->addCustomLinkField(1, ['label' => 'Link mit Anker'])
+
+        // Anker-Button ausblenden
+        ->addCustomLinkField(2, ['label' => 'Link ohne Anker', 'anchor' => 0])
+    )
+    ->show();
+```
+
+---
+
 ## Auslesen der Custom-Links
 
 MForm bietet drei Methoden zum Auslesen und Verarbeiten von Custom-Links:

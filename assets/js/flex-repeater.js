@@ -581,6 +581,7 @@
             this.defaultCount = parseInt(container.dataset.mfrDefaultCount, 10) || 0;
             this.confirmDelete = container.dataset.mfrConfirmDelete === '1';
             this.confirmDeleteMsg = container.dataset.mfrConfirmDeleteMsg || 'Wirklich löschen?';
+            this.copyPaste = container.dataset.mfrCopyPaste === '1';
 
             this.itemsList = container.querySelector('.mfr-items-list');
             this.template = container.querySelector('template.mfr-item-template');
@@ -674,6 +675,22 @@
                     this._log('toggle all clicked (delegated)');
                     this._toggleAll();
                 }
+
+                // Paste button in toolbar → append at end
+                const pasteBtn = e.target.closest('.mfr-btn-paste');
+                if (pasteBtn && pasteBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    this._pasteItem();
+                }
+
+                // Paste button on item → insert after that item
+                const pasteAfterBtn = e.target.closest('.mfr-btn-paste-after');
+                if (pasteAfterBtn && pasteAfterBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    const itemEl = pasteAfterBtn.closest('.mfr-item');
+                    const idx = itemEl ? Array.from(this.itemsList.children).indexOf(itemEl) : -1;
+                    this._pasteItemAfter(idx);
+                }
             });
 
             this._updateAddBtn();
@@ -681,6 +698,17 @@
 
             this._sortableInitialized = false;
             this._initSortable();
+
+            // Show paste buttons if clipboard is already filled
+            if (this.copyPaste) {
+                try {
+                    if (sessionStorage.getItem('mfr_clipboard')) {
+                        this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after, .mfr-btn-paste-after').forEach(function (btn) {
+                            btn.style.display = '';
+                        });
+                    }
+                } catch (e) { /* ignore */ }
+            }
 
             // Formular-Submit wird über den globalen Handler in initRepeaters abgewickelt
         }
@@ -783,9 +811,6 @@
             // Felder befüllen (Textareas vor TinyMCE-Init)
             this._fillFields(itemEl, data);
 
-            // Titel setzen
-            this._setTitle(itemEl, data, index);
-
             // Zugeklappt
             const shouldCollapse = this.collapsed && (!this.firstOpen || index > 0);
             if (shouldCollapse) {
@@ -799,6 +824,9 @@
             }
 
             this._applyItemDisabledState(itemEl, this._isDisabledValue(data ? data[MFR_ITEM_DISABLED_KEY] : null));
+
+            // Titel inkl. Status-Punkt setzen (nach Disabled-State, damit Initialfarbe korrekt ist)
+            this._setTitle(itemEl, data, index);
 
             // Item in DOM einfügen BEVOR Nested Repeater und Widgets initialisiert werden
             this.itemsList.appendChild(clone);
@@ -849,7 +877,19 @@
 
             const baseTitle = extractTitle(data, index);
             const isDisabled = itemEl && itemEl.dataset && itemEl.dataset.mfrDisabled === '1';
-            titleEl.textContent = isDisabled ? (baseTitle + ' (deaktiviert)') : baseTitle;
+
+            // Titel-Text setzen (ohne "(deaktiviert)" – das übernimmt das Badge)
+            titleEl.textContent = baseTitle;
+
+            // Status-Punkt aktualisieren (immer sichtbar)
+            let dot = titleEl.parentElement ? titleEl.parentElement.querySelector('.mfr-status-dot') : null;
+            if (!dot) {
+                dot = document.createElement('span');
+                dot.className = 'mfr-status-dot';
+                titleEl.insertAdjacentElement('beforebegin', dot);
+            }
+            dot.classList.toggle('mfr-status-dot--offline', isDisabled);
+            dot.classList.toggle('mfr-status-dot--online', !isDisabled);
         }
 
         _bindFieldListeners(itemEl) {
@@ -915,6 +955,33 @@
                 });
             }
 
+            // Item kopieren (in sessionStorage ablegen)
+            const copyBtn = itemEl.querySelector('.mfr-btn-copy');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    saveTinyMCE();
+                    const idx = this._indexOf(itemEl);
+                    if (idx === -1) return;
+                    const snapshot = JSON.parse(JSON.stringify(this.data[idx] || {}));
+                    // Remove disabled marker so paste produces an enabled item
+                    delete snapshot[MFR_ITEM_DISABLED_KEY];
+                    try {
+                        sessionStorage.setItem('mfr_clipboard', JSON.stringify(snapshot));
+                    } catch (e2) {
+                        window._mfrClipboard = snapshot;
+                    }
+                    // Show all paste buttons in this container
+                    this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after').forEach(function (btn) {
+                        btn.style.display = '';
+                    });
+                    // Visual feedback
+                    copyBtn.classList.add('mfr-btn-copy-active');
+                    window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 800);
+                    this._log('copyItem', { idx: idx, snapshot: snapshot });
+                });
+            }
+
             // Item entfernen
             const removeBtn = itemEl.querySelector('.mfr-btn-remove');
             if (removeBtn) {
@@ -960,6 +1027,40 @@
                     if (idx < 0 || idx >= this.itemsList.children.length - 1) return;
                     this._moveItem(idx, idx + 1);
                 });
+            }
+        }
+
+        _pasteItem() {
+            let snapshot = null;
+            try {
+                const raw = sessionStorage.getItem('mfr_clipboard');
+                if (raw) snapshot = JSON.parse(raw);
+            } catch (e) { /* ignore */ }
+            if (!snapshot && window._mfrClipboard) {
+                snapshot = window._mfrClipboard;
+            }
+            if (!snapshot) return;
+            const data = JSON.parse(JSON.stringify(snapshot));
+            this._log('pasteItem', { data: data });
+            this.addItem(data);
+        }
+
+        _pasteItemAfter(idx) {
+            let snapshot = null;
+            try {
+                const raw = sessionStorage.getItem('mfr_clipboard');
+                if (raw) snapshot = JSON.parse(raw);
+            } catch (e) { /* ignore */ }
+            if (!snapshot && window._mfrClipboard) {
+                snapshot = window._mfrClipboard;
+            }
+            if (!snapshot) return;
+            const data = JSON.parse(JSON.stringify(snapshot));
+            this._log('pasteItemAfter', { idx: idx, data: data });
+            if (idx >= 0) {
+                this.insertItemAfter(idx, data);
+            } else {
+                this.addItem(data);
             }
         }
 

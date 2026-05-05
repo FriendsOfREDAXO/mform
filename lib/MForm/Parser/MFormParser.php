@@ -99,6 +99,7 @@ class MFormParser
 
         $btnText = $attrs['btn_text'] ?? rex_i18n::msg('mform_flex_repeater_add');
         $btnClass = ' ' . ($attrs['btn_class'] ?? 'btn-primary');
+        $copyPaste = isset($attrs['copy_paste']) && $attrs['copy_paste'];
         $label = '';
         if (!empty($item->getLabel())) {
             $itemLabel = $item->getLabel();
@@ -140,7 +141,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d">%s',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d">%s',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -153,8 +154,21 @@ class MFormParser
             $confirmDelete,
             htmlspecialchars($confirmDeleteMsg, ENT_QUOTES),
             $addonDebug,
+            $copyPaste ? 1 : 0,
             $label
         );
+
+        $copyPasteButtons = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-xs mfr-btn-copy" title="%s"><i class="rex-icon fa-copy"></i></button><button type="button" class="btn btn-xs mfr-btn-paste-after" title="%s" style="display:none"><i class="rex-icon fa-paste"></i></button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_copy'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_after'), ENT_QUOTES)
+        ) : '';
+
+        $pasteButton = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-paste" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES)
+        ) : '';
 
         $toggleAllButton = sprintf(
             '<button type="button" class="btn btn-default mfr-btn-toggle-all" title="%s"><i class="rex-icon fa-square-o"></i> %s</button>',
@@ -162,32 +176,31 @@ class MFormParser
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES)
         );
 
-        $this->elements[] = sprintf(
-            '<div class="mfr-toolbar mfr-toolbar-top">%s<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button></div>',
-            ('true' === $showToggleAll) ? $toggleAllButton : '',
+        $toolbarToggle = ('true' === $showToggleAll) ? $toggleAllButton : '';
+        $toolbarAdd = sprintf(
+            '<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button>',
             htmlspecialchars($btnClass, ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES)
         );
+        $toolbarGroup = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButton . '</div>';
+
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroup . '</div>';
 
         $this->elements[] = '<div class="mfr-items-list"></div>';
 
         $this->elements[] = sprintf(
-            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button><button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body">%s</div></div></template>',
+            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button>%s<button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body">%s</div></div></template>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_up'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_down'), ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),
+            $copyPasteButtons,
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_visibility'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_remove'), ENT_QUOTES),
             $templateHtml
         );
 
-        $this->elements[] = sprintf(
-            '<div class="mfr-toolbar mfr-toolbar-bottom">%s<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button></div>',
-            ('true' === $showToggleAll) ? $toggleAllButton : '',
-            htmlspecialchars($btnClass, ENT_QUOTES),
-            htmlspecialchars($btnText, ENT_QUOTES)
-        );
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroup . '</div>';
 
         if ($this->debug) {
             $this->elements[] = sprintf(

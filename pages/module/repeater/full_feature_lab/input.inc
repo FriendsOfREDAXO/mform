@@ -17,12 +17,12 @@ $rowForm = MForm::factory()
 ;
 
 $mform = MForm::factory()
-    ->addFieldsetArea('Grunddaten', MForm::factory()
+    ->addTabElement('Grunddaten', MForm::factory()
         ->addTextField(1, ['label' => 'Modul-Headline'])
         ->addSelectField(2, ['de' => 'Deutsch', 'en' => 'English'], ['label' => 'Sprache'])
         ->addToggleCheckboxField(3, [1 => 'Feature aktivieren'], ['label' => 'Feature'])
-    )
-    ->addFieldsetArea('Darstellung', MForm::factory()
+    , true)
+    ->addTabElement('Darstellung', MForm::factory()
         ->addRadioImgField(4, $layoutOptions, ['label' => 'Layout'], 'cards')
         ->addRadioColorField(5, [
             'transparent' => ['color' => 'transparent', 'label' => 'Transparent'],
@@ -31,7 +31,7 @@ $mform = MForm::factory()
             'blue' => ['color' => '#2f77bc', 'label' => 'Blau'],
         ], ['label' => 'Hintergrundfarbe'], 'transparent')
     )
-    ->addFieldsetArea('Widgets', MForm::factory()
+    ->addTabElement('Widgets', MForm::factory()
         ->addCustomLinkField(6, ['label' => 'Hauptlink', 'data-intern' => 'enable', 'data-extern' => 'enable', 'data-media' => 'enable', 'data-mailto' => 'enable', 'data-tel' => 'enable'])
         ->addImagelistField(7, ['label' => 'Bildliste'])
         ->addLinklistField(8, ['category' => 1], null, ['label' => 'Verwandte Artikel'])
@@ -46,21 +46,33 @@ $mform = MForm::factory()
             'data-tel' => 'enable',
         ])
     )
-    ->addCollapseElement('Erweiterte Einstellungen', MForm::factory()
+    ->addTabElement('Erweiterte Einstellungen', MForm::factory()
         ->addTextAreaField(10, ['label' => 'Hinweistext'])
         ->addSelectField(11, ['left' => 'Links', 'center' => 'Zentriert', 'right' => 'Rechts'], ['label' => 'Ausrichtung'])
-    , true)
-    ->addRepeaterElement(12, $rowForm, true, true, [
-        'label' => 'Inhaltszeilen',
-        'btn_text' => 'Zeile hinzufuegen',
-        'collapsed' => true,
-        'first_open' => true,
-        'show_toggle_all' => true,
-        'min' => 1,
-        'max' => 20,
-        'confirm_delete' => true,
-        'confirm_delete_msg' => 'Zeile wirklich loeschen?',
-    ])
+    )
+    ->addTabElement('Repeater', MForm::factory()
+        ->addHtml(
+            '<div class="alert alert-info">'
+            . '<strong>Kopieren / Einfügen</strong><br>'
+            . 'Jede Zeile kann über den <i class="rex-icon fa-copy"></i>-Button kopiert '
+            . 'und mit <em>„Danach einfügen"</em> oder <em>„Paste (at end)"</em> wieder eingefügt werden. '
+            . 'Das Clipboard bleibt auch nach einem Seitenreload erhalten (sessionStorage).<br><br>'
+            . '<code>copy_paste =&gt; true</code> aktiviert die Funktion am Repeater-Element.'
+            . '</div>'
+        )
+        ->addRepeaterElement(12, $rowForm, true, true, [
+            'label' => 'Inhaltszeilen',
+            'btn_text' => 'Zeile hinzufügen',
+            'collapsed' => true,
+            'first_open' => true,
+            'show_toggle_all' => true,
+            'min' => 1,
+            'max' => 20,
+            'confirm_delete' => true,
+            'confirm_delete_msg' => 'Zeile wirklich löschen?',
+            'copy_paste' => true,
+        ])
+    )
 ;
 
 echo $mform->show();

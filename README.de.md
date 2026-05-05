@@ -12,10 +12,17 @@ Version 9 legt den Fokus auf einen robusteren und redaktionsfreundlichen Workflo
 
 - Neuer Flex-Repeater im Backend mit stabiler Initialisierung (auch in dynamischen Kontexten)
 - Neuer Aktiv/Inaktiv-Status pro Repeater-Item (Auge): editierbar bleiben, aber bei der Ausgabe ausblenden
+  - Der Status ist im Header sofort sichtbar: gefuellter Punkt (gruen = aktiv, rot = offline)
+- **Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` an `addRepeaterElement()`: einzelnes Item kopieren, als neues Element am Ende einfügen
 - TinyMCE-Kompatibilität im Repeater verbessert (Add/Move/Sort/Remove)
 - Neues Linklist/Medialist-Repeater-Widget mit robuster Popup-Übernahme
+- Neue API `addCustomLinkMultipleField(...)` – Repeater-basiertes Multi-Link-Feld; Single-Format bleibt unveraendert
 - Neue Conditional-API über `addConditionalFieldsetArea(...)`
-- Demo-Sammlung erweitert (u. a. Conditional Fields)
+- **Neue YForm Value-Types** aus dem mform-Paket:
+  - `custom_link` – unterstützt jetzt `anchor: 0` zum Ausblenden des Anker-Buttons; Bug im Classic-Template behoben
+  - `custom_link_multi` – mehrere Links pro YForm-Feld, gespeichert als JSON-Array
+- **Neuer Helfer `MFormRepeaterHelper::decode()`** – Repeater-Werte in einem Aufruf ohne Offline-Items dekodieren
+- Demo-Sammlung erweitert (Conditional Fields, Copy/Paste-Repeater)
 - Doku erweitert (Repeater-Output-Filter, Conditional Fields)
 
 ## Features
@@ -24,7 +31,7 @@ Version 9 legt den Fokus auf einen robusteren und redaktionsfreundlichen Workflo
 - **Erstellen von Moduleingaben per PHP**: Die Basis, um mit MForm zu arbeiten.
 - **Mehrspaltige Formulare**: Layout-Optionen zur Strukturierung der Formulare.
 - **Inline-Formular-Elemente**: Für eine kompakte Formulargestaltung.
-- **HMTL5-Formular-Elemente**: Nutzung moderner Webstandards.
+- **HTML5-Formular-Elemente**: Nutzung moderner Webstandards.
 - **Datalists**: Für verbesserte Eingabeoptionen in Formularen.
 
 ### Erweiterte Gestaltung und Interaktivität
@@ -45,75 +52,33 @@ Version 9 legt den Fokus auf einen robusteren und redaktionsfreundlichen Workflo
 
 Der Formular-Repeater ermöglicht es, Formularelemente dynamisch zu wiederholen und dabei eine Verschachtelung in mehreren Ebenen zu realisieren.
 
-### Migration von MBlock zu MForm 8 
-
-Der neue Repeater ist nur eingeschränkt mit MBlock kompatibel.
-
-Akuell funktionieren nicht bei einer Migration: 
-
-- CustomLinkField // Converter: https://friendsofredaxo.github.io/tricks/addons/mform/custom_link_converter
-- addMediaListField
-- addLinkListField
-
-***MBlock-Modul*** 
-
-```php
-// Basis-ID für die Verwaltung der Formularelemente
-$id = 1;
-
-// Initialisierung von MForm
-$mform = new MForm();
-
-// Hinzufügen eines Feldsets
-$mform->addFieldsetArea('Team member');
-
-// Hinzufügen eines Textfelds, wobei dynamisch auf ein JSON-Format verwiesen wird
-$mform->addTextField("$id.0.name", array('label' => 'Name'));
-
-// Hinzufügen eines Medienfeldes, das durch MBlock in JSON gespeichert wird
-$mform->addMediaField(1, array('label' => 'Avatar'));
-
-// Ausgabe des Formulars mit MBlock, welches die dynamische Handhabung der Blöcke erlaubt
-echo MBlock::show($id, $mform->show(), array('min' => 2, 'max' => 4));
-```
-
-***Das gleiche Modul in MForm 8*** 
-
-Zur Ermittlung der benötigten Feld-Keys sollte man ggf. vorab einen Dump erzeugen. 
-Zu beachten: Aus dem Mediafield 1 im urpsrünglichen MBlock-Modul wird: `'REX_MEDIA_1'`
-
 ```php
 use FriendsOfRedaxo\MForm;
 
-// Initialisierungs-ID des Repeaters mit der Basis-ID des ursprünglichen MBlock-Abschnittes
-$id = 1;
-
-// Erstellen einer neuen MForm-Instanz mit der Factory-Methode und direkte Integration eines Repeaters
 echo MForm::factory()
     ->addRepeaterElement(
-        $id, 
+        1,
         MForm::factory()
-            ->addFieldsetArea('Team member', 
-                MForm::factory()
-                    ->addTextField('name', ['label' => 'Name'])
-                    ->addMediaField('REX_MEDIA_1', ['label' => 'Avatar'])
+            ->addFieldsetArea('Team member', MForm::factory()
+                ->addTextField('name', ['label' => 'Name'])
+                ->addMediaField('image', ['label' => 'Avatar'])
             ),
-        true, 
-        true, 
-        ['min' => 2, 'max' => 4]
+        true,
+        true,
+        ['min' => 1, 'max' => 10]
     )
     ->show();
 ```
 
-
+> **MBlock-Migration:** Hinweise zur Migration bestehender MBlock-Module gibt es im [Migrationsleitfaden](docs/08_mblock_migration.md).
 
 ## Installation
 
-MForm kann direkt über den Redaxo-Installer Installiert werden. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
+MForm kann direkt über den Redaxo-Installer installiert werden. [MForm Redaxo Addon Page](http://www.redaxo.org/de/download/addons/?addon_id=967&searchtxt=mform&cat_id=-1)
 
 1. In REDAXO einloggen
 2. Im Backend unter "Installer > Neue herunterladen" "MForm" suche und unter "Funktion" "ansehen" klicken
-3. Bei der aktuelle Version in der Liste unter "Funktion" "herunterladen" klicken
+3. Bei der aktuellen Version in der Liste unter "Funktion" "herunterladen" klicken
 4. Unter "AddOns" MForm installieren und aktivieren
 
 ## Ausgabe
@@ -123,7 +88,7 @@ Informationen hierzu in der [REDAXO Doku](https://www.redaxo.org/doku/main/redax
 
 ## Lizenz
 
-MForm ist unter der [MIT Lizenz](LICENSE.md) lizensiert.
+MForm ist unter der [MIT Lizenz](LICENSE.md) lizenziert.
 
 ## Changelog
 

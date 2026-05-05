@@ -197,3 +197,33 @@ $mform = MForm::factory()
 // parse mform
 echo $mform->show();
 ```
+
+## showWrapper / setShowWrapper
+
+Standardmäßig rendert MForm ein umschließendes `<div class="mform-wrapper">` um das gesamte Formular. Mit `setShowWrapper(false)` kann dieser Wrapper entfernt werden – nützlich, wenn MForm-Ausgabe in ein eigenes Layout-Container-Element eingebettet wird.
+
+Alle Container-Elemente (`addFieldsetArea`, `addCollapseElement`, `addTabElement`, `addColumnElement`, `addInlineElement`, `addForm`, `addRepeaterElement`) akzeptieren `showWrapper` ebenfalls als letzten bool-Parameter.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+// Globalen Wrapper deaktivieren
+$mform = MForm::factory()
+    ->setShowWrapper(false)
+    ->addTextField(1, ['label' => 'Titel'])
+    ->addTextAreaField(2, ['label' => 'Text']);
+
+echo $mform->show();
+
+// showWrapper nur für einen einzelnen Fieldset-Bereich deaktivieren
+echo MForm::factory()
+    ->addFieldsetArea(
+        'Mein Bereich',
+        MForm::factory()->addTextField(3, ['label' => 'Wert']),
+        [],    // attributes
+        false, // parse
+        false  // showWrapper = false → kein Wrapper-Div um den Fieldset
+    )
+    ->show();
+```
