@@ -26,12 +26,13 @@ if (rex::isBackend()) {
     rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
     rex_view::addCssFile($this->getAssetsUrl('css/list-widget.css'));
     rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
+    rex_view::addJsFile($this->getAssetsUrl('js/sortable.min.js'));
     rex_view::addJsFile($this->getAssetsUrl('js/list-widget.js'));
     rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
     // add mform js / css
-    rex_view::addJsFile($this->getAssetsUrl('js/flex-repeater.js'));
     rex_view::addJsFile($this->getAssetsUrl('mform.js'));
     rex_view::addCssFile($this->getAssetsUrl('css/mform.css'));
+    rex_view::addJsFile($this->getAssetsUrl('js/flex-repeater.js'));
     rex_view::addCssFile($this->getAssetsUrl('css/flex-repeater.css'));
     // reset count per page init
     if (rex_backend_login::hasSession()) {

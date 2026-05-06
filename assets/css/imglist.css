@@ -29,7 +29,7 @@
 }
 
 .rex-js-widget-imglist.is-empty ul.thumbnail-list::before {
-    content: 'Noch keine Medien ausgewaehlt';
+    content: attr(data-empty);
     width: 100%;
     color: var(--mform-widget-muted);
     font-size: 12px;

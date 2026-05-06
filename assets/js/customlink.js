@@ -413,10 +413,16 @@ function customLinkMultiInit(multiWidget) {
         }
     });
 
-    // Sync on form submit
-    multiWidget.closest('form').off('submit.clmulti').on('submit.clmulti', function () {
-        customLinkMultiSerialize(multiWidget);
-    });
+    // Sync on form submit once per form and serialize all multi widgets inside.
+    let form = multiWidget.closest('form');
+    if (form.length && !form.data('clmulti-submit-bound')) {
+        form.data('clmulti-submit-bound', true);
+        form.on('submit.clmulti', function () {
+            $(this).find('.rex-js-cl-multi').each(function () {
+                customLinkMultiSerialize($(this));
+            });
+        });
+    }
 
     // Sortable via move-up/move-down on drag handle click (simple swap)
     multiWidget.on('mousedown.clmulti', '.mform-cl-multi-handle', function (e) {

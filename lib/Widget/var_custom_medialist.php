@@ -76,23 +76,23 @@ class rex_var_custom_medialist extends rex_var
 
         $viewButton = '';
         if ($viewSwitch) {
-            $viewButton = '<a href="#" class="btn btn-popup mform-list-btn mform-list-btn-view-toggle" data-action="toggle-view" data-title-list="' . rex_escape(rex_i18n::msg('mform_list_widget_view_list')) . '" data-title-grid="' . rex_escape(rex_i18n::msg('mform_list_widget_view_grid')) . '" title="' . rex_escape(rex_i18n::msg('mform_list_widget_view_grid')) . '"><i class="rex-icon fa-th-large"></i></a>';
+            $viewButton = '<button type="button" class="btn btn-popup mform-list-btn mform-list-btn-view-toggle" data-action="toggle-view" data-title-list="' . rex_escape(rex_i18n::msg('mform_list_widget_view_list')) . '" data-title-grid="' . rex_escape(rex_i18n::msg('mform_list_widget_view_grid')) . '" title="' . rex_escape(rex_i18n::msg('mform_list_widget_view_grid')) . '"><i class="rex-icon fa-th-large"></i></button>';
         }
 
         return '<div class="rex-js-widget mform-list-widget mform-list-widget-medialist" data-widget-type="medialist" data-widget-id="' . rex_escape($id) . '" data-view="' . rex_escape($initialView) . '" data-preview-base="' . rex_escape($previewBase) . '" data-params="' . rex_escape($openParams) . '">'
             . '<div class="mform-list-shell">'
-            . '<ul class="mform-list-items"></ul>'
+            . '<ul class="mform-list-items" data-empty="' . rex_escape(rex_i18n::msg('mform_widget_empty_entries')) . '"></ul>'
             . '<select class="form-control mform-list-select" name="REX_MEDIALIST_SELECT[' . rex_escape($id) . ']" id="REX_MEDIALIST_SELECT_' . rex_escape($id) . '" size="10">' . $options . '</select>'
             . '<input type="hidden" class="mform-list-value" name="' . rex_escape($name) . '" id="REX_MEDIALIST_' . rex_escape($id) . '" value="' . rex_escape((string) $value) . '">'
             . '</div>'
             . '<div class="mform-list-toolbar">'
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="open" title="' . rex_i18n::msg('var_media_open') . '"' . $disabled . '><i class="rex-icon rex-icon-open-mediapool"></i></a>'
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="add" title="' . rex_i18n::msg('var_media_new') . '"' . $disabled . '><i class="rex-icon rex-icon-add-media"></i></a>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="open" title="' . rex_i18n::msg('var_media_open') . '"' . $disabled . '><i class="rex-icon rex-icon-open-mediapool"></i></button>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="add" title="' . rex_i18n::msg('var_media_new') . '"' . $disabled . '><i class="rex-icon rex-icon-add-media"></i></button>'
             . $viewButton
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="view" title="' . rex_i18n::msg('var_media_view') . '"' . $disabled . '><i class="rex-icon rex-icon-view-media"></i></a>'
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="up" title="' . rex_i18n::msg('var_medialist_move_up') . '"><i class="rex-icon rex-icon-up"></i></a>'
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="down" title="' . rex_i18n::msg('var_medialist_move_down') . '"><i class="rex-icon rex-icon-down"></i></a>'
-            . '<a href="#" class="btn btn-popup mform-list-btn" data-action="delete" title="' . rex_i18n::msg('var_media_remove') . '"' . $disabled . '><i class="rex-icon rex-icon-delete-media"></i></a>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="view" title="' . rex_i18n::msg('var_media_view') . '"' . $disabled . '><i class="rex-icon rex-icon-view-media"></i></button>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="up" title="' . rex_i18n::msg('var_medialist_move_up') . '"><i class="rex-icon rex-icon-up"></i></button>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="down" title="' . rex_i18n::msg('var_medialist_move_down') . '"><i class="rex-icon rex-icon-down"></i></button>'
+            . '<button type="button" class="btn btn-popup mform-list-btn" data-action="delete" title="' . rex_i18n::msg('var_media_remove') . '"' . $disabled . '><i class="rex-icon rex-icon-delete-media"></i></button>'
             . '</div>'
             . '</div>';
     }

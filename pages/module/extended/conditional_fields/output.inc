@@ -58,9 +58,11 @@ switch ($type) {
                 'https://www.youtube-nocookie.com/embed/$1' . $autoplayParam,
                 $videoUrl
             );
-            echo '<div class="video-wrapper">';
-            echo '<iframe src="' . rex_escape($embedUrl) . '" allowfullscreen loading="lazy"></iframe>';
-            echo '</div>';
+            if (is_string($embedUrl) && $embedUrl !== $videoUrl && str_starts_with($embedUrl, 'https://www.youtube-nocookie.com/embed/')) {
+                echo '<div class="video-wrapper">';
+                echo '<iframe src="' . rex_escape($embedUrl) . '" allowfullscreen loading="lazy"></iframe>';
+                echo '</div>';
+            }
         }
         break;
 }

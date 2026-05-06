@@ -147,7 +147,7 @@ class rex_var_custom_link extends rex_var
         $emailClass = (isset($args['mailto']) && 0 == $args['mailto']) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && 0 == $args['phone']) ? ' hidden' : $class;
-        $anchorClass = (isset($args['anchor']) && 0 == $args['anchor']) ? ' hidden' : $class;
+        $anchorClass = (isset($args['anchor']) && 0 != $args['anchor']) ? $class : ' hidden';
         $externalPrefix = (isset($args['external_prefix']) && 0 == $args['external_prefix']) ? $args['external_prefix'] : 'https://';
         $args = self::prepareYLinkArg($args);
         $ylinks = '';
@@ -188,9 +188,8 @@ class rex_var_custom_link extends rex_var
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
         
-        // Anchor fuer alle Widgets aktivieren, solange der Button nicht explizit ausgeblendet wurde.
         $anchorData = '';
-        if (!isset($args['anchor']) || 0 != $args['anchor']) {
+        if (isset($args['anchor']) && 0 != $args['anchor']) {
             $anchorData = ' data-anchor="enable"';
         }
         

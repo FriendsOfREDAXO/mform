@@ -1,3 +1,6 @@
+mform_widget_empty_media = Nenhuma midia selecionada
+mform_widget_empty_entries = Nenhuma entrada selecionada
+yform_values_custom_link_anchor = Ocultar botao de ancora
 mform_name = MForm
 mform_title = MForm
 

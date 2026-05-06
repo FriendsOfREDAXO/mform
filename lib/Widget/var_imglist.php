@@ -98,7 +98,7 @@ class rex_var_imglist extends rex_var
 
         $e = [];
         $e['before'] = '<div class="rex-js-widget custom-imglist ' . $wdgtClass . '" data-params="' . $open_params . '" data-widget-id="' . $id . '">';
-        $e['field'] = '<ul class="form-control thumbnail-list" id="REX_IMGLIST_' . $id . '">' . $thumbnails . '</ul><select class="form-control" name="REX_MEDIALIST_SELECT[' . $id . ']" id="REX_MEDIALIST_SELECT_' . $id . '" size="10">' . $options . '</select><input type="hidden" name="' . $name . '" id="REX_MEDIALIST_' . $id . '" value="' . $value . '" />';
+        $e['field'] = '<ul class="form-control thumbnail-list" id="REX_IMGLIST_' . $id . '" data-empty="' . rex_escape(rex_i18n::msg('mform_widget_empty_media')) . '">' . $thumbnails . '</ul><select class="form-control" name="REX_MEDIALIST_SELECT[' . $id . ']" id="REX_MEDIALIST_SELECT_' . $id . '" size="10">' . $options . '</select><input type="hidden" name="' . $name . '" id="REX_MEDIALIST_' . $id . '" value="' . $value . '" />';
         $e['functionButtons'] = '
                 <a href="#" class="btn btn-popup open" title="' . rex_i18n::msg('var_media_open') . '"' . $disabled . '><i class="rex-icon rex-icon-open-mediapool"></i></a>
                 <a href="#" class="btn btn-popup add" title="' . rex_i18n::msg('var_media_new') . '"' . $disabled . '><i class="rex-icon rex-icon-add-media"></i></a>

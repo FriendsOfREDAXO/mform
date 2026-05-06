@@ -10,7 +10,7 @@ $parameters = [
     'external' => (1 == $this->getElement('external')),
     'intern' => (1 == $this->getElement('intern')),
     'phone' => (1 == $this->getElement('phone')),
-    'anchor' => (0 == $this->getElement('anchor')) ? 0 : 'enable',
+    'anchor' => (1 == (int) $this->getElement('anchor')) ? 0 : 'enable',
     'types' => $this->getElement('types'),
     'category' => $this->getElement('category'),
     'media_category' => $this->getElement('media_category'),
@@ -35,7 +35,7 @@ if (count($notice) > 0) {
 }
 
 ?>
-<div class="<?= $this->getHTMLClass() ?>" id="<?= $this->getHTMLId() ?>">
+<div class="<?= $class_group ?>" id="<?= $this->getHTMLId() ?>">
     <label class="text <?= $this->getWarningClass() ?>" for="<?= $this->getFieldId() ?>" ><?= $this->getLabel() ?></label>
     <?= $widget ?>
     <?= $notice ?>
