@@ -259,7 +259,16 @@
         const tag = field.tagName.toLowerCase();
         if (tag === 'input') {
             if (field.type === 'checkbox') {
-                field.checked = !!(value);
+                const normalized = typeof value === 'string' ? value.trim().toLowerCase() : value;
+                field.checked = !(
+                    normalized === '' ||
+                    normalized === false ||
+                    normalized === 0 ||
+                    normalized === '0' ||
+                    normalized === 'false' ||
+                    normalized === 'off' ||
+                    normalized === 'no'
+                );
                 return;
             }
             if (field.type === 'radio') {
@@ -1449,7 +1458,7 @@
 
     function syncRepeatersInForm(form) {
         if (!form || !form.querySelector('.mfr-container')) return;
-        mfrLog(true, 'syncRepeatersInForm start', {
+        mfrLog(isGlobalDebugEnabled(), 'syncRepeatersInForm start', {
             formAction: form.getAttribute('action'),
             formMethod: form.getAttribute('method'),
             containerCount: form.querySelectorAll('.mfr-container').length
@@ -1465,12 +1474,15 @@
                 });
             }
         });
-        mfrLog(true, 'syncRepeatersInForm end');
+        mfrLog(isGlobalDebugEnabled(), 'syncRepeatersInForm end');
     }
 
     document.addEventListener('submit', function (e) {
         const form = e.target;
-        mfrLog(true, 'document submit capture', form);
+        mfrLog(isGlobalDebugEnabled(), 'document submit capture', {
+            formAction: form && form.getAttribute ? form.getAttribute('action') : null,
+            formMethod: form && form.getAttribute ? form.getAttribute('method') : null
+        });
         syncRepeatersInForm(form);
     }, true);
 
@@ -1479,9 +1491,10 @@
         const submitControl = e.target.closest('button[type="submit"], input[type="submit"], button:not([type])');
         if (!submitControl) return;
         const form = submitControl.form || submitControl.closest('form');
-        mfrLog(true, 'submit control click capture', {
-            control: submitControl,
-            form: form
+        mfrLog(isGlobalDebugEnabled(), 'submit control click capture', {
+            controlType: submitControl.tagName,
+            formAction: form && form.getAttribute ? form.getAttribute('action') : null,
+            formMethod: form && form.getAttribute ? form.getAttribute('method') : null
         });
         syncRepeatersInForm(form);
     }, true);

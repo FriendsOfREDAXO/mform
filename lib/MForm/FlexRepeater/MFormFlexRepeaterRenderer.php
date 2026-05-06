@@ -128,6 +128,9 @@ class MFormFlexRepeaterRenderer
             case 'custom-link':
             case 'media':
             case 'imagelist':
+            case 'custom-link-multi':
+                return self::wrapFormGroup($label, self::renderUnsupportedWidgetPlaceholder($type), $item);
+
                 return self::wrapFormGroup(
                     $label,
                     sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s>', $class, $key, $attrs),
@@ -235,6 +238,14 @@ class MFormFlexRepeaterRenderer
             }
         }
         return $html;
+    }
+
+    private static function renderUnsupportedWidgetPlaceholder(string $type): string
+    {
+        return sprintf(
+            '<div class="alert alert-warning">%s</div>',
+            htmlspecialchars('Widget-Typ "' . $type . '" wird im Flex-Repeater derzeit nicht unterstuetzt.', ENT_QUOTES)
+        );
     }
 
     private static function renderRadioGroup(MFormItem $item, string $fieldKey): string

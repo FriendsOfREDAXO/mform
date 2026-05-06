@@ -1,3 +1,6 @@
+mform_widget_empty_media = No hay medios seleccionados
+mform_widget_empty_entries = No hay entradas seleccionadas
+yform_values_custom_link_anchor = Ocultar boton de anclaje
 mform_name = MForm
 mform_title = MForm
 

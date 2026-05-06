@@ -44,7 +44,7 @@
 }
 
 .mform-list-widget.is-empty .mform-list-items::before {
-    content: 'Keine Eintraege ausgewaehlt';
+    content: attr(data-empty);
     color: var(--mfl-muted);
     font-size: 12px;
 }
@@ -58,12 +58,37 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
 }
 
 .mform-list-widget.mform-list-widget-medialist .mform-list-items li {
     display: flex;
     align-items: center;
     gap: .55rem;
+}
+
+.mform-list-widget .mform-list-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    color: var(--mfl-muted);
+    cursor: grab;
+    flex: 0 0 18px;
+}
+
+.mform-list-widget .mform-list-drag-handle:active {
+    cursor: grabbing;
+}
+
+.mform-list-widget .mform-list-sortable-ghost {
+    opacity: .55;
+}
+
+.mform-list-widget .mform-list-sortable-chosen {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
 }
 
 .mform-list-widget.mform-list-widget-medialist .mform-list-item-media {
@@ -140,6 +165,13 @@
 
 .mform-list-widget .mform-list-toolbar .btn {
     min-width: 32px;
+}
+
+.mform-list-widget .mform-list-toolbar .mform-list-btn[disabled],
+.mform-list-widget .mform-list-toolbar .mform-list-btn.is-disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .mform-list-widget .mform-list-toolbar .mform-list-btn-view-toggle {

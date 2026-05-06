@@ -49,7 +49,7 @@ abstract class MFormElements
     /**
      * @description method to generate element array - add fields
      */
-    public function addElement(string $type, float|int|string $id = null, string $value = null, array $attributes = null, array $options = null, array $parameter = null, ?int $catId = null, ?string $defaultValue = null): MForm
+    public function addElement(string $type, float|int|string|null $id = null, ?string $value = null, ?array $attributes = null, ?array $options = null, ?array $parameter = null, ?int $catId = null, ?string $defaultValue = null): MForm
     {
         // remove ,
         if (!is_int($id)) {
@@ -83,7 +83,7 @@ abstract class MFormElements
         return $this->addElement('html', null, $html);
     }
 
-    public function addHeadline(?string $value = null, array $attributes = null): MForm
+    public function addHeadline(?string $value = null, ?array $attributes = null): MForm
     {
         return $this->addElement('headline', null, $value, $attributes);
     }
@@ -123,7 +123,7 @@ abstract class MFormElements
         return $this->addAlert('success', $value);
     }
 
-    public function addForm(callable|MForm|string $form = null, bool $parse = false, bool $debug = false, bool $showWrapper = false): MForm
+    public function addForm(callable|MForm|string|null $form = null, bool $parse = false, bool $debug = false, bool $showWrapper = false): MForm
     {
         if (!$form instanceof MForm && is_callable($form)) {
             $form = $form();
@@ -140,14 +140,14 @@ abstract class MFormElements
         return $this->addHtml($form);
     }
 
-    public function addFieldsetArea(string $legend = null, $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
+    public function addFieldsetArea(?string $legend = null, mixed $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         return $this->addElement('fieldset', null, null, array_merge(['legend' => $legend], $attributes))
             ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-fieldset', null, null, $attributes);
     }
 
-    public function addColumnElement(int $col, $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
+    public function addColumnElement(int $col, mixed $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         if (!array_key_exists('class', $attributes) || (isset($attributes['class']) && !str_contains($attributes['class'], 'col-'))) {
             $attributes['class'] = "col-sm-$col" . ((isset($attributes['class'])) ? ' ' . $attributes['class'] : '');
@@ -157,7 +157,7 @@ abstract class MFormElements
             ->addElement('close-column', null, null, $attributes);
     }
 
-    public function addInlineElement(string $label = '', $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
+    public function addInlineElement(string $label = '', mixed $form = null, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         return $this->addElement('inline', null, null, $attributes)
             ->setLabel($label)
@@ -165,7 +165,7 @@ abstract class MFormElements
             ->addElement('close-inline', null, null, $attributes);
     }
 
-    public function addTabElement(string $label = '', $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
+    public function addTabElement(string $label = '', mixed $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
     {
         $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
@@ -174,7 +174,7 @@ abstract class MFormElements
             ->addElement('close-tab', null, null, $attributes);
     }
 
-    public function addCollapseElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false, bool $showWrapper = false): MForm
+    public function addCollapseElement(string $label = '', callable|MForm|string|null $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = [], bool $accordion = false, bool $parse = false, bool $showWrapper = false): MForm
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         if (!is_array($attributes)) {
@@ -192,7 +192,7 @@ abstract class MFormElements
             ->addElement('close-collapse', null, null, $attributes);
     }
 
-    public function addAccordionElement(string $label = '', callable|MForm|string $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = []): MForm
+    public function addAccordionElement(string $label = '', callable|MForm|string|null $form = null, bool $openCollapse = false, bool $hideToggleLinks = false, array $attributes = []): MForm
     {
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
@@ -202,7 +202,7 @@ abstract class MFormElements
         string $operator = '=',
         string $compareValue = '',
         string $legend = '',
-        callable|MForm|string $form = null,
+        callable|MForm|string|null $form = null,
         array $attributes = [],
         bool $parse = false,
         bool $showWrapper = false,
@@ -227,12 +227,13 @@ abstract class MFormElements
         $options = $attributes;
         $options['open'] = $open;
         $options['confirm_delete'] = $confirmDelete;
+        $options['show_wrapper'] = $showWrapper;
 
         if (isset($attributes['default_count']) && !isset($options['min'])) {
             $options['default_count'] = (int) $attributes['default_count'];
         }
 
-        return $this->addFlexRepeaterElement($id, $form, $options);
+        return $this->addFlexRepeaterElement($id, $form, $options, $debug, $showWrapper);
     }
 
     /**
@@ -240,39 +241,39 @@ abstract class MFormElements
      *
      * @param array<string, mixed> $options
      */
-    public function addFlexRepeaterElement(float|int|string $id, MForm $form, array $options = []): MForm
+    public function addFlexRepeaterElement(float|int|string $id, MForm $form, array $options = [], bool $debug = false, bool $showWrapper = false): MForm
     {
         return $this->addElement('repeater', $id, null, $options)
-            ->addForm($form, false, false, false)
+            ->addForm($form, false, $debug, $showWrapper)
             ->addElement('close-repeater', $id, null, $options);
     }
 
-    public function addInputField(string $typ, float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    public function addInputField(string $typ, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addElement($typ, $id, null, $attributes, null, null, null, $defaultValue);
     }
 
-    public function addHiddenField(float|int|string $id, string $value = null, array $attributes = null): MForm
+    public function addHiddenField(float|int|string $id, ?string $value = null, ?array $attributes = null): MForm
     {
         return $this->addElement('hidden', $id, $value, $attributes);
     }
 
-    public function addTextField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    public function addTextField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addInputField('text', $id, $attributes, $defaultValue);
     }
 
-    public function addTextAreaField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    public function addTextAreaField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addInputField('textarea', $id, $attributes, $defaultValue);
     }
 
-    public function addTextReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): MForm
+    public function addTextReadOnlyField(float|int|string $id, ?string $value = null, ?array $attributes = null): MForm
     {
         return $this->addElement('text-readonly', $id, $value, $attributes);
     }
 
-    public function addTextAreaReadOnlyField(float|int|string $id, string $value = null, array $attributes = null): MForm
+    public function addTextAreaReadOnlyField(float|int|string $id, ?string $value = null, ?array $attributes = null): MForm
     {
         return $this->addElement('textarea-readonly', $id, $value, $attributes);
     }
@@ -280,12 +281,12 @@ abstract class MFormElements
     /**
      * add select option fields
      */
-    public function addOptionField(string $typ, $id, array $attributes = null, array $options = null, string $defaultValue = null): MForm
+    public function addOptionField(string $typ, mixed $id, ?array $attributes = null, ?array $options = null, ?string $defaultValue = null): MForm
     {
         return $this->addElement($typ, $id, null, $attributes, $options, null, null, $defaultValue);
     }
 
-    public function addSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 1, string $defaultValue = null): MForm
+    public function addSelectField(float|int|string $id, ?array $options = null, ?array $attributes = null, int $size = 1, ?string $defaultValue = null): MForm
     {
         $this->addOptionField('select', $id, $attributes, $options, $defaultValue);
         if ($size > 1) {
@@ -294,7 +295,7 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addMultiSelectField(float|int|string $id, array $options = null, array $attributes = null, int $size = 3, string $defaultValue = null): MForm
+    public function addMultiSelectField(float|int|string $id, ?array $options = null, ?array $attributes = null, int $size = 3, ?string $defaultValue = null): MForm
     {
         $this->addOptionField('multiselect', $id, $attributes, $options, $defaultValue)
             ->setMultiple()
@@ -302,12 +303,12 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addCheckboxField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addOptionField('checkbox', $id, $attributes, $options, $defaultValue);
     }
 
-    public function addToggleCheckboxField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addToggleCheckboxField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         if (!is_array($attributes)) {
             $attributes = [];
@@ -316,7 +317,7 @@ abstract class MFormElements
         return $this->addCheckboxField($id, $options, $attributes, $defaultValue);
     }
 
-    public function addRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
     }
@@ -329,7 +330,7 @@ abstract class MFormElements
      * }
      * $mform->addRadioImgField(4, $options, ['label' => 'Layout Type']);
      */
-    public function addRadioImgField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioImgField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         $newOptions = [];
 
@@ -364,7 +365,7 @@ abstract class MFormElements
      * $options[$i] = ['icon' => "fa fa-icon-0", 'label' => "Label Icon-0"];
      * $mform->addRadioImgField(4, $options, ['label' => 'Label Text']);
      */
-    public function addRadioIconField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioIconField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         $newOptions = [];
         foreach ($options as $key => $option) {
@@ -380,7 +381,7 @@ abstract class MFormElements
         return $this;
     }
 
-    public function addRadioColorField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
+    public function addRadioColorField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         $newOptions = [];
         foreach ($options as $key => $option) {
@@ -417,12 +418,12 @@ abstract class MFormElements
      * }
      */
 
-    public function addLinkField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
+    public function addLinkField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('link', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addLinklistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
+    public function addLinklistField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('linklist', $id, null, $attributes, null, $parameter, $catId);
     }
@@ -433,7 +434,7 @@ abstract class MFormElements
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      */
-    public function addCustomLinkField(float|int|string $id, array $attributes = null, string $defaultValue = null): MForm
+    public function addCustomLinkField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
     {
         return $this->addElement('custom-link', $id, null, $attributes, null, null, null, $defaultValue);
     }
@@ -447,22 +448,22 @@ abstract class MFormElements
      * @param float|int|string $id Field id / value slot (1-10)
      * @param array<string, mixed>|null $attributes Additional attributes (label, btn_add, data-intern, data-media, ...)
      */
-    public function addCustomLinkMultipleField(float|int|string $id, array $attributes = null): MForm
+    public function addCustomLinkMultipleField(float|int|string $id, ?array $attributes = null): MForm
     {
         return $this->addElement('custom-link-multi', $id, null, $attributes);
     }
 
-    public function addMediaField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
+    public function addMediaField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('media', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addMedialistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
+    public function addMedialistField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('medialist', $id, null, $attributes, null, $parameter, $catId);
     }
 
-    public function addImagelistField(float|int|string $id, array $parameter = null, $catId = null, array $attributes = null): MForm
+    public function addImagelistField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('imglist', $id, null, $attributes, null, $parameter, $catId);
     }

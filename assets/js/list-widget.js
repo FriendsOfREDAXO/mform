@@ -96,14 +96,22 @@ function mformListWidgetInit(widget) {
     });
 
     mformListApplyView(widget, type, ids.baseId);
+    mformListInitDragDrop(widget);
 
     list.off('click.mformListWidget').on('click.mformListWidget', 'li', function () {
         mformListSelect(widget, $(this).data('index'));
     });
 
-    widget.find('.mform-list-btn').off('click.mformListWidget').on('click.mformListWidget', function (event) {
+    widget.find('.mform-list-btn')
+        .off('click.mformListWidget keydown.mformListWidget')
+        .on('click.mformListWidget keydown.mformListWidget', function (event) {
+        if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+            return;
+        }
+
         event.preventDefault();
-        if ($(this).is('[disabled], .disabled')) {
+
+        if (this.disabled || $(this).is('[disabled], .disabled, [aria-disabled="true"]')) {
             return false;
         }
 
@@ -311,13 +319,20 @@ function mformListRender(widget, type) {
     options.each(function (index) {
         const option = $(this);
         const selected = option.is(':selected');
+        const label = String(option.text() || option.val() || '');
+        const handle = $('<span/>')
+            .addClass('mform-list-drag-handle')
+            .attr('aria-hidden', 'true')
+            .append($('<i/>').addClass('rex-icon fa-bars'));
+
         const li = $('<li/>')
             .attr('data-index', index)
             .attr('tabindex', '0')
             .toggleClass('is-selected', selected);
 
+        li.append(handle);
+
         if (type === 'medialist') {
-            const label = String(option.text() || option.val() || '');
             const previewBase = String(widget.attr('data-preview-base') || '');
             let preview = String(option.attr('data-preview') || '');
             const ext = String(option.attr('data-ext') || 'file').toUpperCase();
@@ -342,11 +357,75 @@ function mformListRender(widget, type) {
 
             li.append(media).append($('<span/>').addClass('mform-list-item-label').text(label));
         } else {
-            li.text(option.text() || option.val());
+            li.append($('<span/>').addClass('mform-list-item-label').text(label));
         }
 
         list.append(li);
     });
+}
+
+function mformListInitDragDrop(widget) {
+    const list = widget.find('ul.mform-list-items').get(0);
+    if (!list) {
+        return;
+    }
+
+    const existingSortable = widget.data('mformListSortable');
+    if (existingSortable && typeof existingSortable.destroy === 'function') {
+        existingSortable.destroy();
+    }
+
+    if (typeof window.Sortable !== 'function') {
+        return;
+    }
+
+    const sortable = new window.Sortable(list, {
+        animation: 120,
+        draggable: 'li',
+        handle: '.mform-list-drag-handle',
+        ghostClass: 'mform-list-sortable-ghost',
+        chosenClass: 'mform-list-sortable-chosen',
+        onEnd: function () {
+            mformListSyncOrderFromDom(widget);
+        }
+    });
+
+    widget.data('mformListSortable', sortable);
+}
+
+function mformListSyncOrderFromDom(widget) {
+    const select = widget.find('select.mform-list-select');
+    const selectedValue = String(select.find('option:selected').first().val() || '');
+    const options = select.find('option').toArray();
+    const reordered = [];
+
+    widget.find('ul.mform-list-items li').each(function () {
+        const idx = parseInt(String($(this).attr('data-index') || ''), 10);
+        if (Number.isInteger(idx) && typeof options[idx] !== 'undefined') {
+            reordered.push(options[idx]);
+        }
+    });
+
+    if (reordered.length !== options.length) {
+        return;
+    }
+
+    select.empty();
+    reordered.forEach(function (option) {
+        select.append(option);
+    });
+
+    if (selectedValue !== '') {
+        const selectedOption = select.find('option').filter(function () {
+            return String($(this).val() || '') === selectedValue;
+        }).first();
+        if (selectedOption.length) {
+            selectedOption.prop('selected', true);
+        }
+    }
+
+    mformListRender(widget, String(widget.data('widget-type') || '').toLowerCase());
+    mformListWriteHidden(widget);
 }
 
 function mformListSelect(widget, index) {

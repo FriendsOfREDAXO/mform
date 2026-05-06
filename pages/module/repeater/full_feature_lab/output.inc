@@ -26,10 +26,9 @@ $hint       = 'REX_VALUE[10]';
 $alignment  = 'REX_VALUE[11]';
 $multiLinks = 'REX_VALUE[13]';
 
-// ── Repeater-Zeilen – offline-Items automatisch gefiltert ─────────────────────
-// MFormRepeaterHelper::decode() filtert deaktivierte Items (__disabled) heraus
-// und entfernt den internen Schlüssel aus den verbleibenden Einträgen.
-$rows = MFormRepeaterHelper::decode('REX_VALUE[12]');
+// ── Repeater-Zeilen – Rohdaten fuer Statusanzeige + gefilterte Ausgabe ─────────
+$rawRows = json_decode(html_entity_decode('REX_VALUE[12]', ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+$rows = is_array($rawRows) ? $rawRows : [];
 
 // ── Multiple Links (JSON) ─────────────────────────────────────────────────────
 $multiLinksArr = [];
@@ -83,16 +82,16 @@ echo '<tr><th>Hinweistext</th><td>' . nl2br(htmlspecialchars($hint)) . '</td></t
 echo '<tr><th>Ausrichtung</th><td>' . htmlspecialchars($alignment) . '</td></tr>';
 echo '</table>';
 
-echo '<h4>Inhaltszeilen (' . count($rows) . ' Einträge) <small>– copy_paste: true</small></h4>';
+echo '<h4>Inhaltszeilen (' . count(MFormRepeaterHelper::filterEnabledItems($rows)) . ' aktive Einträge / ' . count($rows) . ' gesamt) <small>– copy_paste: true</small></h4>';
 if ($rows) {
     foreach ($rows as $i => $row) {
-        $isDisabled = !empty($row['__disabled']);
+        $isDisabled = is_array($row) ? !MFormRepeaterHelper::isItemEnabled($row) : false;
         echo '<div class="panel ' . ($isDisabled ? 'panel-default' : 'panel-primary') . '" style="margin-bottom:.5rem">';
         echo '<div class="panel-heading">Zeile ' . ($i + 1) . ($isDisabled ? ' <em>(deaktiviert)</em>' : '') . '</div>';
         echo '<div class="panel-body">';
         echo '<table class="table table-condensed" style="margin:0">';
         foreach (['title' => 'Titel', 'style' => 'Stil', 'text' => 'Text', 'cta_links' => 'CTA Links', 'downloads' => 'Downloads'] as $key => $label) {
-            $val = isset($row[$key]) ? (string) $row[$key] : '–';
+            $val = is_array($row) && isset($row[$key]) ? (string) $row[$key] : '–';
             echo '<tr><th style="width:120px">' . htmlspecialchars($label) . '</th><td>' . htmlspecialchars($val ?: '–') . '</td></tr>';
         }
         echo '</table>';
