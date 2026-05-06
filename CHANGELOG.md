@@ -11,6 +11,7 @@
 - Medialist-Widget verbessert: Toggle wieder als Symbol-Button in der Toolbar
 - Medialist-Widget verbessert: echte Datei-Previews analog zur `imagelist` (statt reinem Dateityp-Text)
 - Medialist-Widget fix: Preview-URLs korrekt aufbereitet (HTML-Entity-Decode für `rex_medialistbutton_preview`)
+- `imagelist` wurde auf das neue List-Widget-Muster umgestellt und ist nun ein schlanker Wrapper um `medialist`
 - Neue API: `addCustomLinkMultipleField(...)` fuer mehrere Custom-Links (repeater-basiert), Single-Format bleibt unveraendert
 - Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
 - Neues Template-API: `MForm::registerTemplate($key, $class)`, `MForm::fromTemplate($key)` und `->applyTemplate($key)` ueber interne Registry (projektweite Defaults wiederverwendbar)
