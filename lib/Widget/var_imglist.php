@@ -35,81 +35,40 @@ class rex_var_imglist extends rex_var
                     $args[$key] = $this->getArg($key);
                 }
             }
-            $value = self::getWidget($id, 'REX_INPUT_MEDIALIST[' . $id . ']', $value, $args);
+            $value = self::getWidget($id, 'REX_INPUT_MEDIALIST[' . $id . ']', (string) $value, $args);
         }
 
         return self::quote($value);
     }
 
-    public static function getWidget($id, $name, $value, array $args = [])
+    /**
+     * @param int|string $id
+     * @param array<string, mixed> $args
+     */
+    public static function getWidget($id, int|string|null $name, int|string|null $value, array $args = []): string
     {
-        $open_params = '';
-        if (isset($args['category']) && ($category = (int) $args['category'])) {
-            $open_params .= '&amp;rex_file_category=' . $category;
+        $name = (string) $name;
+        $value = (string) $value;
+
+        $id = str_replace(['][', '[', ']'], '', (string) $id);
+
+        $wrapperArgs = $args;
+        if (!isset($wrapperArgs['view'])) {
+            $wrapperArgs['view'] = 'gallery';
+        }
+        if (!isset($wrapperArgs['views'])) {
+            $wrapperArgs['views'] = 'gallery,grid,list';
+        }
+        if (!isset($wrapperArgs['toolbar'])) {
+            $wrapperArgs['toolbar'] = 'vertical';
         }
 
-        if (array_key_exists(':id',$args)) {
-            unset($args[':id']);
-        }
+        $html = rex_var_custom_medialist::getWidget($id, $name, $value, $wrapperArgs);
 
-        foreach ($args as $aname => $avalue) {
-            $open_params .= '&amp;args[' . $aname . ']=' . urlencode($avalue);
-        }
-
-        $wdgtClass = ' rex-js-widget-imglist';
-        if (isset($args['preview']) && $args['preview']) {
-            $wdgtClass .= ' rex-js-widget-preview';
-            if (rex_addon::get('media_manager')->isAvailable()) {
-                $wdgtClass .= ' rex-js-widget-preview-media-manager';
-            }
-        }
-
-        // todo tooltip option
-        // add to $wdgtClass class rex-js-widget-tooltip
-
-        $thumbnails = '';
-        $options = '';
-        $medialistarray = explode(',', $value);
-        if (is_array($medialistarray)) {
-            foreach ($medialistarray as $key => $file) {
-                if ('' != $file) {
-
-                    $url = rex_url::backendController(['rex_media_type' => 'rex_medialistbutton_preview', 'rex_media_file' => $file]);
-                    $extension = pathinfo($file, PATHINFO_EXTENSION);
-                    $isVideo = in_array($extension, ['mp4', 'webm', 'ogg']);
-                    if ('svg' === $extension || $isVideo) {
-                        $url = rex_url::media($file);
-                    }
-                    $media = $isVideo ? '<video playsinline autoplay muted loop class="thumbnail"><source src="' . $url . '" type="video/' . $extension . '"></video>' : '<img class="thumbnail" src="' . $url . '" />';
-
-                    $thumbnails .= '<li data-key="' . $key . '" value="' . $file . '" data-value="' . $file . '">' . $media . '</li>';
-
-                    $options .= '<option data-key="' . $key . '" value="' . $file . '">' . $file . '</option>';
-                }
-            }
-        }
-
-        $disabled = ' disabled';
-        if (rex::getUser()->getComplexPerm('media')->hasMediaPerm()) {
-            $disabled = '';
-        }
-
-        $id = str_replace(['][', '[', ']'], '', $id);
-
-        $e = [];
-        $e['before'] = '<div class="rex-js-widget custom-imglist ' . $wdgtClass . '" data-params="' . $open_params . '" data-widget-id="' . $id . '">';
-        $e['field'] = '<ul class="form-control thumbnail-list" id="REX_IMGLIST_' . $id . '" data-empty="' . rex_escape(rex_i18n::msg('mform_widget_empty_media')) . '">' . $thumbnails . '</ul><select class="form-control" name="REX_MEDIALIST_SELECT[' . $id . ']" id="REX_MEDIALIST_SELECT_' . $id . '" size="10">' . $options . '</select><input type="hidden" name="' . $name . '" id="REX_MEDIALIST_' . $id . '" value="' . $value . '" />';
-        $e['functionButtons'] = '
-                <a href="#" class="btn btn-popup open" title="' . rex_i18n::msg('var_media_open') . '"' . $disabled . '><i class="rex-icon rex-icon-open-mediapool"></i></a>
-                <a href="#" class="btn btn-popup add" title="' . rex_i18n::msg('var_media_new') . '"' . $disabled . '><i class="rex-icon rex-icon-add-media"></i></a>
-                <a href="#" class="btn btn-popup delete" title="' . rex_i18n::msg('var_media_remove') . '"' . $disabled . '><i class="rex-icon rex-icon-delete-media"></i></a>
-                <a href="#" class="btn btn-popup view" title="' . rex_i18n::msg('var_media_view') . '"' . $disabled . '><i class="rex-icon rex-icon-view-media"></i></a>';
-        $e['after'] = '<div class="rex-js-media-preview"></div></div>';
-
-        $fragment = new rex_fragment();
-        $fragment->setVar('elements', [$e], false);
-        $media = $fragment->parse('core/form/widget_list.php');
-
-        return $media;
+        return str_replace(
+            'mform-list-widget mform-list-widget-medialist',
+            'mform-list-widget mform-list-widget-medialist rex-js-widget-imglist',
+            $html,
+        );
     }
 }

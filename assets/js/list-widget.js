@@ -191,33 +191,65 @@ function mformListApplyView(widget, type, baseId) {
         return;
     }
 
+    const configuredViewsRaw = String(widget.attr('data-views') || '').toLowerCase();
+    let configuredViews = configuredViewsRaw ? configuredViewsRaw.split(',').map(function (view) {
+        return String(view || '').trim();
+    }).filter(function (view) {
+        return view === 'list' || view === 'grid' || view === 'gallery';
+    }) : ['list', 'gallery', 'grid'];
+
+    if (!configuredViews.length) {
+        configuredViews = ['list', 'gallery', 'grid'];
+    }
+
     const stored = mformListGetStoredView(baseId);
     let view = stored || String(widget.attr('data-view') || 'list').toLowerCase();
-    if (view !== 'grid' && view !== 'list') {
-        view = 'list';
+    if (configuredViews.indexOf(view) === -1) {
+        view = configuredViews[0];
     }
 
     widget.attr('data-view', view);
-    widget.toggleClass('is-grid-view', view === 'grid');
-    widget.toggleClass('is-list-view', view !== 'grid');
+    widget.toggleClass('is-grid-view', view === 'grid' || view === 'gallery');
+    widget.toggleClass('is-gallery-view', view === 'gallery');
+    widget.toggleClass('is-list-view', view === 'list');
 
     const btn = widget.find('.mform-list-btn[data-action="toggle-view"]');
     const icon = btn.find('i');
     const titleList = String(btn.attr('data-title-list') || 'List view');
     const titleGrid = String(btn.attr('data-title-grid') || 'Grid view');
+    const titleGallery = String(btn.attr('data-title-gallery') || 'Gallery view');
+    const currentIndex = configuredViews.indexOf(view);
+    const nextView = configuredViews[(currentIndex + 1) % configuredViews.length] || 'list';
+    const nextTitle = nextView === 'gallery' ? titleGallery : (nextView === 'grid' ? titleGrid : titleList);
 
-    if (view === 'grid') {
-        icon.removeClass('fa-th fa-th-large').addClass('fa-list');
-        btn.attr('title', titleList);
+    if (nextView === 'gallery') {
+        icon.removeClass('fa-list fa-th fa-th-large').addClass('fa-image');
+        btn.attr('title', nextTitle);
+    } else if (nextView === 'list') {
+        icon.removeClass('fa-image fa-th fa-th-large').addClass('fa-list');
+        btn.attr('title', nextTitle);
     } else {
-        icon.removeClass('fa-list fa-th').addClass('fa-th-large');
-        btn.attr('title', titleGrid);
+        icon.removeClass('fa-list fa-image fa-th').addClass('fa-th-large');
+        btn.attr('title', nextTitle);
     }
 }
 
 function mformListToggleView(widget, baseId) {
     const current = String(widget.attr('data-view') || 'list').toLowerCase();
-    const next = current === 'grid' ? 'list' : 'grid';
+    const configuredViewsRaw = String(widget.attr('data-views') || '').toLowerCase();
+    let configuredViews = configuredViewsRaw ? configuredViewsRaw.split(',').map(function (view) {
+        return String(view || '').trim();
+    }).filter(function (view) {
+        return view === 'list' || view === 'grid' || view === 'gallery';
+    }) : ['list', 'gallery', 'grid'];
+
+    if (!configuredViews.length) {
+        configuredViews = ['list', 'gallery', 'grid'];
+    }
+
+    const currentIndex = configuredViews.indexOf(current);
+    const nextIndex = currentIndex === -1 ? 0 : ((currentIndex + 1) % configuredViews.length);
+    const next = configuredViews[nextIndex];
     widget.attr('data-view', next);
     mformListSetStoredView(baseId, next);
     mformListApplyView(widget, 'medialist', baseId);
@@ -227,15 +259,21 @@ function mformListEnsureIds(widget, type) {
     const hidden = widget.find('input.mform-list-value');
     const select = widget.find('select.mform-list-select');
 
-    let baseId = String(widget.attr('data-widget-id') || '');
+    const widgetBaseId = String(widget.attr('data-widget-id') || '');
     const hiddenId = String(hidden.attr('id') || '');
     const selectId = String(select.attr('id') || '');
+    let baseId = '';
 
-    if (!baseId && hiddenId && hiddenId.indexOf('REX_') === 0) {
+    // In dynamischen Containern (z. B. MBlock/Gridblock) werden REX_* IDs
+    // beim Reindexing angepasst. Diese IDs sind deshalb die zuverlässigste Quelle.
+    if (hiddenId && hiddenId.indexOf('REX_') === 0) {
         baseId = hiddenId.replace(/^REX_(?:MEDIA|MEDIALIST|LINKLIST)_/, '');
     }
     if (!baseId && selectId && selectId.indexOf('REX_') === 0) {
         baseId = selectId.replace(/^REX_(?:MEDIA|MEDIALIST|LINKLIST)_SELECT_/, '');
+    }
+    if (!baseId) {
+        baseId = widgetBaseId;
     }
     if (!baseId) {
         mformListWidgetCounter += 1;
@@ -284,10 +322,18 @@ function mformListBuildOptionsFromHidden(widget, type) {
         if (type === 'medialist') {
             const dotPos = value.lastIndexOf('.');
             const ext = dotPos > -1 ? value.substring(dotPos + 1).toLowerCase() : 'file';
-            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'avif'].indexOf(ext) !== -1;
+            const isRasterImage = ['jpg', 'jpeg', 'png', 'gif'].indexOf(ext) !== -1;
+            const isModernImage = ['webp', 'avif'].indexOf(ext) !== -1;
+            const isSvg = ext === 'svg';
+            const isVideo = ['mp4', 'webm', 'ogg'].indexOf(ext) !== -1;
+            const isImage = isRasterImage || isModernImage || isSvg;
             option.attr('data-ext', ext);
             option.attr('data-is-image', isImage ? '1' : '0');
-            if (isImage && previewBase) {
+            option.attr('data-media-kind', isVideo ? 'video' : (isImage ? 'image' : 'file'));
+            // Use direct /media/ for svg, avif, webp, video – media manager may not support them
+            if (isVideo || isSvg || isModernImage) {
+                option.attr('data-preview', '/media/' + value);
+            } else if (isRasterImage && previewBase) {
                 option.attr('data-preview', previewBase + encodeURIComponent(value));
             }
         }
@@ -312,14 +358,11 @@ function mformListRender(widget, type) {
 
     widget.removeClass('is-empty');
 
-    if (!select.find('option:selected').length) {
-        select.find('option').first().prop('selected', true);
-    }
-
     options.each(function (index) {
         const option = $(this);
         const selected = option.is(':selected');
         const label = String(option.text() || option.val() || '');
+        const hideLabels = String(widget.attr('data-hide-label') || '0') === '1';
         const handle = $('<span/>')
             .addClass('mform-list-drag-handle')
             .attr('aria-hidden', 'true')
@@ -335,15 +378,42 @@ function mformListRender(widget, type) {
         if (type === 'medialist') {
             const previewBase = String(widget.attr('data-preview-base') || '');
             let preview = String(option.attr('data-preview') || '');
-            const ext = String(option.attr('data-ext') || 'file').toUpperCase();
-            const isImage = String(option.attr('data-is-image') || '0') === '1';
+            const fileValue = String(option.val() || '');
+            const rawExt = (option.attr('data-ext') || fileValue.replace(/^.*\./, '') || 'file').toLowerCase();
+            const extDisplay = rawExt.toUpperCase();
 
-            if (!preview && isImage && previewBase) {
-                preview = previewBase + encodeURIComponent(String(option.val() || ''));
+            // Derive media kind – prefer explicit attribute, fall back to extension
+            let mediaKind = String(option.attr('data-media-kind') || '').toLowerCase();
+            if (!mediaKind) {
+                const isVideo = ['mp4', 'webm', 'ogg'].indexOf(rawExt) !== -1;
+                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg'].indexOf(rawExt) !== -1;
+                mediaKind = isVideo ? 'video' : (isImage ? 'image' : 'file');
+            }
+
+            // Build preview URL if not provided
+            if (!preview) {
+                if (mediaKind === 'video' || rawExt === 'svg' || rawExt === 'webp' || rawExt === 'avif') {
+                    preview = '/media/' + fileValue;
+                } else if (mediaKind === 'image' && previewBase) {
+                    preview = previewBase + encodeURIComponent(fileValue);
+                }
             }
 
             const media = $('<span/>').addClass('mform-list-item-media');
-            if (preview) {
+            if (preview && mediaKind === 'video') {
+                const video = $('<video/>')
+                    .addClass('mform-list-item-thumb')
+                    .attr('playsinline', 'playsinline')
+                    .attr('autoplay', 'autoplay')
+                    .attr('muted', 'muted')
+                    .attr('loop', 'loop');
+                video.append(
+                    $('<source/>')
+                        .attr('src', preview)
+                        .attr('type', 'video/' + rawExt)
+                );
+                media.append(video);
+            } else if (preview) {
                 media.append(
                     $('<img/>')
                         .addClass('mform-list-item-thumb')
@@ -352,10 +422,13 @@ function mformListRender(widget, type) {
                         .attr('loading', 'lazy')
                 );
             } else {
-                media.append($('<span/>').addClass('mform-list-item-ext').text(ext));
+                media.append($('<span/>').addClass('mform-list-item-ext').text(extDisplay));
             }
 
-            li.append(media).append($('<span/>').addClass('mform-list-item-label').text(label));
+            li.append(media);
+            if (!hideLabels) {
+                li.append($('<span/>').addClass('mform-list-item-label').text(label));
+            }
         } else {
             li.append($('<span/>').addClass('mform-list-item-label').text(label));
         }

@@ -4,6 +4,8 @@ $(document).on('rex:ready', function (e, container) {
     setTimeout(function () {
         if (container && container.find(mform_img_list).length) {
             container.find(mform_img_list).each(function () {
+                // New-style imglist uses mform-list-widget / list-widget.js – skip old init
+                if ($(this).hasClass('mform-list-widget')) return;
                 imglist_init_widget($(this));
                 imglist_list_items_action($(this));
                 imglist_widget_actions($(this));
@@ -55,6 +57,8 @@ function writeREXMedialist(id) {
     let element;
 
     $(mform_img_list).each(function () {
+        // New-style imglist (mform-list-widget) is handled by list-widget.js
+        if ($(this).hasClass('mform-list-widget')) return;
         if ($(this).attr('data-widget-id') == id) {
             letitgo = false;
             element = $(this);
