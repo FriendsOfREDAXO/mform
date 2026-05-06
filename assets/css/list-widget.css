@@ -126,6 +126,10 @@
     white-space: nowrap;
 }
 
+.mform-list-widget.mform-list-widget-medialist[data-hide-label="1"] .mform-list-item-label {
+    display: none;
+}
+
 .mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-items li {
     white-space: normal;
     min-height: 48px;
@@ -140,6 +144,24 @@
     width: 100%;
     height: 72px;
     flex-basis: 72px;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-gallery-view .mform-list-items {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .5rem;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-gallery-view .mform-list-items li {
+    min-height: 130px;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-gallery-view .mform-list-item-media {
+    height: 104px;
+    flex-basis: 104px;
+}
+
+.mform-list-widget.mform-list-widget-medialist.is-gallery-view .mform-list-item-label {
+    display: none;
 }
 
 .mform-list-widget.mform-list-widget-medialist.is-grid-view .mform-list-item-label {
@@ -157,6 +179,7 @@
     background: var(--mfl-item-selected-bg);
 }
 
+/* ── Toolbar – horizontal (default) ── */
 .mform-list-widget .mform-list-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -165,6 +188,37 @@
 
 .mform-list-widget .mform-list-toolbar .btn {
     min-width: 32px;
+}
+
+/* ── Toolbar – vertical ── */
+.mform-list-widget[data-toolbar="vertical"] {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: .5rem;
+    padding: .5rem;
+}
+
+.mform-list-widget[data-toolbar="vertical"] .mform-list-shell {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.mform-list-widget[data-toolbar="vertical"] .mform-list-items {
+    max-height: 320px;
+}
+
+.mform-list-widget[data-toolbar="vertical"] .mform-list-toolbar {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: .3rem;
+}
+
+.mform-list-widget[data-toolbar="vertical"] .mform-list-toolbar .btn {
+    width: 100%;
+    min-width: 36px;
 }
 
 .mform-list-widget .mform-list-toolbar .mform-list-btn[disabled],

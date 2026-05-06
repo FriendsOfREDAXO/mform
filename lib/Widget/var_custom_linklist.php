@@ -50,9 +50,17 @@ class rex_var_custom_linklist extends rex_var
             $disabledAria = ' aria-disabled="true"';
         }
 
+        $toolbarOrientation = 'horizontal';
+        if (isset($args['toolbar']) && is_string($args['toolbar'])) {
+            $candidate = strtolower(trim($args['toolbar']));
+            if (in_array($candidate, ['horizontal', 'vertical'], true)) {
+                $toolbarOrientation = $candidate;
+            }
+        }
+
         $id = (string) $id;
 
-        return '<div class="rex-js-widget mform-list-widget mform-list-widget-linklist" data-widget-type="linklist" data-widget-id="' . rex_escape($id) . '" data-params="' . rex_escape($openParams) . '">' 
+        return '<div class="rex-js-widget mform-list-widget mform-list-widget-linklist" data-widget-type="linklist" data-widget-id="' . rex_escape($id) . '" data-toolbar="' . rex_escape($toolbarOrientation) . '" data-params="' . rex_escape($openParams) . '">' 
             . '<div class="mform-list-shell">'
             . '<ul class="mform-list-items" data-empty="' . rex_escape(rex_i18n::msg('mform_widget_empty_entries')) . '"></ul>'
             . '<select class="form-control mform-list-select" name="REX_LINKLIST_SELECT[' . rex_escape($id) . ']" id="REX_LINKLIST_SELECT_' . rex_escape($id) . '" size="10">' . $options . '</select>'

@@ -13,7 +13,7 @@ $(document).on('rex:ready', function (e, container) {
 });
 
 function customlink_init_widget(element) {
-    let id = 'cl' + randId(),
+    let id = customlinkResolveWidgetId(element),
         clang = element.data('clang'),
         media_types = element.data('types'),
         media_Category = element.data('media_category'),
@@ -73,34 +73,37 @@ function customlink_init_widget(element) {
         return window.prompt(promptLabel, inputValue);
     }
 
-    if (!element.hasClass('init_custom_link_widget')) {
-        element.addClass('init_custom_link_widget');
+    // Re-resolve ID on every init so cloned/reindexed Gridblock elements
+    // are bound to their current REX_* ids.
+    id = customlinkResolveWidgetId(element);
+    element.data('id', id);
+    element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
+    element.toggleClass('is-empty', !(hidden_input.val() && String(hidden_input.val()).trim() !== ''));
+    updateActiveButton(hidden_input.val());
+    element.addClass('init_custom_link_widget');
 
-        if (repeaterLink) {
-            let parent = element.parents('.repeater-group'),
-                index = parent.attr('iteration') || randId(),
-                groupsAttr = showed_input.attr('groups') || '',
-                groups = groupsAttr ? groupsAttr.split('.') : [];
-            if (groups.length > 1) {
-                let parentParent = parent.parents('.repeater-group'),
-                    parentIndex = (parentParent) ? parentParent.attr('iteration') : undefined;
-                if (parentIndex !== undefined) {
-                    index = index + '_' + parentIndex;
-                }
+    if (repeaterLink) {
+        let parent = element.parents('.repeater-group'),
+            index = parent.attr('iteration') || randId(),
+            groupsAttr = showed_input.attr('groups') || '',
+            groups = groupsAttr ? groupsAttr.split('.') : [];
+        if (groups.length > 1) {
+            let parentParent = parent.parents('.repeater-group'),
+                parentIndex = (parentParent) ? parentParent.attr('iteration') : undefined;
+            if (parentIndex !== undefined) {
+                index = index + '_' + parentIndex;
             }
-            id = index;
         }
+        id = index;
+    }
 
-        element.data('id', id)
-        element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
-        element.toggleClass('is-empty', !(hidden_input.val() && String(hidden_input.val()).trim() !== ''));
-        updateActiveButton(hidden_input.val());
+    element.data('id', id);
 
-        // ylink
-        element
-            .find('.input-group-btn a.ylink')
-            .off('click.mformCustomlink')
-            .on('click.mformCustomlink', function () {
+    // ylink
+    element
+        .find('.input-group-btn a.ylink')
+        .off('click.mformCustomlink')
+        .on('click.mformCustomlink', function () {
                 let id = element.data('id'),
                     table = $(this).data('table'),
                     column = $(this).data('column'),
@@ -129,11 +132,11 @@ function customlink_init_widget(element) {
                     YForm_selectData(id, label, pool, hidden_input, showed_input, table)
                 })
 
-                return false
-            })
+            return false
+        })
 
-        // media element
-        element.find('a.media_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // media element
+    element.find('a.media_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 value = hidden_input.val(),
                 args = '';
@@ -165,11 +168,11 @@ function customlink_init_widget(element) {
             $(mediaMap).on('rex:selectMedia', (event, mediaName) => {
                 setLinkValue(mediaName, mediaName);
             });
-            return false;
-        });
+        return false;
+    });
 
-        // link element
-        element.find('a.intern_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // link element
+    element.find('a.intern_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 link_id = randInt(),
                 args = '&clang=' + clang;
@@ -188,11 +191,11 @@ function customlink_init_widget(element) {
             $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {
                 setLinkValue(linkurl, linktext);
             });
-            return false;
-        });
+        return false;
+    });
 
-        // extern link
-        element.find('a.external_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // extern link
+    element.find('a.external_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 value = hidden_input.val(),
                 text = showed_input.val();
@@ -210,11 +213,11 @@ function customlink_init_widget(element) {
             if (extern_link == null) {
                 setLinkValue(value, text);
             }
-            return false;
-        });
+        return false;
+    });
 
-        // mail to link
-        element.find('a.email_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // mail to link
+    element.find('a.email_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 value = hidden_input.val(),
                 text = showed_input.val();
@@ -235,11 +238,11 @@ function customlink_init_widget(element) {
             if (mailto_link == null) {
                 setLinkValue(value, text);
             }
-            return false;
-        });
+        return false;
+    });
 
-        // phone link
-        element.find('a.phone_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // phone link
+    element.find('a.phone_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 value = hidden_input.val(),
                 text = showed_input.val();
@@ -260,20 +263,20 @@ function customlink_init_widget(element) {
             if (tel_link == null) {
                 setLinkValue(value, text);
             }
-            return false;
-        });
+        return false;
+    });
 
-        // delete link
-        element.find('a.delete_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // delete link
+    element.find('a.delete_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id');
             clearInterval(timer);
             closeDropDown(id);
             setLinkValue('', '');
-            return false;
-        });
+        return false;
+    });
 
-        // anchor link element
-        element.find('a.anchor_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+    // anchor link element
+    element.find('a.anchor_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
             let id = element.data('id'),
                 value = hidden_input.val(),
                 text = showed_input.val();
@@ -294,9 +297,37 @@ function customlink_init_widget(element) {
             if (anchor_link == null) {
                 setLinkValue(value, text);
             }
-            return false;
-        });
+        return false;
+    });
+}
+
+function customlinkResolveWidgetId(element) {
+    const hiddenInput = element.find('input[type=hidden]').first();
+    const shownInput = element.find('input[type=text]').first();
+    const hiddenId = String(hiddenInput.attr('id') || '');
+    const shownId = String(shownInput.attr('id') || '');
+    const dataId = String(element.data('id') || '');
+    const widgetId = String(element.closest('.rex-js-widget').attr('data-widget-id') || '');
+
+    let id = '';
+
+    if (hiddenId.indexOf('REX_LINK_') === 0) {
+        id = hiddenId.replace(/^REX_LINK_/, '').replace(/_NAME$/, '');
     }
+    if (!id && shownId.indexOf('REX_LINK_') === 0) {
+        id = shownId.replace(/^REX_LINK_/, '').replace(/_NAME$/, '');
+    }
+    if (!id && dataId) {
+        id = dataId;
+    }
+    if (!id && widgetId) {
+        id = widgetId;
+    }
+    if (!id) {
+        id = 'cl' + randId();
+    }
+
+    return id;
 }
 
 function dispatchCustomLinkEvent(element, linkurl, linktext) {
