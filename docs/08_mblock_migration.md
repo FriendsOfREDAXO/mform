@@ -107,7 +107,7 @@ $items = MFormOutputHelper::normalizeRepeaterItems($items, ['link'], ['replace' 
 // Ergebnis: $item['link'] ist jetzt direkt das normalisierte Array
 ```
 
-> **Hintergrund:** Im Repeater (Alpine.js JSON) kann ein Link-Feld je nach MForm-Version als einfacher String (`redaxo://10`) oder als Array mit `id` und `name` ankommen (vgl. [Issue #357](https://github.com/FriendsOfREDAXO/mform/issues/357)). `createLinkData()` erkennt beide Formate und liefert immer ein konsistentes Frontend-Array.
+> **Hintergrund:** Im Flex-Repeater kann ein Link-Feld je nach MForm-Version als einfacher String (`redaxo://10`) oder als Array mit `id` und `name` ankommen (vgl. [Issue #357](https://github.com/FriendsOfREDAXO/mform/issues/357)). `createLinkData()` erkennt beide Formate und liefert immer ein konsistentes Frontend-Array.
 
 ## Schritt 4: Nested-Bloecke migrieren
 

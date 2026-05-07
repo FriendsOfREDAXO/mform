@@ -280,7 +280,7 @@ Media- und Link-Felder verhalten sich in MBlock und im Flex-Repeater **unterschi
 
 > **Wichtig:** `addMediaField()` und `addLinkField()` im **MBlock**-Kontext erfordern eine **numerische** ID.
 > MBlock leitet daraus intern den REDAXO-Variablenname `REX_MEDIA_n` oder `REX_LINK_n` ab.
-> Im **Repeater**-Kontext (Alpine.js JSON) gibt es kein `REX_MEDIA_n`-Konzept – hier muss die ID ein lesbarer **String-Key** sein, der direkt als JSON-Schlüssel verwendet wird.
+> Im **Flex-Repeater**-Kontext gibt es kein `REX_MEDIA_n`-Konzept – hier muss die ID ein lesbarer **String-Key** sein, der direkt als JSON-Schlüssel verwendet wird.
 
 ## Verweise auf die Detaildokumentation
 
