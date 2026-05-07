@@ -1,30 +1,64 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
 ## Version 9.0.0-beta1
-- Neuer Flex-Repeater als Standardpfad, inkl. stabiler Initialisierung in dynamischen Backend-Kontexten
-- Repeater-UI erweitert: Aktiv/Inaktiv-Status pro Item (Auge), Ausgabe-Filter für deaktivierte Items und verbesserte Toggle-All-Logik
-- Statusanzeige im Repeater-Header aktualisiert: gefuellter Punkt (gruen = aktiv, rot = offline)
-- Repeater-Symbole und Bedienung vereinheitlicht (konsistentes Auf-/Zuklappen inkl. Nested-Repeatern)
-- TinyMCE-Kompatibilität verbessert (stabileres Save/Destroy/Reinit bei Add/Move/Sort/Remove)
-- Neues Linklist/Medialist-Repeater-Widget mit robuster Übernahme aus Linkmap/Mediapool-Popups
-- Medialist-Widget erweitert: View-Switch zwischen Listen- und Rasteransicht (`view`, `view_switch`)
-- Medialist-Widget verbessert: Toggle wieder als Symbol-Button in der Toolbar
-- Medialist-Widget verbessert: echte Datei-Previews analog zur `imagelist` (statt reinem Dateityp-Text)
-- Medialist-Widget fix: Preview-URLs korrekt aufbereitet (HTML-Entity-Decode für `rex_medialistbutton_preview`)
-- `imagelist` wurde auf das neue List-Widget-Muster umgestellt und ist nun ein schlanker Wrapper um `medialist`
-- Neue API: `addCustomLinkMultipleField(...)` fuer mehrere Custom-Links (repeater-basiert), Single-Format bleibt unveraendert
-- Neues API-Feature: `addConditionalFieldsetArea(...)` für regelbasierte Anzeige von Formularbereichen
-- Neues Template-API: `MForm::registerTemplate($key, $class)`, `MForm::fromTemplate($key)` und `->applyTemplate($key)` ueber interne Registry (projektweite Defaults wiederverwendbar)
-- Neue Demo-Module ergänzt, u. a. für Conditional Fields Builder und erweiterte Repeater-Szenarien
-- Dokumentation erweitert (Repeater, Output-Filter, Conditional Fields)
-- **Neu: Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` am `addRepeaterElement()`
+
+### Neu
+
+- **`MFormOutputHelper::createLinkData()` / `normalizeLinkData()`** – Unified Link-API als einheitlicher Einstieg für alle Link-Typen
+  - Akzeptiert alle Eingabeformen: einfachen String (`redaxo://`, `https://`, `mailto:`, `tel:`), Array mit `id`/`name` (Repeater-Format aus Issue #357), bereits vorbereitetes `customlink_*`-Array
+  - Parameter `mode` (`frontend` | `raw` | `strict`): steuert ob Backend-Labels (`name` mit ID-Suffix) erhalten bleiben oder bereinigt werden
+  - Optionaler Parameter `extern_blank` (bool) für `target="_blank"` bei externen Links
+- **`MFormOutputHelper::normalizeRepeaterItems()`** – normalisiert Link-Felder in einem kompletten Repeater-Array in einem Schritt
+  - Standard: fügt normalisiertes Array als `<feldname>_normalized` hinzu (kein Datenverlust)
+  - Option `replace => true` überschreibt das Original-Feld
+- **`MForm::useCustomLinkForClassicWidgets(true)`** – rendert `addMediaField()` und `addLinkField()` intern über das `custom_link`-Widget
+  - Kein Änderung am Speicherformat (`REX_MEDIA_n` / `REX_LINK_n` bleiben identisch)
+  - Standard `false` für vollständige Rückwärtskompatibilität
+- **`addCustomLinkMultipleField()`** – mehrere Custom-Links in einem Feld (Repeater-basiert), Single-Format bleibt unverändert
+- **`addConditionalFieldsetArea()`** – regelbasierte Anzeige von Formularbereichen
+- **`addFlexRepeaterElement()`** – neuer Flex-Repeater als Standardpfad, inkl. stabiler Initialisierung in dynamischen Backend-Kontexten
+- **Kopieren / Einfügen für Flex-Repeater** – `copy_paste => true` am `addRepeaterElement()`
   - Copy-Button pro Item speichert Daten im `sessionStorage`
   - Einfügen-Button fügt das kopierte Item als neues Element am Ende ein
   - Clipboard bleibt nach Seitenreload erhalten; `__disabled`-Status wird nicht übernommen
-- **Neu: YForm Value-Type `custom_link_multi`** – Mehrere Custom-Links in einem YForm-Feld (JSON-Array), identisches Widget wie `addCustomLinkMultipleField()`
-- **Neu: YForm Value-Type `custom_link`** – Anker-Button über `anchor: 0` ausblendbar; Bug im Classic-Template (`extern` → `external`) behoben
-- **Neu: `MFormRepeaterHelper::decode()`** – bequemes Dekodieren von Repeater-Werten ohne Offline-Items
+- **`MFormRepeaterHelper::decode()`** – bequemes Dekodieren von Repeater-Werten inkl. Filterung deaktivierter Items
+- **`MFormRepeaterHelper::filterByField()`** – Items nach Feldwert filtern (optionaler strikter Vergleich)
+- **`MFormRepeaterHelper::sortByField()`** – Items nach Feldwert sortieren (asc/desc, auto numerisch/alphabetisch)
+- **`MFormRepeaterHelper::groupByField()`** – Items nach Feldwert gruppieren
+- **`MFormRepeaterHelper::limitItems()`** – Items begrenzen / Pagination-Unterstützung
+- **Template-API:** `MForm::registerTemplate($key, $class)`, `MForm::fromTemplate($key)`, `->applyTemplate($key)` über interne Registry (projektweite Defaults wiederverwendbar)
+- **YForm Value-Type `custom_link_multi`** – mehrere Custom-Links in einem YForm-Feld (JSON-Array)
+- **`addMFormMediaField()`** – MForm-natives Media-Widget ohne Reindex-Problem beim Klonen in MBlock
+- **Dokumentationsseite „Was ist neu in MForm 9?"** als Einstiegsseite in den Backend-Docs
+
+### Erweitert
+
+- Repeater-UI: Aktiv/Inaktiv-Status pro Item (Auge-Icon), Ausgabe-Filter für deaktivierte Items, verbesserte Toggle-All-Logik
+- Repeater-Header: Statusanzeige als gefüllter Punkt (grün = aktiv, rot = offline)
+- Repeater-Symbole und Bedienung vereinheitlicht (konsistentes Auf-/Zuklappen inkl. verschachtelter Repeater)
+- Linklist/Medialist-Repeater-Widget: robuste Übernahme aus Linkmap/Mediapool-Popups
+- Medialist-Widget: View-Switch zwischen Listen- und Rasteransicht (`view`, `view_switch`)
+- Medialist-Widget: Toggle wieder als Symbol-Button in der Toolbar
+- Medialist-Widget: echte Datei-Previews analog zur `imagelist`
+- `imagelist` auf das neue List-Widget-Muster umgestellt (schlanker Wrapper um `medialist`)
+- Neue Demo-Module ergänzt (Conditional Fields Builder, erweiterte Repeater-Szenarien)
+- Dokumentation erweitert: Repeater, Output-Filter, Conditional Fields, neue Einstiegsseite
 - Navigations- und Titelkonsistenz im Backend verbessert
+- Bestehende Helper `prepareCustomLink()`, `getCustomUrl()`, `getCustomLinkUrl()` bleiben unverändert, werden intern auf die neue Normalisierung geroutet
+
+### Fixed
+
+- TinyMCE-Kompatibilität: stabileres Save/Destroy/Reinit bei Add/Move/Sort/Remove im Repeater
+- Medialist-Widget: Preview-URLs korrekt aufbereitet (HTML-Entity-Decode für `rex_medialistbutton_preview`)
+- YForm Value-Type `custom_link`: Bug im Classic-Template (`extern` → `external`) behoben; Anker-Button über `anchor: 0` ausblendbar
+- Verhindert Reindex-Probleme in MBlock beim Klonen von Blöcken (via `useCustomLinkForClassicWidgets`)
+
+### Migration
+
+- Bestehende MBlock-Module mit `addMediaField()` / `addLinkField()` benötigen `MForm::useCustomLinkForClassicWidgets(true)` vor dem `MForm::factory()`-Aufruf, um Reindex-Probleme beim Klonen von Blöcken zu vermeiden – in einem Modul-Input reicht der einmalige Aufruf; das Zurücksetzen auf `false` ist nur nötig, wenn im selben Request weitere MForm-Instanzen ohne das Flag folgen (z. B. in `boot.php` oder Addon-Seiten)
+- Repeater-Ausgabe: `MFormRepeaterHelper::decode()` ist bei Verwendung des Online/Offline-Toggles (`__disabled`) erforderlich; für einfache Repeater ohne Toggle bleibt `json_decode()` ausreichend
+- Namespace-Änderungen: keine neuen Breaking Changes gegenüber v8 (Namespace `FriendsOfRedaxo\MForm` bleibt)
+- Siehe [08_mblock_migration.md](08_mblock_migration.md) für den Migrationsleitfaden
 
 ## Version 8.1.6
 - fix: `notice` Attribut kann nun auch über den Parameter-Array übergeben werden (z.B. `addMediaField`, `addTextField` etc.) – schließt #389

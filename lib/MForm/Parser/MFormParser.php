@@ -30,9 +30,7 @@ use rex_var;
 use rex_var_custom_link;
 use rex_var_imglist;
 use rex_var_link;
-use rex_var_linklist;
 use rex_var_media;
-use rex_var_medialist;
 use rex_view;
 
 use function array_key_exists;
@@ -753,18 +751,76 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'media':
-                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                    // custom_link-Widget, speichert aber in REX_INPUT_MEDIA – Format bleibt kompatibel
+                    $inputSlot = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
+                    $mediaArgs = [
+                        'media'    => 1,
+                        'intern'   => 0,
+                        'external' => 0,
+                        'mailto'   => 0,
+                        'phone'    => 0,
+                        'anchor'   => 0,
+                        'class'    => $item->class,
+                    ];
+                    if (isset($parameter['types'])) {
+                        $mediaArgs['types'] = $parameter['types'];
+                    }
+                    if (isset($parameter['media_category'])) {
+                        $mediaArgs['media_category'] = $parameter['media_category'];
+                    } elseif (isset($parameter['category'])) {
+                        $mediaArgs['media_category'] = $parameter['category'];
+                    }
+                    if (isset($parameter['preview'])) {
+                        $mediaArgs['preview'] = $parameter['preview'];
+                    }
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $item->getVarId() . ']', $item->getValue(), $mediaArgs, false);
+                    $dom = new DOMDocument('1.0', 'utf-8');
+                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $inputs = $dom->getElementsByTagName('input');
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                } else {
+                    $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
+                    $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                    $dom = new DOMDocument();
+                    @$dom->loadHTML(utf8_decode($html));
+                    $inputs = $dom->getElementsByTagName('input');
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                    if ($inputs instanceof DOMNodeList) {
+                        $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
+                    }
+                }
+                break;
+            case 'mform-media':
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_VALUE';
+                $id = $this->getWidgetId($item);
 
-                $dom = new DOMDocument();
-                @$dom->loadHTML(utf8_decode($html));
+                $mediaArgs = [
+                    'media'    => 1,
+                    'intern'   => 0,
+                    'external' => 0,
+                    'mailto'   => 0,
+                    'phone'    => 0,
+                    'anchor'   => 0,
+                    'class'    => $item->class,
+                ];
+                if (isset($parameter['types'])) {
+                    $mediaArgs['types'] = $parameter['types'];
+                }
+                if (isset($parameter['media_category'])) {
+                    $mediaArgs['media_category'] = $parameter['media_category'];
+                }
+                if (isset($parameter['category']) && !isset($mediaArgs['media_category'])) {
+                    $mediaArgs['media_category'] = $parameter['category'];
+                }
+
+                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $mediaArgs, false);
+
+                $dom = new DOMDocument('1.0', 'utf-8');
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                 $inputs = $dom->getElementsByTagName('input');
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
-
-                if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
-                }
                 break;
             case 'imglist':
             case 'medialist':
@@ -835,23 +891,66 @@ class MFormParser
         switch ($item->getType()) {
             default:
             case 'link':
-                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
-
-                $dom = new DOMDocument('1.0', 'utf-8');
-                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
-                $inputs = $dom->getElementsByTagName('input');
-
-                foreach ($inputs as $input) {
-                    $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int)$id);
-                    if ($input instanceof DOMElement) {
-                        if ($input->getAttribute('type') == 'text') {
-                            $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
+                if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                    // custom_link-Widget, speichert aber in REX_INPUT_LINK – Format bleibt kompatibel
+                    $inputSlot = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
+                    $linkArgs = [
+                        'intern'   => 1,
+                        'external' => 0,
+                        'media'    => 0,
+                        'mailto'   => 0,
+                        'phone'    => 0,
+                        'anchor'   => 0,
+                        'class'    => $item->class,
+                    ];
+                    if (isset($parameter['category'])) {
+                        $linkArgs['category'] = $parameter['category'];
+                    }
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $item->getVarId() . ']', $item->getValue(), $linkArgs, false);
+                    $dom = new DOMDocument('1.0', 'utf-8');
+                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $inputs = $dom->getElementsByTagName('input');
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                } else {
+                    $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
+                    $html = rex_var_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                    $dom = new DOMDocument('1.0', 'utf-8');
+                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $inputs = $dom->getElementsByTagName('input');
+                    foreach ($inputs as $input) {
+                        $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int)$id);
+                        if ($input instanceof DOMElement) {
+                            if ($input->getAttribute('type') == 'text') {
+                                $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
+                            }
                         }
                     }
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                }
+                break;
+            case 'mform-link':
+                $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_VALUE';
+                $id = $this->getWidgetId($item);
+
+                $linkArgs = [
+                    'intern'   => 1,
+                    'external' => 0,
+                    'media'    => 0,
+                    'mailto'   => 0,
+                    'phone'    => 0,
+                    'anchor'   => 0,
+                    'class'    => $item->class,
+                ];
+                if (isset($parameter['category'])) {
+                    $linkArgs['category'] = $parameter['category'];
                 }
 
+                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $linkArgs, false);
+
+                $dom = new DOMDocument('1.0', 'utf-8');
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                $inputs = $dom->getElementsByTagName('input');
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
             case 'linklist':
@@ -1020,7 +1119,7 @@ class MFormParser
             $key = ('tel' == $key) ? 'phone' : $key;
             $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
         }
-        foreach (['data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
+        foreach (['data-media-type' => 'types', 'data-types' => 'types', 'types' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
             if (isset($item->getAttributes()[$data])) {
                 $item->setParameter(array_merge($item->getParameter(), [$key => $item->getAttributes()[$data]]));
             }
@@ -1123,7 +1222,7 @@ class MFormParser
             $key = ('tel' == $key) ? 'phone' : $key;
             $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
         }
-        foreach (['data-media-type' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
+        foreach (['data-media-type' => 'types', 'data-types' => 'types', 'types' => 'types', 'data-extern-link-prefix' => 'external_prefix', 'data-link-category' => 'category', 'data-media-category' => 'media_category'] as $data => $key) {
             if (isset($item->getAttributes()[$data])) {
                 $item->setParameter(array_merge($item->getParameter(), [$key => $item->getAttributes()[$data]]));
             }
@@ -1253,6 +1352,7 @@ class MFormParser
                                 $this->generateCheckboxElement($item);
                                 break;
                             case 'link':
+                            case 'mform-link':
                             case 'linklist':
                                 $this->generateLinkElement($item);
                                 break;
@@ -1263,6 +1363,7 @@ class MFormParser
                                 $this->generateCustomLinkMultiElement($item);
                                 break;
                             case 'media':
+                            case 'mform-media':
                             case 'medialist':
                             case 'imglist':
                                 $this->generateMediaElement($item);

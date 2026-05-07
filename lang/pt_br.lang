@@ -15,6 +15,9 @@ mform_info = Informações
 mform_modul_input = Modo de entrada
 mform_modul_output = Modo de saída
 
+mform_docs_outside_modules = MForm fora de módulos
+mform_docs_tutorial_module = Tutorial: módulo de manutenção de páginas
+
 mform_github = MForm FOR – ir para github
 
 mform_repeater_remove_group_confirm_msg = Excluir grupo?
@@ -53,3 +56,11 @@ yform_values_custom_link_media = Media-link button
 yform_values_custom_link_external = Extern-link button
 yform_values_custom_link_mailto = Mailto-link button
 yform_values_custom_link_intern = Redaxo internal-link button
+yform_values_medialist_description = Widget medialist do mform. Lista de mídias com visualização em lista, grade e galeria.
+yform_values_medialist_view = Visualização inicial
+yform_values_medialist_views = Visualizações disponíveis (separadas por vírgula)
+yform_values_medialist_view_switch = Mostrar alternador de visualização
+yform_values_medialist_toolbar = Orientação da barra de ferramentas
+yform_values_medialist_hide_label = Ocultar rótulo na lista
+yform_values_linklist_description = Widget linklist do mform. Lista ordenável de links internos do REDAXO.
+yform_values_linklist_toolbar = Orientação da barra de ferramentas

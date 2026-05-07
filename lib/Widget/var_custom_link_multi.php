@@ -9,9 +9,40 @@
  */
 class rex_var_custom_link_multi extends rex_var
 {
-    protected function getOutput()
+    /**
+     * REX_CUSTOM_LINK_MULTI[id=1]
+     * REX_CUSTOM_LINK_MULTI[id=1 widget=1]
+     * REX_CUSTOM_LINK_MULTI[id=1 widget=1 intern=1 extern=1 media=1 mailto=1]
+     *
+     * Storage: value column (JSON array of link strings).
+     */
+    protected function getOutput(): bool|string
     {
-        return false;
+        $id = $this->getArg('id', 0, true);
+        if (!in_array($this->getContext(), ['module', 'action'], true) || !is_numeric($id) || $id < 1 || $id > 10) {
+            return false;
+        }
+
+        $value = $this->getContextData()->getValue('value' . $id);
+
+        if ($this->hasArg('isset') && $this->getArg('isset')) {
+            return $value ? 'true' : 'false';
+        }
+
+        if ($this->hasArg('widget') && $this->getArg('widget')) {
+            if (!$this->environmentIs(self::ENV_INPUT)) {
+                return false;
+            }
+            $args = [];
+            foreach (['intern', 'extern', 'media', 'mailto', 'phone', 'anchor', 'btn_add', 'category', 'media_category', 'types', 'external_prefix', 'ylink'] as $key) {
+                if ($this->hasArg($key)) {
+                    $args[$key] = $this->getArg($key);
+                }
+            }
+            $value = self::getWidget($id, 'REX_INPUT_VALUE[' . $id . ']', (string) $value, $args);
+        }
+
+        return self::quote($value);
     }
 
     /**

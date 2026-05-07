@@ -1,44 +1,17 @@
 # Custom-Link-Widget
 
-Das MForm Custom-Link-Element ermöglicht es durch den Einsatz eines Feldes mehrere Link-Typen definieren zu können.  
+Das Custom-Link-Widget bündelt mehrere Link-Typen in einem Feld.
 
-Das Custom-Link-Element steht in MForm, YForm und auch als REX_VAR zur Verfügung.  
+## Verfügbarkeit
 
-Die Link Typen des Custom-Link-Elements:
+| Methode | Klassisches Modul | `rex_form` | YForm | `REX_VAR` |
+|---|---|---|---|---|
+| `addCustomLinkField` | ja | ja | ja | ja |
+| `addCustomLinkMultipleField` | ja | ja | ja | ja |
 
-* `data-extern`
-* `data-intern`
-* `data-media`
-* `data-mailto`
-* `data-tel`
-* `ylink`
+## Klassisches Modul
 
-Jeder dieser Typen kann aktiviert oder deaktiviert werden. Per default sind folgende Typen aktiv:
-
-* `data-extern`
-* `data-intern`
-* `data-media`
-
-## Modul-Eingabe
-
-```php
-<?php
-use FriendsOfRedaxo\MForm;
-// init mform
-echo MForm::factory()
-    // add fieldset area
-    ->addFieldsetArea('MForm Widgets', MForm::factory()
-        // custom elements
-        ->addCustomLinkField(1, ['label' => 'Custom Link', 'data-intern' => 'enable', 'data-extern' => 'enable', 'data-media' => 'enable', 'data-mailto' => 'enable', 'data-tel' => 'enable'])
-    )
-    // parse form
-    ->show();
-```
-
-## Multiple-Variante (Repeater-basiert)
-
-Fuer mehrere Custom-Links in einem Feld kann die neue Repeater-API genutzt werden.
-Die bestehende Single-Variante bleibt unveraendert.
+### Mit MForm
 
 ```php
 <?php
@@ -46,9 +19,17 @@ use FriendsOfRedaxo\MForm;
 
 echo MForm::factory()
     ->addFieldsetArea('Links', MForm::factory()
-        ->addCustomLinkMultipleField('links', [
+        ->addCustomLinkField(1, [
+            'label' => 'Custom Link',
+            'data-intern' => 'enable',
+            'data-extern' => 'enable',
+            'data-media' => 'enable',
+            'data-mailto' => 'enable',
+            'data-tel' => 'enable',
+        ])
+        ->addCustomLinkMultipleField(2, [
             'label' => 'Mehrere Links',
-            'btn_add' => 'Link hinzufügen',
+            'btn_add' => 'Link hinzufuegen',
             'data-intern' => 'enable',
             'data-extern' => 'enable',
             'data-media' => 'enable',
@@ -59,123 +40,163 @@ echo MForm::factory()
     ->show();
 ```
 
-Hinweis zur Speicherung:
-- `addCustomLinkField(...)` speichert wie bisher einen einzelnen Link-String.
-- `addCustomLinkMultipleField(...)` speichert ein JSON-Array von Link-Strings, z.B. `["redaxo://1","mailto:a@b.com"]`.
-
-## Modul-Ausgabe
+### Direkt als PHP-Widget
 
 ```php
 <?php
-dump('REX_VALUE[id=1]');
+echo rex_var_custom_link::getWidget(
+    '1',
+    'REX_INPUT_VALUE[1]',
+    'REX_VALUE[1]',
+    [
+        'intern' => 1,
+        'external' => 1,
+        'media' => 1,
+        'mailto' => 1,
+        'phone' => 1,
+        'anchor' => 1,
+    ]
+);
+
+echo rex_var_custom_link_multi::getWidget(
+    '2',
+    'REX_INPUT_VALUE[2]',
+    'REX_VALUE[2]',
+    [
+        'intern' => 1,
+        'external' => 1,
+        'media' => 1,
+        'mailto' => 1,
+        'phone' => 1,
+        'anchor' => 1,
+        'btn_add' => 'Link hinzufuegen',
+    ]
+);
 ```
 
-## Verwendung mit MBlock
-
-Das Custom-Link-Element darf keinen String (wie bei anderen Elementen) in der ID enthalten:  
-
-`$MBlock->addCustomLinkField("$id.0.1",array('label'=>'Link'));`
-
-### MForm
+### Modul-Ausgabe
 
 ```php
-$mform = new MForm();
-$ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']];
-$mform->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink]);
-echo $mform->show();
-```
-
-### Als REX_VAR
-
-```html
-REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=0 mailto=0 phone=1 media=1 ylink="Countries::rex_ycountries::de_de,CountriesEN::rex_ycountries::en_gb"]
-```
-
-## YForm-Value-Types
-
-### custom_link (Einzelner Link)
-
-Das MForm-Paket stellt den YForm-Value-Type `custom_link` bereit. Er kann im YForm-Manager oder per PHP-API genutzt werden.
-
-```php
-$yform->setValueField('custom_link', [
-    'name'    => 'link',
-    'label'   => 'Link',
-    'intern'  => 1,
-    'extern'  => 1,
-    'media'   => 1,
-    'mailto'  => 1,
-    'phone'   => 0,
-    'anchor'  => 0,  // Anker-Button ausblenden
-]);
-```
-
-Tableset-Beispiel:
-```json
-{
-  "type_id": "value",
-  "type_name": "custom_link",
-  "name": "link",
-  "label": "Link",
-  "intern": "1",
-  "external": "1",
-  "media": "1",
-  "anchor": "0"
-}
-```
-
-### custom_link_multi (Mehrere Links, JSON-Array)
-
-Mit dem Value-Type `custom_link_multi` können Redakteure mehrere Links in einem einzigen YForm-Feld verwalten.  
-Die Daten werden als JSON-Array gespeichert, z. B. `["redaxo://1","mailto:a@b.com","https://example.com"]`.
-
-```php
-$yform->setValueField('custom_link_multi', [
-    'name'    => 'links',
-    'label'   => 'Links',
-    'intern'  => 1,
-    'extern'  => 1,
-    'media'   => 1,
-    'mailto'  => 1,
-    'phone'   => 0,
-    'anchor'  => 0,      // Anker-Button ausblenden
-    'btn_add' => 'Link hinzufügen',  // optionale Button-Beschriftung
-    'notice'  => 'Bis zu 5 Links möglich.',
-]);
-```
-
-Tableset-Beispiel:
-```json
-{
-  "type_id": "value",
-  "type_name": "custom_link_multi",
-  "name": "links",
-  "label": "Links",
-  "intern": "1",
-  "external": "1",
-  "media": "1",
-  "mailto": "1",
-  "btn_add": "Link hinzufügen"
-}
-```
-
-#### Ausgabe im Modul
-
-```php
+<?php
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$rawValue = $dataset->getValue('links'); // JSON-String aus Datenbank
-$linksRaw = html_entity_decode($rawValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-$links = json_decode($linksRaw, true) ?? [];
+$value = 'REX_VALUE[id=1]';
+$url = MFormOutputHelper::getCustomUrl($value);
+$data = MFormOutputHelper::prepareCustomLink(['link' => $value], true);
+
+if ($url) {
+    echo '<a href="' . rex_escape($url) . '"' . $data['customlink_target'] . '>'
+        . rex_escape($data['customlink_text'])
+        . '</a>';
+}
+```
+
+Bei `custom_link_multi` muss der gespeicherte JSON-String zuerst dekodiert werden:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+$rawValue = html_entity_decode('REX_VALUE[id=2]', ENT_QUOTES | ENT_HTML5, 'UTF-8');
+$links = json_decode($rawValue, true) ?? [];
 
 foreach ($links as $link) {
-    $url  = MFormOutputHelper::getCustomUrl($link);
+    $url = MFormOutputHelper::getCustomUrl($link);
     $data = MFormOutputHelper::prepareCustomLink(['link' => $link], true);
     echo '<a href="' . rex_escape($url) . '"' . $data['customlink_target'] . '>'
         . rex_escape($data['customlink_text'])
         . '</a>';
 }
 ```
+
+## rex_form
+
+### `custom_link`
+
+```php
+<?php
+$field = $form->addField('', 'link', null, ['internal::fieldClass' => 'rex_form_widget_mform_customlink_element'], true);
+$field->setIntern(1);
+$field->setExternal(1);
+$field->setMedia(1);
+$field->setMailto(1);
+$field->setPhone(1);
+$field->setCategoryId(0);
+```
+
+### `custom_link_multi`
+
+```php
+<?php
+$field = $form->addField('', 'links', null, ['internal::fieldClass' => 'rex_form_widget_mform_custom_link_multi_element'], true);
+$field->setIntern(1);
+$field->setExternal(1);
+$field->setMedia(1);
+$field->setMailto(1);
+$field->setPhone(1);
+$field->setAnchor(1);
+$field->setBtnAdd('Link hinzufuegen');
+```
+
+## YForm
+
+Fuer YForm sind beide Varianten vorhanden:
+
+- `custom_link`
+- `custom_link_multi`
+
+### `custom_link`
+
+```php
+<?php
+$yform->setValueField('custom_link', [
+    'name' => 'link',
+    'label' => 'Link',
+    'intern' => 1,
+    'external' => 1,
+    'media' => 1,
+    'mailto' => 1,
+    'phone' => 0,
+    'anchor' => 1,
+]);
+```
+
+### `custom_link_multi`
+
+```php
+<?php
+$yform->setValueField('custom_link_multi', [
+    'name' => 'links',
+    'label' => 'Links',
+    'intern' => 1,
+    'external' => 1,
+    'media' => 1,
+    'mailto' => 1,
+    'phone' => 0,
+    'anchor' => 1,
+    'btn_add' => 'Link hinzufuegen',
+]);
+```
+
+## REX_VAR
+
+### `custom_link`
+
+```html
+REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=1 mailto=1 phone=1 media=1 anchor=1 ylink="Countries::rex_ycountries::de_de"]
+```
+
+### `custom_link_multi`
+
+```html
+REX_CUSTOM_LINK_MULTI[id=6 widget=1 external=1 intern=1 mailto=1 phone=0 media=1 anchor=1 btn_add="Link hinzufuegen"]
+```
+
+## Hinweise
+
+- `custom_link` speichert einen einzelnen String, z. B. `redaxo://1` oder `mailto:test@example.org`.
+- `custom_link_multi` speichert ein JSON-Array, z. B. `["redaxo://1","mailto:test@example.org"]`.
+- Im MBlock-Kontext sollte `addCustomLinkField()` **immer mit einem String-Pfad** als ID verwendet werden (z. B. `"$id.0.link"`). Damit landet der Wert unter dem lesbaren Schlüssel `$item['link']` im JSON. Eine numerische ID funktioniert zwar technisch, ergibt aber den wenig hilfreichen Schlüssel `$item['6']`.
 
 ---
 
@@ -204,10 +225,59 @@ echo MForm::factory()
 
 ## Auslesen der Custom-Links
 
-MForm bietet drei Methoden zum Auslesen und Verarbeiten von Custom-Links:
+MForm bietet mehrere Methoden zum Auslesen und Verarbeiten von Custom-Links.
+Fuer neue Implementierungen wird der einheitliche Einstieg `createLinkData()` bzw. `normalizeLinkData()` empfohlen.
 
 ```php
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+```
+
+### createLinkData() [NEU]
+
+Einheitlicher Einstieg fuer Einzelwerte, Repeater-Werte und bereits vorbereitete Link-Arrays.
+
+```php
+$normalized = MFormOutputHelper::createLinkData($input);
+
+// immer verfuegbar:
+$url = $normalized['customlink_url'];
+$text = $normalized['customlink_text'];
+$target = $normalized['customlink_target'];
+```
+
+Unterstuetzte Eingaben:
+
+- String, z. B. `redaxo://10`
+- Array mit `link`
+- Repeater-Format mit `id`/`name`
+- Bereits vorbereitete Arrays mit `customlink_url`
+
+### normalizeLinkData() [NEU]
+
+Wie `createLinkData()`, aber mit Optionen:
+
+```php
+$normalized = MFormOutputHelper::normalizeLinkData($input, [
+    'mode' => 'frontend',    // frontend|raw|strict
+    'extern_blank' => true,
+]);
+```
+
+### normalizeRepeaterItems() [NEU]
+
+Normalisiert definierte Link-Felder innerhalb einer Repeater-Liste in einem Schritt.
+
+```php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+
+// fuegt pro Feld `<feldname>_normalized` hinzu
+$items = MFormOutputHelper::normalizeRepeaterItems($items, ['link', 'cta']);
+
+// alternativ originalfeld ersetzen:
+// $items = MFormOutputHelper::normalizeRepeaterItems($items, ['link', 'cta'], ['replace' => true]);
 ```
 
 ### getCustomUrl()

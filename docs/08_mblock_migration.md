@@ -76,6 +76,39 @@ foreach ($items as $item) {
 - Entfernung deaktivierter Items (`__disabled`)
 - Rekursive Aufbereitung bei Nested-Repeatern
 
+### Link-Felder im Repeater ausgeben (Unified-API)
+
+Beim Auslesen von Custom-Link-Feldern aus Repeater-Items kann der Wert je nach Kontext unterschiedliche Formate haben (einfacher String oder Array mit `id`/`name`). Die Unified-API normalisiert beides automatisch:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+$items = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+
+// Option A: Normalisierung pro Link-Feld direkt bei der Ausgabe
+foreach ($items as $item) {
+    $link = MFormOutputHelper::createLinkData($item['link'] ?? '');
+    if ('' !== $link['customlink_url']) {
+        echo '<a href="' . rex_escape($link['customlink_url']) . '"'
+            . $link['customlink_target']
+            . ' class="' . rex_escape($link['customlink_class']) . '"'
+            . '>' . rex_escape($link['customlink_text']) . '</a>';
+    }
+}
+
+// Option B: Alle Link-Felder im Array auf einmal normalisieren (kein Datenverlust)
+$items = MFormOutputHelper::normalizeRepeaterItems($items, ['link', 'ctaLink']);
+// Ergebnis: $item['link_normalized'] und $item['ctaLink_normalized'] sind aufbereitete Arrays
+
+// Option C: Mit replace => true das Original-Feld ueberschreiben
+$items = MFormOutputHelper::normalizeRepeaterItems($items, ['link'], ['replace' => true]);
+// Ergebnis: $item['link'] ist jetzt direkt das normalisierte Array
+```
+
+> **Hintergrund:** Im Repeater (Alpine.js JSON) kann ein Link-Feld je nach MForm-Version als einfacher String (`redaxo://10`) oder als Array mit `id` und `name` ankommen (vgl. [Issue #357](https://github.com/FriendsOfREDAXO/mform/issues/357)). `createLinkData()` erkennt beide Formate und liefert immer ein konsistentes Frontend-Array.
+
 ## Schritt 4: Nested-Bloecke migrieren
 
 Wenn ein MBlock Unterbloecke hatte, in MForm als verschachtelten Repeater modellieren:
@@ -520,18 +553,73 @@ Wichtig:
 - Im Repeater-Subformular den alten Feldnamen `1` fuer den Link vermeiden und z. B. `link` nutzen.
 - Falls du den Feldnamen aenderst, muss das Mapping oben entsprechend gleich bleiben (`'1' -> 'link'`).
 
+## Wenn MBlock noch nicht migriert werden soll: Compat-Modus
+
+Wer MBlock noch nicht vollständig auf den MForm-Repeater migrieren möchte, kann für neue Module einen Compat-Modus aktivieren. Damit werden `addMediaField()` und `addLinkField()` intern über das `custom_link`-Widget gerendert – **das Speicherformat bleibt identisch** (`REX_MEDIA_n`, `REX_LINK_n`).
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MBlock\MBlock;
+
+// Vor MForm::factory() setzen – gilt nur fuer diesen Request-Kontext
+MForm::useCustomLinkForClassicWidgets(true);
+
+$id = 1;
+$mform = MForm::factory()
+    ->addTextField("$id.0.title", ['label' => 'Titel'])
+    ->addMediaField(1, ['label' => 'Bild'])   // rendert jetzt ueber custom_link-Widget
+    ->addLinkField(2, ['label' => 'Link']);    // dito
+
+echo MBlock::show($id, $mform->show());
+```
+
+**Wann `useCustomLinkForClassicWidgets(true)` setzen?**
+
+| Situation | Empfehlung |
+|-----------|------------|
+| Neues Modul mit MBlock, Media/Link sollen nicht reindiziert werden beim Klonen | `true` setzen |
+| Bestehendes Modul mit gespeicherten `REX_MEDIA_n`-Werten, kein Umbau möglich | `false` lassen (Standard), alten Weg beibehalten |
+| Migration auf MForm-Repeater läuft parallel | Während der Übergangszeit optional `true`, dann nach vollständiger Migration nicht mehr nötig |
+| Einheitlicher Widget-Stil gewünscht (alle Felder sehen gleich aus) | `true` setzen |
+
+> **Wichtig:** `useCustomLinkForClassicWidgets(true)` ist ein globales Flag für den aktuellen Request. Setzt du es in einem Modul, gilt es für alle weiteren `MForm::factory()`-Aufrufe auf derselben Seite. Empfehlung: direkt vor dem betroffenen `MForm::factory()` setzen und direkt danach wieder zurücksetzen:
+>
+> ```php
+> MForm::useCustomLinkForClassicWidgets(true);
+> $mform = MForm::factory()->addMediaField(1, ...)->show();
+> MForm::useCustomLinkForClassicWidgets(false); // zuruecksetzen
+> ```
+
+**Ausgabe im Compat-Modus** – Werte auslesen funktioniert wie gehabt:
+
+```php
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$items = MBlock::getDataArray('REX_VALUE[1]');
+foreach ($items as $item) {
+    $mediaName = $item['REX_MEDIA_1'] ?? '';  // unveraendert
+    $linkId    = $item['REX_LINK_2']  ?? '';  // unveraendert
+}
+```
+
 ## Stolperfallen
 
 - Keine 1:1-Kopie von numerischen MBlock-IDs erzwingen. Besser sprechende Keys nutzen.
 - Im Frontend keine rohe Repeater-JSON direkt verarbeiten, immer `decode()` nutzen.
 - Bei TinyMCE in Repeatern die Klasse `tiny-editor` und ein gueltiges `data-profile` setzen.
 - Bei Link-/Media-Listen moeglichst die MForm-Widgets nutzen (`addLinklistField`, `addMedialistField`).
+- `useCustomLinkForClassicWidgets(true)` ist ein globales Request-Flag: immer nach dem betroffenen Block wieder auf `false` zuruecksetzen.
+- Im Repeater können Link-Felder je nach MForm-Version als String oder Array ankommen – immer `MFormOutputHelper::createLinkData()` zur Normalisierung nutzen.
 
 ## Kurze Checkliste
 
 - Eingabe auf `addRepeaterElement(...)` umgestellt
 - Feldstruktur pro Block definiert
 - Frontend-Ausgabe auf `MFormRepeaterHelper::decode()` umgestellt
+- Link-Felder über `MFormOutputHelper::createLinkData()` oder `normalizeRepeaterItems()` normalisiert
 - Nested-Repeater getestet
 - Bestehende Daten (falls noetig) migriert
 - Modul im Redaktionsalltag getestet (Anlegen, Sortieren, Loeschen, Speichern)
+- Falls noch MBlock aktiv: `useCustomLinkForClassicWidgets` bewusst gesetzt oder explizit offen gelassen

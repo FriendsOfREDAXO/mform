@@ -24,6 +24,34 @@ class MForm extends MFormElements
 
     private bool $showWrapper = true;
 
+    /**
+     * Wenn true, werden addMediaField() und addLinkField() intern ueber das
+     * custom_link-Widget gerendert. Das Speicherformat bleibt identisch
+     * (REX_MEDIA / REX_LINK). Vorteil: kein Reindex-Problem in MBlock,
+     * sauberes Clone/Reset-Verhalten, einheitlicher Widget-Stil.
+     */
+    private static bool $useCustomLinkForClassicWidgets = false;
+
+    /**
+     * Schaltet das custom_link-Rendering fuer addMediaField() / addLinkField() ein oder aus.
+     *
+     * Typische Verwendung direkt vor MForm::factory() im Moduleingabe-Code:
+     *
+     *   MForm::useCustomLinkForClassicWidgets(true);
+     *   $mform = MForm::factory()->addMediaField(1, ...)->show();
+     *
+     * Default: false (klassisches Core-Widget, volle Rueckwaertskompatibilitaet).
+     */
+    public static function useCustomLinkForClassicWidgets(bool $enable = true): void
+    {
+        self::$useCustomLinkForClassicWidgets = $enable;
+    }
+
+    public static function isUsingCustomLinkForClassicWidgets(): bool
+    {
+        return self::$useCustomLinkForClassicWidgets;
+    }
+
     function __construct(?string $theme = null, bool $debug = false)
     {
         $this->setTheme((!is_null($theme)) ? $theme : '');

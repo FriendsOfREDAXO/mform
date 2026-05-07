@@ -423,13 +423,22 @@ abstract class MFormElements
         return $this->addElement('link', $id, null, $attributes, null, $parameter, $catId);
     }
 
+    /**
+     * Einheitlicher MForm-Link-Wrapper auf Basis von custom_link (intern-link Fokus).
+     * Speichert den gewaehlten Linkwert im jeweiligen Value-Slot.
+     */
+    public function addMFormLinkField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
+    {
+        return $this->addElement('mform-link', $id, null, $attributes, null, $parameter, $catId);
+    }
+
     public function addLinklistField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('linklist', $id, null, $attributes, null, $parameter, $catId);
     }
 
     /**
-     * @internal attributes ['data-intern'=>'enable','data-extern'=>'enable','data-media'=>'enable','data-mailto'=>'enable','data-tel'=>'disable', 'data-extern-link-prefix' => 'https://www.', 'data-link-category' => 14, 'data-media-category' => 1, 'data-media-type' => 'jpg,png'];
+     * @internal attributes ['data-intern'=>'enable','data-extern'=>'enable','data-media'=>'enable','data-mailto'=>'enable','data-tel'=>'disable', 'data-extern-link-prefix' => 'https://www.', 'data-link-category' => 14, 'data-media-category' => 1, 'data-media-type' => 'jpg,png', 'data-types' => 'jpg,png', 'types' => 'jpg,png'];
      *
      * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
@@ -456,6 +465,15 @@ abstract class MFormElements
     public function addMediaField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
     {
         return $this->addElement('media', $id, null, $attributes, null, $parameter, $catId);
+    }
+
+    /**
+     * Einheitlicher MForm-Media-Wrapper auf Basis von custom_link (media-link Fokus).
+     * Speichert den Dateinamen im jeweiligen Value-Slot.
+     */
+    public function addMFormMediaField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
+    {
+        return $this->addElement('mform-media', $id, null, $attributes, null, $parameter, $catId);
     }
 
     public function addMedialistField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm

@@ -10,6 +10,7 @@ mform_demo_expert = Expert examples
 mform_demo_community = FOS examples
 mform_demo_wrapper = Wrapper examples
 mform_demo_repeater = Repeater examples
+mform_demo_rexform = rex_form demo
 mform_reference_demo = Sample collection
 mform_info = Info
 
@@ -108,18 +109,30 @@ mform_widget_empty_entries = No entries selected
 yform_values_custom_link_multi_description = CustomLinkMultiple widget from mform. Repeater-based widget for multiple links (JSON array).
 yform_values_custom_link_multi_btn_add = Button label ("Add link")
 yform_values_imagelist_description = Image selection/organization with image previews / drag & drop
+yform_values_medialist_description = Medialist widget from mform. Media list with list, grid and gallery views.
+yform_values_medialist_view = Initial view
+yform_values_medialist_views = Available views (comma-separated)
+yform_values_medialist_view_switch = Show view toggle
+yform_values_medialist_toolbar = Toolbar orientation
+yform_values_medialist_hide_label = Hide label in list
+yform_values_linklist_description = Linklist widget from mform. Sortable list of internal REDAXO links.
+yform_values_linklist_toolbar = Toolbar orientation
 yform_values_custom_link_ylink = YFORM link widget (label_text::yform_table_name::column_to_display,label_text2::yform_table_name_2::column_to_display_2)
 
 # Docs
 
 mform_docs = Documentation
+mform_docs_whats_new = What's new in MForm 9?
 mform_docs_basics = Basics
+mform_docs_tutorial_module = Tutorial: Page maintenance module
 mform_docs_redaxo = REDAXO Widgets
+mform_docs_outside_modules = MForm outside modules
 mform_docs_customlink = Custom Link Widget
 mform_docs_imagelist = Imagelist Widget
 mform_docs_wrapper = Wrappers and Layouts
 mform_docs_advanced = Advanced
 mform_docs_repeater = Repeater
+mform_docs_mblock_migration = Migration from MBlock
 mform_docs_templates = Templates and Defaults
 mform_docs_readme = README
 mform_docs_toc = Table of Contents

@@ -2,6 +2,18 @@
 
 Verwende MForm-Elemente in deinem Modul, indem du diese Beispiele kopierst und anpasst.
 
+## Verfügbarkeit
+
+| Methode | Klassisches Modul | `rex_form` | YForm |
+|---|---|---|---|
+| `addTextField` | ja | ja | ja |
+| `addTextAreaField` | ja | ja | ja |
+| `addHiddenField` | ja | ja | ja |
+| `addSelectField` | ja | ja | ja |
+| `addMultiSelectField` | ja | ja | ja |
+| `addCheckboxField` | ja | ja | ja |
+| `addRadioField` | ja | ja | ja |
+
 ## Text-Input- und Hidden-Elemente
 
 Rendert Text- und Eingabe-Elemente wie `<input type="text">`, `<textarea>` oder `<input type="hidden">`.

@@ -17,6 +17,164 @@ use rex_media_manager;
 
 class MFormOutputHelper
 {
+    /**
+     * Unified entry point for link normalization.
+     *
+     * Accepts legacy single-link values, repeater values (array with `id`/`name`),
+     * and already prepared CustomLink arrays.
+     *
+     * @param mixed $input
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    public static function createLinkData(mixed $input, array $options = []): array
+    {
+        return self::normalizeLinkData($input, $options);
+    }
+
+    /**
+     * Normalizes any supported link input into a consistent frontend structure.
+     *
+     * Supported inputs:
+     * - string link value (e.g. redaxo://10, https://..., mailto:...)
+     * - array with `link`
+     * - repeater-like array with `id` / `name`
+     * - already prepared arrays containing `customlink_url`
+     *
+     * Options:
+     * - extern_blank (bool, default true)
+     * - mode (string: frontend|raw|strict, default frontend)
+     *
+     * @param mixed $input
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    public static function normalizeLinkData(mixed $input, array $options = []): array
+    {
+        $externBlank = true;
+        if (isset($options['extern_blank'])) {
+            $externBlank = (bool) $options['extern_blank'];
+        }
+
+        $mode = 'frontend';
+        if (isset($options['mode']) && is_string($options['mode'])) {
+            $mode = strtolower($options['mode']);
+        }
+
+        // If data is already prepared, keep it as source of truth.
+        if (is_array($input) && isset($input['customlink_url'])) {
+            /** @var array<string, mixed> $prepared */
+            $prepared = $input;
+            if (!isset($prepared['customlink_url']) || !is_string($prepared['customlink_url'])) {
+                $prepared['customlink_url'] = '';
+            }
+            if (!isset($prepared['customlink_text']) || !is_string($prepared['customlink_text'])) {
+                $prepared['customlink_text'] = '';
+            }
+            if (!isset($prepared['customlink_target']) || !is_string($prepared['customlink_target'])) {
+                $prepared['customlink_target'] = '';
+            }
+            if (!isset($prepared['customlink_class']) || !is_string($prepared['customlink_class'])) {
+                $prepared['customlink_class'] = '';
+            }
+
+            return $prepared;
+        }
+
+        $linkItem = self::buildLinkItemFromMixedInput($input);
+        $normalized = self::prepareCustomLink($linkItem, $externBlank);
+
+        // Keep backend helper labels only in explicit raw mode.
+        if ('raw' === $mode && is_array($input) && isset($input['name']) && is_string($input['name']) && !isset($normalized['text'])) {
+            $normalized['name'] = $input['name'];
+        }
+
+        if ('strict' === $mode) {
+            if (!isset($normalized['customlink_url']) || !is_string($normalized['customlink_url'])) {
+                $normalized['customlink_url'] = '';
+            }
+            if (!isset($normalized['customlink_text']) || !is_string($normalized['customlink_text'])) {
+                $normalized['customlink_text'] = '';
+            }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Normalizes configured link fields of repeater rows.
+     *
+     * By default a new key `<field>_normalized` is added.
+     * Set option `replace` => true to overwrite the original field.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param array<int, string> $linkFields
+     * @param array<string, mixed> $options
+     * @return array<int, array<string, mixed>>
+     */
+    public static function normalizeRepeaterItems(array $items, array $linkFields, array $options = []): array
+    {
+        $replace = false;
+        if (isset($options['replace'])) {
+            $replace = (bool) $options['replace'];
+        }
+
+        foreach ($items as $index => $item) {
+            foreach ($linkFields as $fieldName) {
+                if (!isset($item[$fieldName])) {
+                    continue;
+                }
+
+                $normalized = self::normalizeLinkData($item[$fieldName], $options);
+                if ($replace) {
+                    $items[$index][$fieldName] = $normalized;
+                } else {
+                    $items[$index][$fieldName . '_normalized'] = $normalized;
+                }
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * @param mixed $input
+     * @return array<string, mixed>
+     */
+    private static function buildLinkItemFromMixedInput(mixed $input): array
+    {
+        if (is_string($input) || is_numeric($input)) {
+            return ['link' => (string) $input, 'text' => ''];
+        }
+
+        if (!is_array($input)) {
+            return ['link' => '', 'text' => ''];
+        }
+
+        $linkValue = '';
+        $textValue = '';
+
+        if (isset($input['link']) && (is_string($input['link']) || is_numeric($input['link']))) {
+            $linkValue = (string) $input['link'];
+        } elseif (isset($input['id']) && (is_string($input['id']) || is_numeric($input['id']))) {
+            // Repeater values can come as ['id' => 'redaxo://12', 'name' => 'Artikel [12]'].
+            $linkValue = (string) $input['id'];
+        } elseif (isset($input['customlink_url']) && is_string($input['customlink_url'])) {
+            $linkValue = $input['customlink_url'];
+        }
+
+        if (isset($input['text']) && is_string($input['text'])) {
+            $textValue = $input['text'];
+        } elseif (isset($input['customlink_text']) && is_string($input['customlink_text'])) {
+            $textValue = $input['customlink_text'];
+        }
+
+        return [
+            'link' => $linkValue,
+            'text' => $textValue,
+        ];
+    }
+
     public static function isFirstSlice($sliceId): bool
     {
         $first = rex_article_slice::getFirstSliceForArticle(rex_article::getCurrentId(), rex_clang::getCurrentId());
@@ -215,16 +373,9 @@ class MFormOutputHelper
             if (isset($item['customlink_url'])) {
                 return $item['customlink_url'];
             }
-            // Regular link value
-            if (isset($item['link'])) {
-                $prepared = self::prepareCustomLink($item, $externBlank);
-                return $prepared['customlink_url'];
-            }
-            // Article array with id
-            if (isset($item['id'])) {
-                return self::getCustomUrl($item['id']);
-            }
-            return '';
+
+            $normalized = self::normalizeLinkData($item, ['extern_blank' => $externBlank]);
+            return (string) ($normalized['customlink_url'] ?? '');
         }
 
         // If we get a string, process it directly

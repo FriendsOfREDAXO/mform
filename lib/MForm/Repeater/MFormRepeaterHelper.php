@@ -295,4 +295,81 @@ class MFormRepeaterHelper
 
         return true;
     }
+
+    /**
+     * Filtert Repeater-Items nach einem Feldwert.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param string $field  Feldname
+     * @param mixed  $value  Gesuchter Wert
+     * @param bool   $strict Strikte Vergleichung (===)
+     * @return array<int, array<string, mixed>>
+     */
+    public static function filterByField(array $items, string $field, mixed $value, bool $strict = false): array
+    {
+        return array_values(array_filter($items, static function (array $item) use ($field, $value, $strict): bool {
+            if (!array_key_exists($field, $item)) {
+                return false;
+            }
+            return $strict ? $item[$field] === $value : $item[$field] == $value;
+        }));
+    }
+
+    /**
+     * Sortiert Repeater-Items nach einem Feldwert.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param string $field     Feldname
+     * @param string $direction 'asc' oder 'desc'
+     * @return array<int, array<string, mixed>>
+     */
+    public static function sortByField(array $items, string $field, string $direction = 'asc'): array
+    {
+        $direction = strtolower($direction);
+
+        usort($items, static function (array $a, array $b) use ($field, $direction): int {
+            $va = $a[$field] ?? '';
+            $vb = $b[$field] ?? '';
+
+            $result = is_numeric($va) && is_numeric($vb)
+                ? $va <=> $vb
+                : strcasecmp((string) $va, (string) $vb);
+
+            return $direction === 'desc' ? -$result : $result;
+        });
+
+        return $items;
+    }
+
+    /**
+     * Gruppiert Repeater-Items nach einem Feldwert.
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param string $field Feldname
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    public static function groupByField(array $items, string $field): array
+    {
+        $groups = [];
+
+        foreach ($items as $item) {
+            $key = isset($item[$field]) ? (string) $item[$field] : 'undefined';
+            $groups[$key][] = $item;
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Begrenzt Repeater-Items (z. B. für Pagination).
+     *
+     * @param array<int, array<string, mixed>> $items
+     * @param int $limit  Maximale Anzahl Items
+     * @param int $offset Start-Position (default: 0)
+     * @return array<int, array<string, mixed>>
+     */
+    public static function limitItems(array $items, int $limit, int $offset = 0): array
+    {
+        return array_slice($items, $offset, $limit);
+    }
 }

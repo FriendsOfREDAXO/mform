@@ -2,6 +2,17 @@
 
 Diese Moduleingabe-Beispiele zeigen, wie man mittels der MForm Wrapper-Elemente Input-Formulare sinnvoll layouten und interaktiv aufbereitet.
 
+## Verfügbarkeit
+
+| Methode | Klassisches Modul | `rex_form` | YForm |
+|---|---|---|---|
+| `addFieldsetArea` | ja | ja | ja |
+| `addCollapseElement` | ja | ja | – |
+| `addAccordionElement` | ja | ja | – |
+| `addTabElement` | ja | ja | – |
+| `addColumnElement` | ja | ja | – |
+| `addInlineElement` | ja | ja | – |
+
 ## Accordion
 
 Stellt ein Accordion-Element dar, das sich bei Klick öffnet und schließt.

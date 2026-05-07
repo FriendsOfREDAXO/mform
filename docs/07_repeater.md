@@ -4,6 +4,13 @@ Das Repeater-Feld ermöglicht es Ihnen, eine Gruppe von Feldern zu erstellen, di
 
 Repeater ist keine 1:1-Übernahme von MBlock, sondern ist ein neuer, moderner Ansatz, um wiederholende Inhalte zu erstellen. Es ist ein eigenständiges Element, das in MForm integriert ist.
 
+## Verfügbarkeit
+
+| Methode | Klassisches Modul | `rex_form` | YForm |
+|---|---|---|---|
+| `addRepeaterElement` | ja | – | – |
+| `addFlexRepeaterElement` | ja | – | – |
+
 > Migration von bestehenden MBlock-Modulen: siehe [08_mblock_migration.md](08_mblock_migration.md).
 
 ## Beispiele
@@ -49,6 +56,10 @@ $items = MFormRepeaterHelper::decode('REX_VALUE[2]');
 
 Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
+> **Wann ist `decode()` nötig?**  
+> `decode()` ist erforderlich, sobald der Repeater einen **Online/Offline-Toggle** (`__disabled`-Flag) verwendet – es filtert deaktivierte Items automatisch heraus.  
+> Für einfache Repeater ohne Toggle-Funktion und bei der Migration bestehender Module ist `decode()` nicht zwingend erforderlich – `json_decode()` + `html_entity_decode()` reicht dort aus.
+
 | Methode | Verwendung |
 |---------|-----------|
 | `decode(string $rexValue)` | **Empfohlen** – übernimmt JSON-Dekodierung, Entity-Dekodierung und Item-Filterung in einem Schritt. |
@@ -64,6 +75,39 @@ $rows  = MFormRepeaterHelper::prepareItemsForOutput($raw);
 ```
 
 Beide Wege verarbeiten verschachtelte Repeater rekursiv und unterstützen das `__disabled`-Flag korrekt.
+
+### Frontend-Datenverarbeitung
+
+Nach dem Dekodieren stehen weitere Hilfsmethoden für typische Ausgabeszenarien zur Verfügung:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+
+$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+
+// Nach Feldwert filtern
+$news = MFormRepeaterHelper::filterByField($items, 'category', 'news');
+// Mit striktem Vergleich (===)
+$active = MFormRepeaterHelper::filterByField($items, 'status', '1', strict: true);
+
+// Sortieren (asc / desc, numerisch oder alphabetisch automatisch erkannt)
+$sorted = MFormRepeaterHelper::sortByField($items, 'date', 'desc');
+
+// Gruppieren – liefert [gruppenname => [items]]
+$grouped = MFormRepeaterHelper::groupByField($items, 'category');
+foreach ($grouped as $category => $categoryItems) {
+    echo '<h2>' . rex_escape($category) . '</h2>';
+    foreach ($categoryItems as $item) {
+        echo '<p>' . rex_escape($item['title'] ?? '') . '</p>';
+    }
+}
+
+// Pagination
+$perPage = 10;
+$page    = (int) rex_get('p', 'int', 0);
+$paged   = MFormRepeaterHelper::limitItems($items, $perPage, $page * $perPage);
+```
 
 ---
 
@@ -180,6 +224,68 @@ Verfügbare Optionen im Repeater-Array:
 
 - MForm lädt SortableJS nur, wenn `window.Sortable` noch nicht vorhanden ist.
 - Wenn ein anderes Addon Sortable bereits global bereitstellt, wird diese Instanz verwendet.
+
+---
+
+## Media- und Link-Felder im Repeater
+
+Der Flex-Repeater speichert alle Werte in einem JSON-Objekt. Daher gelten hier **andere Key-Konventionen als in MBlock**.
+
+### Key-Typen
+
+| Methode | ID-Typ | Ausgabe-Schlüssel im `$item`-Array |
+|---------|--------|-------------------------------------|
+| `addMediaField("bild")` | String (Pflicht!) | `$item['bild']` |
+| `addLinkField("link")` | String (Pflicht!) | `$item['link']` |
+| `addCustomLinkField("link")` | String (empfohlen) | `$item['link']` |
+| `addMFormMediaField("bild")` | String (empfohlen) | `$item['bild']` |
+
+> **Hinweis:** Im Repeater gibt es kein `REX_MEDIA_n`-Konzept. Die ID-Werte landen **direkt als JSON-Schlüssel** im gespeicherten Array. Numerische IDs wie `1` ergeben den Schlüssel `$item['1']`.
+
+### Beispiel
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$itemForm = MForm::factory();
+$itemForm->addTextField('title', ['label' => 'Titel']);
+$itemForm->addMediaField('bild', ['label' => 'Bild']);
+$itemForm->addCustomLinkField('link', ['label' => 'Link', 'intern' => 1, 'extern' => 1]);
+
+$mform = MForm::factory();
+$mform->addRepeaterElement(1, $itemForm);
+echo $mform->show();
+```
+
+**Ausgabe:**
+
+```php
+<?php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+
+// Einheitliche Link-Normalisierung fuer Repeater + Nicht-Repeater-Formate
+$items = MFormOutputHelper::normalizeRepeaterItems($items, ['link']);
+
+foreach ($items as $item) {
+    $title = rex_escape($item['title'] ?? '');
+    $bildName = $item['bild'] ?? '';
+    $link = $item['link_normalized']['customlink_url'] ?? '';
+    $target = $item['link_normalized']['customlink_target'] ?? '';
+
+    if ($bildName) {
+        $media = rex_media::get($bildName);
+        // $media->getFileName(), $media->getTitle() etc.
+    }
+
+    if ($link) {
+        echo '<a href="' . rex_escape($link) . '"' . $target . '>Mehr erfahren</a>';
+    }
+}
+```
 
 ---
 

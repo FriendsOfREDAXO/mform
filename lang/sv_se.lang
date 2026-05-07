@@ -15,6 +15,9 @@ mform_info = Info
 mform_modul_input = Modul input
 mform_modul_output = Modul output
 
+mform_docs_outside_modules = MForm utanför moduler
+mform_docs_tutorial_module = Tutorial: sidhanteringsmodul
+
 mform_github = MForm FOR – Github Repository
 
 mform_repeater_remove_group_confirm_msg = Ta bort grupp?
@@ -59,4 +62,12 @@ yform_values_custom_link_intern = Redaxo internal-link button
 yform_values_custom_link_link_category = Länk-kategori
 yform_values_custom_link_phone = Telefon länkbutton
 yform_values_imagelist_description = Bildval med direktvisning / dra & släpp
+yform_values_medialist_description = Medialist-widget från mform. Medielista med list-, rutnäts- och gallerivy.
+yform_values_medialist_view = Startvy
+yform_values_medialist_views = Tillgängliga vyer (kommaseparerade)
+yform_values_medialist_view_switch = Visa vyväxlare
+yform_values_medialist_toolbar = Verktygsradsorientering
+yform_values_medialist_hide_label = Dölj etikett i listan
+yform_values_linklist_description = Linklist-widget från mform. Sorterbar lista med interna REDAXO-länkar.
+yform_values_linklist_toolbar = Verktygsradsorientering
 yform_values_custom_link_ylink = YForm-Link-Widget (label_text::yform_tabell::visning_column,label_text2::yform_tabell_2::visning_column_2)

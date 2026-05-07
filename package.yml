@@ -19,6 +19,7 @@ page:
                 demo_wrapper: { title: 'translate:demo_wrapper' }
                 demo_extended: { title: 'translate:demo_extended' }
                 demo_repeater: { title: 'translate:demo_repeater' }
+                demo_rexform: { title: 'translate:demo_rexform' }
                 demo_expert: { title: 'translate:demo_expert' }
 
         changelog:
@@ -32,5 +33,4 @@ requires:
 
 conflicts:
     packages:
-        mblock: '>=0.0.0'
         ui_tools: '<1.0.0'

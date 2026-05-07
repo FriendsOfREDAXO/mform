@@ -23,6 +23,45 @@ function customlink_init_widget(element) {
         showed_input = element.find('input[type=text]'),
         value, text, args, timer, repeaterLink = (showed_input.attr('repeater_link') === '1');
 
+    function normalizeMediaTypes(rawTypes) {
+        if (Array.isArray(rawTypes)) {
+            return rawTypes.map(function (entry) {
+                return String(entry || '').trim().toLowerCase();
+            }).filter(Boolean);
+        }
+
+        return String(rawTypes || '')
+            .split(',')
+            .map(function (entry) {
+                return String(entry || '').trim().toLowerCase();
+            })
+            .filter(Boolean);
+    }
+
+    function isPreviewableMediaValue(mediaValue) {
+        const value = String(mediaValue || '').trim().toLowerCase();
+        if (!value || value.indexOf('://') !== -1) {
+            return false;
+        }
+
+        const cleanValue = value.split('?')[0].split('#')[0];
+        const ext = cleanValue.indexOf('.') >= 0 ? cleanValue.split('.').pop() : '';
+        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp', 'tif', 'tiff', 'mp4', 'webm', 'ogg', 'ogv', 'mov', 'm4v'].indexOf(ext) !== -1;
+    }
+
+    function syncMediaPreviewButton(mediaValue) {
+        const previewBtn = element.find('a.media_preview_link');
+        if (!previewBtn.length) {
+            return;
+        }
+
+        const hasMediaButton = element.find('a.media_link').length && !element.find('a.media_link').hasClass('hidden');
+        const canPreview = hasMediaButton && isPreviewableMediaValue(mediaValue);
+        previewBtn.toggleClass('hidden', !canPreview);
+        previewBtn.toggleClass('disabled', !canPreview);
+        previewBtn.attr('aria-disabled', canPreview ? 'false' : 'true');
+    }
+
     function updateActiveButton(value) {
         let v = String(value || '');
         element.find('.btn-popup').removeClass('active');
@@ -62,6 +101,7 @@ function customlink_init_widget(element) {
         showed_input.val(linkText || '');
         element.toggleClass('is-empty', !(linkUrl && String(linkUrl).trim() !== ''));
         updateActiveButton(linkUrl);
+        syncMediaPreviewButton(linkUrl);
         dispatchCustomLinkEvent(hidden_input, hidden_input.val(), showed_input.val());
     }
 
@@ -80,6 +120,7 @@ function customlink_init_widget(element) {
     element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
     element.toggleClass('is-empty', !(hidden_input.val() && String(hidden_input.val()).trim() !== ''));
     updateActiveButton(hidden_input.val());
+    syncMediaPreviewButton(hidden_input.val());
     element.addClass('init_custom_link_widget');
 
     if (repeaterLink) {
@@ -144,8 +185,9 @@ function customlink_init_widget(element) {
             clearInterval(timer);
             closeDropDown(id);
 
-            if (media_types !== undefined) {
-                args = '&args[types]=' + media_types;
+            const mediaTypesList = normalizeMediaTypes(media_types);
+            if (mediaTypesList.length) {
+                args = '&args[types]=' + encodeURIComponent(mediaTypesList.join(','));
             }
             if (media_Category !== undefined) {
                 args = args + '&rex_file_category=' + media_Category;
@@ -168,6 +210,24 @@ function customlink_init_widget(element) {
             $(mediaMap).on('rex:selectMedia', (event, mediaName) => {
                 setLinkValue(mediaName, mediaName);
             });
+        return false;
+    });
+
+    // media preview element
+    element.find('a.media_preview_link').off('click.mformCustomlink').on('click.mformCustomlink', function () {
+            let id = element.data('id'),
+                mediaValue = String(hidden_input.val() || '').trim();
+
+            clearInterval(timer);
+            closeDropDown(id);
+
+            if (!isPreviewableMediaValue(mediaValue)) {
+                syncMediaPreviewButton(mediaValue);
+                return false;
+            }
+
+            hidden_input.attr('id', 'REX_MEDIA_' + id);
+            viewREXMedia(id);
         return false;
     });
 

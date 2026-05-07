@@ -8,9 +8,40 @@
  */
 class rex_var_custom_medialist extends rex_var
 {
-    protected function getOutput()
+    /**
+     * REX_CUSTOM_MEDIALIST[id=1]
+     * REX_CUSTOM_MEDIALIST[id=1 widget=1]
+     * REX_CUSTOM_MEDIALIST[id=1 widget=1 category=5 types="jpg,png,webp,avif" views="gallery,grid,list"]
+     *
+     * Storage: same medialist column as REX_MEDIALIST[id=1].
+     */
+    protected function getOutput(): bool|string
     {
-        return false;
+        $id = $this->getArg('id', 0, true);
+        if (!in_array($this->getContext(), ['module', 'action'], true) || !is_numeric($id) || $id < 1 || $id > 10) {
+            return false;
+        }
+
+        $value = $this->getContextData()->getValue('medialist' . $id);
+
+        if ($this->hasArg('isset') && $this->getArg('isset')) {
+            return $value ? 'true' : 'false';
+        }
+
+        if ($this->hasArg('widget') && $this->getArg('widget')) {
+            if (!$this->environmentIs(self::ENV_INPUT)) {
+                return false;
+            }
+            $args = [];
+            foreach (['category', 'types', 'views', 'view', 'view_switch', 'toolbar', 'hide_label'] as $key) {
+                if ($this->hasArg($key)) {
+                    $args[$key] = $this->getArg($key);
+                }
+            }
+            $value = self::getWidget($id, 'REX_INPUT_MEDIALIST[' . $id . ']', (string) $value, $args);
+        }
+
+        return self::quote($value);
     }
 
     public static function getWidget($id, $name, $value, array $args = [])

@@ -26,15 +26,30 @@ foreach ($readmeCandidates as $candidate) {
 
 // ── Doc-Seiten definieren ─────────────────────────────────────────────────────
 $mform_doc_pages = [
+    'whats_new' => [
+        'title' => rex_i18n::msg('mform_docs_whats_new'),
+        'icon'  => 'rex-icon fa-star',
+        'file'  => 'docs/00_whats_new.md',
+    ],
     'basics' => [
         'title' => rex_i18n::msg('mform_docs_basics'),
         'icon'  => 'rex-icon fa-file-text-o',
         'file'  => 'docs/01_basics.md',
     ],
+    'tutorial_module' => [
+        'title' => rex_i18n::msg('mform_docs_tutorial_module'),
+        'icon'  => 'rex-icon fa-graduation-cap',
+        'file'  => 'docs/11_tutorial_modul.md',
+    ],
     'redaxo' => [
         'title' => rex_i18n::msg('mform_docs_redaxo'),
         'icon'  => 'rex-icon fa-puzzle-piece',
         'file'  => 'docs/02_redaxo.md',
+    ],
+    'outside_modules' => [
+        'title' => rex_i18n::msg('mform_docs_outside_modules'),
+        'icon'  => 'rex-icon fa-cubes',
+        'file'  => 'docs/10_outside_modules.md',
     ],
     'customlink' => [
         'title' => rex_i18n::msg('mform_docs_customlink'),
@@ -60,6 +75,11 @@ $mform_doc_pages = [
         'title' => rex_i18n::msg('mform_docs_repeater'),
         'icon'  => 'rex-icon fa-repeat',
         'file'  => 'docs/07_repeater.md',
+    ],
+    'mblock_migration' => [
+        'title' => rex_i18n::msg('mform_docs_mblock_migration'),
+        'icon'  => 'rex-icon fa-exchange',
+        'file'  => 'docs/08_mblock_migration.md',
     ],
     'templates' => [
         'title' => rex_i18n::msg('mform_docs_templates'),

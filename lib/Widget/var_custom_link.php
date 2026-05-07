@@ -96,7 +96,7 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
-    public static function prepareYLinkArg($args) :array
+    public static function prepareYLinkArg($args): array
     {
         if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
             $ylinks = array_filter(explode(',', $args['ylink']));
@@ -113,8 +113,29 @@ class rex_var_custom_link extends rex_var
         return $args;
     }
 
+    public static function normalizeMediaTypesArg(array $args): array
+    {
+        if (!isset($args['types']) && isset($args['data-types'])) {
+            $args['types'] = $args['data-types'];
+        }
+        if (!isset($args['types']) && isset($args['data-media-type'])) {
+            $args['types'] = $args['data-media-type'];
+        }
+
+        if (isset($args['types'])) {
+            $types = is_array($args['types']) ? implode(',', $args['types']) : (string) $args['types'];
+            $types = strtolower(str_replace(' ', '', $types));
+            $types = trim($types, ',');
+            $args['types'] = $types;
+        }
+
+        return $args;
+    }
+
     public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
     {
+        $args = self::normalizeMediaTypesArg($args);
+
         $valueName = self::getCustomLinkText($value);
         $category = '';
         $mediaCategory = '';
@@ -147,7 +168,7 @@ class rex_var_custom_link extends rex_var
         $emailClass = (isset($args['mailto']) && 0 == $args['mailto']) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && 0 == $args['phone']) ? ' hidden' : $class;
-        $anchorClass = (isset($args['anchor']) && 0 != $args['anchor']) ? $class : ' hidden';
+        $anchorClass = (isset($args['anchor']) && 0 == $args['anchor']) ? ' hidden' : $class;
         $externalPrefix = (isset($args['external_prefix']) && 0 == $args['external_prefix']) ? $args['external_prefix'] : 'https://';
         $args = self::prepareYLinkArg($args);
         $ylinks = '';
@@ -179,6 +200,7 @@ class rex_var_custom_link extends rex_var
         <a href="#" class="btn btn-popup intern_link ' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
         <a href="#" class="btn btn-popup external_link ' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
+        <a href="#" class="btn btn-popup media_preview_link hidden ' . $mediaClass . '" id="mform_media_preview_' . $id . '" title="' . rex_i18n::msg('var_media_view') . '"><i class="rex-icon fa-eye"></i></a>
         <a href="#" class="btn btn-popup email_link ' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
         <a href="#" class="btn btn-popup phone_link ' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
         <a href="#" class="btn btn-popup anchor_link ' . $anchorClass . '" id="mform_anchor_' . $id . '" title="Anker zu Slice setzen"><i class="rex-icon fa-anchor"></i></a>
@@ -187,12 +209,12 @@ class rex_var_custom_link extends rex_var
 
         $fragment = new rex_fragment();
         $fragment->setVar('elements', [$e], false);
-        
+
         $anchorData = '';
         if (isset($args['anchor']) && 0 != $args['anchor']) {
             $anchorData = ' data-anchor="enable"';
         }
-        
+
         return str_replace(
             '<div class="input-group">',
             '<div class="input-group custom-link" ' . $category . $types . $mediaCategory . $anchorData . ' data-extern-link-prefix="' . $externalPrefix . '" data-clang="' . rex_clang::getCurrentId() . '" data-id="' . $id . '">',

@@ -14,6 +14,7 @@ mform_demo_community = Exemples FOS
 mform_demo_wrapper = Exemples d'enveloppe
 mform_reference_demo = Collection d'exemples
 mform_demo_repeater = Exemples de répétition
+mform_demo_rexform = Démo rex_form
 mform_info = Info
 
 mform_modul_input = Module d'entrée
@@ -82,13 +83,23 @@ yform_values_custom_link_intern = Bouton de lien interne
 yform_values_custom_link_link_category = Catégorie de lien
 yform_values_custom_link_phone = Bouton de lien téléphonique
 yform_values_imagelist_description = 🧩 MForm : Sélection d'images avec affichage direct / Glisser-déposer
+yform_values_medialist_description = Widget Medialist de MForm. Liste de médias avec vues liste, grille et galerie.
+yform_values_medialist_view = Vue initiale
+yform_values_medialist_views = Vues disponibles (séparées par des virgules)
+yform_values_medialist_view_switch = Afficher le sélecteur de vue
+yform_values_medialist_toolbar = Orientation de la barre d'outils
+yform_values_medialist_hide_label = Masquer le libellé dans la liste
+yform_values_linklist_description = Widget Linklist de MForm. Liste triable de liens REDAXO internes.
+yform_values_linklist_toolbar = Orientation de la barre d'outils
 yform_values_custom_link_ylink = Widget de lien YForm (label_text::yform_table::column_display,label_text2::yform_table_2::column_display_2)
 
 # Docs
 
 mform_docs = Documentation
 mform_docs_basics = Bases
+mform_docs_tutorial_module = Tutoriel : module de gestion de page
 mform_docs_redaxo = Widgets REDAXO
+mform_docs_outside_modules = MForm hors des modules
 mform_docs_customlink = Widget de lien personnalisé
 mform_docs_imagelist = Widget de liste d'images
 mform_docs_wrapper = Enveloppes et mises en page

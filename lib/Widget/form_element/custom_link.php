@@ -3,9 +3,9 @@
 /**
  * @package redaxo\structure
  * usage:
- *  $field = $form->addField('', 'link', null, ['internal::fieldClass' => 'rex_form_widget_customlink_element'], true);
+ *  $field = $form->addField('', 'link', null, ['internal::fieldClass' => 'rex_form_widget_mform_customlink_element'], true);
  */
-class rex_form_widget_customlink_element extends rex_form_element
+class rex_form_widget_mform_customlink_element extends rex_form_element
 {
     private $args = [];
 

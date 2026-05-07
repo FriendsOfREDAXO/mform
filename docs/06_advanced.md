@@ -2,6 +2,18 @@
 
 Kniffe und Praxisbeispiele, wie MForm-Elemente an die jeweiligen Anforderungen angepasst werden können.
 
+## Verfügbarkeit
+
+| Methode | Klassisches Modul | `rex_form` | YForm |
+|---|---|---|---|
+| `addConditionalFieldsetArea` | ja | – | – |
+| `addToggleCheckboxField` | ja | ja | ja |
+| `addRadioImgField` | ja | – | – |
+| `addRadioIconField` | ja | – | – |
+| `addRadioColorField` | ja | – | – |
+
+## Alle Methoden im Überblick
+
 MForm stellt folgende Element-Methoden bereit:
 
 - Strukturelle Wrapper-Elemente
