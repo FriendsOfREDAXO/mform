@@ -1,6 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.0.0
+## Version 9.0.0-beta1
 - Neuer Flex-Repeater als Standardpfad, inkl. stabiler Initialisierung in dynamischen Backend-Kontexten
 - Repeater-UI erweitert: Aktiv/Inaktiv-Status pro Item (Auge), Ausgabe-Filter für deaktivierte Items und verbesserte Toggle-All-Logik
 - Statusanzeige im Repeater-Header aktualisiert: gefuellter Punkt (gruen = aktiv, rot = offline)
