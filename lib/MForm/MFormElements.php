@@ -423,6 +423,26 @@ abstract class MFormElements
         return $this->addElement('checkbox-group', $id, null, $attributes, $options);
     }
 
+    /**
+     * Renders a color swatch picker – a text input with a preview square and a popup of predefined colors/classes.
+     * The stored value is the raw color value (e.g. "#ff0000") or a CSS class name (e.g. ".bg-primary").
+     *
+     * Option values can be a plain string label, or an array with 'label' and optional 'preview' (hex color for CSS classes):
+     *
+     * @param array<string, string|array{label: string, preview?: string}> $swatches
+     *
+     * @example
+     * $mform->addColorSwatchField('color', [
+     *     '#ffffff' => 'Weiß',
+     *     '#000000' => 'Schwarz',
+     *     '.bg-primary' => ['label' => 'Primärfarbe', 'preview' => '#2f77bc'],
+     * ], ['label' => 'Farbe']);
+     */
+    public function addColorSwatchField(float|int|string $id, ?array $swatches = null, ?array $attributes = null, ?string $defaultValue = null): MForm
+    {
+        return $this->addElement('color-swatch', $id, null, $attributes, $swatches, null, null, $defaultValue);
+    }
+
     /** TODO
      * public function addToggleRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
      * {

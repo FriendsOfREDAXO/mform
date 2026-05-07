@@ -27,6 +27,16 @@ $rowForm = MForm::factory()
         'medium' => 'Mittel',
         'high' => 'Hoch',
     ], ['label' => 'Priorität (Radio-Mode)', 'mode' => 'radio'])
+    ->addColorSwatchField('color', [
+        '#ffffff' => 'Weiß',
+        '#111111' => 'Schwarz',
+        '#2f77bc' => 'Blau',
+        '#e74c3c' => 'Rot',
+        '#27ae60' => 'Grün',
+        '#f39c12' => 'Orange',
+        '.bg-primary' => ['label' => 'Primär (CSS)', 'preview' => '#2f77bc'],
+        '.bg-secondary' => ['label' => 'Sekundär (CSS)', 'preview' => '#6c757d'],
+    ], ['label' => 'Farbe (ColorSwatch)'])
     ->addTextAreaField('text', ['label' => 'Text (TinyMCE)', 'class' => 'tiny-editor', 'data-profile' => 'default'])
     ->addTextAreaField('markdown', ['label' => 'Markdown (MarkdownEditor)', 'class' => 'markdowneditor-editor', 'data-markdowneditor-profile' => 'default'])
     ->addLinklistField('cta_links', ['category' => 1], null, ['label' => 'CTA Links (Linklist)'])
@@ -47,6 +57,15 @@ $mform = MForm::factory()
             'black' => ['color' => '#111111', 'label' => 'Dunkel'],
             'blue' => ['color' => '#2f77bc', 'label' => 'Blau'],
         ], ['label' => 'Hintergrundfarbe'], 'transparent')
+        ->addColorSwatchField(15, [
+            '#ffffff' => 'Weiß',
+            '#111111' => 'Schwarz',
+            '#2f77bc' => 'Blau',
+            '#e74c3c' => 'Rot',
+            '#27ae60' => 'Grün',
+            '.text-primary' => ['label' => 'Primär CSS', 'preview' => '#2f77bc'],
+            '.text-muted' => ['label' => 'Gedämpft CSS', 'preview' => '#6c757d'],
+        ], ['label' => 'Textfarbe (ColorSwatch)'])
         ->addCheckboxGroupField(14, [
             'news' => 'News',
             'blog' => 'Blog',

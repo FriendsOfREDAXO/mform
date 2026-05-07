@@ -903,3 +903,160 @@ body.rex-theme-dark .mform-cl-multi-remove {
         color: #e57373 !important;
     }
 }
+
+/* -------------------------------------------------------
+ * Color Swatch Field (.mform-color-swatch)
+ * ------------------------------------------------------- */
+
+.mform-color-swatch {
+    position: relative;
+}
+
+.mform-cs-preview {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    vertical-align: middle;
+    background: repeating-linear-gradient(45deg, #ccc 0, #ccc 3px, transparent 0, transparent 50%) 0 / 8px 8px;
+    transition: background-color 0.15s;
+    flex-shrink: 0;
+}
+
+.mform-cs-preview--class {
+    font-size: 9px;
+    line-height: 20px;
+    text-align: center;
+    color: #333;
+    background: #e0e0e0 !important;
+    font-weight: bold;
+    letter-spacing: -0.5px;
+}
+
+/* CSS class with known preview color: show the color, add small corner dot as indicator */
+.mform-cs-preview--class-color {
+    position: relative;
+    overflow: hidden;
+}
+
+.mform-cs-preview--class-color::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 8px 8px;
+    border-color: transparent transparent rgba(255,255,255,0.75) transparent;
+}
+
+/* CSS class swatches that have a preview color: show color, add "." overlay */
+.mform-cs-swatch--class[data-preview-color] {
+    position: relative;
+    overflow: hidden;
+}
+
+.mform-cs-swatch--class[data-preview-color]::after {
+    content: '.';
+    position: absolute;
+    bottom: 1px;
+    right: 3px;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+
+.mform-cs-popup {
+    display: none;
+    position: absolute;
+    z-index: 1060;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 160px;
+    max-width: 300px;
+}
+
+.mform-cs-popup.mform-cs-popup--open {
+    display: flex;
+}
+
+.mform-cs-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+}
+
+.mform-cs-swatch:hover {
+    transform: scale(1.2);
+    border-color: rgba(0, 0, 0, 0.4);
+}
+
+.mform-cs-swatch.mform-cs-active {
+    border-color: #79af8a;
+    box-shadow: 0 0 0 2px rgba(121, 175, 138, 0.4);
+}
+
+.mform-cs-swatch--class {
+    background: #e0e0e0;
+    font-size: 8px;
+    font-weight: bold;
+    color: #444;
+    line-height: 24px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+
+/* Dark mode */
+body.rex-theme-dark .mform-cs-popup {
+    background: #1e2a35;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #ccd4dc;
+}
+
+body.rex-theme-dark .mform-cs-preview--class {
+    background: #2d3b48 !important;
+    color: #ccc;
+}
+
+body.rex-theme-dark .mform-cs-swatch--class {
+    background: #2d3b48;
+    color: #ccc;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mform-cs-popup {
+        background: #1e2a35;
+        border-color: rgba(255, 255, 255, 0.12);
+        color: #ccd4dc;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cs-preview--class {
+        background: #2d3b48 !important;
+        color: #ccc;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cs-swatch--class {
+        background: #2d3b48;
+        color: #ccc;
+    }
+}

@@ -18,6 +18,8 @@ function initMFormElements(mform) {
         initMFormRadioImgInlines(mform);
         // init checkbox groups
         initMFormCheckboxGroups(mform);
+        // init color swatches
+        initMFormColorSwatches(mform);
         // init conditional fieldsets
         initMFormConditionals(mform);
     }, 1)
@@ -399,3 +401,80 @@ function initMFormCheckboxGroups(mform) {
         });
     });
 }
+
+function updateColorSwatchPreview(cs, val, previewColor) {
+    var preview = cs.find('.mform-cs-preview');
+    var strVal = (val || '').trim();
+    preview.text('');
+    if (strVal === '') {
+        preview.css('background', 'repeating-linear-gradient(45deg, #ccc 0, #ccc 3px, transparent 0, transparent 50%) 0 / 8px 8px')
+            .removeClass('mform-cs-preview--class mform-cs-preview--class-color')
+            .attr('title', '');
+    } else if (strVal.charAt(0) === '.') {
+        var pc = previewColor || cs.find('.mform-cs-swatch[data-value="' + strVal + '"]').attr('data-preview-color') || '';
+        if (pc) {
+            preview.css('background', pc)
+                .addClass('mform-cs-preview--class-color')
+                .removeClass('mform-cs-preview--class')
+                .attr('title', strVal);
+        } else {
+            preview.css('background', '#e0e0e0')
+                .addClass('mform-cs-preview--class')
+                .removeClass('mform-cs-preview--class-color')
+                .text(strVal.substring(1, 3).toUpperCase())
+                .attr('title', strVal);
+        }
+    } else {
+        preview.css('background', strVal)
+            .removeClass('mform-cs-preview--class mform-cs-preview--class-color')
+            .attr('title', strVal);
+    }
+    // sync active state on swatches
+    cs.find('.mform-cs-swatch').removeClass('mform-cs-active');
+    if (strVal !== '') {
+        cs.find('.mform-cs-swatch[data-value="' + strVal + '"]').addClass('mform-cs-active');
+    }
+}
+
+function initMFormColorSwatches(mform) {
+    // init preview for already-filled inputs
+    mform.find('.mform-color-swatch').each(function () {
+        updateColorSwatchPreview($(this), $(this).find('.mform-cs-input').val());
+    });
+
+    // toggle popup
+    mform.off('click.mformCs').on('click.mformCs', '.mform-cs-btn', function (e) {
+        e.stopPropagation();
+        var cs = $(this).closest('.mform-color-swatch');
+        var popup = cs.find('.mform-cs-popup');
+        var isOpen = popup.hasClass('mform-cs-popup--open');
+        // close all other popups first
+        $('.mform-cs-popup').removeClass('mform-cs-popup--open');
+        if (!isOpen) {
+            popup.addClass('mform-cs-popup--open');
+        }
+    });
+
+    // swatch selection
+    mform.on('click.mformCs', '.mform-cs-swatch', function (e) {
+        e.stopPropagation();
+        var cs = $(this).closest('.mform-color-swatch');
+        var val = String($(this).data('value') || '');
+        var previewColor = $(this).attr('data-preview-color') || '';
+        cs.find('.mform-cs-input').val(val).trigger('change');
+        updateColorSwatchPreview(cs, val, previewColor);
+        cs.find('.mform-cs-popup').removeClass('mform-cs-popup--open');
+    });
+
+    // input typing → update preview
+    mform.on('input.mformCs change.mformCs', '.mform-cs-input', function () {
+        updateColorSwatchPreview($(this).closest('.mform-color-swatch'), $(this).val());
+    });
+}
+
+// close swatch popups on outside click
+$(document).off('click.mformCsGlobal').on('click.mformCsGlobal', function (e) {
+    if (!$(e.target).closest('.mform-color-swatch').length) {
+        $('.mform-cs-popup').removeClass('mform-cs-popup--open');
+    }
+});

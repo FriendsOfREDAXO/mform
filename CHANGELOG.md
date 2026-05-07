@@ -1,5 +1,24 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta3
+
+### Neu
+
+- **`addColorSwatchField()`** – Farbwähler mit Vorschau-Input und Swatches-Popup
+  - Speichert direkte Hex-Werte (`#2f77bc`) **oder** CSS-Klassennamen (`.bg-primary`)
+  - Swatches unterstützen optionalen `preview`-Schlüssel für CSS-Klassen-Einträge
+  - Vollständig im Flex-Repeater unterstützt
+  - Verfügbar in: Klassisches Modul ✓ · YForm ✓
+- **YForm Value-Type `color_swatch`** – ColorSwatch-Feld nativ in YForm-Formularen nutzbar
+  - Swatches als JSON im Feld-Parameter konfigurierbar
+  - Korrekte Listenansicht im YForm-Manager (Farbvorschau-Quadrat bei Hex-Werten)
+
+### Fixed
+
+- Verfügbarkeitstabelle in der Dokumentation korrigiert: `addToggleCheckboxField` und `addColorSwatchField` spiegeln jetzt die tatsächlich vorhandenen Implementierungen wider
+
+---
+
 ## Version 9.0.0-beta2
 
 ### Neu

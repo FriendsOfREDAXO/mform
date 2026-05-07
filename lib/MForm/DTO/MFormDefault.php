@@ -41,5 +41,6 @@ class MFormDefault
         'checkbox' => '',
         'radio' => '',
         'checkbox-group' => '',
+        'color-swatch' => '',
     ];
 }

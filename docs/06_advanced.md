@@ -7,10 +7,11 @@ Kniffe und Praxisbeispiele, wie MForm-Elemente an die jeweiligen Anforderungen a
 | Methode | Klassisches Modul | `rex_form` | YForm |
 |---|---|---|---|
 | `addConditionalFieldsetArea` | ja | – | – |
-| `addToggleCheckboxField` | ja | ja | ja |
+| `addToggleCheckboxField` | ja | – | – |
 | `addRadioImgField` | ja | – | – |
 | `addRadioIconField` | ja | – | – |
 | `addRadioColorField` | ja | – | – |
+| `addColorSwatchField` | ja | – | ja |
 
 ## Alle Methoden im Überblick
 
@@ -40,6 +41,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `addRadioImgField`
   - `addRadioIconField`
   - `addRadioColorField`
+  - `addColorSwatchField`
 - Informelle-Elemente
   - `addHtml`
   - `addHeadline`
@@ -433,6 +435,118 @@ echo MForm::factory()
     ->addRadioImgField(2, $options, ['label' => 'Darstellung'])
     ->show();
 ```
+
+## Beispiel: addRadioColorField – Farbwahl via Radio-Buttons
+
+`addRadioColorField()` stellt farbige Radio-Buttons dar. Jede Option wird als farbiges Quadrat gerendert. Der gespeicherte Wert ist der `key` der gewählten Option.
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addRadioColorField(1, [
+        'transparent' => ['color' => 'transparent', 'label' => 'Transparent'],
+        'white'       => ['color' => '#ffffff',     'label' => 'Weiß'],
+        'black'       => ['color' => '#111111',     'label' => 'Dunkel'],
+        'blue'        => ['color' => '#2f77bc',     'label' => 'Blau'],
+    ], ['label' => 'Hintergrundfarbe'], 'transparent')
+    ->show();
+```
+
+Gespeicherter Wert: `transparent`, `white`, `black` oder `blue` – also der Array-Key, **nicht** der Hex-Wert.
+
+---
+
+## Beispiel: addColorSwatchField – Farbwahl mit Vorschau-Input
+
+`addColorSwatchField()` ist eine modernere Alternative zu `addRadioColorField()`. Das Feld ist ein normales Text-Input mit:
+
+- kleinem Farbvorschau-Quadrat links
+- einem Farbpaletten-Button, der ein Popup mit vordefinierten Swatches öffnet
+- direkter Eingabe möglich (z. B. eigener Hex-Wert)
+
+Im Gegensatz zu `addRadioColorField()` wird **der tatsächliche Farbwert oder der CSS-Klassenname** gespeichert.
+
+**Nur Hex-Farben:**
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addColorSwatchField(1, [
+        '#ffffff' => 'Weiß',
+        '#111111' => 'Schwarz',
+        '#2f77bc' => 'Blau',
+        '#e74c3c' => 'Rot',
+    ], ['label' => 'Farbe'])
+    ->show();
+```
+
+Gespeicherter Wert: `#2f77bc` (direkter Farbwert).
+
+**CSS-Klassen mit optionaler Vorschaufarbe:**
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addColorSwatchField(1, [
+        '#ffffff'      => 'Weiß',
+        '#111111'      => 'Schwarz',
+        '.bg-primary'  => ['label' => 'Primär',    'preview' => '#2f77bc'],
+        '.bg-success'  => ['label' => 'Erfolg',    'preview' => '#27ae60'],
+        '.bg-danger'   => ['label' => 'Gefahr',    'preview' => '#e74c3c'],
+    ], ['label' => 'Hintergrundfarbe'])
+    ->show();
+```
+
+Gespeicherter Wert: `.bg-primary` (CSS-Klassenname).
+
+Der optionale `preview`-Schlüssel bestimmt die Farbe, die im Popup-Swatch und in der Input-Vorschau angezeigt wird. Ohne `preview` erscheint ein grauer Kasten mit Buchstabenkürzel.
+
+**Ausgabe im Template:**
+
+```php
+$color = rex_escape(REX_VALUE[1]);   // z. B. "#2f77bc" oder ".bg-primary"
+
+if (str_starts_with($color, '.')) {
+    // CSS-Klasse
+    echo '<div class="' . ltrim($color, '.') . '">...</div>';
+} elseif ($color !== '') {
+    // Hex-Wert
+    echo '<div style="background-color:' . $color . '">...</div>';
+}
+```
+
+**Im Flex-Repeater:**
+
+Das Feld funktioniert vollständig im Flex-Repeater:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+
+$rowForm = MForm::factory()
+    ->addTextField('title', ['label' => 'Titel'])
+    ->addColorSwatchField('color', [
+        '#ffffff'     => 'Weiß',
+        '#111111'     => 'Schwarz',
+        '.bg-primary' => ['label' => 'Primär', 'preview' => '#2f77bc'],
+    ], ['label' => 'Farbe']);
+
+echo MForm::factory()
+    ->addRepeaterElement(1, $rowForm)
+    ->show();
+```
+
+---
 
 ## Beispiel: Templates / Defaults per Key
 

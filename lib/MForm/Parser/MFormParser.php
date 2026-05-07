@@ -747,6 +747,80 @@ class MFormParser
     }
 
     /**
+     * @description Renders a color swatch picker – text input with preview square and predefined color/class popup.
+     */
+    private function generateColorSwatchElement(MFormItem $item): void
+    {
+        $this->executeDefaultManipulations($item);
+
+        $varIdParts = $item->getVarId();
+        $varIdStr = is_array($varIdParts)
+            ? '[' . implode('][', $varIdParts) . ']'
+            : (string) $varIdParts;
+
+        $uid = 'mform-cs-' . preg_replace('/[^a-z0-9]/i', '-', $varIdStr);
+        $currentValue = (string) $item->getValue();
+
+        $swatchHtml = '';
+        foreach ($item->getOptions() as $value => $label) {
+            $strVal = (string) $value;
+            $labelStr = is_array($label) ? (string) ($label['label'] ?? $strVal) : (string) $label;
+            $previewColor = is_array($label) ? (string) ($label['preview'] ?? '') : '';
+            if (str_starts_with($strVal, '.')) {
+                $styleAttr = '' !== $previewColor ? ' style="background-color:' . htmlspecialchars($previewColor, ENT_QUOTES) . '"' : '';
+                $dataPreview = '' !== $previewColor ? ' data-preview-color="' . htmlspecialchars($previewColor, ENT_QUOTES) . '"' : '';
+                $swatchHtml .= sprintf(
+                    '<button type="button" class="mform-cs-swatch mform-cs-swatch--class" data-value="%s"%s%s title="%s"></button>',
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    $styleAttr,
+                    $dataPreview,
+                    htmlspecialchars($labelStr, ENT_QUOTES)
+                );
+            } else {
+                $swatchHtml .= sprintf(
+                    '<button type="button" class="mform-cs-swatch" data-value="%s" style="background-color:%s" title="%s"></button>',
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    htmlspecialchars($labelStr, ENT_QUOTES)
+                );
+            }
+        }
+
+        $html = sprintf(
+            '<div class="mform-color-swatch" data-cs-id="%s">'
+            . '<div class="input-group">'
+            . '<span class="input-group-addon"><span class="mform-cs-preview"></span></span>'
+            . '<input type="text" class="form-control mform-cs-input" id="%s"'
+            . ' name="REX_INPUT_VALUE%s" value="%s">'
+            . '<span class="input-group-btn">'
+            . '<button type="button" class="btn btn-default mform-cs-btn" tabindex="-1">'
+            . '<i class="rex-icon fa-tint"></i>'
+            . '</button>'
+            . '</span>'
+            . '</div>'
+            . '<div class="mform-cs-popup">%s</div>'
+            . '</div>',
+            htmlspecialchars($uid, ENT_QUOTES),
+            htmlspecialchars($uid, ENT_QUOTES),
+            htmlspecialchars($varIdStr, ENT_QUOTES),
+            htmlspecialchars($currentValue, ENT_QUOTES),
+            $swatchHtml
+        );
+
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'))
+            ->setElement($html)
+            ->setNotice($item->getNotice())
+            ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        if (!empty($item->getAttributes()['form-group-class'])) {
+            $templateElement->setClass($item->getAttributes()['form-group-class']);
+        }
+
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+    }
+
+    /**
      * @description helper method to create radiobutton element
      */
     private function generateRadioElement(MFormItem $item): void
@@ -1409,6 +1483,9 @@ class MFormParser
                                 break;
                             case 'checkbox-group':
                                 $this->generateCheckboxGroupElement($item);
+                                break;
+                            case 'color-swatch':
+                                $this->generateColorSwatchElement($item);
                                 break;
                             case 'link':
                             case 'mform-link':

@@ -127,6 +127,9 @@ class MFormFlexRepeaterRenderer
             case 'checkbox-group':
                 return self::wrapFormGroup($label, self::renderCheckboxGroupWidget($item, $fieldKey), $item);
 
+            case 'color-swatch':
+                return self::wrapFormGroup($label, self::renderColorSwatchWidget($item, $fieldKey), $item);
+
             case 'link':
             case 'custom-link':
             case 'media':
@@ -305,6 +308,54 @@ class MFormFlexRepeaterRenderer
         $html .= '</div>';
 
         return $html;
+    }
+
+    private static function renderColorSwatchWidget(MFormItem $item, string $fieldKey): string
+    {
+        $uid = 'mfr-cs-' . preg_replace('/[^a-z0-9]/i', '-', $fieldKey) . '-' . substr(md5($fieldKey), 0, 6);
+
+        $swatchHtml = '';
+        foreach ($item->getOptions() as $value => $label) {
+            $strVal = (string) $value;
+            $labelStr = is_array($label) ? (string) ($label['label'] ?? $strVal) : (string) $label;
+            $previewColor = is_array($label) ? (string) ($label['preview'] ?? '') : '';
+            if (str_starts_with($strVal, '.')) {
+                $styleAttr = '' !== $previewColor ? ' style="background-color:' . htmlspecialchars($previewColor, ENT_QUOTES) . '"' : '';
+                $dataPreview = '' !== $previewColor ? ' data-preview-color="' . htmlspecialchars($previewColor, ENT_QUOTES) . '"' : '';
+                $swatchHtml .= sprintf(
+                    '<button type="button" class="mform-cs-swatch mform-cs-swatch--class" data-value="%s"%s%s title="%s"></button>',
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    $styleAttr,
+                    $dataPreview,
+                    htmlspecialchars($labelStr, ENT_QUOTES)
+                );
+            } else {
+                $swatchHtml .= sprintf(
+                    '<button type="button" class="mform-cs-swatch" data-value="%s" style="background-color:%s" title="%s"></button>',
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    htmlspecialchars($strVal, ENT_QUOTES),
+                    htmlspecialchars($labelStr, ENT_QUOTES)
+                );
+            }
+        }
+
+        return sprintf(
+            '<div class="mform-color-swatch" data-cs-id="%s">'
+            . '<div class="input-group">'
+            . '<span class="input-group-addon"><span class="mform-cs-preview"></span></span>'
+            . '<input type="text" class="form-control mform-cs-input" data-mfr-field="%s" value="">'
+            . '<span class="input-group-btn">'
+            . '<button type="button" class="btn btn-default mform-cs-btn" tabindex="-1">'
+            . '<i class="rex-icon fa-tint"></i>'
+            . '</button>'
+            . '</span>'
+            . '</div>'
+            . '<div class="mform-cs-popup">%s</div>'
+            . '</div>',
+            htmlspecialchars($uid, ENT_QUOTES),
+            htmlspecialchars($fieldKey, ENT_QUOTES),
+            $swatchHtml
+        );
     }
 
     private static function renderAttributes(array $attributes): string

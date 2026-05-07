@@ -42,6 +42,26 @@ Der Flex-Repeater deckt nun die bekannten Funktionen von MBlock vollständig ab.
 
 → [06_advanced.md](06_advanced.md)
 
+### ColorSwatch – Farbwähler mit Input und Popup
+
+`addColorSwatchField()` – moderner Farbwähler als Erweiterung eines Text-Inputs:
+
+- Kleines Farbvorschau-Quadrat links im Input
+- Farbpaletten-Button öffnet Popup mit vordefinierten Swatches
+- Direkteingabe weiterhin möglich
+- Unterstützt **Hex-Farbwerte** (`#2f77bc`) und **CSS-Klassennamen** (`.bg-primary`) als gespeicherten Wert
+- CSS-Klassen-Swatches können mit optionaler `preview`-Farbe dargestellt werden
+
+```php
+->addColorSwatchField('color', [
+    '#ffffff'     => 'Weiß',
+    '#111111'     => 'Schwarz',
+    '.bg-primary' => ['label' => 'Primär', 'preview' => '#2f77bc'],
+], ['label' => 'Farbe'])
+```
+
+→ [06_advanced.md](06_advanced.md)
+
 ### CheckboxGroup-Widget
 
 - `addCheckboxGroupField()` – visuelle Mehrfachauswahl als Pill-/Tag-Buttons
@@ -122,3 +142,4 @@ MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. F
 | [10_outside_modules.md](10_outside_modules.md) | MForm außerhalb von Modulen verwenden |
 | [11_tutorial_modul.md](11_tutorial_modul.md) | Komplettes Modul-Tutorial |
 | [12_checkbox_group.md](12_checkbox_group.md) | CheckboxGroup-Widget inkl. Radio-Mode |
+| [06_advanced.md](06_advanced.md) | ColorSwatch-Feld, RadioColorField, RadioImgField, ConditionalFieldset |
