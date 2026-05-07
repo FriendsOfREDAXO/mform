@@ -1,6 +1,76 @@
-# MForm - REDAXO Addon
+# MForm – REDAXO Addon
 
 ![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform8.png?raw=true)
+
+MForm macht den Aufbau von REDAXO-Modul-Eingaben angenehm. Statt rohem HTML-Formular-Markup wird alles in sauberem PHP definiert — vom einfachen Textfeld bis hin zum vollständig verschachtelten, copy-paste-fähigen Repeater mit bedingter Anzeige von Feldbereichen.
+
+Nicht nur für Module: MForm erweitert auch **YForm** und **rex_form** um zusätzliche Widgets wie das Custom-Link-Feld, Bildlisten oder den nagelneuen ColorSwatch-Picker.
+
+## Was MForm kann
+
+- Modul-Eingabeformulare per fluentem PHP-API (`MForm::factory()->addTextField(...)->...->show()`)
+- **Flex-Repeater** für dynamisch wiederholbare Formularzeilen — mit Verschachtelung, Copy/Paste und Aktiv/Inaktiv pro Item
+- Wiederverwendbare Formularlogik via **Template-API** (`registerTemplate`, `fromTemplate`, `applyTemplate`)
+- Hilfsklassen für die Repeater-Ausgabe: `MFormRepeaterHelper::decode()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()`
+- YForm Value-Types: `custom_link`, `custom_link_multi`, `color_swatch`
+- Wachsende Bibliothek **installierbarer Demo-Module** direkt aus dem REDAXO-Backend
+
+## Schnellbeispiel
+
+```php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addTabElement('Inhalt', MForm::factory()
+        ->addTextField(1, ['label' => 'Headline'])
+        ->addColorSwatchField(2, [
+            '#ffffff' => 'Weiß',
+            '#111111' => 'Schwarz',
+            '.bg-primary' => ['label' => 'Primär', 'preview' => '#0d6efd'],
+        ], ['label' => 'Hintergrund'])
+    )
+    ->addTabElement('Items', MForm::factory()
+        ->addRepeaterElement(3, MForm::factory()
+            ->addTextField('title', ['label' => 'Titel'])
+            ->addMediaField('image', ['label' => 'Bild'])
+        , true, true, ['min' => 1, 'max' => 10, 'copy_paste' => true])
+    )
+    ->show();
+```
+
+## Dokumentation & Tutorial
+
+Die vollständige Dokumentation ist direkt im REDAXO-Backend unter **MForm → Docs** verfügbar.
+
+Für eine Schritt-für-Schritt-Einführung gibt es den **[FOR-Tutorial-Bereich](https://friendsofredaxo.github.io/tricks/)** mit MForm-spezifischen Beiträgen.
+
+Wer von MBlock migriert, findet den Einstieg in [docs/08_mblock_migration.md](docs/08_mblock_migration.md).
+
+## Installation
+
+Direkt über den REDAXO-Installer installierbar — nach `mform` suchen, herunterladen und aktivieren.
+
+## Lizenz
+
+[MIT Lizenz](LICENSE.md)
+
+## Credits
+
+**Project Leads**
+
+- [Joachim Dörr](https://github.com/joachimdoerr)
+- [Thomas Skerbis](https://github.com/skerbis)
+
+**Flex-Repeater**
+
+[Thorben eaCe](https://github.com/eaCe)
+
+**Docs & Testing**
+
+[alexplusde](https://github.com/alexplusde)
+
+**Ein Projekt von [Friends Of REDAXO](https://github.com/FriendsOfREDAXO)**
+
 
 MForm erleichtert die Erstellung von REDAXO-Modul-Eingaben. Mit MForm kann man nicht nur Formulare erstellen, sondern diese dank flexibler Templates auch optisch genau nach eigenen Wünschen gestalten. Man kann alle REDAXO-Standard-Formularelemente erstellen und erhält einige Extra-Widgets, die sich leicht in Module einfügen lassen.
 
