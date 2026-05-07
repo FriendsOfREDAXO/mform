@@ -4,6 +4,13 @@
 
 ### Neu
 
+- **`addModalElement()`** – Bootstrap-Modal als Sub-Formular direkt im Modul-Input
+  - Trigger-Button und Modal-Titel konfigurierbar über `$label`
+  - Sub-Formular als MForm-Instanz, Callable oder HTML-String (`$form`)
+  - Button-Klasse (`$btnClass`, Standard `btn-default`) und Ausrichtung (`$align`: `'left'`, `'center'`, `'right'`) frei wählbar
+  - Felder werden beim Speichern des Moduls normal übernommen – kein AJAX erforderlich
+  - Vollständig im Flex-Repeater unterstützt (eindeutige IDs per Row via `__MFRID__`-Placeholder)
+  - Einfache Felder (Text, Select, Checkbox) auch innerhalb des Modals verwendbar; TinyMCE/MarkdownEditor nicht empfohlen
 - **`addColorSwatchField()`** – Farbwähler mit Vorschau-Input und Swatches-Popup
   - Speichert direkte Hex-Werte (`#2f77bc`) **oder** CSS-Klassennamen (`.bg-primary`)
   - Swatches unterstützen optionalen `preview`-Schlüssel für CSS-Klassen-Einträge

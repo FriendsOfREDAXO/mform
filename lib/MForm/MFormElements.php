@@ -197,6 +197,27 @@ abstract class MFormElements
         return $this->addCollapseElement($label, $form, $openCollapse, $hideToggleLinks, $attributes, true);
     }
 
+    /**
+     * Opens a Bootstrap modal dialog containing a sub-form. All fields inside the modal are
+     * saved together with the outer form on submission.
+     *
+     * @param string                        $label      Button label and modal title
+     * @param callable|MForm|string|null    $form       Sub-form (MForm instance, callable or HTML string)
+     * @param string                        $btnClass   Additional CSS class(es) for the trigger button (default: btn-default)
+     * @param array                         $attributes Additional HTML attributes for the trigger button
+     * @param bool                          $parse      Whether to parse the sub-form immediately
+     * @param bool                          $showWrapper
+     */
+    public function addModalElement(string $label = '', callable|MForm|string|null $form = null, string $btnClass = 'btn-default', string $align = 'left', array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
+    {
+        $attributes['data-modal-btn-class'] = $btnClass;
+        $attributes['data-modal-align'] = $align;
+        return $this->addElement('modal', null, null, $attributes)
+            ->setLabel($label)
+            ->addForm($form, $parse, false, $showWrapper)
+            ->addElement('close-modal', null, null, $attributes);
+    }
+
     public function addConditionalFieldsetArea(
         float|int|string $sourceField,
         string $operator = '=',

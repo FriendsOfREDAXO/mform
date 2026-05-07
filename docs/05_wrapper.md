@@ -12,6 +12,7 @@ Diese Moduleingabe-Beispiele zeigen, wie man mittels der MForm Wrapper-Elemente 
 | `addTabElement` | ja | ja | – |
 | `addColumnElement` | ja | ja | – |
 | `addInlineElement` | ja | ja | – |
+| `addModalElement` | ja | ja | – |
 
 ## Accordion
 
@@ -208,6 +209,76 @@ $mform = MForm::factory()
 // parse mform
 echo $mform->show();
 ```
+
+## Modal
+
+Öffnet ein Bootstrap-Modal mit einem Sub-Formular. Ein Button wird direkt im Formular eingebettet; alle Felder im Modal-Inhalt werden beim Speichern des Moduls normal übernommen – kein separater AJAX-Request erforderlich.
+
+**Parameter:**
+
+| Parameter | Typ | Standard | Beschreibung |
+|---|---|---|---|
+| `$label` | `string` | `''` | Beschriftung des Trigger-Buttons und Modal-Titels |
+| `$form` | `MForm, callable, string, null` | `null` | Sub-Formular als MForm-Instanz, Callable oder HTML-String |
+| `$btnClass` | `string` | `'btn-default'` | CSS-Klassen für den Button (wird automatisch mit `btn` ergänzt) |
+| `$align` | `string` | `'left'` | Button-Ausrichtung: `'left'`, `'center'` oder `'right'` |
+| `$attributes` | `array` | `[]` | Zusätzliche HTML-Attribute für den Button-Wrapper |
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addTextField(1, ['label' => 'Überschrift'])
+    ->addTextAreaField(2, ['label' => 'Text'])
+
+    // Modal für Block-Einstellungen, Button zentriert
+    ->addModalElement('Block-Einstellungen', MForm::factory()
+        ->addSelectField(10, [
+            '' => '– Standard –',
+            'bg-light' => 'Hellgrau',
+            'bg-dark text-white' => 'Dunkel',
+        ], ['label' => 'Hintergrundfarbe'])
+        ->addSelectField(11, [
+            'py-2' => 'Klein',
+            'py-4' => 'Mittel',
+        ], ['label' => 'Abstand'])
+    , 'btn-default', 'center')
+
+    // Hilfe-Dialog rechts, btn-info
+    ->addModalElement('Hilfe', MForm::factory()
+        ->addAlertInfo('Hinweistexte können hier strukturiert dargestellt werden.')
+    , 'btn-info', 'right')
+;
+echo $mform->show();
+```
+
+### Modal im Repeater
+
+Das Modal funktioniert auch innerhalb eines Repeaters – Einstellungen je Zeile:
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$rowForm = MForm::factory()
+    ->addTextField('title', ['label' => 'Titel'])
+    ->addTextAreaField('text', ['label' => 'Text'])
+    ->addModalElement('Zeilen-Einstellungen', MForm::factory()
+        ->addSelectField('bg', [
+            '' => '– Standard –',
+            'bg-light' => 'Hellgrau',
+            'bg-dark text-white' => 'Dunkel',
+        ], ['label' => 'Hintergrund'])
+        ->addCheckboxField('fullwidth', [1 => 'Volle Breite'], ['label' => 'Layout'])
+    , 'btn-default', 'center');  // Button-Ausrichtung: 'left' | 'center' | 'right'
+
+$mform = MForm::factory()
+    ->addFlexRepeaterElement(1, $rowForm, ['label' => 'Zeilen', 'btn_text' => 'Zeile hinzufügen']);
+echo $mform->show();
+```
+
+> **Hinweis – Repeater im Modal:** Ein einfacher Repeater (Text, Select, Checkbox) kann innerhalb eines Modals verwendet werden. Felder mit JavaScript-Initialisierung beim DOM-ready – insbesondere **TinyMCE** und **MarkdownEditor** – funktionieren im Modal jedoch nicht zuverlässig, da sie sich vor dem ersten Öffnen initialisieren und das Modal zu diesem Zeitpunkt noch nicht sichtbar ist. Solche Felder gehören daher nicht in ein Modal.
 
 ## showWrapper / setShowWrapper
 

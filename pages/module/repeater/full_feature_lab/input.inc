@@ -41,6 +41,31 @@ $rowForm = MForm::factory()
     ->addTextAreaField('markdown', ['label' => 'Markdown (MarkdownEditor)', 'class' => 'markdowneditor-editor', 'data-markdowneditor-profile' => 'default'])
     ->addLinklistField('cta_links', ['category' => 1], null, ['label' => 'CTA Links (Linklist)'])
     ->addMedialistField('downloads', ['types' => 'pdf,zip,jpg,png'], null, ['label' => 'Downloads (Medialist)'])
+    ->addModalElement('Zeilen-Einstellungen', MForm::factory()
+        ->addSelectField('row_bg', [
+            '' => '– Standard –',
+            'bg-light' => 'Hellgrau',
+            'bg-dark text-white' => 'Dunkel',
+            'bg-primary text-white' => 'Primärfarbe',
+        ], ['label' => 'Hintergrundfarbe'])
+        ->addSelectField('row_padding', [
+            '' => '– Standard –',
+            'py-2' => 'Klein',
+            'py-4' => 'Mittel',
+            'py-6' => 'Groß',
+        ], ['label' => 'Abstand'])
+        ->addCheckboxField('row_fullwidth', [1 => 'Volle Breite (fullwidth)'], ['label' => 'Layout'])
+        ->addRepeaterElement('row_badges', MForm::factory()
+            ->addTextField('badge_label', ['label' => 'Text'])
+            ->addSelectField('badge_color', [
+                'primary' => 'Blau',
+                'success' => 'Grün',
+                'danger'  => 'Rot',
+                'warning' => 'Orange',
+            ], ['label' => 'Farbe'])
+        , true, false, ['label' => 'Badges (Repeater im Modal)', 'btn_text' => 'Badge hinzufügen', 'min' => 0, 'max' => 5])
+        ->addAlertInfo('Diese Einstellungen betreffen nur diese Zeile und werden beim Speichern des Moduls übernommen.')
+    , 'btn-default', 'center')
 ;
 
 $mform = MForm::factory()

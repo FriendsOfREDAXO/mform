@@ -42,6 +42,26 @@ Der Flex-Repeater deckt nun die bekannten Funktionen von MBlock vollständig ab.
 
 → [06_advanced.md](06_advanced.md)
 
+### Modal – Sub-Formular im Bootstrap-Modal
+
+`addModalElement()` – öffnet ein Bootstrap-Modal mit einem eigenen Sub-Formular. Ideal für Zeilen-Einstellungen in Repeatern oder optionale Hilfe-Dialoge:
+
+- Trigger-Button direkt im Formular, keine eigene Seite/Popup nötig
+- Button-Ausrichtung: `'left'`, `'center'`, `'right'`
+- Beliebige Felder im Modal (Text, Select, Checkbox, Repeater – kein TinyMCE)
+- Vollständig im Flex-Repeater unterstützt
+
+```php
+->addModalElement('Einstellungen', MForm::factory()
+    ->addSelectField('bg', ['' => 'Standard', 'bg-dark' => 'Dunkel'], ['label' => 'Hintergrund'])
+    ->addCheckboxField('fullwidth', [1 => 'Volle Breite'], ['label' => 'Layout'])
+, 'btn-default', 'center')
+```
+
+→ [05_wrapper.md](05_wrapper.md)
+
+---
+
 ### ColorSwatch – Farbwähler mit Input und Popup
 
 `addColorSwatchField()` – moderner Farbwähler als Erweiterung eines Text-Inputs:
@@ -134,7 +154,7 @@ MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. F
 | [02_redaxo.md](02_redaxo.md) | Media- & Link-Elemente, REX_VALUE-Keys |
 | [03_customlink.md](03_customlink.md) | Custom-Link-Widget, Mehrfach-Links, Ausgabe-API |
 | [04_imagelist.md](04_imagelist.md) | Bildlisten-Feld |
-| [05_wrapper.md](05_wrapper.md) | Fieldset, Tabs, Accordion, Columns |
+| [05_wrapper.md](05_wrapper.md) | Fieldset, Tabs, Accordion, Columns, Modal |
 | [06_advanced.md](06_advanced.md) | Neue Feldtypen, ConditionalFieldset, RadioImg |
 | [07_repeater.md](07_repeater.md) | Repeater, FlexRepeater, Frontend-Hilfsmethoden |
 | [08_mblock_migration.md](08_mblock_migration.md) | Migration von MBlock-Modulen |

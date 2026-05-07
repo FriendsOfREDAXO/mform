@@ -73,4 +73,40 @@ switch ($this->getVar('type')) {
     case 'close-group-tab':
         echo '</div></div>';
         break;
+
+    // MODAL
+    case 'modal':
+        $modalId = $this->getVar('id');
+        $label = $this->getVar('label');
+        $btnClass = 'btn ' . ($this->getVar('class') ?: 'btn-default');
+        // extract alignment from rendered attributes string (data-modal-align="left|center|right")
+        $modalAlignRaw = '';
+        if (preg_match('/data-modal-align="([^"]*?)"/', (string) $this->getVar('attributes'), $_alignM)) {
+            $modalAlignRaw = $_alignM[1];
+        }
+        $modalAlignClass = match ($modalAlignRaw) {
+            'center' => 'text-center',
+            'right'  => 'text-right',
+            default  => 'text-left',
+        };
+        echo '<div class="form-group mfr-modal-wrapper"><div class="col-sm-12 ' . $modalAlignClass . '">';
+        echo '<button type="button" class="' . rex_escape($btnClass) . '" data-toggle="modal" data-target="#' . rex_escape($modalId) . '">';
+        echo '<i class="fa fa-cog"></i> ' . rex_escape($label);
+        echo '</button>';
+        echo '</div></div>';
+        echo '<div class="modal fade" id="' . rex_escape($modalId) . '" tabindex="-1" role="dialog">';
+        echo '<div class="modal-dialog" role="document"><div class="modal-content">';
+        echo '<div class="modal-header">';
+        echo '<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>';
+        echo '<h4 class="modal-title">' . rex_escape($label) . '</h4>';
+        echo '</div>';
+        echo '<div class="modal-body" style="padding: 15px 30px"><div class="mform form-horizontal">';
+        break;
+    case 'close-modal':
+        echo '</div></div>'; // close .mform form-horizontal + modal-body
+        echo '<div class="modal-footer">';
+        echo '<button type="button" class="btn btn-primary" data-dismiss="modal">' . rex_i18n::msg('mform_modal_apply') . '</button>';
+        echo '</div>';
+        echo '</div></div></div>'; // modal-content, modal-dialog, modal
+        break;
 }

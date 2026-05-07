@@ -828,6 +828,22 @@
 
             itemEl.dataset.mfrIndex = String(index);
 
+            // Replace __MFRID__ placeholders so each cloned row gets unique modal IDs.
+            // Each modal block has exactly 2 occurrences of __MFRID__ (data-target + id).
+            // Odd occurrences generate a new uid; even occurrences reuse the last one → pairs share the same ID.
+            if (itemEl.innerHTML.indexOf('__MFRID__') !== -1) {
+                let lastModalId = null;
+                itemEl.innerHTML = itemEl.innerHTML.replace(/__MFRID__/g, function () {
+                    if (lastModalId === null) {
+                        lastModalId = uid('mfr-modal');
+                        return lastModalId;
+                    }
+                    const id = lastModalId;
+                    lastModalId = null;
+                    return id;
+                });
+            }
+
             // Felder befüllen (Textareas vor TinyMCE-Init)
             this._fillFields(itemEl, data);
 

@@ -57,6 +57,36 @@ class MFormFlexRepeaterRenderer
                 continue;
             }
 
+            // MODAL: collect all items until close-modal and render as block
+            if ('modal' === $type) {
+                $modalLabel = self::getLabelString($item->getLabel());
+                $attrs = $item->getAttributes();
+                $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
+                $align = isset($attrs['data-modal-align']) ? $attrs['data-modal-align'] : 'left';
+                $innerHtml = '';
+                $i++;
+                while ($i < count($items)) {
+                    $inner = $items[$i];
+                    if ($inner instanceof MFormItem && 'close-modal' === $inner->getType()) {
+                        $i++;
+                        break;
+                    }
+                    if ($inner instanceof MForm) {
+                        $innerHtml .= self::renderTemplate($inner, $level);
+                    } elseif ($inner instanceof MFormItem) {
+                        $innerHtml .= self::renderField($inner);
+                    }
+                    $i++;
+                }
+                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml);
+                continue;
+            }
+
+            if ('close-modal' === $type) {
+                $i++;
+                continue;
+            }
+
             $html .= self::renderField($item);
             $i++;
         }
@@ -160,9 +190,41 @@ class MFormFlexRepeaterRenderer
             case 'html':
                 return is_string($item->getValue()) ? $item->getValue() : '';
 
+            case 'alert':
+                $val = is_string($item->getValue()) ? $item->getValue() : '';
+                $attrClass = $item->getAttributes()['class'] ?? ($item->getClass() ?: 'alert-info');
+                return sprintf('<div class="alert %s" style="margin-bottom:4px">%s</div>', htmlspecialchars($attrClass, ENT_QUOTES), $val);
+
             default:
                 return '';
         }
+    }
+
+    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml): string
+    {
+        $alignClass = match ($align) {
+            'center' => 'text-center',
+            'right'  => 'text-right',
+            default  => 'text-left',
+        };
+        // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
+        return '<div class="form-group mfr-modal-wrapper">'.
+            '<div class="col-sm-12 ' . $alignClass . '">'.
+            '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"'.
+            ' data-toggle="modal" data-target="#__MFRID__">'.
+            '<i class="fa fa-cog"></i> ' . htmlspecialchars($label, ENT_QUOTES) . '</button>'.
+            '</div></div>'.
+            '<div class="modal fade mfr-modal" id="__MFRID__" tabindex="-1" role="dialog">'.
+            '<div class="modal-dialog" role="document"><div class="modal-content">'.
+            '<div class="modal-header">'.
+            '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>'.
+            '<h4 class="modal-title">' . htmlspecialchars($label, ENT_QUOTES) . '</h4>'.
+            '</div>'.
+            '<div class="modal-body" style="padding: 15px 30px"><div class="mform form-horizontal">' . $innerHtml . '</div></div>'.
+            '<div class="modal-footer">'.
+            '<button type="button" class="btn btn-primary" data-dismiss="modal">Übernehmen</button>'.
+            '</div>'.
+            '</div></div></div>';
     }
 
     private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm): string

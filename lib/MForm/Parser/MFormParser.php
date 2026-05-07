@@ -227,7 +227,20 @@ class MFormParser
         $attributes = $item->getAttributes();
         $removeAttributes = [];
 
-        if (!empty($item->getLabel())) {
+        // MODAL MANIPULATIONS – raw label text needed, no <label> wrapper
+        if ('modal' == $item->getType()) {
+            $labelRaw = $item->getLabel();
+            if (!empty($labelRaw)) {
+                $labelStr = is_array($labelRaw) ? (string) (array_values($labelRaw)[0] ?? '') : (string) $labelRaw;
+                $element->setLabel($labelStr);
+            }
+            $removeAttributes = ['data-modal-btn-class'];
+            $element->setId('mform-modal-' . uniqid('', false));
+            // pass btn class via element class so the fragment can use it
+            if (isset($attributes['data-modal-btn-class'])) {
+                $element->setClass($attributes['data-modal-btn-class']);
+            }
+        } elseif (!empty($item->getLabel())) {
             $element->setLabel($this->parseElement($this->createLabelElement($item->setId('uid_' . uniqid())), 'base'));
         }
 
@@ -1419,6 +1432,7 @@ class MFormParser
                             case 'collapse':
                             case 'inline':
                             case 'column':
+                            case 'modal':
                             case 'start-group-tab':
                             case 'start-group-collapse':
                             case 'start-group-inline':
@@ -1431,6 +1445,7 @@ class MFormParser
                             case 'close-collapse':
                             case 'close-inline':
                             case 'close-column':
+                            case 'close-modal':
                             case 'close-group-tab':
                             case 'close-group-collapse':
                             case 'close-group-inline':
