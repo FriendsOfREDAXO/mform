@@ -401,6 +401,28 @@ abstract class MFormElements
         return $this;
     }
 
+    /**
+     * Renders a styled checkbox group – multiple checkboxes in a visually consistent widget.
+     * Selected values are stored as a comma-separated string in a single hidden input.
+     *
+     * @example
+     * $mform->addCheckboxGroupField("$id.0.tags", [
+     *     'news'  => 'Neuigkeiten',
+     *     'blog'  => 'Blog',
+     *     'event' => 'Events',
+     * ], ['label' => 'Kategorien']);
+     *
+     * Output: $item['tags'] → 'news,event'  (comma-separated string of checked values)
+     * Usage:  $selected = array_filter(explode(',', $item['tags'] ?? ''));
+     *         if (in_array('news', $selected)) { ... }
+     */
+    public function addCheckboxGroupField(float|int|string $id, ?array $options = null, ?array $attributes = null): MForm
+    {
+        $attributes = $attributes ?? [];
+        $attributes['form-group-class'] = 'mform-checkbox-group-wrapper';
+        return $this->addElement('checkbox-group', $id, null, $attributes, $options);
+    }
+
     /** TODO
      * public function addToggleRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): MForm
      * {

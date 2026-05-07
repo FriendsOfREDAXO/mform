@@ -11,6 +11,22 @@ $layoutOptions = [
 $rowForm = MForm::factory()
     ->addTextField('title', ['label' => 'Titel'])
     ->addSelectField('style', ['neutral' => 'Neutral', 'primary' => 'Primary', 'warning' => 'Warning'], ['label' => 'Stil'])
+    ->addCheckboxGroupField('tags', [
+        'news' => 'News',
+        'blog' => 'Blog',
+        'event' => 'Events',
+        'tutorial' => 'Tutorial',
+    ], ['label' => 'Tags horizontal (Standard)'])
+    ->addCheckboxGroupField('types', [
+        'article' => 'Artikel',
+        'page' => 'Seite',
+        'media' => 'Medium',
+    ], ['label' => 'Typen vertikal', 'layout' => 'vertical'])
+    ->addCheckboxGroupField('priority', [
+        'low' => 'Niedrig',
+        'medium' => 'Mittel',
+        'high' => 'Hoch',
+    ], ['label' => 'Priorität (Radio-Mode)', 'mode' => 'radio'])
     ->addTextAreaField('text', ['label' => 'Text (TinyMCE)', 'class' => 'tiny-editor', 'data-profile' => 'default'])
     ->addLinklistField('cta_links', ['category' => 1], null, ['label' => 'CTA Links (Linklist)'])
     ->addMedialistField('downloads', ['types' => 'pdf,zip,jpg,png'], null, ['label' => 'Downloads (Medialist)'])
@@ -30,6 +46,13 @@ $mform = MForm::factory()
             'black' => ['color' => '#111111', 'label' => 'Dunkel'],
             'blue' => ['color' => '#2f77bc', 'label' => 'Blau'],
         ], ['label' => 'Hintergrundfarbe'], 'transparent')
+        ->addCheckboxGroupField(14, [
+            'news' => 'News',
+            'blog' => 'Blog',
+            'event' => 'Events',
+            'tutorial' => 'Tutorial',
+            'video' => 'Video',
+        ], ['label' => 'Kategorien (CheckboxGroup)'], 'news,blog')
     )
     ->addTabElement('Widgets', MForm::factory()
         ->addCustomLinkField(6, ['label' => 'Hauptlink', 'data-intern' => 'enable', 'data-extern' => 'enable', 'data-media' => 'enable', 'data-mailto' => 'enable', 'data-tel' => 'enable'])

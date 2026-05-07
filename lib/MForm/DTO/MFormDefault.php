@@ -40,5 +40,6 @@ class MFormDefault
         'textarea-readonly' => 'form-control',
         'checkbox' => '',
         'radio' => '',
+        'checkbox-group' => '',
     ];
 }

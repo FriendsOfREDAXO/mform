@@ -691,6 +691,62 @@ class MFormParser
     }
 
     /**
+     * @description Renders a styled multi-checkbox group.
+     * Stores selected values as comma-separated string in a hidden input.
+     */
+    private function generateCheckboxGroupElement(MFormItem $item): void
+    {
+        $this->executeDefaultManipulations($item);
+
+        // Collect varId as bracket notation for the hidden input name
+        $varIdParts = $item->getVarId();
+        $varIdStr = is_array($varIdParts)
+            ? '[' . implode('][', $varIdParts) . ']'
+            : (string) $varIdParts;
+
+        $currentValue = (string) $item->getValue();
+        $selectedValues = '' !== $currentValue
+            ? array_flip(array_filter(explode(',', $currentValue)))
+            : [];
+
+        $uid = 'mform-cbg-' . preg_replace('/[^a-z0-9]/i', '-', $varIdStr);
+
+        $attrs = $item->getAttributes();
+        $layout = isset($attrs['layout']) && $attrs['layout'] === 'vertical' ? ' mform-cbg--vertical' : '';
+        $modeAttr = isset($attrs['mode']) && $attrs['mode'] === 'radio' ? ' data-mode="radio"' : '';
+
+        $html = '<div class="mform-checkbox-group' . $layout . '"' . $modeAttr . ' data-cbg-id="' . htmlspecialchars($uid, ENT_QUOTES) . '">';
+        $html .= '<input type="hidden"'
+            . ' id="' . htmlspecialchars($uid, ENT_QUOTES) . '"'
+            . ' name="REX_INPUT_VALUE' . htmlspecialchars($varIdStr, ENT_QUOTES) . '"'
+            . ' value="' . htmlspecialchars($currentValue, ENT_QUOTES) . '"'
+            . ' class="mform-cbg-value">';
+
+        foreach ($item->getOptions() as $key => $label) {
+            $strKey = (string) $key;
+            $isChecked = isset($selectedValues[$strKey]);
+            $activeClass = $isChecked ? ' active' : '';
+            $html .= '<label class="mform-cbg-option' . $activeClass . '" data-value="' . htmlspecialchars($strKey, ENT_QUOTES) . '">';
+            $html .= '<span class="mform-cbg-indicator"></span>';
+            $html .= htmlspecialchars((string) $label, ENT_QUOTES);
+            $html .= '</label>';
+        }
+        $html .= '</div>';
+
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'))
+            ->setElement($html)
+            ->setNotice($item->getNotice())
+            ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        if (!empty($item->getAttributes()['form-group-class'])) {
+            $templateElement->setClass($item->getAttributes()['form-group-class']);
+        }
+
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+    }
+
+    /**
      * @description helper method to create radiobutton element
      */
     private function generateRadioElement(MFormItem $item): void
@@ -1350,6 +1406,9 @@ class MFormParser
                             case 'checkbox':
                             case 'multicheckbox':
                                 $this->generateCheckboxElement($item);
+                                break;
+                            case 'checkbox-group':
+                                $this->generateCheckboxGroupElement($item);
                                 break;
                             case 'link':
                             case 'mform-link':

@@ -675,6 +675,131 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     margin-top: -7px;
 }
 
+/* -------------------------------------------------------
+ * Checkbox Group Widget (.mform-checkbox-group)
+ * ------------------------------------------------------- */
+
+.mform-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.mform-checkbox-group.mform-cbg--vertical {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 4px;
+}
+
+.mform-cbg-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 2px solid rgba(94, 94, 94, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: normal;
+    user-select: none;
+    transition: border-color 0.15s, background-color 0.15s, color 0.15s;
+    opacity: 0.75;
+    margin: 0;
+}
+
+.mform-cbg-option:hover {
+    border-color: rgba(94, 94, 94, 0.55);
+    opacity: 0.9;
+}
+
+.mform-cbg-option.active {
+    border-color: #79af8a;
+    background-color: rgba(121, 175, 138, 0.12);
+    color: inherit;
+    opacity: 1;
+}
+
+.mform-cbg-indicator {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(94, 94, 94, 0.45);
+    border-radius: 3px;
+    background: transparent;
+    flex-shrink: 0;
+    position: relative;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+.mform-cbg-option.active .mform-cbg-indicator {
+    border-color: #79af8a;
+    background-color: #79af8a;
+}
+
+.mform-cbg-option.active .mform-cbg-indicator::after {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: -1px;
+    width: 6px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg);
+}
+
+/* Radio mode: round indicator */
+.mform-checkbox-group[data-mode="radio"] .mform-cbg-indicator {
+    border-radius: 50%;
+}
+
+.mform-checkbox-group[data-mode="radio"] .mform-cbg-option.active .mform-cbg-indicator::after {
+    left: 3px;
+    top: 3px;
+    width: 4px;
+    height: 4px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    transform: none;
+}
+
+/* Dark mode */
+body.rex-theme-dark .mform-cbg-option {
+    border-color: rgba(180, 180, 180, 0.25);
+    color: rgba(220, 220, 220, 0.85);
+}
+
+body.rex-theme-dark .mform-cbg-option:hover {
+    border-color: rgba(180, 180, 180, 0.45);
+}
+
+body.rex-theme-dark .mform-cbg-option.active {
+    border-color: #79af8a;
+    background-color: rgba(121, 175, 138, 0.18);
+    color: #fff;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mform-cbg-option {
+        border-color: rgba(180, 180, 180, 0.25);
+        color: rgba(220, 220, 220, 0.85);
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cbg-option:hover {
+        border-color: rgba(180, 180, 180, 0.45);
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform-cbg-option.active {
+        border-color: #79af8a;
+        background-color: rgba(121, 175, 138, 0.18);
+        color: #fff;
+    }
+}
+
+
+
 .collapse-group > .collapse > .form-group {
     margin-bottom: 15px !important;
 }

@@ -16,6 +16,8 @@ function initMFormElements(mform) {
         initMFormSelectPicker(mform);
         // init radio img inlines
         initMFormRadioImgInlines(mform);
+        // init checkbox groups
+        initMFormCheckboxGroups(mform);
         // init conditional fieldsets
         initMFormConditionals(mform);
     }, 1)
@@ -360,6 +362,40 @@ function initMFormRadioImgInlines(mform) {
             if ($(this).prop('checked')) {
                 $(this).parent().addClass('active');
             }
+        });
+    });
+}
+
+function initMFormCheckboxGroups(mform) {
+    mform.find('.mform-checkbox-group').each(function () {
+        var group = $(this);
+        var hiddenInput = group.find('.mform-cbg-value');
+        var isRadio = group.data('mode') === 'radio';
+
+        // Sync visual active state from current hidden input value (needed after MBlock restores data)
+        var currentVal = hiddenInput.val() || '';
+        var currentSelected = currentVal.length
+            ? currentVal.split(',').map(function (v) { return v.trim(); }).filter(Boolean)
+            : [];
+        group.find('.mform-cbg-option').each(function () {
+            var val = String($(this).data('value') || '');
+            $(this).toggleClass('active', currentSelected.indexOf(val) !== -1);
+        });
+
+        group.off('click.mformCbg').on('click.mformCbg', '.mform-cbg-option', function () {
+            if (isRadio) {
+                var wasActive = $(this).hasClass('active');
+                group.find('.mform-cbg-option').removeClass('active');
+                if (!wasActive) {
+                    $(this).addClass('active');
+                }
+            } else {
+                $(this).toggleClass('active');
+            }
+            var selected = group.find('.mform-cbg-option.active').map(function () {
+                return $(this).data('value');
+            }).get();
+            hiddenInput.val(selected.join(','));
         });
     });
 }

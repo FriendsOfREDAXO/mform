@@ -124,6 +124,9 @@ class MFormFlexRepeaterRenderer
             case 'multicheckbox':
                 return self::wrapFormGroup($label, self::renderCheckboxGroup($item, $fieldKey), $item);
 
+            case 'checkbox-group':
+                return self::wrapFormGroup($label, self::renderCheckboxGroupWidget($item, $fieldKey), $item);
+
             case 'link':
             case 'custom-link':
             case 'media':
@@ -270,6 +273,37 @@ class MFormFlexRepeaterRenderer
         foreach ($options as $key => $value) {
             $html .= sprintf('<label class="checkbox-inline"><input type="checkbox" data-mfr-field="%s" value="%s"> %s</label>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
         }
+        return $html;
+    }
+
+    private static function renderCheckboxGroupWidget(MFormItem $item, string $fieldKey): string
+    {
+        $attrs = $item->getAttributes();
+        $layout = isset($attrs['layout']) && $attrs['layout'] === 'vertical' ? ' mform-cbg--vertical' : '';
+        $modeAttr = isset($attrs['mode']) && $attrs['mode'] === 'radio' ? ' data-mode="radio"' : '';
+        $uid = 'mfr-cbg-' . preg_replace('/[^a-z0-9]/i', '-', $fieldKey) . '-' . substr(md5($fieldKey), 0, 6);
+
+        $html = sprintf(
+            '<div class="mform-checkbox-group%s"%s data-cbg-id="%s">',
+            $layout,
+            $modeAttr,
+            htmlspecialchars($uid, ENT_QUOTES)
+        );
+        // hidden input mit data-mfr-field – wird vom Flex-Repeater gelesen/geschrieben
+        $html .= sprintf(
+            '<input type="hidden" id="%s" data-mfr-field="%s" value="" class="mform-cbg-value">',
+            htmlspecialchars($uid, ENT_QUOTES),
+            htmlspecialchars($fieldKey, ENT_QUOTES)
+        );
+        foreach ($item->getOptions() as $key => $label) {
+            $html .= sprintf(
+                '<label class="mform-cbg-option" data-value="%s"><span class="mform-cbg-indicator"></span>%s</label>',
+                htmlspecialchars((string) $key, ENT_QUOTES),
+                htmlspecialchars((string) $label, ENT_QUOTES)
+            );
+        }
+        $html .= '</div>';
+
         return $html;
     }
 

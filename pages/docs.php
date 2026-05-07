@@ -71,6 +71,11 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-cog',
         'file'  => 'docs/06_advanced.md',
     ],
+    'checkbox_group' => [
+        'title' => rex_i18n::msg('mform_docs_checkbox_group'),
+        'icon'  => 'rex-icon fa-check-square-o',
+        'file'  => 'docs/12_checkbox_group.md',
+    ],
     'repeater' => [
         'title' => rex_i18n::msg('mform_docs_repeater'),
         'icon'  => 'rex-icon fa-repeat',
