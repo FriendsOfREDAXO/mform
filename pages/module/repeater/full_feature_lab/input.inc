@@ -28,6 +28,7 @@ $rowForm = MForm::factory()
         'high' => 'Hoch',
     ], ['label' => 'Priorität (Radio-Mode)', 'mode' => 'radio'])
     ->addTextAreaField('text', ['label' => 'Text (TinyMCE)', 'class' => 'tiny-editor', 'data-profile' => 'default'])
+    ->addTextAreaField('markdown', ['label' => 'Markdown (MarkdownEditor)', 'class' => 'markdowneditor-editor', 'data-markdowneditor-profile' => 'default'])
     ->addLinklistField('cta_links', ['category' => 1], null, ['label' => 'CTA Links (Linklist)'])
     ->addMedialistField('downloads', ['types' => 'pdf,zip,jpg,png'], null, ['label' => 'Downloads (Medialist)'])
 ;

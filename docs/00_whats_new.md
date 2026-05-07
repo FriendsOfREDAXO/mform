@@ -4,14 +4,17 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
-## Repeater – wiederholende Inhalte
+## Flex-Repeater – wiederholende Inhalte
 
-**Neu:** `addRepeaterElement()` und `addFlexRepeaterElement()` ermöglichen wiederholende Feldgruppen direkt in MForm – ohne externes Addon.
+Der Flex-Repeater war bereits vorhanden. In MForm 9 wurde er technisch überarbeitet und deutlich robuster in der REDAXO-Umgebung umgesetzt.
+
+Der Flex-Repeater deckt nun die bekannten Funktionen von MBlock vollständig ab.
 
 - Felder werden als JSON in einem REX_VALUE gespeichert
 - Drag & Drop Sortierung inklusive
+- Editor-Support in Flex-Repeater-Zeilen: TinyMCE, CKE5 und MarkdownEditor
 - `MFormRepeaterHelper` für die Ausgabe im Frontend
-- Hilfsmethoden: `decode()`, `prepareItemsForOutput()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()`
+- **Neu in v9:** Hilfsmethoden `decode()`, `prepareItemsForOutput()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()`
 
 → [07_repeater.md](07_repeater.md)
 
@@ -38,6 +41,26 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 - `addRadioColorField()` – Farbauswahl als Radio-Buttons
 
 → [06_advanced.md](06_advanced.md)
+
+### CheckboxGroup-Widget
+
+- `addCheckboxGroupField()` – visuelle Mehrfachauswahl als Pill-/Tag-Buttons
+- Optionaler Radio-Mode über `mode => radio` für Einzelauswahl im gleichen Widget
+- Horizontales und vertikales Layout über `layout`
+
+→ [12_checkbox_group.md](12_checkbox_group.md)
+
+### Editor-Unterstützung in MForm
+
+MForm 9 unterstützt moderne Editor-Integrationen auch in dynamischen Kontexten wie Flex-Repeatern:
+
+- TinyMCE
+- CKE5
+- MarkdownEditor
+
+Hinweis: Die jeweilige Editor-Initialisierung erfolgt weiterhin durch das entsprechende Addon.
+
+→ [07_repeater.md](07_repeater.md)
 
 ---
 
@@ -98,3 +121,4 @@ MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. F
 | [09_templates.md](09_templates.md) | Fragment-Templates, Custom-Templates |
 | [10_outside_modules.md](10_outside_modules.md) | MForm außerhalb von Modulen verwenden |
 | [11_tutorial_modul.md](11_tutorial_modul.md) | Komplettes Modul-Tutorial |
+| [12_checkbox_group.md](12_checkbox_group.md) | CheckboxGroup-Widget inkl. Radio-Mode |

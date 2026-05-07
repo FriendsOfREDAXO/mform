@@ -1,8 +1,10 @@
-# Repeater
+# Flex-Repeater
 
-Das Repeater-Feld ermöglicht es Ihnen, eine Gruppe von Feldern zu erstellen, die beliebig oft wiederholt werden können. Das ist z.B. bei sich wiederholenden Informationen wie Ansprechpersonen, Leistungen und Layouts wie Tabellen, Listen, mehrspaltige Inhalte oder Reiter sinnvoll.
+Das Flex-Repeater-Feld ermöglicht es Ihnen, eine Gruppe von Feldern zu erstellen, die beliebig oft wiederholt werden können. Das ist z.B. bei sich wiederholenden Informationen wie Ansprechpersonen, Leistungen und Layouts wie Tabellen, Listen, mehrspaltige Inhalte oder Reiter sinnvoll.
 
-Repeater ist keine 1:1-Übernahme von MBlock, sondern ist ein neuer, moderner Ansatz, um wiederholende Inhalte zu erstellen. Es ist ein eigenständiges Element, das in MForm integriert ist.
+Der Flex-Repeater ist keine 1:1-Übernahme von MBlock, sondern ein moderner Ansatz, um wiederholende Inhalte zu erstellen. Er ist ein eigenständiges Element, das in MForm integriert ist.
+
+In der Funktionalität deckt der Flex-Repeater inzwischen alle bekannten MBlock-Funktionen ab.
 
 ## Verfügbarkeit
 
@@ -198,6 +200,45 @@ $sections = MFormRepeaterHelper::decode('REX_VALUE[2]');
 - `data-profile` gibt das TinyMCE-Profil an (Standard: `default`).
 - Beim Drag-and-Drop sowie beim Klick auf „Nach oben / Nach unten" wird TinyMCE automatisch korrekt destroyed und reinitialisiert – kein manueller Eingriff nötig.
 - TinyMCE-Inhalte werden vor jedem DOM-Move in die Textarea zurückgeschrieben und nach der Neuinitialisierung wieder geladen.
+
+## Editor-Kompatibilität (TinyMCE, CKE5, MarkdownEditor)
+
+Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repeater-Zeilen (Add, Remove, Move, Collapse).
+
+### TinyMCE
+
+```php
+->addTextAreaField('text', [
+    'label' => 'Text (TinyMCE)',
+    'class' => 'tiny-editor',
+    'data-profile' => 'default',
+])
+```
+
+### CKE5
+
+```php
+->addTextAreaField('text', [
+    'label' => 'Text (CKE5)',
+    'class' => 'cke5-editor',
+])
+```
+
+### MarkdownEditor
+
+```php
+->addTextAreaField('markdown', [
+    'label' => 'Markdown',
+    'class' => 'markdowneditor-editor',
+    'data-markdowneditor-profile' => 'default',
+])
+```
+
+### Voraussetzungen
+
+- Das jeweilige Editor-Addon muss installiert und aktiviert sein.
+- Die Initialisierung erfolgt durch das jeweilige Addon (MForm liefert die Textarea und Repeater-Lifecycle-Events).
+- Ohne aktives Editor-Addon bleibt das Feld eine normale Textarea.
 
 ### Standardverhalten und Optionen
 
