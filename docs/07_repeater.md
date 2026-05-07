@@ -6,14 +6,14 @@ Der Flex-Repeater ist keine 1:1-Übernahme von MBlock, sondern ein moderner Ansa
 
 In der Funktionalität deckt der Flex-Repeater inzwischen alle bekannten MBlock-Funktionen ab.
 
+---
+
 ## Verfügbarkeit
 
 | Methode | Klassisches Modul | `rex_form` | YForm |
 |---|---|---|---|
 | `addRepeaterElement` | ja | – | – |
 | `addFlexRepeaterElement` | ja | – | – |
-
-> Migration von bestehenden MBlock-Modulen: siehe [08_mblock_migration.md](08_mblock_migration.md).
 
 ## Beispiele
 
@@ -383,4 +383,40 @@ echo $mform->show();
 | `confirm_delete` | bool | `false` | Löschen mit Bestätigung |
 | `confirm_delete_msg` | string | `''` | Text der Bestätigungsmeldung |
 | `copy_paste` | bool | `false` | Kopieren/Einfügen-Funktion aktivieren |
+
+---
+
+## MForm Flex-Repeater vs. MBlock
+
+| Merkmal | MForm Flex-Repeater | MBlock |
+|---|---|---|
+| **Architektur** | PHP rendert Templates, JS klont nur | JS generiert und verwaltet HTML selbst |
+| **JS-Codebasis** | ~1.500 Zeilen | ~3.400 Zeilen |
+| **jQuery-Abhängigkeit** | Nein – Vanilla JS | Ja – jQuery erforderlich |
+| **Template-System** | HTML `<template>`-Element (nativer Browser-Standard) | `data-mblock-plain-sortitem` – HTML als Data-Attribut serialisiert |
+| **Verschachtelung (Nesting)** | ✅ Stabil auf mind. 2 Ebenen, funktioniert transparent | ⚠️ Bekannt instabil – ID-Kollisionen, Sortable-Konflikte, Editor-Probleme |
+| **TinyMCE / Editoren** | Stabile Initialisierung in Repeatern und verschachtelten Kontexten | Erfordert manuelles Destroy/Reinit beim Sortieren; fehleranfällig |
+| **Kopieren / Einfügen** | ✅ `copy_paste => true`, sessionStorage-basiert | ✅ vorhanden, ebenfalls sessionStorage |
+| **Aktiv/Inaktiv-Toggle** | ✅ pro Item, mit visueller Statusanzeige | ✅ vorhanden |
+| **Drag & Drop** | SortableJS (im Addon mitgeliefert) | Eigene Sortable-Implementierung (im Addon mitgeliefert) |
+| **Wartbarkeit** | Hoch – PHP-Rendering klar getrennt von JS | Niedrig – JS muss HTML-Struktur kennen und selbst erzeugen |
+| **Block-Typen** | Eine Struktur pro Repeater-Instanz | Mehrere Block-Typen pro Instanz möglich |
+| **MBlock-Migration** | ✅ Migrationsleitfaden vorhanden | – |
+| **Template-API** | ✅ `MForm::registerTemplate()` für projektweite Vorlagen | – |
+| **Frontend-Ausgabe** | `MFormRepeaterHelper` mit `decode()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()` | `MBlock::filterByField()`, `sortByField()`, `groupByField()`, `limitItems()` – MForm hat diese API von MBlock übernommen und in `MFormRepeaterHelper` integriert |
+
+### Wann MForm Flex-Repeater bevorzugen
+
+- Neue Module – der Flex-Repeater ist der empfohlene Standard
+- Verschachtelte Repeater (Repeater im Repeater)
+- TinyMCE oder MarkdownEditor in Repeater-Zeilen
+- Kein jQuery im Projekt gewünscht
+- Wartbarkeit und langfristige Pflege wichtig
+
+### Wann MBlock behalten
+
+- Bestehende Module mit mehreren **verschiedenen Block-Typen** pro Instanz (das einzige MBlock-Feature ohne direktes Äquivalent im Flex-Repeater)
+- Wenn keine Migration gewünscht ist
+
+> Migration von bestehenden MBlock-Modulen: siehe [08_mblock_migration.md](08_mblock_migration.md).
 
