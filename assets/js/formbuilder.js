@@ -214,20 +214,20 @@
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
             var collapseBtn = item.type === 'repeater'
-                ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen">' + (builderCollapsed[item.uid] ? '▸' : '▾') + '</button>'
+                ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen"><i class="rex-icon fa-chevron-' + (builderCollapsed[item.uid] ? 'right' : 'down') + '"></i></button>'
                 : '';
             head.innerHTML =
-                '<span class="mform-fb__item-handle">::</span>' +
+                '<span class="mform-fb__item-handle"><i class="rex-icon fa-arrows"></i></span>' +
                 collapseBtn +
                 '<span class="mform-fb__item-type">' + item.type + '</span>' +
                 '<span class="mform-fb__item-label"></span>' +
                 '<span class="mform-fb__item-id">id ' + item.id + '</span>' +
                 '<span class="mform-fb__item-actions">' +
-                    '<button type="button" class="mform-fb__item-btn" data-fb-duplicate title="Duplizieren">⎘</button>' +
-                    '<button type="button" class="mform-fb__item-btn" data-fb-copy-item title="Kopieren">⧉</button>' +
-                    '<button type="button" class="mform-fb__item-btn" data-fb-paste-after title="Aus Zwischenablage einfuegen">⎘+</button>' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-duplicate title="Duplizieren"><i class="rex-icon fa-clone"></i></button>' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-copy-item title="Kopieren"><i class="rex-icon fa-copy"></i></button>' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-paste-after title="Aus Zwischenablage einfuegen"><i class="rex-icon fa-paste"></i></button>' +
                 '</span>' +
-                '<button type="button" class="mform-fb__item-remove" data-fb-remove title="Loeschen">x</button>';
+                '<button type="button" class="mform-fb__item-remove" data-fb-remove title="Loeschen"><i class="rex-icon fa-trash"></i></button>';
             head.querySelector('.mform-fb__item-label').textContent = item.label || item.type;
             head.addEventListener('click', function (e) {
                 if (e.target.closest('button')) return;

@@ -96,6 +96,9 @@
     cursor: grab;
     color: #9ca3af;
     font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 4px;
 }
 
 .mform-fb__item-type {
@@ -124,12 +127,18 @@
     border: none;
     color: #ef4444;
     cursor: pointer;
-    padding: 2px 6px;
+    padding: 4px 8px;
     font-size: 14px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
 }
 
 .mform-fb__item-remove:hover {
     color: #b91c1c;
+    background: #fee2e2;
 }
 
 .mform-fb__item-actions {
@@ -143,10 +152,22 @@
     border: 1px solid transparent;
     color: #6b7280;
     cursor: pointer;
-    padding: 1px 6px;
-    font-size: 13px;
+    padding: 4px 8px;
+    font-size: 14px;
     line-height: 1;
     border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 26px;
+}
+
+.mform-fb__item-btn .rex-icon,
+.mform-fb__item-remove .rex-icon,
+.mform-fb__item-handle .rex-icon {
+    font-size: 13px;
+    line-height: 1;
 }
 
 .mform-fb__item-btn:hover {
