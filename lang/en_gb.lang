@@ -7,6 +7,8 @@ mform_demo = Sample collection
 mform_demo_base = Basic examples
 mform_demo_extended = Extended examples
 mform_demo_expert = Expert examples
+mform_demo_layout_preview = Layout & SVG preview
+mform_formbuilder = Form Builder
 mform_demo_community = FOS examples
 mform_demo_wrapper = Wrapper examples
 mform_demo_repeater = Repeater examples
@@ -69,6 +71,7 @@ mform_example_description_expert = The "expert examples" show that MForm can be 
 mform_example_description_community = Later
 mform_example_description_wrapper = The "Wrapper Examples" demonstrate how to effectively layout and enhance input forms using MForm wrapper elements.
 mform_example_description_repeater = The "Repeater Examples" illustrate how simple it is to use a repeater element. Essentially, it can be created like the other wrapper elements. The wrapped form can be replicated using the repeater as many times as needed, with minimum or maximum block limits (similar to MBlock as before).
+mform_example_description_layout_preview = This page demonstrates the two utility classes <code>HtmlToSvgConverter</code> and <code>LayoutPreviewBuilder</code> from the MForm namespace <code>FriendsOfRedaxo\MForm\Utils</code>. <code>LayoutPreviewBuilder</code> programmatically generates SVG layout previews from sections, columns and placeholder elements – ideal as a module preview image in the backend. <code>HtmlToSvgConverter</code> turns plain SVG markup into a complete standalone SVG document (or a base64 data URL).
 
 mform_github = MForm FOR – go to github
 
