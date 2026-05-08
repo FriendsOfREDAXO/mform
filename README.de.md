@@ -56,6 +56,14 @@ Direkt über den REDAXO-Installer installierbar — nach `mform` suchen, herunte
 
 ## Credits
 
+**Projekt-Lead**
+
+[Joachim Dörr](https://github.com/joachimdoerr)
+
+[Thomas Skerbis](https://github.com/skerbis)
+
+---
+
 Danke an alle [Contributors](https://github.com/FriendsOfREDAXO/mform/graphs/contributors), die MForm über die Jahre mitgestaltet haben!
 
 **Top Contributors**
