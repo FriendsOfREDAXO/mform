@@ -51,16 +51,16 @@ class rex_var_custom_link extends rex_var
     {
         $valueName = $value;
 
-        preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
+        if (1 === preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0)) {
+            $matchedTable = (string) $matches[1][0];
+            $matchedId = (string) $matches[2][0];
 
-        $matchedTable = isset($matches[1][0]) ? (string) $matches[1][0] : '';
-        $matchedId = isset($matches[2][0]) ? (string) $matches[2][0] : '';
-
-        if ($matchedTable === str_replace('_', '-', $table) && '' !== $matchedId && ctype_digit($matchedId)) {
-            $sql = rex_sql::factory();
-            $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matchedId]);
-            if (isset($result[0][$column])) {
-                $valueName = trim((string) $result[0][$column]) . ' [id=' . $matchedId . ']';
+            if ($matchedTable === str_replace('_', '-', $table) && ctype_digit($matchedId)) {
+                $sql = rex_sql::factory();
+                $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matchedId]);
+                if (isset($result[0][$column])) {
+                    $valueName = trim((string) $result[0][$column]) . ' [id=' . $matchedId . ']';
+                }
             }
         }
 

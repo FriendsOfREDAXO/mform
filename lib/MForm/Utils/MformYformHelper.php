@@ -25,6 +25,7 @@ class MformYformHelper
         $fields = $sql->getArray('SELECT `table_name`, `name`' . $select . ' FROM `' . rex_yform_manager_field::table() . '` WHERE `type_id`="value" AND `type_name` IN("custom_link","imagelist")');
         #\dump($fields);
 
+        /** @phpstan-ignore-next-line argument.type (template covariance limitation in rex_extension_point) */
         $fields = rex_extension::registerPoint(new rex_extension_point('YFORM_MEDIA_IS_IN_USE', $fields));
 
         if (!count($fields)) {
