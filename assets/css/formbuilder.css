@@ -78,6 +78,9 @@
     padding: 8px 10px;
     margin-bottom: 6px;
     cursor: pointer;
+}
+
+.mform-fb__item-head {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -168,6 +171,7 @@
 .mform-fb__item-handle .rex-icon {
     font-size: 13px;
     line-height: 1;
+    pointer-events: none;
 }
 
 .mform-fb__item-btn:hover {
