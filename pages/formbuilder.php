@@ -13,7 +13,7 @@
 $addon = rex_addon::get('mform');
 
 $intro = '<p>'
-    . 'Klicke ein Feld in der linken Palette an um es einzufuegen, oder ziehe es in die Bauflaeche. '
+    . 'Klicke ein Feld in der linken Palette an um es einzufuegen. Reihenfolge per Drag&Drop am Griff aendern. '
     . 'Per Klick auf ein eingefuegtes Feld oeffnet sich rechts der Eigenschaftsdialog. '
     . 'Im unteren Bereich entsteht in Echtzeit der MForm-PHP-Code zum Kopieren.'
     . '</p>';
@@ -49,7 +49,7 @@ $body = <<<'HTML'
     <div class="mform-fb__canvas-wrap">
         <h4>Bauflaeche</h4>
         <div class="mform-fb__canvas" data-fb-canvas>
-            <p class="mform-fb__hint">Felder hierher ziehen</p>
+            <p class="mform-fb__hint">Klick links auf ein Feld, um es hier einzufuegen</p>
         </div>
 
         <h4 style="margin-top:1.5em">PHP-Code</h4>
