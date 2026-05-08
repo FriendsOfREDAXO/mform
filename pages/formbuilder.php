@@ -70,6 +70,7 @@ $body = <<<'HTML'
         <h4 style="margin-top:1.5em">Wrapper</h4>
         <ul class="mform-fb__field-list" data-fb-palette-wrap>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="repeater">Flex Repeater</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="tab">Tab</li>
         </ul>
         <div class="mform-fb__actions">
             <button type="button" class="btn btn-default" data-fb-action="clear">Alles loeschen</button>
@@ -232,6 +233,9 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="repeaterBtnClass">
                 <label>Add-Button-Klasse <small>(btn_class)</small></label>
                 <input type="text" class="form-control" data-fb-prop="repeaterBtnClass" placeholder="btn-primary">
+            </div>
+            <div class="form-group" data-fb-prop-group="tabPullRight">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="tabPullRight"> Tab rechts ausrichten <small>(pull right)</small></label>
             </div>
         </form>
     </div>

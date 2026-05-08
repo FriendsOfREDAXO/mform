@@ -224,6 +224,48 @@ body.rex-has-theme:not(.rex-theme-light) .mform-fb__item-btn:hover {
     font-style: italic;
 }
 
+/* Tab container */
+.mform-fb__item--tab {
+    flex-direction: column;
+    align-items: stretch;
+    background: #eff6ff;
+    border-color: #3b82f6;
+    padding: 8px;
+}
+
+.mform-fb__item--tab > .mform-fb__item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.mform-fb__item--tab .mform-fb__nested {
+    border: 2px dashed #93c5fd;
+    border-radius: 4px;
+    padding: 6px;
+    min-height: 60px;
+    background: #fff;
+}
+
+.mform-fb__item--tab .mform-fb__nested.is-drop {
+    border-color: #1d4ed8;
+    background: #dbeafe;
+}
+
+.mform-fb__item--tab .mform-fb__nested-hint {
+    color: #9ca3af;
+    text-align: center;
+    margin: 14px 0;
+    font-size: 12px;
+    font-style: italic;
+}
+
+body.rex-theme-dark .mform-fb__item--tab {
+    background: #1e3a8a;
+    border-color: #3b82f6;
+}
+
 /* Props */
 .mform-fb__props .form-group {
     margin-bottom: 10px;
