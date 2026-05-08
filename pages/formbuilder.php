@@ -13,8 +13,8 @@
 $addon = rex_addon::get('mform');
 
 $intro = '<p>'
-    . 'Ziehe Felder aus der linken Palette in die mittlere Bauflaeche. '
-    . 'Per Klick auf ein Feld oeffnet sich rechts der Eigenschaftsdialog. '
+    . 'Klicke ein Feld in der linken Palette an um es einzufuegen, oder ziehe es in die Bauflaeche. '
+    . 'Per Klick auf ein eingefuegtes Feld oeffnet sich rechts der Eigenschaftsdialog. '
     . 'Im unteren Bereich entsteht in Echtzeit der MForm-PHP-Code zum Kopieren.'
     . '</p>';
 
@@ -83,6 +83,11 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="required">
                 <label class="checkbox">
                     <input type="checkbox" data-fb-prop="required"> Required
+                </label>
+            </div>
+            <div class="form-group" data-fb-prop-group="tinymce">
+                <label class="checkbox">
+                    <input type="checkbox" data-fb-prop="tinymce"> TinyMCE-Editor (class="tinymce-editor")
                 </label>
             </div>
             <div class="form-group" data-fb-prop-group="full">
