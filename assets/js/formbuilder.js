@@ -12,7 +12,7 @@
 
     var TYPES = {
         text:        { label: 'Text', method: 'addTextField',        props: ['label', 'defaultValue', 'placeholder', 'required', 'full'] },
-        textarea:    { label: 'Textarea', method: 'addTextAreaField', props: ['label', 'defaultValue', 'placeholder', 'required', 'full'] },
+        textarea:    { label: 'Textarea', method: 'addTextAreaField', props: ['label', 'defaultValue', 'placeholder', 'tinymce', 'required', 'full'] },
         select:      { label: 'Select', method: 'addSelectField',     props: ['label', 'defaultValue', 'options', 'required', 'full'] },
         radio:       { label: 'Radio',  method: 'addRadioField',      props: ['label', 'defaultValue', 'options', 'required'] },
         checkbox:    { label: 'Checkbox', method: 'addCheckboxField', props: ['label', 'defaultValue', 'options'] },
@@ -50,6 +50,7 @@
             options: type === 'select' || type === 'radio' || type === 'checkbox' ? "1=Option 1\n2=Option 2" : '',
             required: false,
             full: false,
+            tinymce: false,
             repeaterMin: '',
             repeaterMax: '',
             children: type === 'repeater' ? [] : null
@@ -282,7 +283,7 @@
         emitCode();
     }
 
-    // Palette items: cloned on drag-out via Sortable
+    // Palette items: cloned on drag-out via Sortable + click-to-add fallback
     Sortable.create($palette, {
         group: { name: 'fb-palette', pull: 'clone', put: false },
         sort: false,
@@ -293,6 +294,31 @@
         sort: false,
         animation: 0
     });
+
+    // Click-to-add (primary, also acts as fallback if drag fails)
+    function paletteClick(e) {
+        var li = e.target.closest('.mform-fb__pal-item');
+        if (!li) return;
+        var type = li.dataset.type;
+        if (!type) return;
+        var newItem = makeItem(type);
+        if (type === 'repeater') {
+            state.push(newItem);
+        } else {
+            // If a repeater is currently active, append into its children;
+            // otherwise append at top level.
+            if (activeItem && activeItem.type === 'repeater') {
+                activeItem.children.push(newItem);
+            } else {
+                state.push(newItem);
+            }
+        }
+        renderCanvas();
+        emitCode();
+        selectItem(newItem);
+    }
+    $palette.addEventListener('click', paletteClick);
+    $paletteWrap.addEventListener('click', paletteClick);
 
     Sortable.create($canvas, {
         group: { name: 'fb-fields', pull: true, put: ['fb-fields', 'fb-palette'] },
@@ -365,6 +391,7 @@
         if (item.label && item.type !== 'hidden') attrs.label = item.label;
         if (item.placeholder) attrs.placeholder = item.placeholder;
         if (item.required) attrs.required = 'required';
+        if (item.tinymce && item.type === 'textarea') attrs['class'] = 'form-control tinymce-editor';
 
         var attrParts = Object.keys(attrs).map(function (k) {
             return phpStr(k) + ' => ' + phpStr(attrs[k]);
