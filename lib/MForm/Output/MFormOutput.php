@@ -24,18 +24,27 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
  *       ->limit(6)
  *       ->renderGrid(3, fn($item) => '<h3>' . rex_escape($item['title']) . '</h3>');
  *
- * All terminal render*() methods return a string. Intermediate
- * methods (filter, where, sort, limit, map) return a new immutable
- * MFormOutput instance, so the original data stays untouched.
+ * Supports framework presets (Bootstrap, Tailwind, UIKit) and fully custom
+ * attributes for grids and lists. All terminal render*() methods return a
+ * string. Intermediate methods (filter, where, sort, limit, map) return a
+ * new immutable MFormOutput instance, so the original data stays untouched.
  *
  * @phpstan-type Item array<string, mixed>
+ * @phpstan-type Attrs array<string, scalar|array<int, string>|null>
  */
 final class MFormOutput
 {
+    public const GRID_BOOTSTRAP = 'bootstrap';
+    public const GRID_TAILWIND  = 'tailwind';
+    public const GRID_UIKIT     = 'uikit';
+    public const GRID_NONE      = 'none';
+
     /** @var array<int, array<string, mixed>> */
     private array $items;
 
     private string $emptyOutput = '';
+
+    private static string $defaultGridFramework = self::GRID_BOOTSTRAP;
 
     /** @param array<int, array<string, mixed>> $items */
     private function __construct(array $items)
@@ -243,17 +252,27 @@ final class MFormOutput
     }
 
     /**
-     * Renders items as a Bootstrap-style grid.
+     * Renders items as a CSS-grid using a framework preset.
      *
-     * Wraps every $cols items in a row container.
+     * Wraps every $cols items in a row container. Supported presets:
+     *   - 'bootstrap' (default): `row` + `col-md-X col-12`
+     *   - 'tailwind':            `grid grid-cols-1 md:grid-cols-N gap-4`
+     *   - 'uikit':               `uk-grid-match uk-child-width-1-N@m` + `uk-grid`
+     *   - 'none':                no preset classes; supply via $rowAttrs/$colAttrs
+     *
+     * Custom attributes (`$rowAttrs`, `$colAttrs`) are merged into the preset.
+     * The `class` attribute is concatenated, all other attributes overwrite.
      *
      * @param callable(array<string, mixed>, int): string $template
+     * @param array<string, scalar|array<int, string>|null> $rowAttrs
+     * @param array<string, scalar|array<int, string>|null> $colAttrs
      */
     public function renderGrid(
         int $cols,
         callable $template,
-        string $rowClass = 'row',
-        string $colClass = '',
+        string $framework = '',
+        array $rowAttrs = [],
+        array $colAttrs = [],
         string $rowTag = 'div',
         string $colTag = 'div',
     ): string {
@@ -262,19 +281,19 @@ final class MFormOutput
         }
 
         $cols = max(1, $cols);
-        // Bootstrap default if no col class given
-        if ('' === $colClass) {
-            $bsCol = (int) floor(12 / $cols);
-            $colClass = 'col-md-' . max(1, min(12, $bsCol));
-        }
+        $framework = '' === $framework ? self::$defaultGridFramework : $framework;
+        [$presetRow, $presetCol] = self::gridPreset($framework, $cols);
+
+        $rowAttrs = self::mergeAttrs($presetRow, $rowAttrs);
+        $colAttrs = self::mergeAttrs($presetCol, $colAttrs);
 
         $out = '';
         $chunks = array_chunk($this->items, $cols);
         $offset = 0;
         foreach ($chunks as $chunk) {
-            $out .= '<' . $rowTag . ' class="' . rex_escape($rowClass) . '">';
+            $out .= '<' . $rowTag . self::attrsToString($rowAttrs) . '>';
             foreach ($chunk as $j => $item) {
-                $out .= '<' . $colTag . ' class="' . rex_escape($colClass) . '">';
+                $out .= '<' . $colTag . self::attrsToString($colAttrs) . '>';
                 $out .= (string) $template($item, $offset + $j);
                 $out .= '</' . $colTag . '>';
             }
@@ -286,31 +305,60 @@ final class MFormOutput
     }
 
     /**
+     * Sets the default grid framework for all subsequent renderGrid() calls
+     * that do not specify a framework explicitly.
+     */
+    public static function setDefaultGridFramework(string $framework): void
+    {
+        self::$defaultGridFramework = $framework;
+    }
+
+    /**
+     * Returns ['rowAttrs', 'colAttrs'] for a framework preset.
+     *
+     * @return array{0: array<string, scalar|array<int, string>|null>, 1: array<string, scalar|array<int, string>|null>}
+     */
+    private static function gridPreset(string $framework, int $cols): array
+    {
+        return match ($framework) {
+            self::GRID_TAILWIND => [
+                ['class' => 'grid grid-cols-1 md:grid-cols-' . $cols . ' gap-4'],
+                [],
+            ],
+            self::GRID_UIKIT => [
+                ['class' => 'uk-grid-match uk-child-width-1-' . $cols . '@m', 'uk-grid' => ''],
+                [],
+            ],
+            self::GRID_NONE => [[], []],
+            self::GRID_BOOTSTRAP => [
+                ['class' => 'row'],
+                ['class' => 'col-12 col-md-' . max(1, min(12, (int) floor(12 / $cols)))],
+            ],
+            default => [[], []],
+        };
+    }
+
+    /**
      * Renders items as a `<ul>` / `<ol>` list.
      *
      * @param callable(array<string, mixed>, int): string $template
-     * @param array<string, string> $listAttrs Attributes for the list tag (e.g. ['class' => 'nav'])
+     * @param array<string, scalar|array<int, string>|null> $listAttrs Attributes for the list tag
+     * @param array<string, scalar|array<int, string>|null> $itemAttrs Attributes for each list item
      */
     public function renderList(
         callable $template,
         string $listTag = 'ul',
         string $itemTag = 'li',
         array $listAttrs = [],
-        string $itemClass = '',
+        array $itemAttrs = [],
     ): string {
         if ([] === $this->items) {
             return $this->emptyOutput;
         }
 
-        $attrs = '';
-        foreach ($listAttrs as $name => $val) {
-            $attrs .= ' ' . $name . '="' . rex_escape($val) . '"';
-        }
-
-        $out = '<' . $listTag . $attrs . '>';
+        $out = '<' . $listTag . self::attrsToString($listAttrs) . '>';
         foreach ($this->items as $i => $item) {
-            $itemAttr = '' !== $itemClass ? ' class="' . rex_escape($itemClass) . '"' : '';
-            $out .= '<' . $itemTag . $itemAttr . '>';
+            $out .= '<' . $itemTag . self::attrsToString($itemAttrs) . '>';
             $out .= (string) $template($item, $i);
             $out .= '</' . $itemTag . '>';
         }
@@ -358,5 +406,91 @@ final class MFormOutput
         $fragment->setVar('data', $data, false);
 
         return $fragment->parse($fragmentName);
+    }
+
+    /**
+     * Renders a single arbitrary HTML tag with attributes and content.
+     *
+     * Inspired by FORHtml's tag builder. Useful inside templates:
+     *
+     *   MFormOutput::tag('a', ['href' => $url, 'class' => 'btn'], 'Mehr')
+     *
+     * Attribute values are escaped; `class` may be string or string[].
+     * `null` and `false` values omit the attribute (HTML5 boolean).
+     * Self-closing tags (img, br, hr, input, meta, link …) are auto-closed.
+     *
+     * @param array<string, scalar|array<int, string>|null> $attrs
+     */
+    public static function tag(string $tag, array $attrs = [], string $content = ''): string
+    {
+        static $voidTags = [
+            'img' => true, 'br' => true, 'hr' => true, 'input' => true,
+            'meta' => true, 'link' => true, 'area' => true, 'base' => true,
+            'col' => true, 'embed' => true, 'source' => true, 'track' => true, 'wbr' => true,
+        ];
+
+        $open = '<' . $tag . self::attrsToString($attrs);
+        if (isset($voidTags[strtolower($tag)])) {
+            return $open . '>';
+        }
+
+        return $open . '>' . $content . '</' . $tag . '>';
+    }
+
+    /**
+     * Builds an attribute string ` k="v" k="v"` from an attrs array.
+     *
+     * - `class` may be a string or string[] (joined with space, deduplicated)
+     * - `null` or `false` values are omitted
+     * - `true` values render as boolean attribute (`disabled`, `uk-grid`)
+     * - All values are escaped via rex_escape()
+     *
+     * @param array<string, scalar|array<int, string>|null> $attrs
+     */
+    private static function attrsToString(array $attrs): string
+    {
+        $out = '';
+        foreach ($attrs as $name => $value) {
+            if (null === $value || false === $value) {
+                continue;
+            }
+            if (true === $value) {
+                $out .= ' ' . $name;
+                continue;
+            }
+            if (is_array($value)) {
+                $value = implode(' ', array_values(array_unique(array_filter(array_map('strval', $value), static fn (string $v): bool => '' !== $v))));
+                if ('' === $value) {
+                    continue;
+                }
+            }
+            $out .= ' ' . $name . '="' . rex_escape((string) $value) . '"';
+        }
+
+        return $out;
+    }
+
+    /**
+     * Merges two attribute arrays. The `class` attribute is concatenated;
+     * all other attributes from $b overwrite those in $a.
+     *
+     * @param array<string, scalar|array<int, string>|null> $a
+     * @param array<string, scalar|array<int, string>|null> $b
+     * @return array<string, scalar|array<int, string>|null>
+     */
+    private static function mergeAttrs(array $a, array $b): array
+    {
+        $merged = $a;
+        foreach ($b as $name => $value) {
+            if ('class' === $name && isset($merged['class'])) {
+                $left = is_array($merged['class']) ? $merged['class'] : preg_split('/\s+/', (string) $merged['class'], -1, PREG_SPLIT_NO_EMPTY);
+                $right = is_array($value) ? $value : preg_split('/\s+/', (string) $value, -1, PREG_SPLIT_NO_EMPTY);
+                $merged['class'] = array_values(array_unique(array_merge($left ?: [], $right ?: [])));
+                continue;
+            }
+            $merged[$name] = $value;
+        }
+
+        return $merged;
     }
 }

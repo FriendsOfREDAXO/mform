@@ -60,7 +60,7 @@ echo MFormOutput::from('REX_VALUE[1]')
 
 ### `renderList(callable $template, ...): string`
 
-Mit umschließendem `<ul>` / `<ol>`:
+Mit umschließendem `<ul>` / `<ol>`. Beide `listAttrs` und `itemAttrs` akzeptieren beliebige HTML-Attribute (inkl. boolean wie `disabled`, `uk-tab`):
 
 ```php
 echo MFormOutput::from('REX_VALUE[1]')
@@ -68,22 +68,73 @@ echo MFormOutput::from('REX_VALUE[1]')
         fn($item) => rex_escape($item['title']),
         listTag: 'ul',
         itemTag: 'li',
-        listAttrs: ['class' => 'nav nav-pills'],
+        listAttrs: ['class' => 'nav nav-pills', 'role' => 'tablist'],
+        itemAttrs: ['class' => 'nav-item'],
     );
 ```
 
-### `renderGrid(int $cols, callable $template, ...): string`
-
-Bootstrap-konforme Grid-Ausgabe (`row` + `col-md-X`):
+`class` darf auch als Array übergeben werden:
 
 ```php
+listAttrs: ['class' => ['uk-list', 'uk-list-divider']]
+```
+
+### `renderGrid(int $cols, callable $template, string $framework = 'bootstrap', array $rowAttrs = [], array $colAttrs = [], string $rowTag = 'div', string $colTag = 'div'): string`
+
+Framework-aware Grid-Output. Unterstützt **Bootstrap**, **Tailwind**, **UIKit** und **none** (ohne Preset). Eigene Klassen/Attribute werden in das Preset hineingemerged — bei `class` wird konkateniert, alle anderen Attribute überschreiben.
+
+| Framework | Row-Klassen | Spalten-Klassen | Extra |
+|---|---|---|---|
+| `bootstrap` (default) | `row` | `col-12 col-md-{12/N}` | – |
+| `tailwind` | `grid grid-cols-1 md:grid-cols-{N} gap-4` | – | – |
+| `uikit` | `uk-grid-match uk-child-width-1-{N}@m` | – | `uk-grid` Attribut |
+| `none` | – | – | komplett selbst über `$rowAttrs`/`$colAttrs` |
+
+**Bootstrap (Default):**
+```php
 echo MFormOutput::from('REX_VALUE[1]')
-    ->renderGrid(3, function ($item) {
-        return '<div class="card">'
-             . '<h3>' . rex_escape($item['title']) . '</h3>'
-             . '<p>' . rex_escape($item['lead']) . '</p>'
-             . '</div>';
-    });
+    ->renderGrid(3, fn($i) => '<div class="card">'.rex_escape($i['title']).'</div>');
+```
+
+**Tailwind:**
+```php
+echo MFormOutput::from('REX_VALUE[1]')
+    ->renderGrid(3, fn($i) => '<div class="rounded p-4 bg-gray-50">'.rex_escape($i['title']).'</div>',
+        framework: 'tailwind');
+```
+
+**UIKit:**
+```php
+echo MFormOutput::from('REX_VALUE[1]')
+    ->renderGrid(4, fn($i) => '<div class="uk-card uk-card-default uk-card-body">'.rex_escape($i['title']).'</div>',
+        framework: 'uikit');
+```
+
+**Eigene Klassen ergänzen** (Default-Klassen bleiben erhalten):
+```php
+echo MFormOutput::from('REX_VALUE[1]')
+    ->renderGrid(2, fn($i) => '<h3>'.rex_escape($i['title']).'</h3>',
+        framework: 'tailwind',
+        rowAttrs: ['class' => 'gap-8 my-12'],         // wird zu "grid grid-cols-1 md:grid-cols-2 gap-4 gap-8 my-12"
+        colAttrs: ['class' => 'shadow-lg', 'data-aos' => 'fade-up']);
+```
+
+**Komplett eigene Struktur** mit `framework: 'none'`:
+```php
+echo MFormOutput::from('REX_VALUE[1]')
+    ->renderGrid(3, fn($i) => '<article>'.rex_escape($i['title']).'</article>',
+        framework: 'none',
+        rowTag: 'section',
+        rowAttrs: ['class' => 'my-grid', 'role' => 'list'],
+        colTag: 'article',
+        colAttrs: ['class' => 'my-cell']);
+```
+
+**Default-Framework projektweit setzen** (z. B. in `boot.php`):
+```php
+\FriendsOfRedaxo\MForm\Output\MFormOutput::setDefaultGridFramework(
+    \FriendsOfRedaxo\MForm\Output\MFormOutput::GRID_TAILWIND
+);
 ```
 
 ### `renderChunks(int $size, callable $template): string`
@@ -158,6 +209,42 @@ echo MFormOutput::from('REX_VALUE[1]')
     ->where(fn($i) => !empty($i['image']))
     ->map(fn($i) => $i + ['url' => rex_media::get($i['image'])?->getUrl()])
     ->renderGrid(2, fn($i) => '<img src="' . rex_escape($i['url']) . '">');
+```
+
+## HTML-Tag-Helper
+
+Inspiriert von [forhtml](https://github.com/FriendsOfREDAXO/forhtml) gibt es eine statische `tag()`-Methode für sauberes HTML in Templates:
+
+```php
+use FriendsOfRedaxo\MForm\Output\MFormOutput;
+
+echo MFormOutput::tag('a',
+    ['href' => $url, 'class' => ['btn', 'btn-primary'], 'target' => '_blank'],
+    'Mehr erfahren'
+);
+// → <a href="..." class="btn btn-primary" target="_blank">Mehr erfahren</a>
+
+// Boolean-Attribute (HTML5):
+echo MFormOutput::tag('button',
+    ['class' => 'btn', 'disabled' => true],
+    'Senden'
+);
+// → <button class="btn" disabled>Senden</button>
+
+// Void-Tags werden auto-closed:
+echo MFormOutput::tag('img', ['src' => $src, 'alt' => $alt]);
+// → <img src="..." alt="...">
+```
+
+Praktisch im Template-Callback:
+
+```php
+echo MFormOutput::from('REX_VALUE[1]')
+    ->renderGrid(3, fn($i) => MFormOutput::tag('article',
+        ['class' => 'card', 'data-id' => $i['id'] ?? null],
+        MFormOutput::tag('h3', [], rex_escape($i['title'])) .
+        MFormOutput::tag('p', ['class' => 'lead'], rex_escape($i['lead']))
+    ), framework: 'tailwind');
 ```
 
 ## Sicherheit
