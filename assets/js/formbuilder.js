@@ -874,9 +874,11 @@
         function topLevelExpr(item) {
             var rv = '"' + rexVarFor(item.type, item.id) + '"';
             switch (item.type) {
+                case 'linklist':
+                    // Liste von Artikel-IDs (kommagetrennt gespeichert)
+                    return 'array_map("intval", array_filter(explode(",", ' + rv + ')))';
                 case 'medialist':
                 case 'imagelist':
-                case 'linklist':
                 case 'checkbox':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
@@ -899,9 +901,10 @@
         function childExpr(child, key) {
             var access = '$row[' + phpStr(key) + '] ?? ""';
             switch (child.type) {
+                case 'linklist':
+                    return 'array_map("intval", array_filter(explode(",", (string) (' + access + '))))';
                 case 'medialist':
                 case 'imagelist':
-                case 'linklist':
                 case 'checkbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
                 case 'customlink':
@@ -925,8 +928,21 @@
             var lbl = item.label ? ' (' + item.label + ')' : '';
             var hint = topLevelHint(item);
             lines.push('// ' + item.type + lbl + (hint ? ' \u2013 ' + hint : ''));
+            var values = optionValuesComment(item);
+            if (values) lines.push('//   ' + values);
             lines.push('$' + name + ' = ' + topLevelExpr(item) + ';');
             return lines.join('\n');
+        }
+
+        // Wenn select/radio/checkbox Optionen hat, zeige die moeglichen Keys.
+        function optionValuesComment(item) {
+            if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox') {
+                return '';
+            }
+            var opts = parseOptions(item.options || '');
+            if (!opts.length) return '';
+            var keys = opts.map(function (o) { return String(o.key); });
+            return 'moegliche Werte: ' + keys.join(', ');
         }
 
         // Kurzer Hinweis zum Inhaltstyp / wie man das Feld benutzt.
@@ -936,7 +952,7 @@
                 case 'medialist':   return 'Array von Dateinamen (kommasepariert gespeichert)';
                 case 'imagelist':   return 'Array von Bilddateinamen (kommasepariert gespeichert)';
                 case 'link':        return 'Artikel-ID (int), z.B. rex_getUrl($id)';
-                case 'linklist':    return 'Array von Artikel-IDs (kommasepariert gespeichert)';
+                case 'linklist':    return 'Array von Artikel-IDs (int[])';
                 case 'customlink':  return 'normalisiertes Array mit customlink_url, customlink_text, customlink_target, customlink_class';
                 case 'customlinkmultiple': return 'Array normalisierter Custom-Links (je Eintrag customlink_url/_text/_target/_class)';
                 case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
@@ -988,6 +1004,8 @@
                     var clbl = c.label ? ' (' + c.label + ')' : '';
                     var ch = childHint(c);
                     lines.push(inner + '// ' + c.type + clbl + (ch ? ' \u2013 ' + ch : ''));
+                    var cv = optionValuesComment(c);
+                    if (cv) lines.push(inner + '//   ' + cv);
                     var line = inner + '$' + key + ' = ' + childExpr(c, key) + ';';
                     if (rowVar !== 'row') {
                         line = line.replace(/\$row\[/g, '$' + rowVar + '[');
@@ -1027,12 +1045,13 @@
                     (item.children || []).forEach(function (c) {
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
+                            body.push('');
                         } else if (c.type === 'headline' || c.type === 'description') {
-                            // ueberspringen
+                            // ueberspringen (sind reine Form-Strukturhinweise)
                         } else {
                             body.push(renderTopLevelVar(c));
+                            body.push('');
                         }
-                        body.push('');
                     });
                 } else if (item.type === 'repeater') {
                     body.push(renderRepeaterBlock(item, ''));
