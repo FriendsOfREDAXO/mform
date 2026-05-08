@@ -5,6 +5,32 @@
 (function () {
     'use strict';
 
+    var initialised = false;
+
+    function init() {
+        if (initialised) return;
+        var canvas = document.querySelector('[data-fb-canvas]');
+        if (!canvas) return; // not on this page
+        initialised = true;
+        run();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    // REDAXO PJAX – container reload
+    if (typeof jQuery !== 'undefined') {
+        jQuery(document).on('rex:ready', function () {
+            // After a PJAX reload, init flag must reset because DOM is replaced
+            initialised = false;
+            init();
+        });
+    }
+
+    function run() {
+
     if (typeof Sortable === 'undefined') {
         console.error('[mform-fb] Sortable is not available.');
         return;
@@ -460,4 +486,6 @@
     // initial
     renderCanvas();
     emitCode();
+
+    } // end run()
 })();
