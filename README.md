@@ -1,5 +1,9 @@
 # MForm – REDAXO Addon
 
+[![Static Analysis](https://github.com/FriendsOfREDAXO/mform/actions/workflows/static-analysis.yml/badge.svg?branch=main)](https://github.com/FriendsOfREDAXO/mform/actions/workflows/static-analysis.yml)
+[![PHP](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3%20%7C%208.4-777BB4?logo=php&logoColor=white)](https://github.com/FriendsOfREDAXO/mform/actions/workflows/static-analysis.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform8.png?raw=true?2)
 
 MForm takes the pain out of building REDAXO module inputs. Instead of writing raw HTML form markup, everything gets defined in clean PHP — from a simple text field to fully nested, copy-paste-capable repeaters with conditional logic.
