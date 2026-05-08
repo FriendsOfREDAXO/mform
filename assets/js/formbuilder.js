@@ -879,9 +879,12 @@
                 case 'checkbox':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
+                case 'customlink':
+                    // laut Doku: createLinkData() erkennt String- und Array-Format automatisch
+                    return '\\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData(' + rv + ')';
                 case 'customlinkmultiple':
-                    // laut Doku: HTML-decodieren + json_decode (gespeichert als JSON-Array)
-                    return 'json_decode(html_entity_decode(' + rv + ', ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []';
+                    // gespeichert als JSON-Array; pro Eintrag normalisieren
+                    return 'array_map(static fn ($l) => \\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData($l), json_decode(html_entity_decode(' + rv + ', ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? [])';
                 case 'link':
                     return '(int) ' + rv;
                 default:
@@ -898,8 +901,10 @@
                 case 'linklist':
                 case 'checkbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
+                case 'customlink':
+                    return '\\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData(' + access + ')';
                 case 'customlinkmultiple':
-                    return 'json_decode(html_entity_decode((string) (' + access + '), ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []';
+                    return 'array_map(static fn ($l) => \\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData($l), (array) (is_string(' + access + ') ? (json_decode(html_entity_decode((string) (' + access + '), ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []) : (' + access + ')))';
                 case 'link':
                     return '(int) (' + access + ')';
                 case 'repeater':
@@ -927,8 +932,8 @@
                 case 'imagelist':   return 'Array von Bilddateinamen (kommasepariert gespeichert)';
                 case 'link':        return 'Artikel-ID (int), z.B. rex_getUrl($id)';
                 case 'linklist':    return 'Array von Artikel-IDs (kommasepariert gespeichert)';
-                case 'customlink':  return 'String wie redaxo://1, mailto:, tel: oder media:// \u2013 mit MFormOutputHelper::getCustomUrl() / ::prepareCustomLink() aufloesen';
-                case 'customlinkmultiple': return 'JSON-Array von Custom-Link-Strings \u2013 mit MFormOutputHelper::getCustomUrl()/::prepareCustomLink() pro Eintrag';
+                case 'customlink':  return 'normalisiertes Array mit customlink_url, customlink_text, customlink_target, customlink_class';
+                case 'customlinkmultiple': return 'Array normalisierter Custom-Links (je Eintrag customlink_url/_text/_target/_class)';
                 case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'select':
                 case 'radio':       return 'einzelner ausgewaehlter Wert';
