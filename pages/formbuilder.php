@@ -16,7 +16,15 @@ $intro = '<p>'
     . 'Klicke ein Feld in der linken Palette an um es einzufuegen. Reihenfolge per Drag&Drop am Griff aendern. '
     . 'Per Klick auf ein eingefuegtes Feld oeffnet sich rechts der Eigenschaftsdialog. '
     . 'Im unteren Bereich entsteht in Echtzeit der MForm-PHP-Code zum Kopieren.'
-    . '</p>';
+    . '</p>'
+    . '<div class="alert alert-info" style="margin-top:1em">'
+    . '<strong>Hinweis:</strong> Der Form Builder bietet bewusst nur eine kuratierte Auswahl der haeufigsten MForm-Felder, '
+    . 'um einen einfachen Einstieg zu ermoeglichen. Spezielle Felder wie <code>addRadioImgField</code>, '
+    . '<code>addColorSwatchField</code>, <code>addToggleCheckboxField</code>, <code>addInputField</code> mit eigenen Typen, '
+    . 'verschachtelte Layouts (Fieldset, Column, Collapse, Modal) oder Conditional Fieldsets sind weiterhin '
+    . 'direkt im PHP-Code verfuegbar &ndash; siehe <a href="https://github.com/FriendsOfREDAXO/mform/tree/main/docs" target="_blank" rel="noopener">MForm-Doku</a>. '
+    . 'Der generierte Code laesst sich beliebig erweitern.'
+    . '</div>';
 
 // TinyMCE-Profile aus DB lesen, falls verfuegbar.
 $tinyProfiles = [];
