@@ -126,12 +126,12 @@ class MFormParser
 
         $min = (int) ($attrs['min'] ?? 0);
         $max = (int) ($attrs['max'] ?? 0);
-        $collapsed = !isset($attrs['collapsed']) || $attrs['collapsed'] ? 'true' : 'false';
+        $collapsed = isset($attrs['collapsed']) && $attrs['collapsed'] ? 'true' : 'false';
         $firstOpen = !isset($attrs['first_open']) || $attrs['first_open'] ? 'true' : 'false';
         $showToggleAll = !isset($attrs['show_toggle_all']) || $attrs['show_toggle_all'] ? 'true' : 'false';
-        $open = isset($attrs['open']) && $attrs['open'] ? 'true' : 'false';
+        $open = !isset($attrs['open']) || $attrs['open'] ? 'true' : 'false';
         $defaultCount = isset($attrs['default_count']) ? (int) $attrs['default_count'] : 0;
-        $confirmDelete = isset($attrs['confirm_delete']) ? (int) ((bool) $attrs['confirm_delete']) : 0;
+        $confirmDelete = !isset($attrs['confirm_delete']) || $attrs['confirm_delete'] ? 1 : 0;
         $confirmDeleteMsg = isset($attrs['confirm_delete_msg'])
             ? (string) $attrs['confirm_delete_msg']
             : (string) rex_i18n::msg('mform_repeater_remove_group_confirm_msg');

@@ -85,8 +85,8 @@
             repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
                 props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
                         'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll',
-                        'repeaterCopyPaste', 'repeaterConfirmDelete', 'repeaterConfirmDeleteMsg',
-                        'repeaterBtnText', 'repeaterBtnClass'] }
+                        'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
+                        'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] }
         };
 
         var state = [];
@@ -137,11 +137,12 @@
                 repeaterMin: '',
                 repeaterMax: '',
                 repeaterDefaultCount: '',
-                repeaterCollapsed: type === 'repeater' ? true : false,
+                repeaterCollapsed: false,
                 repeaterFirstOpen: type === 'repeater' ? true : false,
                 repeaterShowToggleAll: type === 'repeater' ? true : false,
-                repeaterCopyPaste: type === 'repeater' ? true : false,
+                repeaterCopyPaste: false,
                 repeaterConfirmDelete: type === 'repeater' ? true : false,
+                repeaterOpen: type === 'repeater' ? true : false,
                 repeaterConfirmDeleteMsg: '',
                 repeaterBtnText: '',
                 repeaterBtnClass: '',
@@ -692,12 +693,15 @@
             if (maxVal !== null && !isNaN(maxVal)) parts.push("'max' => " + maxVal);
             if (defCnt !== null && !isNaN(defCnt)) parts.push("'default_count' => " + defCnt);
             if (item.label) parts.push("'label' => " + phpStr(item.label));
-            // Flags only emit when DIFFERENT from MForm default (default true for collapsed/first_open/show_toggle_all)
-            if (item.repeaterCollapsed === false) parts.push("'collapsed' => false");
+            // Flags only emit when DIFFERENT from MForm core default.
+            // Core defaults: collapsed=false, first_open=true, show_toggle_all=true,
+            //                open=true, copy_paste=false, confirm_delete=true.
+            if (item.repeaterCollapsed === true) parts.push("'collapsed' => true");
             if (item.repeaterFirstOpen === false) parts.push("'first_open' => false");
             if (item.repeaterShowToggleAll === false) parts.push("'show_toggle_all' => false");
+            if (item.repeaterOpen === false) parts.push("'open' => false");
             if (item.repeaterCopyPaste === true) parts.push("'copy_paste' => true");
-            if (item.repeaterConfirmDelete === true) parts.push("'confirm_delete' => true");
+            if (item.repeaterConfirmDelete === false) parts.push("'confirm_delete' => false");
             if (item.repeaterConfirmDeleteMsg) parts.push("'confirm_delete_msg' => " + phpStr(item.repeaterConfirmDeleteMsg));
             if (item.repeaterBtnText) parts.push("'btn_text' => " + phpStr(item.repeaterBtnText));
             if (item.repeaterBtnClass) parts.push("'btn_class' => " + phpStr(item.repeaterBtnClass));

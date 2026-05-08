@@ -185,6 +185,9 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="repeaterShowToggleAll">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterShowToggleAll"> "Alle ein-/ausklappen"-Button <small>(show_toggle_all)</small></label>
             </div>
+            <div class="form-group" data-fb-prop-group="repeaterOpen">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterOpen"> Neu hinzugefuegtes Item geoeffnet <small>(open)</small></label>
+            </div>
             <div class="form-group" data-fb-prop-group="repeaterCopyPaste">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterCopyPaste"> Kopieren/Einfuegen erlauben <small>(copy_paste)</small></label>
             </div>
