@@ -106,7 +106,7 @@
             nested.className = 'mform-fb__nested';
             nested.dataset.fbNested = item.uid;
             if (item.children.length === 0) {
-                nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen</p>';
+                nested.innerHTML = '<p class="mform-fb__nested-hint">Felder fuer den Repeater hier einfuegen (Repeater oben anklicken, dann links ein Feld waehlen)</p>';
             } else {
                 item.children.forEach(function (c) { nested.appendChild(renderItem(c)); });
             }
@@ -149,7 +149,7 @@
     function renderCanvas() {
         $canvas.innerHTML = '';
         if (state.length === 0) {
-            $canvas.innerHTML = '<p class="mform-fb__hint">Felder hierher ziehen</p>';
+            $canvas.innerHTML = '<p class="mform-fb__hint">Klick links auf ein Feld, um es hier einzufuegen</p>';
             highlightActive();
             return;
         }
@@ -283,35 +283,21 @@
         emitCode();
     }
 
-    // Palette items: cloned on drag-out via Sortable + click-to-add fallback
-    Sortable.create($palette, {
-        group: { name: 'fb-palette', pull: 'clone', put: false },
-        sort: false,
-        animation: 0
-    });
-    Sortable.create($paletteWrap, {
-        group: { name: 'fb-palette', pull: 'clone', put: false },
-        sort: false,
-        animation: 0
-    });
-
-    // Click-to-add (primary, also acts as fallback if drag fails)
+    // Palette items: click-to-add only.
+    // Sortable on the palette swallows clicks, so we deliberately do not
+    // attach Sortable to the palette containers.
     function paletteClick(e) {
         var li = e.target.closest('.mform-fb__pal-item');
-        if (!li) return;
+        if (!li || !$palette.contains(li) && !$paletteWrap.contains(li)) return;
         var type = li.dataset.type;
         if (!type) return;
         var newItem = makeItem(type);
         if (type === 'repeater') {
             state.push(newItem);
+        } else if (activeItem && activeItem.type === 'repeater') {
+            activeItem.children.push(newItem);
         } else {
-            // If a repeater is currently active, append into its children;
-            // otherwise append at top level.
-            if (activeItem && activeItem.type === 'repeater') {
-                activeItem.children.push(newItem);
-            } else {
-                state.push(newItem);
-            }
+            state.push(newItem);
         }
         renderCanvas();
         emitCode();
@@ -321,11 +307,11 @@
     $paletteWrap.addEventListener('click', paletteClick);
 
     Sortable.create($canvas, {
-        group: { name: 'fb-fields', pull: true, put: ['fb-fields', 'fb-palette'] },
+        group: { name: 'fb-fields', pull: true, put: 'fb-fields' },
         animation: 150,
         handle: '.mform-fb__item-handle',
-        onAdd: handleSortAdd,
         onUpdate: handleSortUpdate,
+        onAdd: handleSortAdd,
         onRemove: rebuildAllAndEmit
     });
 
