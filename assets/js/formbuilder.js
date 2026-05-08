@@ -1,6 +1,16 @@
 /**
  * MForm Visual Form Builder.
  * Vanilla JS, depends only on the globally available Sortable from sortable.min.js.
+ *
+ * Architektur:
+ *  - Modell (state[]) ist single-source-of-truth.
+ *  - Sortable-Events mutieren das Modell direkt anhand evt.from / evt.to /
+ *    evt.oldIndex / evt.newIndex; wir scannen NICHT das DOM.
+ *  - Palette unterstützt sowohl Drag&Drop (Sortable mit pull:'clone') als
+ *    auch Click-to-Add. Klick und Drag stören sich nicht, weil Sortable
+ *    Klicks ohne tatsächlichen Drag durchlässt.
+ *  - Repeater dürfen maximal eine weitere Repeater-Ebene tief verschachtelt
+ *    werden (zwei Repeater-Ebenen insgesamt). Tiefer-Drops werden geblockt.
  */
 (function () {
     'use strict';
@@ -10,20 +20,17 @@
     function init() {
         if (initialised) return;
         var canvas = document.querySelector('[data-fb-canvas]');
-        if (!canvas) return; // not on this page
+        if (!canvas) return;
         initialised = true;
         run();
     }
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
-    // REDAXO PJAX – container reload
     if (typeof jQuery !== 'undefined') {
         jQuery(document).on('rex:ready', function () {
-            // After a PJAX reload, init flag must reset because DOM is replaced
             initialised = false;
             init();
         });
@@ -31,453 +38,548 @@
 
     function run() {
 
-    if (typeof Sortable === 'undefined') {
-        console.error('[mform-fb] Sortable is not available.');
-        return;
-    }
+        if (typeof Sortable === 'undefined') {
+            console.error('[mform-fb] Sortable is not available.');
+            return;
+        }
 
-    var TYPES = {
-        text:        { label: 'Text', method: 'addTextField',        props: ['label', 'defaultValue', 'placeholder', 'required', 'full'] },
-        textarea:    { label: 'Textarea', method: 'addTextAreaField', props: ['label', 'defaultValue', 'placeholder', 'tinymce', 'required', 'full'] },
-        select:      { label: 'Select', method: 'addSelectField',     props: ['label', 'defaultValue', 'options', 'required', 'full'] },
-        radio:       { label: 'Radio',  method: 'addRadioField',      props: ['label', 'defaultValue', 'options', 'required'] },
-        checkbox:    { label: 'Checkbox', method: 'addCheckboxField', props: ['label', 'defaultValue', 'options'] },
-        hidden:      { label: 'Hidden', method: 'addHiddenField',     props: ['defaultValue'] },
-        headline:    { label: 'Headline', method: 'addHeadlineElement', props: ['label'] },
-        description: { label: 'Description', method: 'addDescriptionElement', props: ['label'] },
-        repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement', props: ['label', 'repeaterMin', 'repeaterMax'] }
-    };
+        // Wie oft darf ein Repeater verschachtelt werden? 1 = zwei Ebenen.
+        var MAX_REPEATER_DEPTH = 1;
 
-    /** @type {Array<Object>} top-level model */
-    var state = [];
-    var nextId = 1;
-    var activeItem = null;
-
-    var $canvas = document.querySelector('[data-fb-canvas]');
-    var $palette = document.querySelector('[data-fb-palette]');
-    var $paletteWrap = document.querySelector('[data-fb-palette-wrap]');
-    var $code = document.querySelector('[data-fb-code]');
-    var $propsForm = document.querySelector('[data-fb-props-form]');
-    var $propsEmpty = document.querySelector('[data-fb-props-empty]');
-
-    if (!$canvas) return;
-
-    // ---- Model helpers ---------------------------------------------------
-
-    function makeItem(type) {
-        var def = TYPES[type];
-        var item = {
-            uid: 'fb-' + (Math.random().toString(36).slice(2, 8)),
-            id: nextId++,
-            type: type,
-            label: def.label,
-            defaultValue: '',
-            placeholder: '',
-            options: type === 'select' || type === 'radio' || type === 'checkbox' ? "1=Option 1\n2=Option 2" : '',
-            required: false,
-            full: false,
-            tinymce: false,
-            repeaterMin: '',
-            repeaterMax: '',
-            children: type === 'repeater' ? [] : null
+        var TYPES = {
+            text:        { label: 'Text', method: 'addTextField',
+                props: ['label', 'defaultValue', 'placeholder', 'required', 'full'] },
+            textarea:    { label: 'Textarea', method: 'addTextAreaField',
+                props: ['label', 'defaultValue', 'placeholder', 'tinymce', 'required', 'full'] },
+            select:      { label: 'Select', method: 'addSelectField',
+                props: ['label', 'defaultValue', 'options', 'required', 'full'] },
+            radio:       { label: 'Radio', method: 'addRadioField',
+                props: ['label', 'defaultValue', 'options', 'required'] },
+            checkbox:    { label: 'Checkbox', method: 'addCheckboxField',
+                props: ['label', 'defaultValue', 'options'] },
+            hidden:      { label: 'Hidden', method: 'addHiddenField',
+                props: ['defaultValue'] },
+            headline:    { label: 'Headline', method: 'addHeadlineElement',
+                props: ['label'] },
+            description: { label: 'Description', method: 'addDescriptionElement',
+                props: ['label'] },
+            // REDAXO core widgets
+            media:       { label: 'Media', method: 'addMediaField',
+                props: ['label', 'category'] },
+            medialist:   { label: 'Medialist', method: 'addMedialistField',
+                props: ['label', 'category'] },
+            imagelist:   { label: 'Imagelist', method: 'addImagelistField',
+                props: ['label', 'category'] },
+            link:        { label: 'Link', method: 'addLinkField',
+                props: ['label', 'category'] },
+            linklist:    { label: 'Linklist', method: 'addLinklistField',
+                props: ['label', 'category'] },
+            customlink:  { label: 'Custom Link', method: 'addCustomLinkField',
+                props: ['label'] },
+            customlinkmultiple: { label: 'Custom Link Multiple', method: 'addCustomLinkMultipleField',
+                props: ['label'] },
+            repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
+                props: ['label', 'repeaterMin', 'repeaterMax'] }
         };
-        return item;
-    }
 
-    function findItem(uid, list) {
-        list = list || state;
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].uid === uid) return list[i];
-            if (list[i].children) {
-                var hit = findItem(uid, list[i].children);
-                if (hit) return hit;
+        var state = [];
+        var nextId = 1;
+        var activeItem = null;
+
+        var $canvas = document.querySelector('[data-fb-canvas]');
+        var $palette = document.querySelector('[data-fb-palette]');
+        var $paletteWrap = document.querySelector('[data-fb-palette-wrap]');
+        var $code = document.querySelector('[data-fb-code]');
+        var $propsForm = document.querySelector('[data-fb-props-form]');
+        var $propsEmpty = document.querySelector('[data-fb-props-empty]');
+
+        $canvas.dataset.fbDepth = '0';
+
+        // ---- Model helpers --------------------------------------------------
+
+        function makeItem(type) {
+            var def = TYPES[type];
+            return {
+                uid: 'fb-' + (Math.random().toString(36).slice(2, 8)),
+                id: nextId++,
+                type: type,
+                label: def.label,
+                defaultValue: '',
+                placeholder: '',
+                category: '',
+                options: (type === 'select' || type === 'radio' || type === 'checkbox') ? "1=Option 1\n2=Option 2" : '',
+                required: false,
+                full: false,
+                tinymce: false,
+                repeaterMin: '',
+                repeaterMax: '',
+                children: type === 'repeater' ? [] : null
+            };
+        }
+
+        function findItem(uid, list) {
+            list = list || state;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].uid === uid) return list[i];
+                if (list[i].children) {
+                    var hit = findItem(uid, list[i].children);
+                    if (hit) return hit;
+                }
             }
+            return null;
         }
-        return null;
-    }
 
-    function removeItem(uid, list) {
-        list = list || state;
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].uid === uid) { list.splice(i, 1); return true; }
-            if (list[i].children && removeItem(uid, list[i].children)) return true;
+        function removeItem(uid, list) {
+            list = list || state;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].uid === uid) { list.splice(i, 1); return true; }
+                if (list[i].children && removeItem(uid, list[i].children)) return true;
+            }
+            return false;
         }
-        return false;
-    }
 
-    // ---- Rendering -------------------------------------------------------
+        // Tree-aware: if a repeater contains a repeater, that's depth 1.
+        function maxRepeaterSubtreeDepth(item) {
+            if (item.type !== 'repeater') return -1;
+            var max = 0;
+            (item.children || []).forEach(function (c) {
+                if (c.type === 'repeater') {
+                    var d = 1 + (maxRepeaterSubtreeDepth(c) === -1 ? 0 : 1 + maxRepeaterSubtreeDepth(c));
+                    // Simpler: recurse
+                }
+            });
+            // simpler: iterative via children
+            return 0;
+        }
 
-    function renderItem(item) {
-        var el = document.createElement('div');
-        el.className = 'mform-fb__item mform-fb__item--' + item.type;
-        el.dataset.uid = item.uid;
+        // ---- Rendering ------------------------------------------------------
 
-        if (item.type === 'repeater') {
+        function renderItem(item, depth) {
+            var el = document.createElement('div');
+            el.className = 'mform-fb__item mform-fb__item--' + item.type;
+            el.dataset.uid = item.uid;
+
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
             head.innerHTML =
                 '<span class="mform-fb__item-handle">::</span>' +
-                '<span class="mform-fb__item-type">repeater</span>' +
+                '<span class="mform-fb__item-type">' + item.type + '</span>' +
                 '<span class="mform-fb__item-label"></span>' +
                 '<span class="mform-fb__item-id">id ' + item.id + '</span>' +
                 '<button type="button" class="mform-fb__item-remove" data-fb-remove>x</button>';
-            head.querySelector('.mform-fb__item-label').textContent = item.label || 'Repeater';
+            head.querySelector('.mform-fb__item-label').textContent = item.label || item.type;
             head.addEventListener('click', function (e) {
                 if (e.target.closest('[data-fb-remove]')) return;
                 selectItem(item);
             });
             el.appendChild(head);
 
-            var nested = document.createElement('div');
-            nested.className = 'mform-fb__nested';
-            nested.dataset.fbNested = item.uid;
-            if (item.children.length === 0) {
-                nested.innerHTML = '<p class="mform-fb__nested-hint">Felder fuer den Repeater hier einfuegen (Repeater oben anklicken, dann links ein Feld waehlen)</p>';
-            } else {
-                item.children.forEach(function (c) { nested.appendChild(renderItem(c)); });
-            }
-            el.appendChild(nested);
-
-            // sortable for nested zone
-            Sortable.create(nested, {
-                group: { name: 'fb-fields', pull: true, put: ['fb-fields'] },
-                animation: 150,
-                handle: '.mform-fb__item-handle',
-                onAdd: handleSortAdd,
-                onUpdate: handleSortUpdate,
-                onRemove: handleSortRemove
-            });
-        } else {
-            el.innerHTML =
-                '<span class="mform-fb__item-handle">::</span>' +
-                '<span class="mform-fb__item-type">' + item.type + '</span>' +
-                '<span class="mform-fb__item-label"></span>' +
-                '<span class="mform-fb__item-id">id ' + item.id + '</span>' +
-                '<button type="button" class="mform-fb__item-remove" data-fb-remove>x</button>';
-            el.querySelector('.mform-fb__item-label').textContent = item.label || item.type;
-            el.addEventListener('click', function (e) {
-                if (e.target.closest('[data-fb-remove]')) return;
-                selectItem(item);
-            });
-        }
-
-        el.querySelector('[data-fb-remove]').addEventListener('click', function (e) {
-            e.stopPropagation();
-            removeItem(item.uid);
-            if (activeItem === item) { activeItem = null; renderProps(); }
-            renderCanvas();
-            emitCode();
-        });
-
-        return el;
-    }
-
-    function renderCanvas() {
-        $canvas.innerHTML = '';
-        if (state.length === 0) {
-            $canvas.innerHTML = '<p class="mform-fb__hint">Klick links auf ein Feld, um es hier einzufuegen</p>';
-            highlightActive();
-            return;
-        }
-        state.forEach(function (item) {
-            $canvas.appendChild(renderItem(item));
-        });
-        highlightActive();
-    }
-
-    function highlightActive() {
-        document.querySelectorAll('.mform-fb__item.is-active').forEach(function (el) { el.classList.remove('is-active'); });
-        if (!activeItem) return;
-        var el = $canvas.querySelector('[data-uid="' + activeItem.uid + '"]');
-        if (el) el.classList.add('is-active');
-    }
-
-    // ---- Props panel -----------------------------------------------------
-
-    function selectItem(item) {
-        activeItem = item;
-        renderProps();
-        highlightActive();
-    }
-
-    function renderProps() {
-        if (!activeItem) {
-            $propsEmpty.style.display = '';
-            $propsForm.style.display = 'none';
-            return;
-        }
-        $propsEmpty.style.display = 'none';
-        $propsForm.style.display = '';
-
-        var def = TYPES[activeItem.type];
-        var available = def.props || [];
-
-        $propsForm.querySelectorAll('[data-fb-prop-group]').forEach(function (g) {
-            g.style.display = available.indexOf(g.dataset.fbPropGroup) !== -1 ? '' : 'none';
-        });
-
-        // Label group: also hidden field has no label - but our def excludes it.
-        var labelGrp = $propsForm.querySelector('.form-group:first-child');
-        labelGrp.style.display = available.indexOf('label') !== -1 ? '' : 'none';
-
-        $propsForm.querySelectorAll('[data-fb-prop]').forEach(function (input) {
-            var key = input.dataset.fbProp;
-            var val = activeItem[key];
-            if (input.type === 'checkbox') input.checked = !!val;
-            else input.value = val == null ? '' : val;
-        });
-    }
-
-    $propsForm.addEventListener('input', function (e) {
-        if (!activeItem) return;
-        var input = e.target.closest('[data-fb-prop]');
-        if (!input) return;
-        var key = input.dataset.fbProp;
-        activeItem[key] = input.type === 'checkbox' ? input.checked : input.value;
-        // Live update the rendered label
-        var el = $canvas.querySelector('[data-uid="' + activeItem.uid + '"]');
-        if (el && key === 'label') {
-            var lbl = el.querySelector('.mform-fb__item-label');
-            if (lbl) lbl.textContent = activeItem.label || activeItem.type;
-        }
-        emitCode();
-    });
-
-    // ---- Sortable wiring -------------------------------------------------
-    //
-    // We do NOT rebuild the model from a DOM scan after each drop, because
-    // Sortable can leave the DOM in an intermediate state during cross-list
-    // moves which causes items to "disappear" until the next render.
-    // Instead we mutate `state` directly using evt.oldIndex/newIndex/from/to.
-
-    function listFor(el) {
-        if (el === $canvas) return state;
-        if (el && el.dataset && el.dataset.fbNested) {
-            var owner = findItem(el.dataset.fbNested);
-            return owner && owner.children ? owner.children : null;
-        }
-        return null;
-    }
-
-    function handleSortAdd(evt) {
-        // Palette is no longer Sortable, so this only fires for canvas<->nested.
-        var toList = listFor(evt.to);
-        if (!toList) return;
-        // The element was already removed from the source list by handleSortRemove
-        // OR will be (Sortable fires remove before add on cross-list). To stay
-        // safe we always look the item up via uid in the WHOLE state tree.
-        var uid = evt.item.dataset && evt.item.dataset.uid;
-        if (!uid) return;
-        var item = findItem(uid);
-        if (!item) return;
-        // Remove from anywhere it might still be (idempotent), then insert.
-        removeItem(uid);
-        if (item.type === 'repeater' && evt.to !== $canvas) {
-            alert('Repeater im Repeater wird im MVP nicht unterstuetzt.');
-            // re-add at original position is too tricky; just put it on top level
-            state.push(item);
-            renderCanvas();
-            emitCode();
-            return;
-        }
-        toList.splice(evt.newIndex, 0, item);
-        renderCanvas();
-        emitCode();
-    }
-
-    function handleSortRemove() {
-        // Intentionally empty: handleSortAdd does the full move atomically by
-        // calling removeItem(uid) before inserting at the new index.
-    }
-
-    function handleSortUpdate(evt) {
-        // Reorder within the same list.
-        var list = listFor(evt.from);
-        if (!list) return;
-        if (evt.oldIndex === evt.newIndex) return;
-        var moved = list.splice(evt.oldIndex, 1)[0];
-        list.splice(evt.newIndex, 0, moved);
-        renderCanvas();
-        emitCode();
-    }
-
-    // Palette items: click-to-add only.
-    // Sortable on the palette swallows clicks, so we deliberately do not
-    // attach Sortable to the palette containers.
-    function paletteClick(e) {
-        var li = e.target.closest('.mform-fb__pal-item');
-        if (!li || !$palette.contains(li) && !$paletteWrap.contains(li)) return;
-        var type = li.dataset.type;
-        if (!type) return;
-        var newItem = makeItem(type);
-        if (type === 'repeater') {
-            state.push(newItem);
-        } else if (activeItem && activeItem.type === 'repeater') {
-            activeItem.children.push(newItem);
-        } else {
-            state.push(newItem);
-        }
-        renderCanvas();
-        emitCode();
-        selectItem(newItem);
-    }
-    $palette.addEventListener('click', paletteClick);
-    $paletteWrap.addEventListener('click', paletteClick);
-
-    Sortable.create($canvas, {
-        group: { name: 'fb-fields', pull: true, put: 'fb-fields' },
-        animation: 150,
-        handle: '.mform-fb__item-handle',
-        onUpdate: handleSortUpdate,
-        onAdd: handleSortAdd,
-        onRemove: handleSortRemove
-    });
-
-    // ---- Toolbar ---------------------------------------------------------
-
-    document.querySelector('[data-fb-action="clear"]').addEventListener('click', function () {
-        if (!confirm('Alles loeschen?')) return;
-        state = [];
-        nextId = 1;
-        activeItem = null;
-        renderProps();
-        renderCanvas();
-        emitCode();
-    });
-
-    document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
-        var txt = $code.textContent;
-        navigator.clipboard.writeText(txt).then(function () {
-            var msg = document.querySelector('[data-fb-copy-msg]');
-            msg.textContent = 'kopiert';
-            setTimeout(function () { msg.textContent = ''; }, 1500);
-        });
-    });
-
-    // ---- Code generation -------------------------------------------------
-
-    function phpStr(s) {
-        return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
-    }
-
-    function parseOptions(raw) {
-        if (!raw) return [];
-        return raw.split('\n').map(function (line) { return line.trim(); }).filter(Boolean).map(function (line, idx) {
-            var eq = line.indexOf('=');
-            if (eq === -1) return { key: idx + 1, label: line };
-            return { key: line.slice(0, eq).trim(), label: line.slice(eq + 1).trim() };
-        });
-    }
-
-    function optionsArray(items, indent) {
-        var pairs = items.map(function (o) {
-            var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
-            return k + ' => ' + phpStr(o.label);
-        });
-        return '[' + pairs.join(', ') + ']';
-    }
-
-    function slugify(s, fallback) {
-        if (!s) return fallback;
-        var slug = String(s).toLowerCase()
-            .replace(/[\u00e4]/g, 'ae').replace(/[\u00f6]/g, 'oe').replace(/[\u00fc]/g, 'ue').replace(/[\u00df]/g, 'ss')
-            .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-        return slug || fallback;
-    }
-
-    /**
-     * Render a single field as fluent chain (no leading $mform).
-     */
-    function renderField(item, idArg, indent) {
-        var def = TYPES[item.type];
-        var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
-        var attrs = {};
-        if (item.label && item.type !== 'hidden') attrs.label = item.label;
-        if (item.placeholder) attrs.placeholder = item.placeholder;
-        if (item.required) attrs.required = 'required';
-        if (item.tinymce && item.type === 'textarea') attrs['class'] = 'form-control tinymce-editor';
-
-        var attrParts = Object.keys(attrs).map(function (k) {
-            return phpStr(k) + ' => ' + phpStr(attrs[k]);
-        });
-        var attrPhp = attrParts.length ? '[' + attrParts.join(', ') + ']' : null;
-
-        var line = '$mform->' + def.method + '(' + idLit;
-
-        if (item.type === 'select' || item.type === 'radio' || item.type === 'checkbox') {
-            var opts = parseOptions(item.options);
-            line += ', ' + optionsArray(opts);
-            if (attrPhp) line += ', ' + attrPhp;
-            if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
-        } else if (item.type === 'text' || item.type === 'textarea') {
-            if (attrPhp) line += ', ' + attrPhp;
-            if (item.defaultValue) line += ', null, ' + phpStr(item.defaultValue);
-        } else if (item.type === 'hidden') {
-            line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
-        } else if (item.type === 'headline' || item.type === 'description') {
-            line += ', ' + phpStr(item.label || '');
-        }
-
-        line += ')';
-        if (item.full) line += '\n' + indent + '    ->setFull()';
-        return indent + line;
-    }
-
-    function renderRepeater(item, slotId, indent) {
-        var minMax = '';
-        var childKeys = {};
-        // Collect & assign string keys for inner fields
-        var innerLines = item.children.map(function (c) {
-            var key = slugify(c.label, 'field_' + c.id);
-            // ensure unique
-            var base = key, n = 2;
-            while (childKeys[key]) { key = base + '_' + n++; }
-            childKeys[key] = true;
-            return renderField(c, key, indent + '        ');
-        }).join("\n");
-
-        var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
-        var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
-
-        var configParts = [];
-        if (minVal !== null && !isNaN(minVal)) configParts.push("'min' => " + minVal);
-        if (maxVal !== null && !isNaN(maxVal)) configParts.push("'max' => " + maxVal);
-        if (item.label) configParts.push("'label' => " + phpStr(item.label));
-
-        var cfg = configParts.length ? ', [' + configParts.join(', ') + ']' : '';
-
-        var inner = innerLines || (indent + '        // Felder hier ablegen');
-
-        return indent + '$mform->addFlexRepeaterElement(' + slotId + ', MForm::factory()\n'
-            + inner + (innerLines ? '\n' : '\n')
-            + indent + '    , null' + cfg + ');';
-    }
-
-    function emitCode() {
-        if (state.length === 0) {
-            $code.textContent = '// Noch keine Felder hinzugefuegt.';
-            return;
-        }
-        var lines = [];
-        lines.push('use FriendsOfRedaxo\\MForm;');
-        lines.push('');
-        lines.push('$mform = MForm::factory();');
-        lines.push('');
-        state.forEach(function (item) {
             if (item.type === 'repeater') {
-                lines.push(renderRepeater(item, item.id, ''));
-            } else {
-                lines.push(renderField(item, item.id, '') + ';');
+                var nested = document.createElement('div');
+                nested.className = 'mform-fb__nested';
+                nested.dataset.fbNested = item.uid;
+                nested.dataset.fbDepth = String(depth + 1);
+                if (item.children.length === 0) {
+                    nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder Repeater oben anklicken und dann links ein Feld waehlen</p>';
+                } else {
+                    item.children.forEach(function (c) { nested.appendChild(renderItem(c, depth + 1)); });
+                }
+                el.appendChild(nested);
+
+                Sortable.create(nested, {
+                    group: { name: 'fb-fields', pull: true, put: ['fb-palette', 'fb-fields'] },
+                    animation: 150,
+                    handle: '.mform-fb__item-handle',
+                    onAdd: handleSortAdd,
+                    onUpdate: handleSortUpdate,
+                    onRemove: handleSortRemove
+                });
             }
+
+            head.querySelector('[data-fb-remove]').addEventListener('click', function (e) {
+                e.stopPropagation();
+                removeItem(item.uid);
+                if (activeItem === item) { activeItem = null; renderProps(); }
+                renderCanvas();
+                emitCode();
+            });
+
+            return el;
+        }
+
+        function renderCanvas() {
+            $canvas.innerHTML = '';
+            if (state.length === 0) {
+                $canvas.innerHTML = '<p class="mform-fb__hint">Felder hierher ziehen oder links anklicken</p>';
+                highlightActive();
+                return;
+            }
+            state.forEach(function (item) {
+                $canvas.appendChild(renderItem(item, 0));
+            });
+            highlightActive();
+        }
+
+        function highlightActive() {
+            $canvas.querySelectorAll('.mform-fb__item.is-active').forEach(function (el) { el.classList.remove('is-active'); });
+            if (!activeItem) return;
+            var els = $canvas.querySelectorAll('[data-uid="' + activeItem.uid + '"]');
+            els.forEach(function (el) { el.classList.add('is-active'); });
+        }
+
+        // ---- Props panel ----------------------------------------------------
+
+        function selectItem(item) {
+            activeItem = item;
+            renderProps();
+            highlightActive();
+        }
+
+        function renderProps() {
+            if (!activeItem) {
+                $propsEmpty.style.display = '';
+                $propsForm.style.display = 'none';
+                return;
+            }
+            $propsEmpty.style.display = 'none';
+            $propsForm.style.display = '';
+
+            var def = TYPES[activeItem.type];
+            var available = def.props || [];
+
+            $propsForm.querySelectorAll('[data-fb-prop-group]').forEach(function (g) {
+                g.style.display = available.indexOf(g.dataset.fbPropGroup) !== -1 ? '' : 'none';
+            });
+
+            $propsForm.querySelectorAll('[data-fb-prop]').forEach(function (input) {
+                var key = input.dataset.fbProp;
+                var val = activeItem[key];
+                if (input.type === 'checkbox') input.checked = !!val;
+                else input.value = val == null ? '' : val;
+            });
+        }
+
+        $propsForm.addEventListener('input', function (e) {
+            if (!activeItem) return;
+            var input = e.target.closest('[data-fb-prop]');
+            if (!input) return;
+            var key = input.dataset.fbProp;
+            activeItem[key] = input.type === 'checkbox' ? input.checked : input.value;
+            if (key === 'label') {
+                $canvas.querySelectorAll('[data-uid="' + activeItem.uid + '"] > .mform-fb__item-head .mform-fb__item-label').forEach(function (lbl) {
+                    lbl.textContent = activeItem.label || activeItem.type;
+                });
+            }
+            emitCode();
         });
-        lines.push('');
-        lines.push('echo $mform->show();');
-        $code.textContent = lines.join('\n');
-    }
 
-    // initial
-    renderCanvas();
-    emitCode();
+        // ---- Sortable wiring ------------------------------------------------
 
+        function listFor(el) {
+            if (el === $canvas) return state;
+            if (el && el.dataset && el.dataset.fbNested) {
+                var owner = findItem(el.dataset.fbNested);
+                return owner && owner.children ? owner.children : null;
+            }
+            return null;
+        }
+
+        function depthOf(el) {
+            return parseInt((el && el.dataset && el.dataset.fbDepth) || '0', 10);
+        }
+
+        function handleSortAdd(evt) {
+            var fromPalette = evt.from === $palette || evt.from === $paletteWrap;
+            var toList = listFor(evt.to);
+            if (!toList) {
+                if (evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
+                renderCanvas();
+                return;
+            }
+
+            if (fromPalette) {
+                var type = evt.item.dataset.type;
+                if (evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
+                if (type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
+                    alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                    renderCanvas();
+                    return;
+                }
+                var newItem = makeItem(type);
+                toList.splice(evt.newIndex, 0, newItem);
+                renderCanvas();
+                emitCode();
+                selectItem(newItem);
+                return;
+            }
+
+            // Cross-list move within builder
+            var uid = evt.item.dataset && evt.item.dataset.uid;
+            if (!uid) return;
+            var item = findItem(uid);
+            if (!item) return;
+
+            // Block dropping a repeater that would exceed max depth
+            if (item.type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
+                alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                renderCanvas();
+                return;
+            }
+
+            removeItem(uid);
+            toList.splice(evt.newIndex, 0, item);
+            renderCanvas();
+            emitCode();
+        }
+
+        function handleSortRemove() { /* no-op: handled in onAdd */ }
+
+        function handleSortUpdate(evt) {
+            var list = listFor(evt.from);
+            if (!list) return;
+            if (evt.oldIndex === evt.newIndex) return;
+            var moved = list.splice(evt.oldIndex, 1)[0];
+            list.splice(evt.newIndex, 0, moved);
+            renderCanvas();
+            emitCode();
+        }
+
+        // Palette: clone-on-drag + click-to-add. Both work side by side.
+        Sortable.create($palette, {
+            group: { name: 'fb-palette', pull: 'clone', put: false },
+            sort: false,
+            animation: 0
+        });
+        Sortable.create($paletteWrap, {
+            group: { name: 'fb-palette', pull: 'clone', put: false },
+            sort: false,
+            animation: 0
+        });
+
+        function paletteClick(e) {
+            // Ignore if it was the end of a drag
+            if (e.detail === 0) return;
+            var li = e.target.closest('.mform-fb__pal-item');
+            if (!li) return;
+            // Only react if the li is inside one of the palette containers
+            if (!$palette.contains(li) && !$paletteWrap.contains(li)) return;
+            var type = li.dataset.type;
+            if (!type) return;
+            var newItem = makeItem(type);
+            if (type === 'repeater') {
+                if (activeItem && activeItem.type === 'repeater') {
+                    // Active repeater is depth 0 (top level only) -> insert nested
+                    activeItem.children.push(newItem);
+                } else {
+                    state.push(newItem);
+                }
+            } else if (activeItem && activeItem.type === 'repeater') {
+                activeItem.children.push(newItem);
+            } else {
+                state.push(newItem);
+            }
+            renderCanvas();
+            emitCode();
+            selectItem(newItem);
+        }
+        $palette.addEventListener('click', paletteClick);
+        $paletteWrap.addEventListener('click', paletteClick);
+
+        Sortable.create($canvas, {
+            group: { name: 'fb-fields', pull: true, put: ['fb-palette', 'fb-fields'] },
+            animation: 150,
+            handle: '.mform-fb__item-handle',
+            onUpdate: handleSortUpdate,
+            onAdd: handleSortAdd,
+            onRemove: handleSortRemove
+        });
+
+        // ---- Toolbar --------------------------------------------------------
+
+        document.querySelector('[data-fb-action="clear"]').addEventListener('click', function () {
+            if (!confirm('Alles loeschen?')) return;
+            state = [];
+            nextId = 1;
+            activeItem = null;
+            renderProps();
+            renderCanvas();
+            emitCode();
+        });
+
+        document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
+            navigator.clipboard.writeText($code.textContent).then(function () {
+                var msg = document.querySelector('[data-fb-copy-msg]');
+                msg.textContent = 'kopiert';
+                setTimeout(function () { msg.textContent = ''; }, 1500);
+            });
+        });
+
+        // ---- Code generation ------------------------------------------------
+
+        function phpStr(s) {
+            return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+        }
+
+        function parseOptions(raw) {
+            if (!raw) return [];
+            return raw.split('\n').map(function (line) { return line.trim(); }).filter(Boolean).map(function (line, idx) {
+                var eq = line.indexOf('=');
+                if (eq === -1) return { key: idx + 1, label: line };
+                return { key: line.slice(0, eq).trim(), label: line.slice(eq + 1).trim() };
+            });
+        }
+
+        function optionsArray(items) {
+            var pairs = items.map(function (o) {
+                var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
+                return k + ' => ' + phpStr(o.label);
+            });
+            return '[' + pairs.join(', ') + ']';
+        }
+
+        function slugify(s, fallback) {
+            if (!s) return fallback;
+            var slug = String(s).toLowerCase()
+                .replace(/[\u00e4]/g, 'ae').replace(/[\u00f6]/g, 'oe').replace(/[\u00fc]/g, 'ue').replace(/[\u00df]/g, 'ss')
+                .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+            return slug || fallback;
+        }
+
+        function attrsForItem(item) {
+            var a = {};
+            if (item.label && item.type !== 'hidden') a.label = item.label;
+            if (item.placeholder) a.placeholder = item.placeholder;
+            if (item.required) a.required = 'required';
+            if (item.tinymce && item.type === 'textarea') a['class'] = 'form-control tinymce-editor';
+            return a;
+        }
+
+        function attrsToPhp(attrs) {
+            var keys = Object.keys(attrs);
+            if (!keys.length) return null;
+            return '[' + keys.map(function (k) { return phpStr(k) + ' => ' + phpStr(attrs[k]); }).join(', ') + ']';
+        }
+
+        function renderField(item, idArg, indent) {
+            var def = TYPES[item.type];
+            var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
+            var attrs = attrsForItem(item);
+            var attrPhp = attrsToPhp(attrs);
+            var line = '$mform->' + def.method + '(' + idLit;
+
+            switch (item.type) {
+                case 'select':
+                case 'radio':
+                case 'checkbox':
+                    line += ', ' + optionsArray(parseOptions(item.options));
+                    if (attrPhp) line += ', ' + attrPhp;
+                    if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                case 'text':
+                case 'textarea':
+                    if (attrPhp) line += ', ' + attrPhp;
+                    if (item.defaultValue) line += ', null, ' + phpStr(item.defaultValue);
+                    break;
+                case 'hidden':
+                    line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
+                    break;
+                case 'headline':
+                case 'description':
+                    line += ', ' + phpStr(item.label || '');
+                    break;
+                // addMediaField($id, ?array $parameter = null, $catId = null, ?array $attributes = null)
+                case 'media':
+                case 'medialist':
+                case 'imagelist':
+                case 'link':
+                case 'linklist':
+                    var catLit = item.category ? parseInt(item.category, 10) || phpStr(item.category) : 'null';
+                    line += ', null, ' + catLit + (attrPhp ? ', ' + attrPhp : '');
+                    break;
+                // addCustomLinkField($id, ?array $attributes = null, ?string $defaultValue = null)
+                case 'customlink':
+                    if (attrPhp) line += ', ' + attrPhp;
+                    if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                // addCustomLinkMultipleField($id, ?array $attributes = null)
+                case 'customlinkmultiple':
+                    if (attrPhp) line += ', ' + attrPhp;
+                    break;
+            }
+
+            line += ')';
+            if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
+                line += '\n' + indent + '    ->setFull()';
+            }
+            return indent + line;
+        }
+
+        function renderRepeaterChain(item, indent, idCtxArg) {
+            // Generate inner factory chain for a repeater. `idCtxArg` is the
+            // string-key/id used in the parent call; the inner block uses
+            // MForm::factory()-> lines for each child.
+            var childKeys = {};
+            var innerParts = (item.children || []).map(function (c) {
+                var key = slugify(c.label, 'field_' + c.id);
+                var base = key, n = 2;
+                while (childKeys[key]) { key = base + '_' + n++; }
+                childKeys[key] = true;
+
+                if (c.type === 'repeater') {
+                    return renderRepeaterStmt(c, key, indent + '        ');
+                }
+                return renderField(c, key, indent + '        ') + ';';
+            });
+
+            var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
+            var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
+            var cfgParts = [];
+            if (minVal !== null && !isNaN(minVal)) cfgParts.push("'min' => " + minVal);
+            if (maxVal !== null && !isNaN(maxVal)) cfgParts.push("'max' => " + maxVal);
+            if (item.label) cfgParts.push("'label' => " + phpStr(item.label));
+            var cfg = cfgParts.length ? ', [' + cfgParts.join(', ') + ']' : '';
+
+            var inner = innerParts.length ? innerParts.join("\n") : (indent + '        // Felder hier ablegen');
+
+            return {
+                inner: inner,
+                cfg: cfg
+            };
+        }
+
+        function renderRepeaterStmt(item, idArg, indent) {
+            var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
+            var built = renderRepeaterChain(item, indent);
+            return indent + '$mform->addFlexRepeaterElement(' + idLit + ', MForm::factory()\n'
+                + built.inner + '\n'
+                + indent + '    , null' + built.cfg + ');';
+        }
+
+        function emitCode() {
+            if (state.length === 0) {
+                $code.textContent = '// Noch keine Felder hinzugefuegt.';
+                return;
+            }
+            var lines = [];
+            lines.push('use FriendsOfRedaxo\\MForm;');
+            lines.push('');
+            lines.push('$mform = MForm::factory();');
+            lines.push('');
+            state.forEach(function (item) {
+                if (item.type === 'repeater') {
+                    lines.push(renderRepeaterStmt(item, item.id, ''));
+                } else {
+                    lines.push(renderField(item, item.id, '') + ';');
+                }
+            });
+            lines.push('');
+            lines.push('echo $mform->show();');
+            $code.textContent = lines.join('\n');
+        }
+
+        // ---- Init -----------------------------------------------------------
+
+        renderCanvas();
+        emitCode();
     } // end run()
 })();

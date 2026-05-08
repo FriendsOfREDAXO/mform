@@ -36,6 +36,13 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="hidden">Hidden</li>
             <li class="mform-fb__pal-item" data-type="headline">Headline</li>
             <li class="mform-fb__pal-item" data-type="description">Description</li>
+            <li class="mform-fb__pal-item" data-type="media">Media</li>
+            <li class="mform-fb__pal-item" data-type="medialist">Medialist</li>
+            <li class="mform-fb__pal-item" data-type="imagelist">Imagelist</li>
+            <li class="mform-fb__pal-item" data-type="link">Link</li>
+            <li class="mform-fb__pal-item" data-type="linklist">Linklist</li>
+            <li class="mform-fb__pal-item" data-type="customlink">Custom Link</li>
+            <li class="mform-fb__pal-item" data-type="customlinkmultiple">Custom Link Multiple</li>
         </ul>
         <h4 style="margin-top:1.5em">Wrapper</h4>
         <ul class="mform-fb__field-list" data-fb-palette-wrap>
@@ -64,9 +71,13 @@ $body = <<<'HTML'
         <h4>Eigenschaften</h4>
         <p class="mform-fb__hint" data-fb-props-empty>Klicke ein Feld in der Bauflaeche an.</p>
         <form class="mform-fb__props-form" data-fb-props-form style="display:none">
-            <div class="form-group">
+            <div class="form-group" data-fb-prop-group="label">
                 <label>Label</label>
                 <input type="text" class="form-control" data-fb-prop="label">
+            </div>
+            <div class="form-group" data-fb-prop-group="category">
+                <label>Kategorie-ID <small>(optional, fuer Media-/Link-Picker)</small></label>
+                <input type="number" class="form-control" data-fb-prop="category" min="0">
             </div>
             <div class="form-group" data-fb-prop-group="defaultValue">
                 <label>Default-Value</label>
