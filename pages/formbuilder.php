@@ -83,12 +83,19 @@ $body = <<<'HTML'
             <p class="mform-fb__hint">Klick links auf ein Feld, um es hier einzufuegen</p>
         </div>
 
-        <h4 style="margin-top:1.5em">PHP-Code</h4>
+        <h4 style="margin-top:1.5em">Eingabe (Modul-Input)</h4>
         <div class="mform-fb__code-bar">
             <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy">Code kopieren</button>
             <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
         </div>
         <pre class="mform-fb__code"><code data-fb-code>// Noch keine Felder hinzugefuegt.</code></pre>
+
+        <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
+        <div class="mform-fb__code-bar">
+            <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
+            <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
+        </div>
+        <pre class="mform-fb__code"><code data-fb-output>// Noch keine Felder hinzugefuegt.</code></pre>
     </div>
 
     <div class="mform-fb__props" data-fb-props>

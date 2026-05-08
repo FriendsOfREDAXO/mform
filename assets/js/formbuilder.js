@@ -113,6 +113,7 @@
         var $palette = document.querySelector('[data-fb-palette]');
         var $paletteWrap = document.querySelector('[data-fb-palette-wrap]');
         var $code = document.querySelector('[data-fb-code]');
+        var $output = document.querySelector('[data-fb-output]');
         var $propsForm = document.querySelector('[data-fb-props-form]');
         var $propsEmpty = document.querySelector('[data-fb-props-empty]');
 
@@ -583,6 +584,14 @@
             });
         });
 
+        document.querySelector('[data-fb-action="copy-output"]').addEventListener('click', function () {
+            navigator.clipboard.writeText($output.textContent).then(function () {
+                var msg = document.querySelector('[data-fb-copy-output-msg]');
+                msg.textContent = 'kopiert';
+                setTimeout(function () { msg.textContent = ''; }, 1500);
+            });
+        });
+
         // ---- Code generation ------------------------------------------------
 
         function phpStr(s) {
@@ -830,6 +839,211 @@
             lines.push('');
             lines.push('echo $mform->show();');
             $code.textContent = lines.join('\n');
+            emitOutputCode();
+        }
+
+        // ---- Output-Code (Modul-Output) -------------------------------------
+
+        // Welche REX_VALUE-Variante zum Feldtyp gehoert.
+        function rexVarFor(type, id) {
+            if (type === 'media') return 'REX_MEDIA[' + id + ']';
+            if (type === 'medialist') return 'REX_MEDIALIST[' + id + ']';
+            if (type === 'link') return 'REX_LINK[' + id + ']';
+            if (type === 'linklist') return 'REX_LINK_LIST[' + id + ']';
+            // Imagelist, Custom Link (single + multiple), MFormMediaField, MFormLinkField
+            // sowie alle Form-Felder schreiben in REX_VALUE.
+            return 'REX_VALUE[' + id + ']';
+        }
+
+        // Welcher Repeater-Item-Key zu einem Child-Feld gehoert.
+        function childKeyFor(child, usedKeys) {
+            var key = slugify(child.label, 'field_' + child.id);
+            var base = key, n = 2;
+            while (usedKeys[key]) { key = base + '_' + n++; }
+            usedKeys[key] = true;
+            return key;
+        }
+
+        // Gibt eine PHP-Zeile zur Anzeige eines einzelnen Felds zurueck (Top-Level).
+        function renderTopLevelOutput(item) {
+            var lbl = item.label || item.type + ' ' + item.id;
+            var rv = rexVarFor(item.type, item.id);
+            switch (item.type) {
+                case 'headline':
+                    return '<h2>' + escapeHtml(lbl) + '</h2>';
+                case 'description':
+                    return '<p class="description">' + escapeHtml(lbl) + '</p>';
+                case 'hidden':
+                    return '<?php // hidden: ' + escapeHtml(lbl) + ' = "' + rv + '" ?>';
+                case 'media':
+                    return '<?php $media = "' + rv + '"; if ($media): ?>\n'
+                        + '    <img src="<?= rex_url::media($media) ?>" alt="<?= rex_escape($media) ?>">\n'
+                        + '<?php endif; ?>';
+                case 'medialist':
+                case 'imagelist':
+                    return '<?php $list = array_filter(explode(",", "' + rv + '")); ?>\n'
+                        + '<?php foreach ($list as $file): ?>\n'
+                        + '    <img src="<?= rex_url::media($file) ?>" alt="<?= rex_escape($file) ?>">\n'
+                        + '<?php endforeach; ?>';
+                case 'link':
+                    return '<?php $articleId = (int) "' + rv + '"; if ($articleId > 0 && ($article = rex_article::get($articleId))): ?>\n'
+                        + '    <a href="<?= rex_getUrl($articleId) ?>"><?= rex_escape($article->getName()) ?></a>\n'
+                        + '<?php endif; ?>';
+                case 'linklist':
+                    return '<?php $ids = array_filter(array_map("intval", explode(",", "' + rv + '"))); ?>\n'
+                        + '<ul>\n'
+                        + '<?php foreach ($ids as $articleId): if (!($article = rex_article::get($articleId))) continue; ?>\n'
+                        + '    <li><a href="<?= rex_getUrl($articleId) ?>"><?= rex_escape($article->getName()) ?></a></li>\n'
+                        + '<?php endforeach; ?>\n'
+                        + '</ul>';
+                case 'customlink':
+                    return '<?php // Custom Link: gemischtes Format (Artikel-ID, URL, Mailto, Tel oder media://)\n'
+                        + '$link = "' + rv + '";\n'
+                        + 'if ($link): ?>\n'
+                        + '    <a href="<?= rex_escape($link) ?>"><?= rex_escape($link) ?></a>\n'
+                        + '<?php endif; ?>';
+                case 'customlinkmultiple':
+                    return '<?php $links = array_filter(explode(",", "' + rv + '")); ?>\n'
+                        + '<?php foreach ($links as $link): ?>\n'
+                        + '    <a href="<?= rex_escape($link) ?>"><?= rex_escape($link) ?></a>\n'
+                        + '<?php endforeach; ?>';
+                case 'textarea':
+                    if (item.tinymce) {
+                        return '<div><?= "' + rv + '" ?></div>';
+                    }
+                    return '<div><?= nl2br(rex_escape("' + rv + '")) ?></div>';
+                case 'select':
+                case 'radio':
+                    return '<p><?= rex_escape("' + rv + '") ?></p>';
+                case 'checkbox':
+                    return '<?php $values = array_filter(explode(",", "' + rv + '")); ?>\n'
+                        + '<ul>\n'
+                        + '<?php foreach ($values as $v): ?><li><?= rex_escape($v) ?></li><?php endforeach; ?>\n'
+                        + '</ul>';
+                default: // text und sonstige
+                    return '<p><?= rex_escape("' + rv + '") ?></p>';
+            }
+        }
+
+        // Repeater-Output: foreach + Children-Zugriff via Item-Key.
+        function renderRepeaterOutput(item, varName, indent) {
+            indent = indent || '';
+            var rv = 'REX_VALUE[' + item.id + ']';
+            var lines = [];
+            lines.push(indent + '<?php $' + varName + ' = \\FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper::decode("' + rv + '"); ?>');
+            lines.push(indent + '<?php foreach ($' + varName + ' as $row): ?>');
+            var inner = indent + '    ';
+            var usedKeys = {};
+            (item.children || []).forEach(function (c) {
+                var key = childKeyFor(c, usedKeys);
+                lines.push(renderRepeaterChildOutput(c, key, inner));
+            });
+            lines.push(indent + '<?php endforeach; ?>');
+            return lines.join('\n');
+        }
+
+        // Inner: Felder innerhalb eines Repeater-Foreach. Daten kommen aus $row[key].
+        function renderRepeaterChildOutput(child, key, indent) {
+            var lbl = child.label || child.type;
+            var access = '$row[' + phpStr(key) + '] ?? ""';
+            switch (child.type) {
+                case 'headline':
+                    return indent + '<h3>' + escapeHtml(lbl) + '</h3>';
+                case 'description':
+                    return indent + '<p class="description">' + escapeHtml(lbl) + '</p>';
+                case 'hidden':
+                    return indent + '<?php // hidden: ' + escapeHtml(lbl) + ' ?>';
+                case 'media':
+                    return indent + '<?php if ($file = (' + access + ')): ?>\n'
+                         + indent + '    <img src="<?= rex_url::media($file) ?>" alt="<?= rex_escape($file) ?>">\n'
+                         + indent + '<?php endif; ?>';
+                case 'medialist':
+                case 'imagelist':
+                    return indent + '<?php foreach (array_filter(explode(",", (string) (' + access + '))) as $file): ?>\n'
+                         + indent + '    <img src="<?= rex_url::media($file) ?>" alt="<?= rex_escape($file) ?>">\n'
+                         + indent + '<?php endforeach; ?>';
+                case 'link':
+                    return indent + '<?php $aid = (int) (' + access + '); if ($aid > 0 && ($a = rex_article::get($aid))): ?>\n'
+                         + indent + '    <a href="<?= rex_getUrl($aid) ?>"><?= rex_escape($a->getName()) ?></a>\n'
+                         + indent + '<?php endif; ?>';
+                case 'linklist':
+                    return indent + '<?php foreach (array_filter(array_map("intval", explode(",", (string) (' + access + ')))) as $aid): if (!($a = rex_article::get($aid))) continue; ?>\n'
+                         + indent + '    <a href="<?= rex_getUrl($aid) ?>"><?= rex_escape($a->getName()) ?></a>\n'
+                         + indent + '<?php endforeach; ?>';
+                case 'customlink':
+                    return indent + '<?php if ($link = (' + access + ')): ?><a href="<?= rex_escape($link) ?>"><?= rex_escape($link) ?></a><?php endif; ?>';
+                case 'customlinkmultiple':
+                    return indent + '<?php foreach (array_filter(explode(",", (string) (' + access + '))) as $link): ?>\n'
+                         + indent + '    <a href="<?= rex_escape($link) ?>"><?= rex_escape($link) ?></a>\n'
+                         + indent + '<?php endforeach; ?>';
+                case 'textarea':
+                    if (child.tinymce) {
+                        return indent + '<div><?= ' + access + ' ?></div>';
+                    }
+                    return indent + '<div><?= nl2br(rex_escape((string) (' + access + '))) ?></div>';
+                case 'checkbox':
+                    return indent + '<ul>\n'
+                         + indent + '<?php foreach (array_filter(explode(",", (string) (' + access + '))) as $v): ?><li><?= rex_escape($v) ?></li><?php endforeach; ?>\n'
+                         + indent + '</ul>';
+                case 'repeater':
+                    // Nested repeater: $row[key] ist bereits ein dekodiertes Array
+                    var sub = [];
+                    sub.push(indent + '<?php foreach ((array) (' + access + ') as $row2): ?>');
+                    var subUsed = {};
+                    (child.children || []).forEach(function (gc) {
+                        var k2 = childKeyFor(gc, subUsed);
+                        var inner2 = indent + '    ';
+                        var src = renderRepeaterChildOutput(gc, k2, inner2)
+                            // $row -> $row2 fuer die zweite Ebene
+                            .replace(/\$row\[/g, '$row2[');
+                        sub.push(src);
+                    });
+                    sub.push(indent + '<?php endforeach; ?>');
+                    return sub.join('\n');
+                default:
+                    return indent + '<p><?= rex_escape((string) (' + access + ')) ?></p>';
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function repeaterVarName(item) {
+            var slug = slugify(item.label, 'repeater_' + item.id);
+            return slug.replace(/[^a-z0-9_]/gi, '_');
+        }
+
+        function emitOutputCode() {
+            if (state.length === 0) {
+                $output.textContent = '<?php // Noch keine Felder hinzugefuegt. ?>';
+                return;
+            }
+            var lines = [];
+            lines.push('<?php');
+            lines.push('// Modul-Output: passt zu den oben generierten Eingabefeldern.');
+            lines.push('// Bei Bedarf Variablen-Namen, HTML-Struktur und Fallbacks anpassen.');
+            lines.push('?>');
+            lines.push('');
+            state.forEach(function (item) {
+                if (item.type === 'tab') {
+                    // Tabs sind nur ein Eingabe-Strukturhinweis, im Output nichts Eigenes.
+                    lines.push('<?php // ----- ' + (item.label || 'Tab') + ' (Tab) ----- ?>');
+                    (item.children || []).forEach(function (c) {
+                        if (c.type === 'repeater') {
+                            lines.push(renderRepeaterOutput(c, repeaterVarName(c), ''));
+                        } else {
+                            lines.push(renderTopLevelOutput(c));
+                        }
+                    });
+                } else if (item.type === 'repeater') {
+                    lines.push(renderRepeaterOutput(item, repeaterVarName(item), ''));
+                } else {
+                    lines.push(renderTopLevelOutput(item));
+                }
+                lines.push('');
+            });
+            $output.textContent = lines.join('\n');
         }
 
         // ---- Init -----------------------------------------------------------
