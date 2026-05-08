@@ -132,6 +132,36 @@
     color: #b91c1c;
 }
 
+.mform-fb__item-actions {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: 4px;
+}
+
+.mform-fb__item-btn {
+    background: none;
+    border: 1px solid transparent;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 1px 6px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 3px;
+}
+
+.mform-fb__item-btn:hover {
+    color: #111827;
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+body.rex-theme-dark .mform-fb__item-btn:hover,
+body.rex-has-theme:not(.rex-theme-light) .mform-fb__item-btn:hover {
+    color: #f9fafb;
+    background: #374151;
+    border-color: #4b5563;
+}
+
 /* Repeater container */
 .mform-fb__item--repeater {
     flex-direction: column;
