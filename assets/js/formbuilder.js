@@ -65,17 +65,21 @@
             textarea:    { label: 'Textarea', method: 'addTextAreaField',
                 props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'tinymceProfile', 'required', 'full'] },
             select:      { label: 'Select', method: 'addSelectField',
-                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'options', 'isMulti', 'notice', 'cssClass', 'required', 'full'] },
             radio:       { label: 'Radio', method: 'addRadioField',
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required'] },
             checkbox:    { label: 'Checkbox', method: 'addCheckboxField',
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
+            checkboxgroup: { label: 'Checkbox Group', method: 'addCheckboxGroupField',
+                props: ['label', 'defaultValue', 'options', 'cbgLayout', 'cbgMode', 'notice', 'cssClass'] },
             hidden:      { label: 'Hidden', method: 'addHiddenField',
                 props: ['defaultValue'] },
             headline:    { label: 'Headline', method: 'addHeadline',
                 props: ['label'] },
             description: { label: 'Description', method: 'addDescription',
                 props: ['label'] },
+            html:        { label: 'HTML-Block', method: 'addHtml',
+                props: ['htmlContent'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
                 props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
@@ -135,11 +139,18 @@
                 cssClass: '',
                 rows: '',
                 category: '',
-                options: (type === 'select' || type === 'radio' || type === 'checkbox') ? "1=Option 1\n2=Option 2" : '',
+                options: (type === 'select' || type === 'radio' || type === 'checkbox' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2" : '',
                 required: false,
                 full: false,
                 tinymce: false,
                 tinymceProfile: '',
+                // Select multiple
+                isMulti: false,
+                // CheckboxGroup
+                cbgLayout: 'horizontal',
+                cbgMode: 'checkbox',
+                // HTML-Block
+                htmlContent: '',
                 // CustomLink
                 clTypeIntern: type === 'customlink' || type === 'customlinkmultiple',
                 clTypeExtern: type === 'customlink' || type === 'customlinkmultiple',
@@ -633,6 +644,13 @@
             if (item.rows && item.type === 'textarea') a.rows = item.rows;
             if (item.btnAdd && item.type === 'customlinkmultiple') a.btn_add = item.btnAdd;
 
+            // CheckboxGroup: layout / mode / default-value laut docs/12_checkbox_group.md
+            if (item.type === 'checkboxgroup') {
+                if (item.cbgLayout && item.cbgLayout !== 'horizontal') a.layout = item.cbgLayout;
+                if (item.cbgMode && item.cbgMode !== 'checkbox') a.mode = item.cbgMode;
+                if (item.defaultValue) a['default-value'] = item.defaultValue;
+            }
+
             // CSS class merge: tiny-editor + user classes
             var classes = [];
             if (item.tinymce && item.type === 'textarea') {
@@ -679,16 +697,26 @@
             if (item.type === 'headline' || item.type === 'description') {
                 return def.method + '(' + phpStr(item.label || '') + ')';
             }
+            // HTML-Block: kein id, ein String-Argument mit dem HTML
+            if (item.type === 'html') {
+                return def.method + '(' + phpStr(item.htmlContent || '') + ')';
+            }
             var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
-            var line = def.method + '(' + idLit;
+            // Select Multiple: nutzt eine andere Methode, sonst gleiche Signatur wie select.
+            var method = def.method;
+            if (item.type === 'select' && item.isMulti) {
+                method = 'addMultiSelectField';
+            }
+            var line = method + '(' + idLit;
 
             switch (item.type) {
                 case 'select':
                 case 'radio':
                 case 'checkbox':
+                case 'checkboxgroup':
                     line += ', ' + optionsArray(parseOptions(item.options));
                     if (attrPhp) line += ', ' + attrPhp;
-                    if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
+                    if (item.defaultValue && item.type !== 'checkboxgroup') line += ', ' + phpStr(item.defaultValue);
                     break;
                 case 'text':
                 case 'textarea':
@@ -880,8 +908,15 @@
                 case 'medialist':
                 case 'imagelist':
                 case 'checkbox':
+                case 'checkboxgroup':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
+                case 'select':
+                    // Multi-Select speichert ebenfalls kommasepariert
+                    if (item.isMulti) {
+                        return 'array_filter(explode(",", ' + rv + '))';
+                    }
+                    return rv;
                 case 'customlink':
                     // laut Doku: createLinkData() erkennt String- und Array-Format automatisch
                     outputUses.outputHelper = true;
@@ -906,7 +941,13 @@
                 case 'medialist':
                 case 'imagelist':
                 case 'checkbox':
+                case 'checkboxgroup':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
+                case 'select':
+                    if (child.isMulti) {
+                        return 'array_filter(explode(",", (string) (' + access + ')))';
+                    }
+                    return access;
                 case 'customlink':
                     outputUses.outputHelper = true;
                     return 'MFormOutputHelper::createLinkData(' + access + ')';
@@ -936,7 +977,7 @@
 
         // Wenn select/radio/checkbox Optionen hat, zeige die moeglichen Keys.
         function optionValuesComment(item) {
-            if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox') {
+            if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup') {
                 return '';
             }
             var opts = parseOptions(item.options || '');
@@ -956,7 +997,9 @@
                 case 'customlink':  return 'normalisiertes Array mit customlink_url, customlink_text, customlink_target, customlink_class';
                 case 'customlinkmultiple': return 'Array normalisierter Custom-Links (je Eintrag customlink_url/_text/_target/_class)';
                 case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
+                case 'checkboxgroup': return item.cbgMode === 'radio' ? 'einzelner ausgewaehlter Wert (CheckboxGroup im Radio-Mode)' : 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'select':
+                    return item.isMulti ? 'Array der ausgewaehlten Werte (Multi-Select, kommasepariert gespeichert)' : 'einzelner ausgewaehlter Wert';
                 case 'radio':       return 'einzelner ausgewaehlter Wert';
                 case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
                 case 'hidden':      return 'verstecktes Feld';
@@ -998,7 +1041,7 @@
                     }
                     lines.push(sub);
                     delete c.__childKey;
-                } else if (c.type === 'headline' || c.type === 'description') {
+                } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
                     // ueberspringen
                 } else {
                     var clbl = c.label ? ' (' + c.label + ')' : '';
@@ -1046,7 +1089,7 @@
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
-                        } else if (c.type === 'headline' || c.type === 'description') {
+                        } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
                             // ueberspringen (sind reine Form-Strukturhinweise)
                         } else {
                             body.push(renderTopLevelVar(c));
@@ -1056,7 +1099,7 @@
                 } else if (item.type === 'repeater') {
                     body.push(renderRepeaterBlock(item, ''));
                     body.push('');
-                } else if (item.type === 'headline' || item.type === 'description') {
+                } else if (item.type === 'headline' || item.type === 'description' || item.type === 'html') {
                     // ueberspringen
                 } else {
                     body.push(renderTopLevelVar(item));

@@ -56,9 +56,11 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="select">Select</li>
             <li class="mform-fb__pal-item" data-type="radio">Radio</li>
             <li class="mform-fb__pal-item" data-type="checkbox">Checkbox</li>
+            <li class="mform-fb__pal-item" data-type="checkboxgroup">Checkbox Group</li>
             <li class="mform-fb__pal-item" data-type="hidden">Hidden</li>
             <li class="mform-fb__pal-item" data-type="headline">Headline</li>
             <li class="mform-fb__pal-item" data-type="description">Description</li>
+            <li class="mform-fb__pal-item" data-type="html">HTML-Block</li>
             <li class="mform-fb__pal-item" data-type="media">Media</li>
             <li class="mform-fb__pal-item" data-type="medialist">Medialist</li>
             <li class="mform-fb__pal-item" data-type="imagelist">Imagelist</li>
@@ -133,6 +135,29 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="options">
                 <label>Optionen <small>(eine pro Zeile, optional <code>key=label</code>)</small></label>
                 <textarea class="form-control" rows="5" data-fb-prop="options"></textarea>
+            </div>
+            <div class="form-group" data-fb-prop-group="isMulti">
+                <label class="checkbox">
+                    <input type="checkbox" data-fb-prop="isMulti"> Mehrfachauswahl <small>(addMultiSelectField)</small>
+                </label>
+            </div>
+            <div class="form-group" data-fb-prop-group="cbgLayout">
+                <label>Layout</label>
+                <select class="form-control" data-fb-prop="cbgLayout">
+                    <option value="horizontal">horizontal</option>
+                    <option value="vertical">vertical</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="cbgMode">
+                <label>Modus</label>
+                <select class="form-control" data-fb-prop="cbgMode">
+                    <option value="checkbox">Mehrfachauswahl (checkbox)</option>
+                    <option value="radio">Einfachauswahl (radio)</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="htmlContent">
+                <label>HTML <small>(wird 1:1 in das Formular eingefuegt)</small></label>
+                <textarea class="form-control" rows="6" data-fb-prop="htmlContent" placeholder="<hr><p class='text-muted'>Hinweis ...</p>"></textarea>
             </div>
             <div class="form-group" data-fb-prop-group="required">
                 <label class="checkbox">
