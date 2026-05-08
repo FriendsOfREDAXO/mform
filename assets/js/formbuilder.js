@@ -850,9 +850,9 @@
 
         function rexVarFor(type, id) {
             if (type === 'media') return 'REX_MEDIA[' + id + ']';
-            if (type === 'medialist') return 'REX_MEDIALIST[' + id + ']';
+            if (type === 'medialist' || type === 'imagelist') return 'REX_MEDIALIST[id=' + id + ']';
             if (type === 'link') return 'REX_LINK[' + id + ']';
-            if (type === 'linklist') return 'REX_LINK_LIST[' + id + ']';
+            if (type === 'linklist') return 'REX_LINKLIST[id=' + id + ']';
             return 'REX_VALUE[' + id + ']';
         }
 
@@ -876,10 +876,12 @@
                 case 'medialist':
                 case 'imagelist':
                 case 'linklist':
-                case 'customlinkmultiple':
                 case 'checkbox':
-                    // kommagetrennte Listen -> Array
+                    // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
+                case 'customlinkmultiple':
+                    // laut Doku: HTML-decodieren + json_decode (gespeichert als JSON-Array)
+                    return 'json_decode(html_entity_decode(' + rv + ', ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []';
                 case 'link':
                     return '(int) ' + rv;
                 default:
@@ -894,9 +896,10 @@
                 case 'medialist':
                 case 'imagelist':
                 case 'linklist':
-                case 'customlinkmultiple':
                 case 'checkbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
+                case 'customlinkmultiple':
+                    return 'json_decode(html_entity_decode((string) (' + access + '), ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []';
                 case 'link':
                     return '(int) (' + access + ')';
                 case 'repeater':
@@ -920,13 +923,13 @@
         function topLevelHint(item) {
             switch (item.type) {
                 case 'media':       return 'Dateiname in /media/, z.B. mit rex_url::media($name) verlinken';
-                case 'medialist':   return 'Array von Dateinamen';
-                case 'imagelist':   return 'Array von Bilddateinamen';
+                case 'medialist':   return 'Array von Dateinamen (kommasepariert gespeichert)';
+                case 'imagelist':   return 'Array von Bilddateinamen (kommasepariert gespeichert)';
                 case 'link':        return 'Artikel-ID (int), z.B. rex_getUrl($id)';
-                case 'linklist':    return 'String "id1,id2,..." \u2013 ggf. weiter zerlegen';
-                case 'customlink':  return 'gemischtes Format (Artikel-ID, URL, mailto:, tel: oder media://)';
-                case 'customlinkmultiple': return 'Array gemischter Link-Strings';
-                case 'checkbox':    return 'Array der ausgewaehlten Werte';
+                case 'linklist':    return 'Array von Artikel-IDs (kommasepariert gespeichert)';
+                case 'customlink':  return 'String wie redaxo://1, mailto:, tel: oder media:// \u2013 mit MFormOutputHelper::getCustomUrl() / ::prepareCustomLink() aufloesen';
+                case 'customlinkmultiple': return 'JSON-Array von Custom-Link-Strings \u2013 mit MFormOutputHelper::getCustomUrl()/::prepareCustomLink() pro Eintrag';
+                case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'select':
                 case 'radio':       return 'einzelner ausgewaehlter Wert';
                 case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
