@@ -86,7 +86,9 @@
                 props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
                         'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll',
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
-                        'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] }
+                        'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
+            tab:         { label: 'Tab', method: 'addTabElement',
+                props: ['label', 'tabPullRight'] }
         };
 
         var state = [];
@@ -147,7 +149,9 @@
                 repeaterConfirmDeleteMsg: '',
                 repeaterBtnText: '',
                 repeaterBtnClass: '',
-                children: type === 'repeater' ? [] : null
+                // Tab
+                tabPullRight: false,
+                children: (type === 'repeater' || type === 'tab') ? [] : null
             };
         }
 
@@ -222,7 +226,8 @@
 
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
-            var collapseBtn = item.type === 'repeater'
+            var hasChildren = item.type === 'repeater' || item.type === 'tab';
+            var collapseBtn = hasChildren
                 ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen"><i class="rex-icon fa-chevron-' + (builderCollapsed[item.uid] ? 'right' : 'down') + '"></i></button>'
                 : '';
             head.innerHTML =
@@ -244,7 +249,7 @@
             });
             el.appendChild(head);
 
-            if (item.type === 'repeater') {
+            if (item.type === 'repeater' || item.type === 'tab') {
                 var nested = document.createElement('div');
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
@@ -253,7 +258,7 @@
                     nested.style.display = 'none';
                 }
                 if (item.children.length === 0) {
-                    nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder Repeater oben anklicken und dann links ein Feld waehlen</p>';
+                    nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + (item.type === 'tab' ? 'Tab' : 'Repeater') + ' oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
                     item.children.forEach(function (c) { nested.appendChild(renderItem(c, depth + 1)); });
                 }
@@ -440,6 +445,11 @@
                     setTimeout(doRender, 0);
                     return;
                 }
+                if (type === 'tab' && depthOf(evt.to) > 0) {
+                    alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
+                    setTimeout(doRender, 0);
+                    return;
+                }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
                 setTimeout(function () { doRender(); selectItem(newItem); }, 0);
@@ -454,6 +464,11 @@
 
             if (item.type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
                 alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                setTimeout(doRender, 0);
+                return;
+            }
+            if (item.type === 'tab' && depthOf(evt.to) > 0) {
+                alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
                 setTimeout(doRender, 0);
                 return;
             }
@@ -714,6 +729,21 @@
                 + ')';
         }
 
+        function renderTabStmt(item, indent, isFirst) {
+            var inner = renderRepeaterInner(item, indent);
+            var label = item.label || '';
+            var openTab = isFirst ? 'true' : 'false';
+            var args = phpStr(label) + ', MForm::factory()\n' + inner;
+            // Drop trailing args we can default; only emit pullRight if true
+            if (item.tabPullRight) {
+                return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', true);';
+            }
+            if (isFirst) {
+                return indent + '$mform->addTabElement(' + args + ', true);';
+            }
+            return indent + '$mform->addTabElement(' + args + ');';
+        }
+
         function repeaterCfg(item) {
             var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
             var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
@@ -767,9 +797,13 @@
             lines.push('');
             lines.push('$mform = MForm::factory();');
             lines.push('');
-            state.forEach(function (item) {
+            state.forEach(function (item, idx) {
                 if (item.type === 'repeater') {
                     lines.push(renderRepeaterStmt(item, item.id, ''));
+                } else if (item.type === 'tab') {
+                    // First tab in a contiguous run is opened by default.
+                    var isFirstTab = idx === 0 || state[idx - 1].type !== 'tab';
+                    lines.push(renderTabStmt(item, '', isFirstTab));
                 } else {
                     lines.push(renderField(item, item.id, '') + ';');
                 }
