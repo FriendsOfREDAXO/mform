@@ -18,6 +18,29 @@ $intro = '<p>'
     . 'Im unteren Bereich entsteht in Echtzeit der MForm-PHP-Code zum Kopieren.'
     . '</p>';
 
+// TinyMCE-Profile aus DB lesen, falls verfuegbar.
+$tinyProfiles = [];
+if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Handler\Database::class)) {
+    $rows = \FriendsOfRedaxo\TinyMce\Handler\Database::getAllProfiles() ?? [];
+    foreach ($rows as $row) {
+        if (isset($row['name']) && '' !== (string) $row['name']) {
+            $tinyProfiles[] = (string) $row['name'];
+        }
+    }
+    sort($tinyProfiles);
+}
+
+if ([] === $tinyProfiles) {
+    $tinyProfileHtml = '<input type="text" class="form-control" data-fb-prop="tinymceProfile" placeholder="default">'
+        . '<p class="help-block" style="margin-top:4px"><small>Hinweis: TinyMCE-Addon nicht installiert oder keine Profile vorhanden. Profilname kann manuell eingetragen werden.</small></p>';
+} else {
+    $tinyProfileHtml = '<select class="form-control" data-fb-prop="tinymceProfile"><option value="">(Standardprofil)</option>';
+    foreach ($tinyProfiles as $name) {
+        $tinyProfileHtml .= '<option value="' . rex_escape($name) . '">' . rex_escape($name) . '</option>';
+    }
+    $tinyProfileHtml .= '</select>';
+}
+
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_info'), false);
 $fragment->setVar('body', $intro, false);
@@ -113,31 +136,9 @@ $body = <<<'HTML'
                     <input type="checkbox" data-fb-prop="tinymce"> TinyMCE-Editor
                 </label>
             </div>
-            <?php
-            $tinyProfiles = [];
-            if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\TinyMce\Handler\Database::class)) {
-                $rows = \FriendsOfRedaxo\TinyMce\Handler\Database::getAllProfiles() ?? [];
-                foreach ($rows as $row) {
-                    if (isset($row['name']) && '' !== (string) $row['name']) {
-                        $tinyProfiles[] = (string) $row['name'];
-                    }
-                }
-                sort($tinyProfiles);
-            }
-            ?>
             <div class="form-group" data-fb-prop-group="tinymceProfile">
                 <label>TinyMCE-Profil <small>(data-profile)</small></label>
-                <?php if ([] === $tinyProfiles): ?>
-                    <input type="text" class="form-control" data-fb-prop="tinymceProfile" placeholder="default">
-                    <p class="help-block" style="margin-top:4px"><small>Hinweis: Das TinyMCE-Addon ist nicht installiert oder es sind keine Profile vorhanden. Profilname kann manuell eingetragen werden.</small></p>
-                <?php else: ?>
-                    <select class="form-control" data-fb-prop="tinymceProfile">
-                        <option value="">(Standardprofil)</option>
-                        <?php foreach ($tinyProfiles as $name): ?>
-                            <option value="<?= rex_escape($name) ?>"><?= rex_escape($name) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                <?php endif; ?>
+                {{TINY_PROFILE_FIELD}}
             </div>
             <div class="form-group" data-fb-prop-group="full">
                 <label class="checkbox">
@@ -236,6 +237,8 @@ $body = <<<'HTML'
     </div>
 </div>
 HTML;
+
+$body = str_replace('{{TINY_PROFILE_FIELD}}', $tinyProfileHtml, $body);
 
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_formbuilder'), false);
