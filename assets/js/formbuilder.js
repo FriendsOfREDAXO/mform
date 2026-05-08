@@ -422,48 +422,53 @@
         function handleSortAdd(evt) {
             var fromPalette = evt.from === $palette || evt.from === $paletteWrap;
             var toList = listFor(evt.to);
+            // Always defer: let Sortable finish its DOM mutations, then re-render from state.
+            var doRender = function () { renderCanvas(); emitCode(); };
+
             if (!toList) {
                 if (evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
-                renderCanvas();
+                setTimeout(doRender, 0);
                 return;
             }
 
             if (fromPalette) {
                 var type = evt.item.dataset.type;
                 if (evt.item.parentNode) evt.item.parentNode.removeChild(evt.item);
+                if (!type) { setTimeout(doRender, 0); return; }
                 if (type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
                     alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
-                    renderCanvas();
+                    setTimeout(doRender, 0);
                     return;
                 }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
-                renderCanvas();
-                emitCode();
-                selectItem(newItem);
+                setTimeout(function () { doRender(); selectItem(newItem); }, 0);
                 return;
             }
 
             // Cross-list move within builder
             var uid = evt.item.dataset && evt.item.dataset.uid;
-            if (!uid) return;
+            if (!uid) { setTimeout(doRender, 0); return; }
             var item = findItem(uid);
-            if (!item) return;
+            if (!item) { setTimeout(doRender, 0); return; }
 
-            // Block dropping a repeater that would exceed max depth
             if (item.type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
                 alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
-                renderCanvas();
+                setTimeout(doRender, 0);
                 return;
             }
 
             removeItem(uid);
             toList.splice(evt.newIndex, 0, item);
-            renderCanvas();
-            emitCode();
+            setTimeout(doRender, 0);
         }
 
-        function handleSortRemove() { /* no-op: handled in onAdd */ }
+        // Safety net: if Sortable removes an item from a list and onAdd never fires
+        // on a known destination (e.g. dropped outside any drop zone), the state is
+        // still intact but the DOM lost the node. A deferred renderCanvas heals this.
+        function handleSortRemove() {
+            setTimeout(function () { renderCanvas(); }, 0);
+        }
 
         function handleSortUpdate(evt) {
             var list = listFor(evt.from);
@@ -471,8 +476,7 @@
             if (evt.oldIndex === evt.newIndex) return;
             var moved = list.splice(evt.oldIndex, 1)[0];
             list.splice(evt.newIndex, 0, moved);
-            renderCanvas();
-            emitCode();
+            setTimeout(function () { renderCanvas(); emitCode(); }, 0);
         }
 
         // Palette: clone-on-drag + click-to-add. Both work side by side.
