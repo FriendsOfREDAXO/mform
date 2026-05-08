@@ -1,5 +1,33 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta6
+
+### Neu
+
+- **Visueller Form Builder** (`Backend → MForm → Form Builder`) – Drei-Spalten-Oberfläche zum Zusammenklicken von MForm-Modulen mit Drag-and-Drop und Live-PHP-Code-Generator.
+  - 16 Feld-Typen: Text, Textarea, Select, Radio, Checkbox, Hidden, Headline, Description, Media, Medialist, Imagelist, Link, Linklist, Custom Link, Custom Link Multiple, Flex Repeater
+  - 2 Repeater-Verschachtelungs-Ebenen, mit eigenständigen Drop-Zonen
+  - Feld-Eigenschaften: Label, Default-Value, Placeholder, Hinweistext, CSS-Klassen, Zeilen (Textarea), Optionen, Required, TinyMCE-Editor, `setFull()`, Custom-Link-Linktypen-Toggles, Link-/Media-Kategorien, Extern-Link-Prefix, Media-Type-Whitelist, Add-Button-Text
+  - Im Canvas: Repeater einklappbar, Item **Duplizieren / Kopieren / Einfügen** mit rekursiver UID/ID-Neuvergabe
+  - Generator emittiert nur Optionen, die vom Core-Default abweichen
+
+### Changed
+
+- **Flex Repeater Defaults** angepasst:
+  - `collapsed` jetzt `false` (war `true`)
+  - `first_open` jetzt `false` (war `true` – ohne `collapsed=true` ohne Wirkung)
+  - `open` (neu hinzugefügtes Item geöffnet) jetzt `true` (war `false`)
+  - `copy_paste` jetzt `true` (war `false`)
+  - `confirm_delete` jetzt `true` (war `false`)
+  - Hinweis: Bestehende Module ohne explizite Optionen verhalten sich daher leicht anders. Bei Bedarf alte Werte explizit setzen.
+- Neue Repeater-Optionen im Builder verfügbar: `default_count`, `collapsed`, `first_open`, `show_toggle_all`, `open`, `copy_paste`, `confirm_delete`, `confirm_delete_msg`, `btn_text`, `btn_class`.
+
+### Demo
+
+- **Layout Preview Demo** (`Backend → MForm → Demos → Layout Preview`) – Demo-Seite für `HtmlToSvgConverter` und `LayoutPreviewBuilder` mit Beispielen für SVG-Tag-Sets und CSS-Style-Attribut-Mapping.
+
+---
+
 ## Version 9.0.0-beta5
 
 ### Code-Qualität
