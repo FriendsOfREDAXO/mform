@@ -140,12 +140,12 @@
 
             // sortable for nested zone
             Sortable.create(nested, {
-                group: { name: 'fb-fields', pull: true, put: ['fb-fields', 'fb-palette'] },
+                group: { name: 'fb-fields', pull: true, put: ['fb-fields'] },
                 animation: 150,
                 handle: '.mform-fb__item-handle',
                 onAdd: handleSortAdd,
                 onUpdate: handleSortUpdate,
-                onRemove: rebuildAllAndEmit
+                onRemove: handleSortRemove
             });
         } else {
             el.innerHTML =
@@ -244,67 +244,59 @@
     });
 
     // ---- Sortable wiring -------------------------------------------------
+    //
+    // We do NOT rebuild the model from a DOM scan after each drop, because
+    // Sortable can leave the DOM in an intermediate state during cross-list
+    // moves which causes items to "disappear" until the next render.
+    // Instead we mutate `state` directly using evt.oldIndex/newIndex/from/to.
+
+    function listFor(el) {
+        if (el === $canvas) return state;
+        if (el && el.dataset && el.dataset.fbNested) {
+            var owner = findItem(el.dataset.fbNested);
+            return owner && owner.children ? owner.children : null;
+        }
+        return null;
+    }
 
     function handleSortAdd(evt) {
-        var fromPalette = evt.from.dataset.fbPalette !== undefined || evt.from.dataset.fbPaletteWrap !== undefined;
-        if (fromPalette) {
-            var type = evt.item.dataset.type;
-            evt.item.parentNode.removeChild(evt.item);  // drop palette ghost
-            var newItem = makeItem(type);
-            insertIntoTarget(evt.to, evt.newIndex, newItem);
+        // Palette is no longer Sortable, so this only fires for canvas<->nested.
+        var toList = listFor(evt.to);
+        if (!toList) return;
+        // The element was already removed from the source list by handleSortRemove
+        // OR will be (Sortable fires remove before add on cross-list). To stay
+        // safe we always look the item up via uid in the WHOLE state tree.
+        var uid = evt.item.dataset && evt.item.dataset.uid;
+        if (!uid) return;
+        var item = findItem(uid);
+        if (!item) return;
+        // Remove from anywhere it might still be (idempotent), then insert.
+        removeItem(uid);
+        if (item.type === 'repeater' && evt.to !== $canvas) {
+            alert('Repeater im Repeater wird im MVP nicht unterstuetzt.');
+            // re-add at original position is too tricky; just put it on top level
+            state.push(item);
             renderCanvas();
             emitCode();
-            selectItem(newItem);
             return;
         }
-        rebuildAllAndEmit();
+        toList.splice(evt.newIndex, 0, item);
+        renderCanvas();
+        emitCode();
     }
 
-    function handleSortUpdate() {
-        rebuildAllAndEmit();
+    function handleSortRemove() {
+        // Intentionally empty: handleSortAdd does the full move atomically by
+        // calling removeItem(uid) before inserting at the new index.
     }
 
-    function insertIntoTarget(targetEl, idx, item) {
-        if (targetEl === $canvas) {
-            state.splice(idx, 0, item);
-        } else if (targetEl.dataset.fbNested) {
-            var owner = findItem(targetEl.dataset.fbNested);
-            if (owner && owner.children) {
-                if (item.type === 'repeater') {
-                    // disallow nested repeaters in MVP
-                    alert('Repeater im Repeater wird im MVP nicht unterstuetzt.');
-                    return;
-                }
-                owner.children.splice(idx, 0, item);
-            }
-        }
-    }
-
-    /**
-     * After a Sortable reorder, rebuild model from DOM.
-     */
-    function rebuildAllAndEmit() {
-        var newTop = [];
-        Array.prototype.forEach.call($canvas.children, function (el) {
-            if (!el.dataset || !el.dataset.uid) return;
-            var item = findItem(el.dataset.uid);
-            if (!item) return;
-            // Rebuild children if repeater
-            if (item.type === 'repeater') {
-                var nested = el.querySelector('[data-fb-nested]');
-                var children = [];
-                if (nested) {
-                    Array.prototype.forEach.call(nested.children, function (cEl) {
-                        if (!cEl.dataset || !cEl.dataset.uid) return;
-                        var ci = findItem(cEl.dataset.uid);
-                        if (ci) children.push(ci);
-                    });
-                }
-                item.children = children;
-            }
-            newTop.push(item);
-        });
-        state = newTop;
+    function handleSortUpdate(evt) {
+        // Reorder within the same list.
+        var list = listFor(evt.from);
+        if (!list) return;
+        if (evt.oldIndex === evt.newIndex) return;
+        var moved = list.splice(evt.oldIndex, 1)[0];
+        list.splice(evt.newIndex, 0, moved);
         renderCanvas();
         emitCode();
     }
@@ -338,7 +330,7 @@
         handle: '.mform-fb__item-handle',
         onUpdate: handleSortUpdate,
         onAdd: handleSortAdd,
-        onRemove: rebuildAllAndEmit
+        onRemove: handleSortRemove
     });
 
     // ---- Toolbar ---------------------------------------------------------
