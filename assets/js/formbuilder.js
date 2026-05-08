@@ -163,6 +163,15 @@
             return null;
         }
 
+        function removeItem(uid, list) {
+            list = list || state;
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].uid === uid) { list.splice(i, 1); return true; }
+                if (list[i].children && removeItem(uid, list[i].children)) return true;
+            }
+            return false;
+        }
+
         function deepCloneWithNewIds(item) {
             var copy = JSON.parse(JSON.stringify(item));
             function reId(node) {
