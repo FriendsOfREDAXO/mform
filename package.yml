@@ -21,6 +21,11 @@ page:
                 demo_repeater: { title: 'translate:demo_repeater' }
                 demo_rexform: { title: 'translate:demo_rexform' }
                 demo_expert: { title: 'translate:demo_expert' }
+                demo_layout_preview: { title: 'translate:demo_layout_preview' }
+
+        formbuilder:
+            title: 'translate:formbuilder'
+            icon: rex-icon fa-grip
 
         changelog:
             title: 'translate:changelog'
