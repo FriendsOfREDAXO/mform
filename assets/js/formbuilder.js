@@ -16,12 +16,18 @@
     'use strict';
 
     var initialised = false;
+    var initialisedCanvas = null;
 
     function init() {
-        if (initialised) return;
         var canvas = document.querySelector('[data-fb-canvas]');
         if (!canvas) return;
+        // Wenn bereits auf demselben Canvas initialisiert: nichts tun.
+        // (rex:ready feuert bei manchen REDAXO-Setups sonst eine doppelte
+        //  Initialisierung mit doppelten Event-Listenern und parallelen
+        //  state-Arrays, was zu "Geister"-Eintraegen nach Loeschen fuehrt.)
+        if (initialised && initialisedCanvas === canvas) return;
         initialised = true;
+        initialisedCanvas = canvas;
         run();
     }
     if (document.readyState === 'loading') {
@@ -31,8 +37,15 @@
     }
     if (typeof jQuery !== 'undefined') {
         jQuery(document).on('rex:ready', function () {
-            initialised = false;
-            init();
+            // Reset nur wenn der Canvas-Knoten ausgetauscht wurde (z.B. echter
+            // Page-Wechsel via PJAX). Bei reinem rex:ready ohne DOM-Wechsel
+            // ueberspringen wir die Re-Initialisierung.
+            var canvas = document.querySelector('[data-fb-canvas]');
+            if (canvas && canvas !== initialisedCanvas) {
+                initialised = false;
+                initialisedCanvas = null;
+                init();
+            }
         });
     }
 
@@ -335,6 +348,12 @@
         });
 
         function renderCanvas() {
+            // Destroy any existing nested Sortable instances before wiping the DOM.
+            // Otherwise their internal state can re-insert stale clones on subsequent drags.
+            $canvas.querySelectorAll('[data-fb-nested]').forEach(function (el) {
+                var s = (typeof Sortable !== 'undefined' && Sortable.get) ? Sortable.get(el) : null;
+                if (s) { try { s.destroy(); } catch (e) {} }
+            });
             $canvas.innerHTML = '';
             if (state.length === 0) {
                 $canvas.innerHTML = '<p class="mform-fb__hint">Felder hierher ziehen oder links anklicken</p>';
