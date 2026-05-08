@@ -48,15 +48,15 @@
 
         var TYPES = {
             text:        { label: 'Text', method: 'addTextField',
-                props: ['label', 'defaultValue', 'placeholder', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'placeholder', 'notice', 'cssClass', 'required', 'full'] },
             textarea:    { label: 'Textarea', method: 'addTextAreaField',
-                props: ['label', 'defaultValue', 'placeholder', 'tinymce', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'required', 'full'] },
             select:      { label: 'Select', method: 'addSelectField',
-                props: ['label', 'defaultValue', 'options', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required', 'full'] },
             radio:       { label: 'Radio', method: 'addRadioField',
-                props: ['label', 'defaultValue', 'options', 'required'] },
+                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required'] },
             checkbox:    { label: 'Checkbox', method: 'addCheckboxField',
-                props: ['label', 'defaultValue', 'options'] },
+                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
             hidden:      { label: 'Hidden', method: 'addHiddenField',
                 props: ['defaultValue'] },
             headline:    { label: 'Headline', method: 'addHeadline',
@@ -65,19 +65,23 @@
                 props: ['label'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
-                props: ['label', 'category'] },
+                props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
             medialist:   { label: 'Medialist', method: 'addMedialistField',
-                props: ['label', 'category'] },
+                props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
             imagelist:   { label: 'Imagelist', method: 'addImagelistField',
-                props: ['label', 'category'] },
+                props: ['label', 'category', 'notice', 'cssClass'] },
             link:        { label: 'Link', method: 'addLinkField',
-                props: ['label', 'category'] },
+                props: ['label', 'category', 'notice', 'cssClass'] },
             linklist:    { label: 'Linklist', method: 'addLinklistField',
-                props: ['label', 'category'] },
+                props: ['label', 'category', 'notice', 'cssClass'] },
             customlink:  { label: 'Custom Link', method: 'addCustomLinkField',
-                props: ['label'] },
+                props: ['label', 'notice', 'cssClass',
+                        'clTypeIntern', 'clTypeExtern', 'clTypeMedia', 'clTypeMailto', 'clTypeTel',
+                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
             customlinkmultiple: { label: 'Custom Link Multiple', method: 'addCustomLinkMultipleField',
-                props: ['label'] },
+                props: ['label', 'notice', 'cssClass', 'btnAdd',
+                        'clTypeIntern', 'clTypeExtern', 'clTypeMedia', 'clTypeMailto', 'clTypeTel',
+                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
             repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
                 props: ['label', 'repeaterMin', 'repeaterMax'] }
         };
@@ -106,11 +110,26 @@
                 label: def.label,
                 defaultValue: '',
                 placeholder: '',
+                notice: '',
+                cssClass: '',
+                rows: '',
                 category: '',
                 options: (type === 'select' || type === 'radio' || type === 'checkbox') ? "1=Option 1\n2=Option 2" : '',
                 required: false,
                 full: false,
                 tinymce: false,
+                // CustomLink
+                clTypeIntern: type === 'customlink' || type === 'customlinkmultiple',
+                clTypeExtern: type === 'customlink' || type === 'customlinkmultiple',
+                clTypeMedia: false,
+                clTypeMailto: false,
+                clTypeTel: false,
+                linkCategory: '',
+                mediaCategory: '',
+                externPrefix: '',
+                mediaType: '',
+                btnAdd: '',
+                // Repeater
                 repeaterMin: '',
                 repeaterMax: '',
                 children: type === 'repeater' ? [] : null
@@ -450,7 +469,32 @@
             if (item.label && item.type !== 'hidden') a.label = item.label;
             if (item.placeholder) a.placeholder = item.placeholder;
             if (item.required) a.required = 'required';
-            if (item.tinymce && item.type === 'textarea') a['class'] = 'form-control tinymce-editor';
+            if (item.notice) a.notice = item.notice;
+            if (item.rows && item.type === 'textarea') a.rows = item.rows;
+            if (item.btnAdd && item.type === 'customlinkmultiple') a.btn_add = item.btnAdd;
+
+            // CSS class merge: tinymce-editor + user classes
+            var classes = [];
+            if (item.tinymce && item.type === 'textarea') {
+                classes.push('form-control', 'tinymce-editor');
+            }
+            if (item.cssClass) classes.push(item.cssClass);
+            if (classes.length) a['class'] = classes.join(' ');
+
+            // CustomLink data-* toggles
+            if (item.type === 'customlink' || item.type === 'customlinkmultiple') {
+                a['data-intern'] = item.clTypeIntern ? 'enable' : 'disable';
+                a['data-extern'] = item.clTypeExtern ? 'enable' : 'disable';
+                a['data-media']  = item.clTypeMedia  ? 'enable' : 'disable';
+                a['data-mailto'] = item.clTypeMailto ? 'enable' : 'disable';
+                a['data-tel']    = item.clTypeTel    ? 'enable' : 'disable';
+                if (item.linkCategory)  a['data-link-category']  = item.linkCategory;
+                if (item.mediaCategory) a['data-media-category'] = item.mediaCategory;
+                if (item.externPrefix)  a['data-extern-link-prefix'] = item.externPrefix;
+                if (item.mediaType)     a['data-media-type'] = item.mediaType;
+            } else if ((item.type === 'media' || item.type === 'medialist') && item.mediaType) {
+                a['data-media-type'] = item.mediaType;
+            }
             return a;
         }
 
