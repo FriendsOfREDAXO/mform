@@ -161,7 +161,7 @@ class HtmlToSvgConverter {
 
         $this->applyStylesToElement($element, $styles);
 
-        if ($tagName === 'text' && !empty(trim($content))) {
+        if ($tagName === 'text' && '' !== trim($content)) {
             $textContent = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
             $element->appendChild($this->svg->createTextNode($textContent));
             if (!$element->hasAttribute('dominant-baseline')) {
@@ -265,7 +265,9 @@ class HtmlToSvgConverter {
 
         foreach ($declarations as $declaration) {
             $declaration = trim($declaration);
-            if (empty($declaration)) continue;
+            if ('' === $declaration) {
+                continue;
+            }
 
             $parts = explode(':', $declaration, 2);
             if (count($parts) == 2) {

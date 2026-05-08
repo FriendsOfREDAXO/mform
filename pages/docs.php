@@ -106,6 +106,11 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-book',
         'file'  => $readmeFile,
     ],
+    'security' => [
+        'title' => rex_i18n::msg('mform_docs_security'),
+        'icon'  => 'rex-icon fa-lock',
+        'file'  => 'SECURITY.md',
+    ],
     'changelog' => [
         'title' => rex_i18n::msg('mform_changelog'),
         'icon'  => 'rex-icon fa-list',
@@ -189,7 +194,7 @@ if ($q !== '') {
         foreach ($searchResults as $key => $p) {
             $url = rex_url::currentBackendPage(['func' => $key]);
             $title = rex_escape($p['title']);
-            if (!empty($p['anchor'])) {
+            if ('' !== $p['anchor']) {
                 $url .= '#' . $p['anchor'];
                 $title .= ' <small class="text-muted"><i class="rex-icon fa-angle-right"></i> ' . rex_escape($p['heading']) . '</small>';
             }
@@ -237,7 +242,7 @@ if ($q !== '') {
         }, (string) $parsed);
 
         // TOC HTML
-        if (!empty($toc)) {
+        if ([] !== $toc) {
             $tocHtml = '<div class="panel panel-default" style="margin-top:20px">'
                 . '<div class="panel-heading"><b>' . rex_i18n::msg('mform_docs_toc') . '</b></div>'
                 . '<div class="panel-body" style="padding:10px">'
@@ -291,47 +296,3 @@ $mainContent = $fragment->parse('core/page/section.php');
 // ── Layout ────────────────────────────────────────────────────────────────────
 echo '<div class="row"><div class="col-md-3">' . $sidebar . '</div><div class="col-md-9">' . $mainContent . '</div></div>';
 
-echo '
-<style>
-mark { background:#ffe066; color:#000; padding:0 2px; border-radius:2px; }
-.rex-docs pre { position:relative; }
-.rex-docs .btn-copy-code {
-    position:absolute; top:5px; right:5px; padding:3px 8px; font-size:12px;
-    opacity:.5; transition:opacity .2s; cursor:pointer; background:#fff;
-    border:1px solid #ddd; border-radius:3px; color:#333; z-index:10;
-}
-.rex-docs pre:hover .btn-copy-code { opacity:1; }
-.rex-docs .btn-copy-code.copied { background:#5bb75b; color:#fff; border-color:#5bb75b; opacity:1; }
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Copy-Buttons an Code-Blöcken
-    document.querySelectorAll(".rex-docs pre").forEach(function (pre) {
-        var btn = document.createElement("button");
-        btn.className = "btn-copy-code";
-        btn.textContent = "Kopieren";
-        btn.addEventListener("click", function () {
-            var code = pre.querySelector("code");
-            if (!code) return;
-            navigator.clipboard.writeText(code.textContent || "").then(function () {
-                btn.textContent = "✓ Kopiert";
-                btn.classList.add("copied");
-                setTimeout(function () { btn.textContent = "Kopieren"; btn.classList.remove("copied"); }, 2000);
-            });
-        });
-        pre.appendChild(btn);
-    });
-
-    // TOC-Filter
-    var filter = document.getElementById("mform-toc-filter");
-    if (filter) {
-        filter.addEventListener("input", function () {
-            var val = this.value.toLowerCase();
-            document.querySelectorAll("#mform-toc-list .list-group-item").forEach(function (item) {
-                item.style.display = val === "" || item.textContent.toLowerCase().includes(val) ? "" : "none";
-            });
-        });
-    }
-});
-</script>
-';

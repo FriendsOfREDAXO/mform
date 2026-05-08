@@ -1,5 +1,27 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta7
+
+### Neu
+
+- **SECURITY.md** – Verantwortungsvolle Offenlegung über GitHub Security Advisory, Versionsmatrix, Reaktionszeiten nach CVSS-Schweregrad und klar abgegrenzter Scope. Über die Doku-Seite **Sicherheit** im Backend (`Backend → MForm → Dokumentation → Sicherheit`) auch direkt einsehbar.
+- **GitHub Action „Static Analysis“** (`.github/workflows/static-analysis.yml`) – läuft bei Push, PR und manuell (`workflow_dispatch`):
+  - PHP-Lint Matrix (8.1, 8.2, 8.3, 8.4)
+  - PHP-CS-Fixer Dry-Run (`@PSR12`-Fallback, falls keine eigene Konfig vorhanden)
+  - **Rexstan** (`^3.0`) auf Basis des aktuellen REDAXO-Latest-Release, scope-begrenzt auf das mform-Addon
+
+### Code-Qualität
+
+- **`empty()` aus `lib/` und `pages/` entfernt** – alle ~50 Vorkommen durch strikte Vergleiche ersetzt (`'' !== $x`, `[] !== $x`, `null !== $x`). Stabilere Semantik, keine impliziten Falsy-Casts mehr.
+- **TODO-Marker aufgelöst** – veraltete `// TODO`- und `/** TODO */`-Blöcke in `MFormElements.php` und `MFormRepeaterHelper.php` entweder umgesetzt oder durch erklärende Kommentare ersetzt.
+- **Inline-CSS/JS aus `pages/docs.php` ausgelagert** in `assets/css/docs.css` und `assets/js/docs.js`. Assets werden in `boot.php` nur auf den Doku-Seiten registriert. Cache-Busting übernimmt REDAXO automatisch.
+
+### Fixed
+
+- **Doku: TOC-Filter funktioniert wieder nach PJAX-Navigation** – `assets/js/docs.js` initialisiert sich jetzt über `rex:ready` (jQuery) statt nur über `DOMContentLoaded`. Init-Routinen sind idempotent (Marker-basiert), keine Doppel-Bindings beim Re-Init.
+
+---
+
 ## Version 9.0.0-beta6
 
 ### Neu

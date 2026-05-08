@@ -66,13 +66,13 @@ class MFormModuleHelper
 
         $imgs = [];
 
-        if (!empty($images)) {
+        if ([] !== $images) {
             foreach ($images as $image) {
                 $imgs[] = "<img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\" style=\"margin-bottom: 10px; margin-right: 10px;\">";
             }
         }
 
-        if (!empty($message) && !empty($imgs)) {
+        if ([] !== $imgs) {
             $message .= '<hr>';
         }
 
@@ -81,7 +81,7 @@ class MFormModuleHelper
 
     public static function addBackendInfoImgMsg(string $image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
     {
-        if (empty($message)) {
+        if ('' === $message) {
             self::$msg[] = "<p><img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\"></p>";
         } else {
             self::$msg[] = '<p>' . sprintf($message, $image) . "<hr><img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\"></p>";

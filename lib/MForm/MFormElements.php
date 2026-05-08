@@ -523,23 +523,6 @@ abstract class MFormElements
         return $this->addElement('color-swatch', $id, null, $attributes, $swatches, null, null, $defaultValue);
     }
 
-    /** TODO
-     * public function addToggleRadioField(float|int|string $id, array $options = null, array $attributes = null, string $defaultValue = null): static
-     * {
-     * //$parallaxMForm->addRadioField("{$config['parallax_id']}.parallax-sticky-test", ['true' => 'on', 'false' => 'off'], ['label' => $config['label']['parallax_sticky'],'class' => 'btn-group', 'data-toggle'] );
-     * //$parallaxMForm->addHtml('<div class="btn-group" data-toggle="buttons">
-     * //  <label class="btn btn-default active" >
-     * //    <input type="radio" name="colour" id="green" value="green"> Green
-     * //  </label>
-     * //  <label class="btn btn-default" >
-     * //    <input type="radio"  name="colour" id="blue" value="blue"> Blue
-     * //  </label>
-     * //</div>
-     * //');
-     * return $this->addOptionField('radio', $id, $attributes, $options, $defaultValue);
-     * }
-     */
-
     /**
      * @param array<string, mixed>|null $parameter
      * @param array<string, mixed>|null $attributes
@@ -638,7 +621,7 @@ abstract class MFormElements
     {
         if ($id === null) $id = '';
         $inputsConfig['id'] = $id;
-        if (!empty($filename)) {
+        if ('' !== $filename) {
             if (substr($filename,(strlen($filename) - 1), 1) == '/') $filename = substr($filename, 0, strlen($filename) - 1);
             $basename = pathinfo($filename, PATHINFO_BASENAME);
             if (str_contains($filename, '.php')) {

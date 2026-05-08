@@ -87,29 +87,29 @@ class MFormValueHandler
         if (null === $value && count($result) > 0) {
             // read value by type
             $default = true;
-            if (is_array($item->getVarId()) && 1 === count($item->getVarId()) && !empty($item->getVarId()[0])) {
+            if (is_array($item->getVarId()) && 1 === count($item->getVarId()) && '' !== (string) $item->getVarId()[0]) {
                 switch ($item->getType()) {
                     case 'linklist':
-                        if (!empty($result['linklist'][$item->getVarId()[0]])) {
+                        if ('' !== (string) ($result['linklist'][$item->getVarId()[0]] ?? '')) {
                             $value = $result['linklist'][$item->getVarId()[0]];
                         }
                         $default = false;
                         break;
                     case 'imglist':
                     case 'medialist':
-                        if (!empty($result['filelist'][$item->getVarId()[0]])) {
+                        if ('' !== (string) ($result['filelist'][$item->getVarId()[0]] ?? '')) {
                             $value = $result['filelist'][$item->getVarId()[0]];
                         }
                         $default = false;
                         break;
                     case 'link':
-                        if (!empty($result['link'][$item->getVarId()[0]])) {
+                        if ('' !== (string) ($result['link'][$item->getVarId()[0]] ?? '')) {
                             $value = $result['link'][$item->getVarId()[0]];
                         }
                         $default = false;
                         break;
                     case 'media':
-                        if (!empty($result['file'][$item->getVarId()[0]])) {
+                        if ('' !== (string) ($result['file'][$item->getVarId()[0]] ?? '')) {
                             $value = $result['file'][$item->getVarId()[0]];
                         }
                         $default = false;

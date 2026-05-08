@@ -43,6 +43,11 @@ if (rex::isBackend()) {
         rex_view::addCssFile($addon->getAssetsUrl('css/formbuilder.css'));
         rex_view::addJsFile($addon->getAssetsUrl('js/formbuilder.js'));
     }
+    // docs page
+    if (str_starts_with((string) rex_be_controller::getCurrentPage(), 'mform/docs')) {
+        rex_view::addCssFile($addon->getAssetsUrl('css/docs.css'));
+        rex_view::addJsFile($addon->getAssetsUrl('js/docs.js'));
+    }
     // reset count per page init
     if (rex_backend_login::hasSession()) {
         rex_set_session('mform_count', 0);

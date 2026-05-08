@@ -112,7 +112,7 @@ class rex_var_custom_link extends rex_var
      */
     public static function prepareYLinkArg(array $args): array
     {
-        if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
+        if (isset($args['ylink']) && is_string($args['ylink']) && '' !== $args['ylink']) {
             $ylinks = array_filter(explode(',', $args['ylink']));
             $args['ylink'] = [];
             foreach ($ylinks as $ylink) {
@@ -212,7 +212,7 @@ class rex_var_custom_link extends rex_var
                     }
                 }
             }
-            if (!empty($ylinks)) {
+            if ('' !== $ylinks) {
                 $ylinks = '<a class="btn btn-popup" href="#" data-toggle="dropdown"><i class="rex-icon fa-database"></i> <span class="caret"></span></a><ul id="mform_ylink_' . $id . '" class="dropdown-menu">' . $ylinks . '</ul>';
             }
         }

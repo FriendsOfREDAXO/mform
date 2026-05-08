@@ -27,7 +27,7 @@ abstract class MFormInputsAbstract
 
     protected function getContentFrom(int|string|null $id = null): MForm
     {
-        if (!empty($this->config['contentMForm']) && $this->config['contentMForm'] instanceof MForm) {
+        if (isset($this->config['contentMForm']) && $this->config['contentMForm'] instanceof MForm) {
             return $this->config['contentMForm']->setShowWrapper(false);
         } else {
             $contentForm = MForm::factory()->setShowWrapper(false)
@@ -52,10 +52,10 @@ abstract class MFormInputsAbstract
             $keys = array_diff($keys, ['bgClass']);
         }
         foreach ($keys as $key) {
-            if (!empty($this->config[$key]) && is_array($this->config[$key])) {
+            if (isset($this->config[$key]) && is_array($this->config[$key]) && [] !== $this->config[$key]) {
 
                 if (isset($this->config[$key . 'Toggle']) && $this->config[$key . 'Toggle'] === true) {
-                    $configForm->addToggleCheckboxField($idPrefix . $key . 'Custom', [1 => (!empty($this->config[$key . 'ToggleLabel'])) ? $this->config[$key . 'ToggleLabel'] : 'Custom "' . $key . '"'], ['label' => $this->config[$key . 'Label'], 'data-toggle-item' => 'collapse' . $key]);
+                    $configForm->addToggleCheckboxField($idPrefix . $key . 'Custom', [1 => ('' !== (string) ($this->config[$key . 'ToggleLabel'] ?? '')) ? $this->config[$key . 'ToggleLabel'] : 'Custom "' . $key . '"'], ['label' => $this->config[$key . 'Label'], 'data-toggle-item' => 'collapse' . $key]);
                     $configForm->addForm(MForm::factory()
                         ->addCollapseElement('link', MForm::factory()
                             ->addRadioImgField($idPrefix . $key, $this->config[$key], ['label' => ''], $this->config[$key . 'DefaultValue'])

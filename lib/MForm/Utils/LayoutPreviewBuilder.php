@@ -89,7 +89,7 @@ class LayoutPreviewBuilder
 
     public function startNestedSection(): static
     {
-        if (empty($this->elements) || empty(end($this->elements)['columns'])) {
+        if ([] === $this->elements || [] === (end($this->elements)['columns'] ?? [])) {
             throw new Exception("Cannot start nested section: No active column");
         }
 
@@ -116,7 +116,7 @@ class LayoutPreviewBuilder
     // hier sollte eine Methode addArrow() hinzugefügt werden, die die Pfeile hinzufügt
     public function addArrow(string $position, int $size, string $color): static
     {
-        if (empty($this->elements) || empty(end($this->elements)['columns'])) {
+        if ([] === $this->elements || [] === (end($this->elements)['columns'] ?? [])) {
             throw new Exception("Add a column before adding an element.");
         }
 
@@ -155,7 +155,7 @@ class LayoutPreviewBuilder
             ];
         } else {
             // Normales Verhalten für Hauptspalten
-            if (empty($this->elements) || end($this->elements)['type'] !== 'section') {
+            if ([] === $this->elements || end($this->elements)['type'] !== 'section') {
                 $this->addSection();
             }
             $currentSection = &$this->elements[count($this->elements) - 1];
@@ -172,7 +172,7 @@ class LayoutPreviewBuilder
      */
     public function addElement(string $type, string $position = 'left', string $aspectRatio = '1:1', array $config = []): static
     {
-        if (empty($this->elements) || empty(end($this->elements)['columns'])) {
+        if ([] === $this->elements || [] === (end($this->elements)['columns'] ?? [])) {
             throw new Exception("Add a column before adding an element.");
         }
 
@@ -435,7 +435,7 @@ class LayoutPreviewBuilder
         }
 
         // Beschreibung über dem Element
-        if (!empty($description)) {
+        if ('' !== $description) {
             // Schatten für bessere Lesbarkeit
             $element .= '<text x="' . ($x + $width / 2) . '" y="' . ($y - 20) .
                 '" fill="#ffffff" text-anchor="middle" ' .

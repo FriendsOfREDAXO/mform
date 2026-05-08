@@ -113,7 +113,7 @@ class MFormParser
         $btnClass = ' ' . ($attrs['btn_class'] ?? 'btn-primary');
         $copyPaste = !isset($attrs['copy_paste']) || $attrs['copy_paste'];
         $label = '';
-        if (!empty($item->getLabel())) {
+        if ('' !== $item->getLabel() && [] !== $item->getLabel()) {
             $itemLabel = $item->getLabel();
             if (is_array($itemLabel)) {
                 $firstLabel = reset($itemLabel);
@@ -247,7 +247,7 @@ class MFormParser
         // MODAL MANIPULATIONS – raw label text needed, no <label> wrapper
         if ('modal' == $item->getType()) {
             $labelRaw = $item->getLabel();
-            if (!empty($labelRaw)) {
+            if ('' !== $labelRaw && [] !== $labelRaw) {
                 $labelStr = is_array($labelRaw) ? (string) (array_values($labelRaw)[0] ?? '') : (string) $labelRaw;
                 $element->setLabel($labelStr);
             }
@@ -257,11 +257,11 @@ class MFormParser
             if (isset($attributes['data-modal-btn-class'])) {
                 $element->setClass($attributes['data-modal-btn-class']);
             }
-        } elseif (!empty($item->getLabel())) {
+        } elseif ('' !== $item->getLabel() && [] !== $item->getLabel()) {
             $element->setLabel($this->parseElement($this->createLabelElement($item->setId('uid_' . uniqid())), 'base'));
         }
 
-        if (!empty($item->getLegend())) {
+        if ('' !== $item->getLegend()) {
             $legendElement = new MFormElement();
             $legendElement->setType('legend')
                 ->setLegend($item->getLegend());
@@ -284,7 +284,7 @@ class MFormParser
             }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
-                ->setClass((empty($item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
+                ->setClass(((('' === $item->getLabel() || [] === $item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links']))) ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
                 ->setValue(is_array($item->getLabel()) ? (string) (array_values($item->getLabel())[0] ?? '') : (string) $item->getLabel());
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
@@ -580,7 +580,7 @@ class MFormParser
         ->setLabel($value) // set option label
         ->setType($templateType);
 
-        if (!empty($toggle)) {
+        if ('' !== $toggle && [] !== $toggle) {
             $attributes = [];
             if (is_array($toggle) && count($toggle) == 2) {
                 $attributes[':data-toggle-item'] = $toggle[1];
@@ -772,7 +772,7 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
-        if (!empty($item->getAttributes()['form-group-class'])) {
+        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
             $templateElement->setClass($item->getAttributes()['form-group-class']);
         }
 
@@ -846,7 +846,7 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
-        if (!empty($item->getAttributes()['form-group-class'])) {
+        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
             $templateElement->setClass($item->getAttributes()['form-group-class']);
         }
 
@@ -877,7 +877,7 @@ class MFormParser
             ->setElement($radioElements)
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
-        if (!empty($item->getAttributes()['form-group-class'])) {
+        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
             $templateElement->setClass($item->getAttributes()['form-group-class']);
             unset($item->getAttributes()['form-group-class']);
         }
@@ -1588,7 +1588,7 @@ class MFormParser
         // set tooltip
         if ($item->getInfoTooltip()) {
             // parse tooltip
-            if (empty($item->getInfoTooltipIcon())) {
+            if ('' === (string) $item->getInfoTooltipIcon()) {
                 $item->setInfoTooltipIcon('fa-exclamation');
             }
 
@@ -1642,7 +1642,7 @@ class MFormParser
         $templateType = 'default';
 
         // set default template
-        if (!empty($item->getLabelColClass()) && !empty($item->getFormItemColClass())) {
+        if ('' !== $item->getLabelColClass() && '' !== $item->getFormItemColClass()) {
             $templateType .= '_custom'; // add _custom to template type
             $templateElement->setLabelColClass($item->getLabelColClass())
                 ->setFormItemColClass($item->getFormItemColClass());

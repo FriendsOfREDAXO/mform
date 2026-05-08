@@ -45,7 +45,7 @@ class MFormRepeaterHelper
             $ikey = (int) $key;
             if ($mformItem instanceof MFormItem) {
                 $nameKey = self::getNameKey($mformItem);
-                if (!empty($nameKey) && $mformItem->getType() === 'repeater') {
+                if ('' !== $nameKey && $mformItem->getType() === 'repeater') {
                     $keys[$nameKey] = $nameKey;
                     $nextItem = $items[$ikey + 1] ?? null;
                     if ($nextItem instanceof MForm) {
@@ -96,7 +96,7 @@ class MFormRepeaterHelper
             if ($mformItem instanceof MFormItem) {
                 $nameKey = self::getNameKey($mformItem);
                 // prepare mform items
-                if (!empty($nameKey)) {
+                if ('' !== $nameKey) {
                     // dump($mformItem->getType());
                     switch ($mformItem->getType()) {
                         case 'repeater':
@@ -120,20 +120,19 @@ class MFormRepeaterHelper
                         case 'media':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('repeater_link', true);
-                            $obj[$nameKey] = (!empty($mformItem->getDefaultValue())) ? $mformItem->getDefaultValue() : '';
+                            $obj[$nameKey] = ('' !== $mformItem->getDefaultValue()) ? $mformItem->getDefaultValue() : '';
                             break;
                         case 'link':
                         case 'custom-link':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('repeater_link', true);
-                            // TODO add default value
+                            // Default-Value fuer Link-Widgets ist immer leer; explizite Defaults sind nicht vorgesehen.
                             $obj[$nameKey] = ['name' => '', 'id' => ''];
                             break;
                         case 'medialist':
                         case 'linklist':
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
-                            # $mformItem->addAttribute('repeater_link', true);
-                        // TODO add default value
+                            // Default-Value fuer Listen-Widgets ist immer leer; explizite Defaults sind nicht vorgesehen.
                             $obj[$nameKey] = ['list' => []];
                             break;
                         case 'textarea':
@@ -150,7 +149,7 @@ class MFormRepeaterHelper
                         default:
                             self::addWidgetAttributes($mformItem, $repeaterId, $group, $groups, $parentId);
                             $mformItem->addAttribute('x-on:change', 'updateValues()');
-                            $obj[$nameKey] = (!empty($mformItem->getDefaultValue())) ? $mformItem->getDefaultValue() : '';
+                            $obj[$nameKey] = ('' !== $mformItem->getDefaultValue()) ? $mformItem->getDefaultValue() : '';
                             break;
                     }
                 }
@@ -190,9 +189,11 @@ class MFormRepeaterHelper
 
     private static function addWidgetAttributes(MFormItem $mformItem, string $repeaterId, string $group, string $groups, string|null $parentId, string|null $nameKey = null): void
     {
-        if (empty($nameKey)) $nameKey = self::getNameKey($mformItem);
+        if (null === $nameKey || '' === $nameKey) {
+            $nameKey = self::getNameKey($mformItem);
+        }
         $mformItem->addAttribute('x-model', $group . '[\'' . $nameKey . '\']')
-            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((!empty($parentId) && $parentId != $repeaterId)?"+'-".$parentId."-'+".$parentId.'Index':''))
+            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((null !== $parentId && '' !== $parentId && $parentId != $repeaterId)?"+'-".$parentId."-'+".$parentId.'Index':''))
             ->addAttribute('group', $group)
             ->addAttribute('groups', $groups)
             ->addAttribute('repeaterId', $repeaterId)
@@ -203,7 +204,7 @@ class MFormRepeaterHelper
             $toggleOptions = $mformItem->getToggleOptions();
             foreach ($toggleOptions as $key => $toggleOption) {
                 if (!is_array($toggleOption)) {
-                    $toggleOptions[$key] = [$toggleOption, "'" . $toggleOption . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : '')];
+                    $toggleOptions[$key] = [$toggleOption, "'" . $toggleOption . "-'+" . $repeaterId . "Index" . ((null !== $parentId && '' !== $parentId && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : '')];
                 }
             }
             $mformItem->setToggleOptions($toggleOptions);
@@ -216,10 +217,10 @@ class MFormRepeaterHelper
 //        dump([$repeaterId, $parentId]);
 
         if (isset($mformItem->getAttributes()['data-toggle-item'])) {
-            $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
+            $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((null !== $parentId && '' !== $parentId && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
         }
         if (isset($mformItem->getAttributes()['data-group-collapse-id'])) {
-            $mformItem->addAttribute(':data-group-collapse-id', "'" . $mformItem->getAttributes()['data-group-collapse-id'] . "-'+" . $repeaterId . "Index" . ((!empty($parentId) && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
+            $mformItem->addAttribute(':data-group-collapse-id', "'" . $mformItem->getAttributes()['data-group-collapse-id'] . "-'+" . $repeaterId . "Index" . ((null !== $parentId && '' !== $parentId && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));
         }
     }
 

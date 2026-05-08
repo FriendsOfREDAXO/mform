@@ -1,0 +1,140 @@
+name: Static Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+jobs:
+  php-lint:
+    name: PHP Lint
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: none
+
+      - name: Lint PHP files
+        run: |
+          find . -path ./vendor -prune -o -type f -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /tmp/lint.log
+          if grep -v "^No syntax errors" /tmp/lint.log | grep -q .; then
+            echo "::error::Syntax errors detected"
+            cat /tmp/lint.log
+            exit 1
+          fi
+
+  php-cs-fixer:
+    name: PHP-CS-Fixer (dry-run)
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: php-cs-fixer
+
+      - name: Run PHP-CS-Fixer
+        run: |
+          if [ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || [ -f .php_cs.dist ] || [ -f .php_cs ]; then
+            php-cs-fixer fix --dry-run --diff --ansi
+          else
+            echo "Kein .php-cs-fixer-Konfig vorhanden, fallback @PSR12"
+            php-cs-fixer fix --dry-run --diff --ansi --rules=@PSR12 lib pages
+          fi
+
+  # TODO: rexstan-Job hinzufuegen, sobald CI-Setup fuer REDAXO-Core verfuegbar ist.
+  # Aktuell laeuft Rexstan lokal via Docker (siehe README), CI braucht ein vollstaendiges REDAXO-Test-Setup.
+
+  rexstan:
+    name: rexstan
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    permissions:
+      contents: read
+
+    env:
+      ADDON_KEY: ${{ github.event.repository.name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, intl, pdo_mysql
+          coverage: none
+
+      # Aktuelles REDAXO-Release laden
+      - name: Download latest REDAXO release
+        run: |
+          LATEST_RELEASE=$(curl -L -s -H 'Accept: application/json' https://github.com/redaxo/redaxo/releases/latest)
+          REDAXO_VERSION=$(echo "$LATEST_RELEASE" | sed -e 's/.*"tag_name":"\([^"]*\)".*/\1/')
+          echo "Downloaded REDAXO $REDAXO_VERSION"
+          curl -Ls -o redaxo.zip "https://github.com/redaxo/redaxo/releases/download/$REDAXO_VERSION/redaxo_$REDAXO_VERSION.zip"
+          unzip -oq redaxo.zip -d redaxo_cms
+          rm redaxo.zip
+
+      # MySQL fuer REDAXO-Setup starten
+      - name: Init database
+        run: |
+          sudo /etc/init.d/mysql start
+          mysql -uroot -h127.0.0.1 -proot -e 'create database redaxo5;'
+
+      # REDAXO setup ausfuehren
+      - name: Setup REDAXO
+        run: |
+          php redaxo_cms/redaxo/bin/console setup:run -n \
+            --lang=de_de --agree-license \
+            --db-host=127.0.0.1 --db-name=redaxo5 --db-password=root \
+            --db-createdb=no --db-setup=normal \
+            --admin-username=admin --admin-password=adminpassword \
+            --error-email=test@redaxo.invalid --ansi
+          php redaxo_cms/redaxo/bin/console config:set --type boolean debug.enabled true
+          php redaxo_cms/redaxo/bin/console config:set --type boolean debug.throw_always_exception true
+
+      # Addon kopieren + Rexstan installieren
+      - name: Copy and install Addons
+        run: |
+          rsync -av \
+            --exclude='./vendor' \
+            --exclude='.github' \
+            --exclude='.git' \
+            --exclude='redaxo_cms' \
+            './' "redaxo_cms/redaxo/src/addons/${ADDON_KEY}"
+          redaxo_cms/redaxo/bin/console install:download 'rexstan' '^3.0'
+          redaxo_cms/redaxo/bin/console package:install 'rexstan'
+          redaxo_cms/redaxo/bin/console package:install "${ADDON_KEY}"
+
+      # Optional: addon-spezifischer Bootstrap (.tools/rexstan.php) wird ausgefuehrt, falls vorhanden
+      - name: Execute addon rexstan bootstrap (optional)
+        run: |
+          if [ -f "redaxo/src/addons/${ADDON_KEY}/.tools/rexstan.php" ]; then
+            php -f "redaxo/src/addons/${ADDON_KEY}/.tools/rexstan.php"
+          else
+            echo "Kein .tools/rexstan.php vorhanden, Schritt uebersprungen."
+          fi
+        working-directory: redaxo_cms
+
+      - name: Run rexstan
+        run: redaxo_cms/redaxo/bin/console rexstan:analyze "redaxo/src/addons/${ADDON_KEY}"
+

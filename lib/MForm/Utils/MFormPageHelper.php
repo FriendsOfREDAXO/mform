@@ -50,7 +50,7 @@ class MFormPageHelper
                 $key = $type . '_' . $module;
                 $moduleId = (rex_module::forKey($key) instanceof rex_module) ? rex_module::forKey($key)->getId() : null;
 
-                if (!empty($content)) {
+                if ('' !== $content) {
                     if ($installKey == $key) {
                         // install
                         $sql = rex_sql::factory();

@@ -215,7 +215,7 @@ class MFormOutputHelper
         ], $item);
 
         // Return early if no link provided
-        if (empty($item['link'])) {
+        if ('' === ($item['link'] ?? '')) {
             return $item;
         }
 
@@ -241,7 +241,7 @@ class MFormOutputHelper
                 ];
                 
                 // Use media title if no text is explicitly set
-                if (!empty($media->getTitle()) && empty($item['text'])) {
+                if ('' !== (string) $media->getTitle() && '' === ($item['text'] ?? '')) {
                     $item['customlink_text'] = $media->getTitle();
                 }
             }
@@ -271,7 +271,7 @@ class MFormOutputHelper
                 ];
 
                 // Use article name if no text is explicitly set
-                if (empty($item['text'])) {
+                if ('' === ($item['text'] ?? '')) {
                     $item['customlink_text'] = $art->getName();
                 }
             }
@@ -300,7 +300,7 @@ class MFormOutputHelper
                 ];
 
                 // Use article name if no text is explicitly set
-                if (empty($item['text'])) {
+                if ('' === ($item['text'] ?? '')) {
                     $item['customlink_text'] = $art->getName();
                 }
             }
@@ -322,14 +322,14 @@ class MFormOutputHelper
                         $item['type'] = 'telephone';
                         $item['customlink_class'] = ' tel';
                         $item['metadata']['phone_number'] = str_replace('tel:', '', $item['customlink_url']);
-                        if (empty($item['text'])) {
+                        if ('' === ($item['text'] ?? '')) {
                             $item['customlink_text'] = $item['metadata']['phone_number'];
                         }
                     } elseif ($urlComponents['scheme'] === 'mailto') {
                         $item['type'] = 'email';
                         $item['customlink_class'] = ' mail';
                         $item['metadata']['email'] = str_replace('mailto:', '', $item['customlink_url']);
-                        if (empty($item['text'])) {
+                        if ('' === ($item['text'] ?? '')) {
                             $item['customlink_text'] = $item['metadata']['email'];
                         }
                     }
@@ -345,9 +345,9 @@ class MFormOutputHelper
         // 1. Explicitly provided text
         // 2. Type-specific defaults (already set above)
         // 3. URL as fallback
-        if (!empty($item['text'])) {
+        if ('' !== ($item['text'] ?? '')) {
             $item['customlink_text'] = $item['text'];
-        } elseif (empty($item['customlink_text'])) {
+        } elseif ('' === ($item['customlink_text'] ?? '')) {
             $item['customlink_text'] = str_replace(['http://', 'https://'], '', $item['customlink_url']);
         }
 
