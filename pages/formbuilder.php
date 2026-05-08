@@ -12,10 +12,6 @@
 
 $addon = rex_addon::get('mform');
 
-// Register builder assets only on this page.
-rex_view::addCssFile($addon->getAssetsUrl('css/formbuilder.css'));
-rex_view::addJsFile($addon->getAssetsUrl('js/formbuilder.js'));
-
 $intro = '<p>'
     . 'Ziehe Felder aus der linken Palette in die mittlere Bauflaeche. '
     . 'Per Klick auf ein Feld oeffnet sich rechts der Eigenschaftsdialog. '

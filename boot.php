@@ -38,6 +38,11 @@ if (rex::isBackend()) {
     rex_view::addCssFile($addon->getAssetsUrl('css/mform.css'));
     rex_view::addJsFile($addon->getAssetsUrl('js/flex-repeater.js'));
     rex_view::addCssFile($addon->getAssetsUrl('css/flex-repeater.css'));
+    // form builder (only on its own page)
+    if (str_starts_with((string) rex_be_controller::getCurrentPage(), 'mform/formbuilder')) {
+        rex_view::addCssFile($addon->getAssetsUrl('css/formbuilder.css'));
+        rex_view::addJsFile($addon->getAssetsUrl('js/formbuilder.js'));
+    }
     // reset count per page init
     if (rex_backend_login::hasSession()) {
         rex_set_session('mform_count', 0);
