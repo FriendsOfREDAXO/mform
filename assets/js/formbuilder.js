@@ -108,6 +108,7 @@
         var nextId = 1;
         var activeItem = null;
         var clipboard = null; // shallow item clone in memory for paste
+        var outputUses = { outputHelper: false, repeaterHelper: false };
 
         var $canvas = document.querySelector('[data-fb-canvas]');
         var $palette = document.querySelector('[data-fb-palette]');
@@ -881,10 +882,12 @@
                     return 'array_filter(explode(",", ' + rv + '))';
                 case 'customlink':
                     // laut Doku: createLinkData() erkennt String- und Array-Format automatisch
-                    return '\\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData(' + rv + ')';
+                    outputUses.outputHelper = true;
+                    return 'MFormOutputHelper::createLinkData(' + rv + ')';
                 case 'customlinkmultiple':
                     // gespeichert als JSON-Array; pro Eintrag normalisieren
-                    return 'array_map(static fn ($l) => \\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData($l), json_decode(html_entity_decode(' + rv + ', ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? [])';
+                    outputUses.outputHelper = true;
+                    return 'array_map(static fn ($l) => MFormOutputHelper::createLinkData($l), json_decode(html_entity_decode(' + rv + ', ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? [])';
                 case 'link':
                     return '(int) ' + rv;
                 default:
@@ -902,9 +905,11 @@
                 case 'checkbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
                 case 'customlink':
-                    return '\\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData(' + access + ')';
+                    outputUses.outputHelper = true;
+                    return 'MFormOutputHelper::createLinkData(' + access + ')';
                 case 'customlinkmultiple':
-                    return 'array_map(static fn ($l) => \\FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper::createLinkData($l), (array) (is_string(' + access + ') ? (json_decode(html_entity_decode((string) (' + access + '), ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []) : (' + access + ')))';
+                    outputUses.outputHelper = true;
+                    return 'array_map(static fn ($l) => MFormOutputHelper::createLinkData($l), (array) (is_string(' + access + ') ? (json_decode(html_entity_decode((string) (' + access + '), ENT_QUOTES | ENT_HTML5, "UTF-8"), true) ?? []) : (' + access + ')))';
                 case 'link':
                     return '(int) (' + access + ')';
                 case 'repeater':
@@ -957,7 +962,8 @@
 
             if (rowVar === 'row') {
                 lines.push(indent + '// Repeater' + lbl + ' \u2013 dekodierte Items als Array von Zeilen');
-                lines.push(indent + '$' + name + ' = \\FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']");');
+                outputUses.repeaterHelper = true;
+                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']");');
                 lines.push(indent + 'foreach ($' + name + ' as $' + rowVar + ') {');
             } else {
                 lines.push(indent + '// verschachtelter Repeater' + lbl);
@@ -998,44 +1004,60 @@
                 $output.textContent = '// Noch keine Felder hinzugefuegt.';
                 return;
             }
-            var lines = [];
-            lines.push('// =============================================================');
-            lines.push('// Modul-Output: Variablen aus den Eingabefeldern befuellen.');
-            lines.push('// Variablennamen werden aus den Labels abgeleitet (slugify:');
-            lines.push('//   Kleinbuchstaben, Umlaute -> ae/oe/ue/ss, Sonderzeichen -> _).');
-            lines.push('// Ohne Label wird ein Fallback wie field_<id> verwendet.');
-            lines.push('// HTML, Escaping (rex_escape), Fallbacks etc. nach Bedarf selbst');
-            lines.push('// ergaenzen.');
-            lines.push('// =============================================================');
-            lines.push('');
+            // Tracking, welche use-Statements wir brauchen.
+            outputUses.outputHelper = false;
+            outputUses.repeaterHelper = false;
+            var body = [];
+            body.push('// =============================================================');
+            body.push('// Modul-Output: Variablen aus den Eingabefeldern befuellen.');
+            body.push('// Variablennamen werden aus den Labels abgeleitet (slugify:');
+            body.push('//   Kleinbuchstaben, Umlaute -> ae/oe/ue/ss, Sonderzeichen -> _).');
+            body.push('// Ohne Label wird ein Fallback wie field_<id> verwendet.');
+            body.push('// HTML, Escaping (rex_escape), Fallbacks etc. nach Bedarf selbst');
+            body.push('// ergaenzen.');
+            body.push('// =============================================================');
+            body.push('');
             state.forEach(function (item) {
                 if (item.type === 'tab') {
                     if (item.label) {
-                        lines.push('// ----- Tab: ' + item.label + ' -----');
+                        body.push('// ----- Tab: ' + item.label + ' -----');
                     } else {
-                        lines.push('// ----- Tab -----');
+                        body.push('// ----- Tab -----');
                     }
                     (item.children || []).forEach(function (c) {
                         if (c.type === 'repeater') {
-                            lines.push(renderRepeaterBlock(c, ''));
+                            body.push(renderRepeaterBlock(c, ''));
                         } else if (c.type === 'headline' || c.type === 'description') {
                             // ueberspringen
                         } else {
-                            lines.push(renderTopLevelVar(c));
+                            body.push(renderTopLevelVar(c));
                         }
-                        lines.push('');
+                        body.push('');
                     });
                 } else if (item.type === 'repeater') {
-                    lines.push(renderRepeaterBlock(item, ''));
-                    lines.push('');
+                    body.push(renderRepeaterBlock(item, ''));
+                    body.push('');
                 } else if (item.type === 'headline' || item.type === 'description') {
                     // ueberspringen
                 } else {
-                    lines.push(renderTopLevelVar(item));
-                    lines.push('');
+                    body.push(renderTopLevelVar(item));
+                    body.push('');
                 }
             });
-            $output.textContent = lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
+
+            // use-Statements vorne dranhaengen, falls noetig.
+            var head = [];
+            if (outputUses.outputHelper) {
+                head.push('use FriendsOfRedaxo\\MForm\\Utils\\MFormOutputHelper;');
+            }
+            if (outputUses.repeaterHelper) {
+                head.push('use FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;');
+            }
+            if (head.length > 0) {
+                head.push('');
+            }
+
+            $output.textContent = head.concat(body).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
         }
 
         // ---- Init -----------------------------------------------------------
