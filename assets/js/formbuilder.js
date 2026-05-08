@@ -1124,21 +1124,26 @@
             var lbl = item.label ? ' (' + item.label + ')' : '';
             var hint = topLevelHint(item);
             lines.push('// ' + item.type + lbl + (hint ? ' \u2013 ' + hint : ''));
-            var values = optionValuesComment(item);
-            if (values) lines.push('//   ' + values);
+            optionValuesComment(item).forEach(function (v) { lines.push('//   ' + v); });
             lines.push('$' + name + ' = ' + topLevelExpr(item) + ';');
             return lines.join('\n');
         }
 
-        // Wenn select/radio/checkbox Optionen hat, zeige die moeglichen Keys.
+        // Wenn select/radio/checkbox Optionen hat, zeige die moeglichen Werte
+        // inkl. Labels als Kommentar (hilft beim Mapping in der Ausgabe).
         function optionValuesComment(item) {
             if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup') {
-                return '';
+                return [];
             }
             var opts = parseOptions(item.options || '');
-            if (!opts.length) return '';
-            var keys = opts.map(function (o) { return String(o.key); });
-            return 'moegliche Werte: ' + keys.join(', ');
+            if (!opts.length) return [];
+            var lines = ['moegliche Werte:'];
+            opts.forEach(function (o) {
+                var key = String(o.key);
+                var label = String(o.label || '');
+                lines.push('  ' + key + (label && label !== key ? ' = ' + label : ''));
+            });
+            return lines;
         }
 
         // Kurzer Hinweis zum Inhaltstyp / wie man das Feld benutzt.
@@ -1202,8 +1207,7 @@
                     var clbl = c.label ? ' (' + c.label + ')' : '';
                     var ch = childHint(c);
                     lines.push(inner + '// ' + c.type + clbl + (ch ? ' \u2013 ' + ch : ''));
-                    var cv = optionValuesComment(c);
-                    if (cv) lines.push(inner + '//   ' + cv);
+                    optionValuesComment(c).forEach(function (v) { lines.push(inner + '//   ' + v); });
                     var line = inner + '$' + key + ' = ' + childExpr(c, key) + ';';
                     if (rowVar !== 'row') {
                         line = line.replace(/\$row\[/g, '$' + rowVar + '[');
