@@ -59,9 +59,9 @@
                 props: ['label', 'defaultValue', 'options'] },
             hidden:      { label: 'Hidden', method: 'addHiddenField',
                 props: ['defaultValue'] },
-            headline:    { label: 'Headline', method: 'addHeadlineElement',
+            headline:    { label: 'Headline', method: 'addHeadline',
                 props: ['label'] },
-            description: { label: 'Description', method: 'addDescriptionElement',
+            description: { label: 'Description', method: 'addDescription',
                 props: ['label'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
@@ -460,12 +460,18 @@
             return '[' + keys.map(function (k) { return phpStr(k) + ' => ' + phpStr(attrs[k]); }).join(', ') + ']';
         }
 
-        function renderField(item, idArg, indent) {
+        // Builds the call expression WITHOUT a leading `$mform` / `->`, so the
+        // caller can choose: top-level uses `$mform->...`, inner items use `->...`.
+        function renderCall(item, idArg) {
             var def = TYPES[item.type];
-            var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
             var attrs = attrsForItem(item);
             var attrPhp = attrsToPhp(attrs);
-            var line = '$mform->' + def.method + '(' + idLit;
+            // Headline / Description: no id, single string argument
+            if (item.type === 'headline' || item.type === 'description') {
+                return def.method + '(' + phpStr(item.label || '') + ')';
+            }
+            var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
+            var line = def.method + '(' + idLit;
 
             switch (item.type) {
                 case 'select':
@@ -483,76 +489,93 @@
                 case 'hidden':
                     line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
                     break;
-                case 'headline':
-                case 'description':
-                    line += ', ' + phpStr(item.label || '');
-                    break;
-                // addMediaField($id, ?array $parameter = null, $catId = null, ?array $attributes = null)
                 case 'media':
                 case 'medialist':
                 case 'imagelist':
                 case 'link':
                 case 'linklist':
-                    var catLit = item.category ? parseInt(item.category, 10) || phpStr(item.category) : 'null';
+                    var catLit = item.category ? (parseInt(item.category, 10) || phpStr(item.category)) : 'null';
                     line += ', null, ' + catLit + (attrPhp ? ', ' + attrPhp : '');
                     break;
-                // addCustomLinkField($id, ?array $attributes = null, ?string $defaultValue = null)
                 case 'customlink':
                     if (attrPhp) line += ', ' + attrPhp;
                     if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
                     break;
-                // addCustomLinkMultipleField($id, ?array $attributes = null)
                 case 'customlinkmultiple':
                     if (attrPhp) line += ', ' + attrPhp;
                     break;
             }
-
             line += ')';
+            return line;
+        }
+
+        // Render top-level field as `$mform->call(...);` (with optional setFull chain)
+        function renderField(item, idArg, indent) {
+            var line = indent + '$mform->' + renderCall(item, idArg);
             if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
                 line += '\n' + indent + '    ->setFull()';
             }
-            return indent + line;
+            return line;
         }
 
-        function renderRepeaterChain(item, indent, idCtxArg) {
-            // Generate inner factory chain for a repeater. `idCtxArg` is the
-            // string-key/id used in the parent call; the inner block uses
-            // MForm::factory()-> lines for each child.
-            var childKeys = {};
-            var innerParts = (item.children || []).map(function (c) {
-                var key = slugify(c.label, 'field_' + c.id);
-                var base = key, n = 2;
-                while (childKeys[key]) { key = base + '_' + n++; }
-                childKeys[key] = true;
-
-                if (c.type === 'repeater') {
-                    return renderRepeaterStmt(c, key, indent + '        ');
-                }
-                return renderField(c, key, indent + '        ') + ';';
-            });
-
-            var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
-            var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
-            var cfgParts = [];
-            if (minVal !== null && !isNaN(minVal)) cfgParts.push("'min' => " + minVal);
-            if (maxVal !== null && !isNaN(maxVal)) cfgParts.push("'max' => " + maxVal);
-            if (item.label) cfgParts.push("'label' => " + phpStr(item.label));
-            var cfg = cfgParts.length ? ', [' + cfgParts.join(', ') + ']' : '';
-
-            var inner = innerParts.length ? innerParts.join("\n") : (indent + '        // Felder hier ablegen');
-
-            return {
-                inner: inner,
-                cfg: cfg
-            };
+        // Render inner field as `->call(...)` chained to MForm::factory()
+        function renderInnerChainLink(item, idArg, indent) {
+            var line = indent + '->' + renderCall(item, idArg);
+            if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
+                line += '\n' + indent + '->setFull()';
+            }
+            return line;
         }
 
         function renderRepeaterStmt(item, idArg, indent) {
             var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
-            var built = renderRepeaterChain(item, indent);
+            var inner = renderRepeaterInner(item, indent);
+            var cfg = repeaterCfg(item);
             return indent + '$mform->addFlexRepeaterElement(' + idLit + ', MForm::factory()\n'
-                + built.inner + '\n'
-                + indent + '    , null' + built.cfg + ');';
+                + inner
+                + (cfg ? ',\n' + indent + '    ' + cfg : '')
+                + ');';
+        }
+
+        function renderInnerRepeaterChainLink(item, idArg, indent) {
+            // Inside an outer factory(), a nested repeater is added with
+            // ->addFlexRepeaterElement($id, MForm::factory()->...->..., $options)
+            var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
+            var inner = renderRepeaterInner(item, indent);
+            var cfg = repeaterCfg(item);
+            return indent + '->addFlexRepeaterElement(' + idLit + ', MForm::factory()\n'
+                + inner
+                + (cfg ? ',\n' + indent + '    ' + cfg : '')
+                + ')';
+        }
+
+        function repeaterCfg(item) {
+            var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
+            var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
+            var parts = [];
+            if (minVal !== null && !isNaN(minVal)) parts.push("'min' => " + minVal);
+            if (maxVal !== null && !isNaN(maxVal)) parts.push("'max' => " + maxVal);
+            if (item.label) parts.push("'label' => " + phpStr(item.label));
+            return parts.length ? '[' + parts.join(', ') + ']' : '';
+        }
+
+        function renderRepeaterInner(item, indent) {
+            var children = item.children || [];
+            if (children.length === 0) {
+                return indent + '        // Felder hier ablegen\n';
+            }
+            var keyPool = {};
+            var lines = children.map(function (c) {
+                var key = slugify(c.label, 'field_' + c.id);
+                var base = key, n = 2;
+                while (keyPool[key]) { key = base + '_' + n++; }
+                keyPool[key] = true;
+                if (c.type === 'repeater') {
+                    return renderInnerRepeaterChainLink(c, key, indent + '        ');
+                }
+                return renderInnerChainLink(c, key, indent + '        ');
+            });
+            return lines.join('\n') + '\n';
         }
 
         function emitCode() {
