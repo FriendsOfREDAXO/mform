@@ -7,6 +7,7 @@
 
 class rex_yform_value_custom_link_multi extends rex_yform_value_abstract
 {
+    /** @return void */
     public function enterObject()
     {
         static $counter = 0;
@@ -20,6 +21,7 @@ class rex_yform_value_custom_link_multi extends rex_yform_value_abstract
         $this->params['value_pool']['sql'][$this->getName()] = $this->getValue();
     }
 
+    /** @return array<string, mixed> */
     public function getDefinitions(): array
     {
         return [
@@ -47,15 +49,19 @@ class rex_yform_value_custom_link_multi extends rex_yform_value_abstract
         ];
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return string
+     */
     public static function getListValue($params)
     {
-        if ('' === $params['value']) {
+        if ('' === (string) ($params['value'] ?? '')) {
             return '-';
         }
-        $rawValue = html_entity_decode($params['value'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $rawValue = html_entity_decode((string) ($params['value'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $links = json_decode($rawValue, true);
         if (!is_array($links)) {
-            return rex_escape($params['value']);
+            return rex_escape((string) ($params['value'] ?? ''));
         }
         $out = [];
         foreach ($links as $link) {

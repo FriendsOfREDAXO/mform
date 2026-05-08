@@ -7,6 +7,7 @@
 
 class rex_yform_value_imagelist extends rex_yform_value_abstract
 {
+    /** @return void */
     public function enterObject()
     {
         static $counter = 0;
@@ -20,6 +21,7 @@ class rex_yform_value_imagelist extends rex_yform_value_abstract
         $this->params['value_pool']['sql'][$this->getElement(1)] = $this->getValue();
     }
 
+    /** @return array<string, mixed> */
     public function getDefinitions(): array
     {
         return [
@@ -38,16 +40,22 @@ class rex_yform_value_imagelist extends rex_yform_value_abstract
         ];
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return string
+     */
     public static function getListValue($params)
     {
-        $files = explode(',', $params['subject']);
+        $subject = (string) ($params['subject'] ?? '');
+        $files = explode(',', $subject);
+        $return = [];
 
         if (1 == count($files)) {
-            $filename = $params['subject'];
-            if (strlen($params['subject']) > 16) {
-                $filename = mb_substr($params['subject'], 0, 6) . ' ... ' . mb_substr($params['subject'], -6);
+            $filename = $subject;
+            if (strlen($subject) > 16) {
+                $filename = mb_substr($subject, 0, 6) . ' ... ' . mb_substr($subject, -6);
             }
-            $return[] = '<span style="white-space:nowrap;" title="' . rex_escape($params['subject']) . '">' . $filename . '</span>';
+            $return[] = '<span style="white-space:nowrap;" title="' . rex_escape($subject) . '">' . $filename . '</span>';
         } else {
             foreach ($files as $file) {
                 $filename = $file;
@@ -61,15 +69,24 @@ class rex_yform_value_imagelist extends rex_yform_value_abstract
         return implode('<br />', $return);
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return void
+     */
     public static function getSearchField($params)
     {
         $params['searchForm']->setValueField('text', ['name' => $params['field']->getName(), 'label' => $params['field']->getLabel()]);
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return string
+     */
     public static function getSearchFilter($params)
     {
         $sql = rex_sql::factory();
-        $value = $params['value'];
+        $rawValue = $params['value'] ?? '';
+        $value = is_array($rawValue) ? implode(',', $rawValue) : (string) $rawValue;
         $field = $params['field']->getName();
 
         if ('(empty)' == $value) {

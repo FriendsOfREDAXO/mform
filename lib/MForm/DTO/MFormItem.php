@@ -11,20 +11,28 @@ class MFormItem
 {
     public string $type = "";
     public string $id = "";
+    /** @var array<mixed>|string */
     public array|string $varId = "";
+    /** @var array<mixed>|string|null */
     public array|string|null $value = "";
     public string $stringValue = "";
     public string $defaultValue = "";
     public string $mode = "";
     public int|string $size = 1;
+    /** @var array<string, mixed> */
     public array $attributes = [];
     public string $class = '';
     public bool $defaultClass = true;
+    /** @var array<mixed> */
     public array $options = [];
+    /** @var array<mixed> */
     public array $disabledOptions = [];
+    /** @var array<mixed> */
     public array $toggleOptions = [];
+    /** @var array<string, mixed> */
     public array $parameter = [];
     public bool $multiple = false;
+    /** @var array<mixed>|string */
     public array|string $label = "";
     public string $legend = "";
     public bool $full = false;
@@ -61,22 +69,26 @@ class MFormItem
         return $this;
     }
 
+    /** @return array<mixed>|string */
     public function getVarId(): array|string
     {
         return $this->varId;
     }
 
+    /** @param array<mixed>|string $varId */
     public function setVarId(array|string $varId): static
     {
         $this->varId = $varId;
         return $this;
     }
 
+    /** @return array<mixed>|string|null */
     public function getValue(): array|string|null
     {
         return $this->value;
     }
 
+    /** @param array<mixed>|string|null $value */
     public function setValue(array|string|null $value): static
     {
         $this->value = $value;
@@ -127,17 +139,19 @@ class MFormItem
         return $this;
     }
 
+    /** @return array<string, mixed> */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
-    public function addAttribute($key, $value): static
+    public function addAttribute(string $key, mixed $value): static
     {
         $this->attributes[$key] = $value;
         return $this;
     }
 
+    /** @param array<string, mixed> $attributes */
     public function setAttributes(array $attributes): static
     {
         $this->attributes = $attributes;
@@ -149,7 +163,7 @@ class MFormItem
         return $this->class;
     }
 
-    public function setClass($class): static
+    public function setClass(string $class): static
     {
         $this->class = $class;
         return $this;
@@ -166,44 +180,52 @@ class MFormItem
         return $this;
     }
 
+    /** @return array<mixed> */
     public function getOptions(): array
     {
         return $this->options;
     }
 
+    /** @param array<mixed> $options */
     public function setOptions(array $options): static
     {
         $this->options = $options;
         return $this;
     }
 
+    /** @return array<mixed> */
     public function getToggleOptions(): array
     {
         return $this->toggleOptions;
     }
 
+    /** @param array<mixed> $toggleOptions */
     public function setToggleOptions(array $toggleOptions): static
     {
         $this->toggleOptions = $toggleOptions;
         return $this;
     }
 
+    /** @return array<mixed> */
     public function getDisabledOptions(): array
     {
         return $this->disabledOptions;
     }
 
+    /** @param array<mixed> $disabledOptions */
     public function setDisabledOptions(array $disabledOptions): static
     {
         $this->disabledOptions = $disabledOptions;
         return $this;
     }
 
+    /** @return array<string, mixed> */
     public function getParameter(): array
     {
         return $this->parameter;
     }
 
+    /** @param array<string, mixed> $parameter */
     public function setParameter(array $parameter): static
     {
         $this->parameter = $parameter;
@@ -221,11 +243,13 @@ class MFormItem
         return $this;
     }
 
+    /** @return array<mixed>|string */
     public function getLabel(): array|string
     {
         return $this->label;
     }
 
+    /** @param array<mixed>|string $label */
     public function setLabel(array|string $label): static
     {
         $this->label = $label;

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FriendsOfRedaxo\MFormTemplate;
 
 use FriendsOfRedaxo\MForm;
-use rex_exception;
 
 final class TemplateRegistry
 {
@@ -19,14 +18,6 @@ final class TemplateRegistry
      */
     public static function register(string $key, string $templateClass): void
     {
-        if (!is_subclass_of($templateClass, TemplateInterface::class)) {
-            throw new rex_exception(sprintf(
-                'MForm template class "%s" must implement %s',
-                $templateClass,
-                TemplateInterface::class,
-            ));
-        }
-
         self::$templates[$key] = $templateClass;
     }
 

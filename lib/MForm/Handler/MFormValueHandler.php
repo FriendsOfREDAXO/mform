@@ -17,9 +17,13 @@ use rex_sql_exception;
 use function array_key_exists;
 use function count;
 use function is_array;
+use function is_scalar;
 
 class MFormValueHandler
 {
+    /**
+     * @return array<string, array<int, mixed>>
+     */
     public static function loadRexVars(): array
     {
         $sliceId = rex_request('slice_id', 'int', false);
@@ -51,7 +55,9 @@ class MFormValueHandler
                         }
 
                         // thanks @dtpop
-                        $jsonResult = json_decode(htmlspecialchars_decode((string) $result['value'][$i], ENT_NOQUOTES), true); // wb
+                        $rawValue = $result['value'][$i];
+                        $rawStringValue = (is_scalar($rawValue) || null === $rawValue) ? (string) $rawValue : '';
+                        $jsonResult = json_decode(htmlspecialchars_decode($rawStringValue, ENT_NOQUOTES), true); // wb
 
                         if (is_array($jsonResult)) {
                             $result['value_string'][$i] = $result['value'][$i];
@@ -66,7 +72,10 @@ class MFormValueHandler
         return $result;
     }
 
-    public static function decorateItem(MFormItem $item, array $result, string $value = null, string $defaultValue = null): void
+    /**
+     * @param array<string, mixed> $result
+     */
+    public static function decorateItem(MFormItem $item, array $result, ?string $value = null, ?string $defaultValue = null): void
     {
         if (null !== $defaultValue) {
             // set default value

@@ -12,9 +12,9 @@ class rex_form_widget_mform_custom_link_multi_element extends rex_form_element
 
     // 1. Parameter nicht genutzt, muss aber hier stehen,
     // wg einheitlicher Konstruktorparameter
-    public function __construct($tag = '', ?rex_form_base $table = null, array $attributes = [])
+    public function __construct(string $tag = '', ?rex_form_base $table = null, array $attributes = [])
     {
-        parent::__construct('', $table, $attributes);
+        parent::__construct($tag, $table, $attributes);
     }
 
     public function setIntern(int $intern): void
@@ -52,14 +52,14 @@ class rex_form_widget_mform_custom_link_multi_element extends rex_form_element
         $this->args['btn_add'] = $label;
     }
 
-    public function setCategoryId(int $category_id): void
+    public function setCategoryId(int $categoryId): void
     {
-        $this->args['category'] = $category_id;
+        $this->args['category'] = $categoryId;
     }
 
-    public function setMediaCategoryId(int $category_id): void
+    public function setMediaCategoryId(int $categoryId): void
     {
-        $this->args['media_category'] = $category_id;
+        $this->args['media_category'] = $categoryId;
     }
 
     public function setTypes(string $types): void

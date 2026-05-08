@@ -175,7 +175,7 @@ class MFormOutputHelper
         ];
     }
 
-    public static function isFirstSlice($sliceId): bool
+    public static function isFirstSlice(int $sliceId): bool
     {
         $first = rex_article_slice::getFirstSliceForArticle(rex_article::getCurrentId(), rex_clang::getCurrentId());
         if ($first instanceof rex_article_slice) {
@@ -189,9 +189,9 @@ class MFormOutputHelper
      * Prepares and enriches link information with additional metadata
      * while maintaining backward compatibility
      *
-     * @param array $item The input link item
+     * @param array<string, mixed> $item The input link item
      * @param bool $externBlank Whether external links should open in new tab
-     * @return array Enhanced link information
+     * @return array<string, mixed> Enhanced link information
      */
     public static function prepareCustomLink(array $item, bool $externBlank = true): array
     {
@@ -361,7 +361,7 @@ class MFormOutputHelper
      * Returns only the URL for a given link value
      * Accepts either a CustomLink array or any link string
      * 
-     * @param array|string $item The CustomLink array or link string
+     * @param array<string, mixed>|string $item The CustomLink array or link string
      * @param bool $externBlank Whether external links should open in new tab
      * @return string The processed URL
      */

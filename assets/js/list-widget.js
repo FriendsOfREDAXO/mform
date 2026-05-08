@@ -61,6 +61,38 @@ function mformListRegisterPopupCallback(type, baseId, callback) {
     store[type][key] = callback;
 }
 
+function mformListResolveLinkOptionLabels(widget) {
+    const select = widget.find('select.mform-list-select');
+    const options = select.find('option');
+
+    if (!options.length) {
+        return;
+    }
+
+    options.each(function () {
+        const option = $(this);
+        const rawValue = String(option.val() || '').trim();
+
+        if (!rawValue) {
+            return;
+        }
+
+        $.getJSON(
+            'index.php',
+            { 'rex-api-call': 'mform_resolve_link', value: rawValue },
+            function (resp) {
+                const text = resp && typeof resp.text === 'string' ? resp.text.trim() : '';
+                if (!text) {
+                    return;
+                }
+
+                option.text(text);
+                mformListRender(widget, 'linklist');
+            }
+        );
+    });
+}
+
 $(document).on('rex:ready', function (e, container) {
     setTimeout(function () {
         if (!container || !container.find(mform_list_widget).length) {
@@ -342,6 +374,10 @@ function mformListBuildOptionsFromHidden(widget, type) {
 
     select.empty();
     options.forEach(function (opt) { select.append(opt); });
+
+    if (type === 'linklist') {
+        mformListResolveLinkOptionLabels(widget);
+    }
 }
 
 function mformListRender(widget, type) {

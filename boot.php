@@ -7,6 +7,8 @@
 
 rex_api_function::register('mform_resolve_link', \FriendsOfREDAXO\MForm\Api\ResolveLinkApi::class);
 
+$addon = rex_addon::get('mform');
+
 if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'ytemplates'));
     
@@ -22,20 +24,20 @@ if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
 
 if (rex::isBackend()) {
     // add toggle files
-    rex_view::addCssFile($this->getAssetsUrl('toggle/toggle.css'));
-    rex_view::addJsFile($this->getAssetsUrl('toggle/toggle.js'));
+    rex_view::addCssFile($addon->getAssetsUrl('toggle/toggle.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('toggle/toggle.js'));
     // widgets
-    rex_view::addCssFile($this->getAssetsUrl('css/imglist.css'));
-    rex_view::addCssFile($this->getAssetsUrl('css/list-widget.css'));
-    rex_view::addJsFile($this->getAssetsUrl('js/imglist.js'));
-    rex_view::addJsFile($this->getAssetsUrl('js/sortable.min.js'));
-    rex_view::addJsFile($this->getAssetsUrl('js/list-widget.js'));
-    rex_view::addJsFile($this->getAssetsUrl('js/customlink.js'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/imglist.css'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/list-widget.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/imglist.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/sortable.min.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/list-widget.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/customlink.js'));
     // add mform js / css
-    rex_view::addJsFile($this->getAssetsUrl('mform.js'));
-    rex_view::addCssFile($this->getAssetsUrl('css/mform.css'));
-    rex_view::addJsFile($this->getAssetsUrl('js/flex-repeater.js'));
-    rex_view::addCssFile($this->getAssetsUrl('css/flex-repeater.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('mform.js'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/mform.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/flex-repeater.js'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/flex-repeater.css'));
     // reset count per page init
     if (rex_backend_login::hasSession()) {
         rex_set_session('mform_count', 0);

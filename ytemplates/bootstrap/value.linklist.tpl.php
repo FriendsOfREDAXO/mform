@@ -1,6 +1,11 @@
 <?php
 
-$buttonId = $counter;
+/**
+ * @var rex_yform_value_linklist $this
+ * @psalm-scope-this rex_yform_value_linklist
+ */
+
+$buttonId = isset($counter) ? (int) $counter : 0;
 $name = $this->getFieldName();
 $value = htmlspecialchars((string) $this->getValue());
 

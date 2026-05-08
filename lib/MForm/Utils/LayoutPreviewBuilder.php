@@ -9,28 +9,32 @@ use Exception;
  */
 class LayoutPreviewBuilder
 {
-    private $svgWidth = 800;
-    private $svgHeight = 800;
-    private $elements = [];
-    private $backgroundColor = '#f8f9fa';
-    private $aspectRatio = '1:1';
-    private $columnGap = 30;
-    private $sectionGap = 40;
-    private $currentContext = ['main'];  // Stack für den Kontext (main, nested)
-    private $nestedSectionGap = 10; // Kleinerer Abstand für verschachtelte Sections
-    private $fontSizes = [
+    private float $svgWidth = 800;
+    private float $svgHeight = 800;
+    /** @var array<int, array<string, mixed>> */
+    private array $elements = [];
+    private string $backgroundColor = '#f8f9fa';
+    private string $aspectRatio = '1:1';
+    private int $columnGap = 30;
+    private int $sectionGap = 40;
+    /** @var string[] */
+    private array $currentContext = ['main'];  // Stack für den Kontext (main, nested)
+    private int $nestedSectionGap = 10; // Kleinerer Abstand für verschachtelte Sections
+    /** @var array<string, int> */
+    private array $fontSizes = [
         'elementTitle' => 124,
         'description' => 124,
         'lineHeight' => 24,
         'strokeWidth' => 3,
     ];
 
-    private $fontStyles = [
+    /** @var array<string, string> */
+    private array $fontStyles = [
         'fontWeight' => 'bold',
         'fontFamily' => 'system-ui, -apple-system, sans-serif',
     ];
 
-    public function setFontSize($key, $value)
+    public function setFontSize(string $key, int $value): static
     {
         if (array_key_exists($key, $this->fontSizes)) {
             $this->fontSizes[$key] = $value;
@@ -38,7 +42,8 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function setFontSizes(array $sizes)
+    /** @param array<string, int> $sizes */
+    public function setFontSizes(array $sizes): static
     {
         foreach ($sizes as $key => $value) {
             $this->setFontSize($key, $value);
@@ -46,33 +51,34 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function setFontStyle($key, $value)
+    public function setFontStyle(string $key, string $value): static
     {
         $this->fontStyles[$key] = $value;
         return $this;
     }
 
-    public function setFontStyles(array $styles)
+    /** @param array<string, string> $styles */
+    public function setFontStyles(array $styles): static
     {
         $this->fontStyles = array_merge($this->fontStyles, $styles);
         return $this;
     }
 
-    public function setAspectRatio($aspectRatio)
+    public function setAspectRatio(string $aspectRatio): static
     {
         $this->aspectRatio = $aspectRatio;
         list($w, $h) = explode(':', $aspectRatio);
-        $this->svgHeight = ($this->svgWidth / $w) * $h;
+        $this->svgHeight = ($this->svgWidth / (float) $w) * (float) $h;
         return $this;
     }
 
-    public function setBackgroundColor($color)
+    public function setBackgroundColor(string $color): static
     {
         $this->backgroundColor = $color;
         return $this;
     }
 
-    public function addSection()
+    public function addSection(): static
     {
         $this->elements[] = [
             'type' => 'section',
@@ -81,7 +87,7 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function startNestedSection()
+    public function startNestedSection(): static
     {
         if (empty($this->elements) || empty(end($this->elements)['columns'])) {
             throw new Exception("Cannot start nested section: No active column");
@@ -98,7 +104,7 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function endNestedSection()
+    public function endNestedSection(): static
     {
         if (end($this->currentContext) !== 'nested') {
             throw new Exception("No nested section to end");
@@ -108,7 +114,7 @@ class LayoutPreviewBuilder
     }
 
     // hier sollte eine Methode addArrow() hinzugefügt werden, die die Pfeile hinzufügt
-    public function addArrow($position, $size, $color)
+    public function addArrow(string $position, int $size, string $color): static
     {
         if (empty($this->elements) || empty(end($this->elements)['columns'])) {
             throw new Exception("Add a column before adding an element.");
@@ -135,7 +141,7 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function addColumn($width)
+    public function addColumn(string $width): static
     {
         if (end($this->currentContext) === 'nested') {
             // Füge Spalte zur verschachtelten Section hinzu
@@ -161,7 +167,10 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    public function addElement($type, $position = 'left', $aspectRatio = '1:1', $config = [])
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function addElement(string $type, string $position = 'left', string $aspectRatio = '1:1', array $config = []): static
     {
         if (empty($this->elements) || empty(end($this->elements)['columns'])) {
             throw new Exception("Add a column before adding an element.");
@@ -195,30 +204,23 @@ class LayoutPreviewBuilder
         return $this;
     }
 
-    private function getWidth($width, $parentWidth = null)
+    private function getWidth(string $width, ?float $parentWidth = null): float
     {
         $actualWidth = $parentWidth ?? $this->svgWidth;
         $gap = $this->columnGap;
 
-        switch ($width) {
-            case '1/4':
-                return ($actualWidth - 3 * $gap) / 4;
-            case '1/3':
-                return ($actualWidth - 2 * $gap) / 3;
-            case '1/2':
-                return ($actualWidth - $gap) / 2;
-            case '2/3':
-                return (($actualWidth - $gap) * 2) / 3;
-            case '3/4':
-                return (($actualWidth - $gap) * 3) / 4;
-            case 'full':
-                return $actualWidth;
-            default:
-                return ($actualWidth - $gap) / 2;
-        }
+        return match ($width) {
+            '1/4' => ($actualWidth - 3 * $gap) / 4,
+            '1/3' => ($actualWidth - 2 * $gap) / 3,
+            '1/2' => ($actualWidth - $gap) / 2,
+            '2/3' => (($actualWidth - $gap) * 2) / 3,
+            '3/4' => (($actualWidth - $gap) * 3) / 4,
+            'full' => $actualWidth,
+            default => ($actualWidth - $gap) / 2,
+        };
     }
 
-    private function getHeight($aspectRatio, $width)
+    private function getHeight(string $aspectRatio, float $width): float
     {
         if (!str_contains($aspectRatio, ':')) {
             return $width; // Fallback 1:1
@@ -238,7 +240,10 @@ class LayoutPreviewBuilder
         return ($width / $w) * $h;
     }
 
-    private function calculateSectionHeight($section, $isNested = false)
+    /**
+     * @param array<string, mixed> $section
+     */
+    private function calculateSectionHeight(array $section, bool $isNested = false): float
     {
         $maxHeight = 0;
         $gap = $isNested ? $this->nestedSectionGap : $this->sectionGap;
@@ -263,11 +268,11 @@ class LayoutPreviewBuilder
     /**
      * Rendert das aktuell aufgebaute Layout als Base64-Data-URL.
      */
-    public function render()
+    public function render(): string
     {
         // Berechne die maximale Höhe basierend auf dem Seitenverhältnis
         list($w, $h) = explode(':', $this->aspectRatio);
-        $maxHeight = ($this->svgWidth / $w) * $h;
+        $maxHeight = ($this->svgWidth / (float) $w) * (float) $h;
 
         // Berechne tatsächliche Content-Höhe
         $contentHeight = 0;
@@ -308,7 +313,10 @@ class LayoutPreviewBuilder
     /**
      * Rendert eine Section rekursiv und liefert deren benoetigte Hoehe zurueck.
      */
-    private function renderSection(&$svg, $section, $offsetX, $offsetY, $isNested = false, $parentWidth = null)
+    /**
+     * @param array<string, mixed> $section
+     */
+    private function renderSection(string &$svg, array $section, float $offsetX, float $offsetY, bool $isNested = false, ?float $parentWidth = null): float
     {
         $currentX = $offsetX;
         $maxHeight = 0;
@@ -347,7 +355,7 @@ class LayoutPreviewBuilder
         return $maxHeight;
     }
 
-    private function reset()
+    private function reset(): void
     {
         $this->elements = [];
         $this->backgroundColor = '#f8f9fa';
@@ -357,7 +365,7 @@ class LayoutPreviewBuilder
     /**
      * Erzeugt den SVG-Markup-Block fuer ein einzelnes Platzhalter-Element.
      */
-    private function generateElement($type, $x, $y, $width, $height, $description = '', $arrow = false)
+    private function generateElement(string $type, float $x, float $y, float $width, float $height, string $description = '', bool $arrow = false): string
     {
         $element = '';
 
@@ -464,7 +472,7 @@ class LayoutPreviewBuilder
         return $element;
     }
 
-    private function generateAccordion($x, $y, $width, $height)
+    private function generateAccordion(float $x, float $y, float $width, float $height): string
     {
         $itemCount = 4;
         $itemHeight = ($height - (($itemCount - 1) * 10)) / $itemCount;
@@ -521,7 +529,7 @@ class LayoutPreviewBuilder
         return $accordion;
     }
 
-    private function generateForm($x, $y, $width)
+    private function generateForm(float $x, float $y, float $width): string
     {
         $inputHeight = 40;
         $spacing = 10;
@@ -555,7 +563,7 @@ class LayoutPreviewBuilder
         return $form;
     }
 
-    private function generateTextLines($x, $y, $columnWidth)
+    private function generateTextLines(float $x, float $y, float $columnWidth): string
     {
         $line1Width = $columnWidth * 0.9;
         $line2Width = $columnWidth * 0.7;
@@ -571,7 +579,7 @@ class LayoutPreviewBuilder
         ';
     }
 
-    private function generateList($x, $y, $width)
+    private function generateList(float $x, float $y, float $width): string
     {
         $itemHeight = 30;
         $list = '';
@@ -593,7 +601,7 @@ class LayoutPreviewBuilder
         return $list;
     }
 
-    private function generateGallery($x, $y, $width, $height)
+    private function generateGallery(float $x, float $y, float $width, float $height): string
     {
         $gallery = '';
         $columns = 3;
@@ -619,7 +627,7 @@ class LayoutPreviewBuilder
         return $gallery;
     }
 
-    private function generateTabs($x, $y, $width, $height)
+    private function generateTabs(float $x, float $y, float $width, float $height): string
     {
         $tabWidth = $width / 3;
         $tabHeight = 40;

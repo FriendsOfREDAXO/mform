@@ -29,6 +29,9 @@ class MFormParameterHandler
         }
     }
 
+    /**
+     * @param array<string, mixed> $parameter
+     */
     public static function addParameters(MFormItem $item, array $parameter): void
     {
         // is parameter an array

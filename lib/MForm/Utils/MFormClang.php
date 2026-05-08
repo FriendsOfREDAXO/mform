@@ -16,15 +16,16 @@ class MFormClang
     /**
      * @description for multilingual backend
      */
-    public static function getClangValue($languageData)
+    public static function getClangValue(mixed $languageData): mixed
     {
         // lang data must be array
         if (is_array($languageData)) {
             // clean output var
             $langData = '';
+            $userLanguage = rex::getUser()?->getLanguage();
             foreach ($languageData as $key => $value) {
                 // is user lang in lang data array
-                if ($key == rex::getUser()->getLanguage() || $key . '_utf8' == rex::getUser()->getLanguage()) {
+                if (null !== $userLanguage && ($key == $userLanguage || $key . '_utf8' == $userLanguage)) {
                     // set value for exchange
                     $langData = $value;
                 }

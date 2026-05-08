@@ -1,8 +1,13 @@
 <?php
 
-$buttonId = $counter;
+/**
+ * @var rex_yform_value_imagelist $this
+ * @psalm-scope-this rex_yform_value_imagelist
+ */
+
+$buttonId = isset($counter) ? (int) $counter : 0;
 $name = $this->getFieldName();
-$value = htmlspecialchars($this->getValue());
+$value = htmlspecialchars((string) $this->getValue());
 
 $widget_params = [];
 $widget_params['category'] = 0;
@@ -11,7 +16,7 @@ if ('' != $this->getElement('category')) {
 }
 $widget_params['preview'] = $this->getElement('preview');
 
-$types = trim($this->getElement('types')) ?? '';
+$types = trim((string) $this->getElement('types'));
 if ('*' == $types) {
     $types = '';
 }

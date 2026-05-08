@@ -171,6 +171,7 @@ class MFormElement
         return $this;
     }
 
+    /** @return array<int, string> */
     public function getKeys(): array
     {
         $keys = [];
@@ -180,6 +181,7 @@ class MFormElement
         return $keys;
     }
 
+    /** @return array<int, mixed> */
     public function getValues(): array
     {
         $values = [];

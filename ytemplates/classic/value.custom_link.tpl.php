@@ -1,9 +1,14 @@
 <?php
 
-$buttonId = $counter;
+/**
+ * @var rex_yform_value_custom_link $this
+ * @psalm-scope-this rex_yform_value_custom_link
+ */
+
+$buttonId = isset($counter) ? (int) $counter : 0;
 $categoryId = 0;
 $name = $this->getFieldName();
-$value = htmlspecialchars($this->getValue());
+$value = htmlspecialchars((string) $this->getValue());
 $parameters = [
     'media' => (1 == $this->getElement('media')),
     'mailto' => (1 == $this->getElement('mailto')),

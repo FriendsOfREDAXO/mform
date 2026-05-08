@@ -44,7 +44,10 @@ class rex_var_custom_medialist extends rex_var
         return self::quote($value);
     }
 
-    public static function getWidget($id, $name, $value, array $args = [])
+    /**
+     * @param array<string, mixed> $args
+     */
+    public static function getWidget(int|string $id, string $name, string $value, array $args = []): string
     {
         $openParams = '';
         if (isset($args['category']) && ($category = (int) $args['category'])) {
@@ -56,7 +59,7 @@ class rex_var_custom_medialist extends rex_var
         }
 
         $values = [];
-        if (is_string($value) && '' !== trim($value)) {
+        if ('' !== trim($value)) {
             foreach (explode(',', $value) as $file) {
                 $file = trim($file);
                 if ('' !== $file) {

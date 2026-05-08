@@ -44,7 +44,10 @@ class rex_var_custom_linklist extends rex_var
         return self::quote($value);
     }
 
-    public static function getWidget($id, $name, $value, array $args = [])
+    /**
+     * @param array<string, mixed> $args
+     */
+    public static function getWidget(int|string $id, string $name, string $value, array $args = []): string
     {
         $category = rex_category::getCurrent() ? rex_category::getCurrent()->getId() : 0;
         if (isset($args['category'])) {
@@ -54,7 +57,7 @@ class rex_var_custom_linklist extends rex_var
         $openParams = '&clang=' . rex_clang::getCurrentId() . '&category_id=' . $category;
 
         $values = [];
-        if (is_string($value) && '' !== trim($value)) {
+        if ('' !== trim($value)) {
             foreach (explode(',', $value) as $link) {
                 $link = trim($link);
                 if ('' !== $link) {

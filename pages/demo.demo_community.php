@@ -7,10 +7,12 @@
 
 use FriendsOfRedaxo\MForm\Utils\MFormPageHelper;
 
+$addon = rex_addon::get('mform');
+
 // parse info fragment
 $fragment = new rex_fragment();
-$fragment->setVar('title', $this->i18n('info'), false);
-$fragment->setVar('body', '<p>' . $this->i18n('example_description_community') . '</p>', false);
+$fragment->setVar('title', $addon->i18n('info'), false);
+$fragment->setVar('body', '<p>' . $addon->i18n('example_description_community') . '</p>', false);
 echo $fragment->parse('core/page/section.php');
 
 echo MFormPageHelper::exchangeExamples('community');

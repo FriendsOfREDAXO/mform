@@ -17,7 +17,8 @@ use function is_array;
 class MFormGroupExtensionHelper
 {
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     public static function addTabGroupExtensionItems(array $items): array
     {
@@ -25,7 +26,8 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     public static function addColumnGroupExtensionItems(array $items): array
     {
@@ -33,7 +35,8 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     public static function addCollapseGroupExtensionItems(array $items): array
     {
@@ -41,7 +44,8 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     public static function addAccordionGroupExtensionItems(array $items): array
     {
@@ -49,7 +53,8 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     public static function addRepeaterGroupExtensionItems(array $items): array
     {
@@ -57,18 +62,19 @@ class MFormGroupExtensionHelper
     }
 
     /**
-     * @param MFormItem[] $items
-     * @return MFormItem[]
+     * @param array<int|string, MFormItem|MForm> $items
+     * @return array<int|string, MFormItem|MForm>
      */
     private static function addGroupExtensionItems(array $items, string $type): array
     {
         $newItems = array();
         $key = 0;
-        $groupKey = 0;
+        $groupKey = '0';
         $groupCount = 0;
         $count = 1;
         $group = false;
         $toggleAttributes = false;
+        $item = new MFormItem();
 
         foreach ($items as $key => $item) {
             if ($item instanceof MFormItem) {
@@ -96,7 +102,7 @@ class MFormGroupExtensionHelper
                             $group = true;
                             $count = 1; // reset count by type for group
                             ++$groupCount; // count by group
-                            $groupKey = uniqid($groupCount);
+                            $groupKey = (string) uniqid((string) $groupCount);
 
                             // open the new group before the group item will be added to the item list
                             if (is_array($toggleAttributes)) {
@@ -112,7 +118,7 @@ class MFormGroupExtensionHelper
 
                         } else {
                             // close prev item by same type in group
-                            if ($items[$key - 1] instanceof MFormItem && $items[$key - 1]->type != "close-$type") { // is not closed by other item
+                            if ($items[(int) $key - 1] instanceof MFormItem && $items[(int) $key - 1]->type != "close-$type") { // is not closed by other item
                                 // close auto
                                 $newItems[] = self::createGroupItem("close-$type", $groupCount, ($count - 1), $groupKey, $item);
                             }
@@ -135,7 +141,7 @@ class MFormGroupExtensionHelper
                         // close type in group
                         $newItems[] = $item;
 
-                        if (isset($items[$key + 1]) && $items[$key + 1] instanceof MFormItem && $items[$key + 1]->type != $type or // next item is not from type close group
+                        if (isset($items[(int) $key + 1]) && $items[(int) $key + 1] instanceof MFormItem && $items[(int) $key + 1]->type != $type or // next item is not from type close group
                             isset($item->getAttributes()["data-close-group-$type"]) && $item->getAttributes()["data-close-group-$type"] == 1
                         ) {
                             // close group auto
@@ -144,7 +150,7 @@ class MFormGroupExtensionHelper
                         }
                         break;
                 }
-            } else if ($item instanceof MForm) {
+            } else {
                 /** var MForm $item */
                 $newItems[] = $item;
                 $count++;
@@ -153,10 +159,10 @@ class MFormGroupExtensionHelper
 
         // group and item was not closed do it now
         if ($group) {
-            if (isset($newItems[$key]) && $newItems[$key] instanceof MFormItem && $items[$key]->type != "close-$type") {
-                $newItems[] = self::createGroupItem("close-$type", $groupCount, $count, $groupKey, $item);
+            if (isset($newItems[$key]) && $newItems[$key] instanceof MFormItem && $items[$key] instanceof MFormItem && $items[$key]->getType() != "close-$type") {
+                $newItems[] = self::createGroupItem("close-$type", $groupCount, $count, $groupKey, $item instanceof MFormItem ? $item : null);
             }
-            $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count, $groupKey, $item);
+            $newItems[] = self::createGroupItem("close-group-$type", $groupCount, $count, $groupKey, $item instanceof MFormItem ? $item : null);
         }
 
         return $newItems;
@@ -166,7 +172,7 @@ class MFormGroupExtensionHelper
     {
         $newItem = new MFormItem();
 
-        if (null !== $item && is_array($item->getAttributes()) && count($item->getAttributes()) > 0) {
+        if (null !== $item && count($item->getAttributes()) > 0) {
             $attributes = [];
             foreach ($item->getAttributes() as $key => $value) {
                 if (str_contains($key, 'data-group-')) {

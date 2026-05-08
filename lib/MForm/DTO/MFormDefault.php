@@ -12,6 +12,7 @@ class MFormDefault
     /**
      * @description default classes for r5 bootstrap backend theme
      */
+    /** @var array<string, string> */
     public static array $classes = [
         'start-group-column' => '',
         'column' => '',

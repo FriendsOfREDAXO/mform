@@ -50,7 +50,7 @@ $swatchesHtml = '';
 foreach ($swatches as $key => $config) {
     $key = (string) $key;
     if (is_array($config)) {
-        $label       = rex_escape($config['label'] ?? $key);
+        $label       = rex_escape($config['label']);
         $swatchPreview = rex_escape($config['preview'] ?? '');
     } else {
         $label       = rex_escape((string) $config);

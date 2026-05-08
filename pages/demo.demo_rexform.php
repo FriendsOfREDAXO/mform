@@ -45,11 +45,13 @@ $form->addTextAreaField('teaser', 'Kurztext fuer die News-Anleser.', ['label' =>
 $form->addInputField('date', 'publish_date', date('Y-m-d'), ['label' => 'Veroeffentlichen am', 'class' => 'form-control']);
 
 // Aufmacherbilder (Imagelist-Widget).
+/** @var rex_form_widget_mform_imglist_element $heroImages */
 $heroImages = $form->addField('', 'hero_images', null, ['internal::fieldClass' => 'rex_form_widget_mform_imglist_element', 'label' => 'Aufmacherbilder'], true);
 $heroImages->setTypes('jpg,jpeg,png,webp,avif');
 $heroImages->setCategoryId(0);
 
 // Anlagen/Downloads als Medialist mit fester Listenansicht.
+/** @var rex_form_widget_mform_medialist_element $attachments */
 $attachments = $form->addField('', 'attachments', null, ['internal::fieldClass' => 'rex_form_widget_mform_medialist_element', 'label' => 'Downloads / Anlagen'], true);
 $attachments->setTypes('pdf,zip,docx,jpg,png');
 $attachments->setView('list');
@@ -57,10 +59,12 @@ $attachments->setViews('list,grid,gallery');
 $attachments->setToolbar('vertical');
 
 // Verweise auf interne Artikel.
+/** @var rex_form_widget_mform_linklist_element $related */
 $related = $form->addField('', 'related_articles', null, ['internal::fieldClass' => 'rex_form_widget_mform_linklist_element', 'label' => 'Verwandte Artikel'], true);
 $related->setToolbar('horizontal');
 
 // Ein zentraler CTA-Link (intern/extern/media/mailto).
+/** @var rex_form_widget_mform_customlink_element $cta */
 $cta = $form->addField('', 'cta_link', null, ['internal::fieldClass' => 'rex_form_widget_mform_customlink_element', 'label' => 'Call-to-Action'], true);
 $cta->setIntern(1);
 $cta->setExternal(1);
@@ -69,6 +73,7 @@ $cta->setMailto(1);
 $cta->setPhone(0);
 
 // Mehrere Quellen/Referenzen als Custom-Link-Multi.
+/** @var rex_form_widget_mform_custom_link_multi_element $sources */
 $sources = $form->addField('', 'sources', null, ['internal::fieldClass' => 'rex_form_widget_mform_custom_link_multi_element', 'label' => 'Quellen / Referenzen'], true);
 $sources->setIntern(1);
 $sources->setExternal(1);

@@ -236,7 +236,7 @@ body.rex-theme-dark .mform .collapsing {
 .mform .custom-link.input-group {
     border: 1px solid #d8e0e8;
     border-radius: 6px;
-    overflow: hidden;
+    overflow: visible;
     background: #fff;
 }
 
@@ -257,6 +257,10 @@ body.rex-theme-dark .mform .collapsing {
     background: #f7f9fb;
     min-width: 34px;
     min-height: 36px;
+}
+
+.mform .custom-link.input-group .btn.btn-popup.media_preview_link--leading {
+    margin-right: 8px;
 }
 
 .mform .custom-link.input-group .btn.btn-popup:hover,
@@ -283,6 +287,10 @@ body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup {
     border-left-color: #344150;
     background: #27323d;
     color: #c9d4df;
+}
+
+body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup.media_preview_link--leading {
+    margin-right: 8px;
 }
 
 body.rex-theme-dark .mform .custom-link.input-group .btn.btn-popup:hover,
@@ -336,6 +344,10 @@ body.rex-theme-dark .mform .custom-link.input-group.is-empty input.form-control[
         border-left-color: #344150;
         background: #27323d;
         color: #c9d4df;
+    }
+
+    body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup.media_preview_link--leading {
+        margin-right: 8px;
     }
 
     body.rex-has-theme:not(.rex-theme-light) .mform .custom-link.input-group .btn.btn-popup:hover,
@@ -857,6 +869,15 @@ body.rex-theme-dark .mform-cbg-option.active {
 
 .mform-cl-multi-handle:active {
     cursor: grabbing;
+}
+
+.mform-cl-multi-sortable-ghost {
+    opacity: 0.4;
+}
+
+.mform-cl-multi-sortable-chosen {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--rex-panel-color, #fff);
 }
 
 .mform-cl-multi-remove {

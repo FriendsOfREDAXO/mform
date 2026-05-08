@@ -1,5 +1,25 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta5
+
+### Code-Qualität
+
+- **Rexstan: 0 Fehler im gesamten Addon** – Alle statischen Analyse-Fehler (`variable.undefined`, `method.notFound`, `nullCoalesce.offset`, `argument.type`) behoben. Betrifft `boot.php`, Demo-Seiten (`pages/demo.*.php`), `pages/docs.php` sowie alle YForm-Templates (`ytemplates/bootstrap/` und `ytemplates/classic/`).
+  - `$this`-Aufrufe in Addon-Includes auf `rex_addon::get('mform')` umgestellt
+  - Explizite `@var`- und `@psalm-scope-this`-Annotationen in allen YForm-Templates ergänzt
+  - `$counter ?? 0`-Fallback in Templates für YForm-injizierte Variablen
+  - Null-Guard für `rex_file::get()` in `docs.php`
+
+### Fixed
+
+- **Custom-Link-Widget: Werte und Vorschau nach Reload korrekt** – Bereits gespeicherte Werte werden im Single- und Multi-Widget wieder korrekt übernommen und lesbar aufgelöst, auch für `redaxo://ID`-Links. Der Vorschau-Button für Medien steht jetzt direkt hinter dem Namensfeld und ist mit bewusstem Abstand von den restlichen Aktionen getrennt.
+- **Linklist im Flex-Repeater: Artikelnamen nach Reload korrekt** – Bereits gespeicherte Linklisten-Einträge werden nach dem erneuten Öffnen nicht mehr nur als Platzhalter wie `Artikel 5` angezeigt, sondern wieder zu den echten Artikelnamen aufgelöst.
+- **Custom-Link-Multi: Trash-Icon** – Der Entfernen-Button je Eintrag zeigt jetzt ein `fa-trash`-Symbol statt des durchgestrichenen Link-Icons.
+- **Custom-Link: E-Mail-Validierung** – Die `mailto:`-Eingabe prüft vor dem Speichern, ob die eingegebene E-Mail-Adresse syntaktisch valide ist. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
+- **Custom-Link: Telefon-Validierung** – Die `tel:`-Eingabe lässt nur Ziffern, `+`, `-`, Leerzeichen und Klammern zu. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
+
+---
+
 ## Version 9.0.0-beta4
 
 ### Fixed
@@ -9,10 +29,6 @@
 - **Flex-Repeater: Readonly-Felder korrekt gerendert** – `addTextReadonlyField()` und `addTextareaReadonlyField()` gaben zuvor einen leeren String zurück. Werden jetzt als `readonly`-Input/Textarea dargestellt.
 - **Flex-Repeater: Radio- und Checkbox-Styling** – `addRadioField()` und `addCheckboxField()` rendern jetzt Bootstrap-3-konforme `<div class="radio">` / `<div class="checkbox">`-Wrapper statt nackter `radio-inline`-Labels. Vertikale Abstände und Ausrichtung korrigiert.
 - **Flex-Repeater: Dead-Code entfernt** – Unreachable-Code-Block nach dem `custom-link-multi`-Case im Renderer bereinigt.
-- **Custom-Link-Widget: Artikelname bei vorhandenem Wert** – Beim Initialisieren eines Custom-Link-Widgets mit bereits gesetztem Wert (z. B. aus dem Flex-Repeater) wird der gespeicherte Wert per AJAX über den neuen Endpunkt `rex-api-call=mform_resolve_link` zu einem lesbaren Namen aufgelöst (Artikelname statt nackter ID/URL). Die API-Klasse ist namespaced (`FriendsOfREDAXO\MForm\Api\ResolveLinkApi`) und wird via `rex_api_function::register()` registriert.
-- **Custom-Link-Multi: Trash-Icon** – Der Entfernen-Button je Eintrag zeigt jetzt ein `fa-trash`-Symbol statt des durchgestrichenen Link-Icons.
-- **Custom-Link: E-Mail-Validierung** – Die `mailto:`-Eingabe prüft vor dem Speichern, ob die eingegebene E-Mail-Adresse syntaktisch valide ist. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
-- **Custom-Link: Telefon-Validierung** – Die `tel:`-Eingabe lässt nur Ziffern, `+`, `-`, Leerzeichen und Klammern zu. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
 
 ---
 

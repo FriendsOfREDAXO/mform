@@ -13,11 +13,9 @@ use FriendsOfRedaxo\MForm\Utils\MFormClang;
 use rex_logger;
 use rex_sql;
 
-use function is_array;
-
 class MFormOptionHandler
 {
-    public static function addOption(MFormItem $item, $value, $key): void
+    public static function addOption(MFormItem $item, mixed $value, int|string $key): void
     {
         $item->options[$key] = MFormClang::getClangValue($value);
     }
@@ -25,11 +23,14 @@ class MFormOptionHandler
     /**
      * @description set option to item
      */
-    public static function disableOption(MFormItem $item, $key): void
+    public static function disableOption(MFormItem $item, int|string $key): void
     {
         $item->disabledOptions[$key] = $key;
     }
-    public static function addOptGroup(MFormItem $item, string $label, $options): void
+    /**
+     * @param array<mixed> $options
+     */
+    public static function addOptGroup(MFormItem $item, string $label, array $options): void
     {
         $option = [];
         foreach ($options as $key => $value) {
@@ -40,6 +41,9 @@ class MFormOptionHandler
         $item->options[$label] = $option;
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     public static function setOptions(MFormItem $item, array $options): void
     {
         // if options an array
@@ -54,30 +58,32 @@ class MFormOptionHandler
         }
     }
 
-    public static function toggleOptions(MFormItem $item, $options): void
+    /**
+     * @param array<mixed> $options
+     */
+    public static function toggleOptions(MFormItem $item, array $options): void
     {
-        if (is_array($options)) {
-            $item->toggleOptions = $options;
-        }
+        $item->toggleOptions = $options;
     }
 
-    public static function disableOptions(MFormItem $item, $keys): void
+    /**
+     * @param array<mixed> $keys
+     */
+    public static function disableOptions(MFormItem $item, array $keys): void
     {
-        if (is_array($keys)) {
-            $item->disabledOptions = $keys;
-        }
+        $item->disabledOptions = $keys;
     }
 
     /**
      * @description set options form sql table as array to item
      */
-    public static function setSqlOptions(MFormItem $item, $query): void
+    public static function setSqlOptions(MFormItem $item, string $query): void
     {
         try {
             $sql = rex_sql::factory();
             $sql->setQuery($query);
             while ($sql->hasNext()) {
-                self::addOption($item, $sql->getValue('name'), $sql->getValue('id'));
+                self::addOption($item, $sql->getValue('name'), (string) $sql->getValue('id'));
                 $sql->next();
             }
         } catch (Exception $e) {

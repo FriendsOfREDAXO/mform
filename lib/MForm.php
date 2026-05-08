@@ -7,6 +7,7 @@
 
 namespace FriendsOfRedaxo;
 
+use FriendsOfRedaxo\MFormTemplate\TemplateInterface;
 use FriendsOfRedaxo\MForm\MFormElements;
 use FriendsOfRedaxo\MForm\Parser\MFormParser;
 use FriendsOfRedaxo\MFormTemplate\TemplateRegistry;
@@ -72,7 +73,7 @@ class MForm extends MFormElements
         }
     }
 
-    public static function factory($debug = false): MForm
+    public static function factory(bool $debug = false): MForm
     {
         $class = static::getFactoryClass();
         return new $class(null, $debug);
@@ -94,7 +95,7 @@ class MForm extends MFormElements
     /**
      * Registriert eine Template-Klasse fuer einen Key.
      *
-    * @param class-string<\FriendsOfRedaxo\MFormTemplate\TemplateInterface> $templateClass
+     * @param class-string<TemplateInterface> $templateClass
      */
     public static function registerTemplate(string $key, string $templateClass): void
     {

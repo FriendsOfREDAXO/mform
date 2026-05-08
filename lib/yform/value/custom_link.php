@@ -7,6 +7,7 @@
 
 class rex_yform_value_custom_link extends rex_yform_value_abstract
 {
+    /** @return void */
     public function enterObject()
     {
         static $counter = 0;
@@ -20,6 +21,7 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
         $this->params['value_pool']['sql'][$this->getName()] = $this->getValue();
     }
 
+    /** @return array<string, mixed> */
     public function getDefinitions(): array
     {
         return [
@@ -46,11 +48,15 @@ class rex_yform_value_custom_link extends rex_yform_value_abstract
         ];
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return string
+     */
     public static function getListValue($params)
     {
-        if ('' == $params['value']) {
+        if ('' == (string) ($params['value'] ?? '')) {
             return '-';
         }
-        return rex_var_custom_link::getCustomLinkText($params['value']);
+        return rex_var_custom_link::getCustomLinkText((string) ($params['value'] ?? ''));
     }
 }

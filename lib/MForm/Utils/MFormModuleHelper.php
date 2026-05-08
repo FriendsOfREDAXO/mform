@@ -14,8 +14,14 @@ use function count;
 
 class MFormModuleHelper
 {
-    public static array $msg = array();
+    /** @var array<int, string> */
+    public static array $msg = [];
 
+    /**
+     * @param array<string, mixed> $defaultConfig
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
     public static function mergeInputConfig(array $defaultConfig = [], array $config = [], int $maxMergeDepth = PHP_INT_MAX, int $currentDepth = 0): array
     {
         foreach ($config as $key => $value) {
@@ -33,6 +39,11 @@ class MFormModuleHelper
         return $defaultConfig;
     }
 
+    /**
+     * @param array<string, mixed> $defaultConfig
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
     public static function mergeOutputConfig(array $defaultConfig = [], array $config = []): array
     {
         foreach ($config as $key => $value) {
@@ -46,9 +57,10 @@ class MFormModuleHelper
         return $defaultConfig;
     }
 
-    public static function addBackendInfoImgList($images, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
+    /** @param array<int, string> $images */
+    public static function addBackendInfoImgList(array $images, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
     {
-        if (empty($message)) {
+        if ('' === $message) {
             $message = "<p>$message</p>";
         }
 
@@ -67,7 +79,7 @@ class MFormModuleHelper
         self::$msg[] = $message . implode('', $imgs);
     }
 
-    public static function addBackendInfoImgMsg($image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
+    public static function addBackendInfoImgMsg(string $image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
     {
         if (empty($message)) {
             self::$msg[] = "<p><img src=\"/index.php?rex_media_type={$mediaType}&rex_media_file={$image}\"></p>";

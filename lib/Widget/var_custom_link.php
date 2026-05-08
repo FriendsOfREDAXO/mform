@@ -14,21 +14,28 @@ class rex_var_custom_link extends rex_var
      * @return string
      * @author Joachim Doerr
      */
-    public static function getCustomLinkText($value)
+    public static function getCustomLinkText(mixed $value): string
     {
-        $valueName = $value;
-        if (true === file_exists(rex_path::media($value))) {
+        $valueString = (is_scalar($value) || null === $value) ? (string) $value : '';
+        $valueName = $valueString;
+        if (file_exists(rex_path::media($valueString))) {
             // do nothing
-        } elseif (false === filter_var($value, FILTER_VALIDATE_URL) && is_numeric($value)) {
-            // article!
-            $art = rex_article::get((int) $value);
+        } elseif (false === filter_var($valueString, FILTER_VALIDATE_URL) && is_numeric($valueString)) {
+            // article by plain numeric ID (e.g. "14")
+            $art = rex_article::get((int) $valueString);
+            if ($art instanceof rex_article) {
+                $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
+            }
+        } elseif (1 === preg_match('/^redaxo:\/\/(\d+)$/', $valueString, $m)) {
+            // article by redaxo://ID format
+            $art = rex_article::get((int) $m[1]);
             if ($art instanceof rex_article) {
                 $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
             }
         }
-        $valueName = rex_extension::registerPoint(
+        $valueName = (string) rex_extension::registerPoint(
             new rex_extension_point('mform/varCustomLink.getCustomLinkText', $valueName, [
-                'value' => $value,
+                'value' => $valueString,
             ]),
         );
         return $valueName;
@@ -40,17 +47,20 @@ class rex_var_custom_link extends rex_var
      * @return string
      * @author Joachim Doerr
      */
-    public static function getCustomLinkYFormLinkText($value, $table, $column, $name = null)
+    public static function getCustomLinkYFormLinkText(string $value, string $table, string $column, ?string $name = null): string
     {
         $valueName = $value;
 
         preg_match('@(rex-.*)://(\d+)@i', $value, $matches, PREG_OFFSET_CAPTURE, 0);
 
-        if ((isset($matches[1][0]) && $matches[1][0] == str_replace('_', '-', $table)) && (isset($matches[2][0]) && is_numeric($matches[2][0]))) {
+        $matchedTable = isset($matches[1][0]) ? (string) $matches[1][0] : '';
+        $matchedId = isset($matches[2][0]) ? (string) $matches[2][0] : '';
+
+        if ($matchedTable === str_replace('_', '-', $table) && '' !== $matchedId && ctype_digit($matchedId)) {
             $sql = rex_sql::factory();
-            $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matches[2][0]]);
+            $result = $sql->getArray("select $column from $table where id=:id", ['id' => $matchedId]);
             if (isset($result[0][$column])) {
-                $valueName = trim($result[0][$column]) . ' [id=' . $matches[2][0] . ']';
+                $valueName = trim((string) $result[0][$column]) . ' [id=' . $matchedId . ']';
             }
         }
 
@@ -96,13 +106,20 @@ class rex_var_custom_link extends rex_var
         return self::quote($value);
     }
 
-    public static function prepareYLinkArg($args): array
+    /**
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
+     */
+    public static function prepareYLinkArg(array $args): array
     {
         if (isset($args['ylink']) && is_string($args['ylink']) && !empty($args['ylink'])) {
             $ylinks = array_filter(explode(',', $args['ylink']));
             $args['ylink'] = [];
             foreach ($ylinks as $ylink) {
-                $link = array_filter(explode('::', $ylink));
+                $link = array_values(array_filter(explode('::', $ylink)));
+                if (!isset($link[0], $link[1], $link[2])) {
+                    continue;
+                }
                 $args['ylink'][] = [
                     'name' => $link[0],
                     'table' => $link[1],
@@ -113,6 +130,10 @@ class rex_var_custom_link extends rex_var
         return $args;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
+     */
     public static function normalizeMediaTypesArg(array $args): array
     {
         if (!isset($args['types']) && isset($args['data-types'])) {
@@ -132,17 +153,21 @@ class rex_var_custom_link extends rex_var
         return $args;
     }
 
-    public static function getWidget($id, $name, $value, array $args = [], $btnIdUniq = true)
+    /**
+     * @param array<string, mixed> $args
+     */
+    public static function getWidget(int|string $id, string $name, mixed $value, array $args = [], bool $btnIdUniq = true): string
     {
         $args = self::normalizeMediaTypesArg($args);
 
-        $valueName = self::getCustomLinkText($value);
+        $valueString = (is_scalar($value) || null === $value) ? (string) $value : '';
+        $valueName = self::getCustomLinkText($valueString);
         $category = '';
         $mediaCategory = '';
         $types = '';
 
-        if (false === filter_var($value, FILTER_VALIDATE_URL) && is_numeric($value)) {
-            $art = rex_article::get((int) $value);
+        if (false === filter_var($valueString, FILTER_VALIDATE_URL) && is_numeric($valueString)) {
+            $art = rex_article::get((int) $valueString);
             if ($art instanceof rex_article) {
                 $category = $art->getCategoryId();
             }
@@ -169,12 +194,12 @@ class rex_var_custom_link extends rex_var
         $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
         $phoneClass = (isset($args['phone']) && 0 == $args['phone']) ? ' hidden' : $class;
         $anchorClass = (isset($args['anchor']) && 0 == $args['anchor']) ? ' hidden' : $class;
-        $externalPrefix = (isset($args['external_prefix']) && 0 == $args['external_prefix']) ? $args['external_prefix'] : 'https://';
+        $externalPrefix = (isset($args['external_prefix']) && '' !== (string) $args['external_prefix']) ? (string) $args['external_prefix'] : 'https://';
         $args = self::prepareYLinkArg($args);
         $ylinks = '';
 
         if (true === $btnIdUniq) {
-            $id = uniqid($id);
+            $id = uniqid((string) $id);
         }
 
         if (isset($args['ylink']) && is_array($args['ylink']) && count($args['ylink']) > 0 && isset($args['ylink'][0]['name'])) {
@@ -182,8 +207,8 @@ class rex_var_custom_link extends rex_var
                 if (is_array($link) && isset($link['name']) && isset($link['table']) && isset($link['column'])) {
                     $ylinks .= '<li><a href="#" class="ylink" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
 
-                    if (!is_null($value) && str_contains($value, str_replace('_', '-', $link['table']))) {
-                        $valueName = self::getCustomLinkYFormLinkText($value, $link['table'], $link['column']);
+                    if ('' !== $valueString && str_contains($valueString, str_replace('_', '-', $link['table']))) {
+                        $valueName = self::getCustomLinkYFormLinkText($valueString, $link['table'], $link['column']);
                     }
                 }
             }
@@ -193,14 +218,14 @@ class rex_var_custom_link extends rex_var
         }
 
         $e = [];
-        $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . $value . '" />';
+        $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . rex_escape($valueString) . '" />';
         $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
         $e['after'] = '</div>';
         $e['functionButtons'] = $ylinks . '
+        <a href="#" class="btn btn-popup media_preview_link media_preview_link--leading hidden ' . $mediaClass . '" id="mform_media_preview_' . $id . '" title="' . rex_i18n::msg('var_media_view') . '"><i class="rex-icon fa-eye"></i></a>
         <a href="#" class="btn btn-popup intern_link ' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
         <a href="#" class="btn btn-popup external_link ' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
-        <a href="#" class="btn btn-popup media_preview_link hidden ' . $mediaClass . '" id="mform_media_preview_' . $id . '" title="' . rex_i18n::msg('var_media_view') . '"><i class="rex-icon fa-eye"></i></a>
         <a href="#" class="btn btn-popup email_link ' . $emailClass . '" id="mform_mailto_' . $id . '" title="' . rex_i18n::msg('var_mailto_link') . '"><i class="rex-icon fa-envelope-o"></i></a>
         <a href="#" class="btn btn-popup phone_link ' . $phoneClass . '" id="mform_tel_' . $id . '" title="' . rex_i18n::msg('var_phone_link') . '"><i class="rex-icon fa-phone"></i></a>
         <a href="#" class="btn btn-popup anchor_link ' . $anchorClass . '" id="mform_anchor_' . $id . '" title="Anker zu Slice setzen"><i class="rex-icon fa-anchor"></i></a>

@@ -8,11 +8,12 @@ use DOMDocument;
  * Konvertiert einfachen HTML/SVG-nahen Markup in ein eigenstaendiges SVG.
  */
 class HtmlToSvgConverter {
-    private $dom;
-    private $svg;
-    private $svgNS = 'http://www.w3.org/2000/svg';
-    private $viewBoxWidth = 800;  // Standard-Wert
-    private $viewBoxHeight = 600; // Standard-Wert
+    /** @phpstan-ignore property.onlyWritten */
+    private DOMDocument $dom;
+    private DOMDocument $svg;
+    private string $svgNS = 'http://www.w3.org/2000/svg';
+    private int $viewBoxWidth = 800;
+    private int $viewBoxHeight = 600;
 
     public function __construct() {
         $this->dom = new DOMDocument();
@@ -23,7 +24,8 @@ class HtmlToSvgConverter {
     /**
      * Gibt das erzeugte SVG direkt als Base64-Data-URL zurueck.
      */
-    public function convertToBase64($html, $attributes = []) {
+    /** @param array<string, mixed> $attributes */
+    public function convertToBase64(string $html, array $attributes = []): string {
         $svg = $this->convert($html, $attributes);
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
@@ -31,7 +33,8 @@ class HtmlToSvgConverter {
     /**
      * Verpackt das erzeugte SVG in ein img-Tag fuer die direkte Ausgabe.
      */
-    public function convertToImgTag($html, $attributes = []) {
+    /** @param array<string, mixed> $attributes */
+    public function convertToImgTag(string $html, array $attributes = []): string {
         $dataUrl = $this->convertToBase64($html, array_merge([
             'viewBox' => '0 0 2780 2780'
         ], $attributes));
@@ -56,17 +59,24 @@ class HtmlToSvgConverter {
     /**
      * Baut aus dem uebergebenen Markup ein vollstaendiges SVG-Dokument.
      */
-    public function convert($html, $attributes = []) {
+    /** @param array<string, mixed> $attributes */
+    public function convert(string $html, array $attributes = []): string {
         $this->svg = new DOMDocument('1.0', 'UTF-8');
         $this->svg->formatOutput = true;
 
         // Extrahiere ViewBox-Dimensionen aus den Attributen
         if (isset($attributes['viewBox'])) {
-            list(, , $this->viewBoxWidth, $this->viewBoxHeight) = explode(' ', $attributes['viewBox']);
+            $parts = explode(' ', (string) $attributes['viewBox']);
+            $this->viewBoxWidth = isset($parts[2]) ? (int) $parts[2] : $this->viewBoxWidth;
+            $this->viewBoxHeight = isset($parts[3]) ? (int) $parts[3] : $this->viewBoxHeight;
         }
 
-        $svg = $this->svg->createElementNS($this->svgNS, 'svg');
-        $svg = $this->svg->appendChild($svg);
+        $svgEl = $this->svg->createElementNS($this->svgNS, 'svg');
+        if (!($svgEl instanceof \DOMElement)) {
+            return '';
+        }
+        $this->svg->appendChild($svgEl);
+        $svg = $svgEl;
 
         $defaultAttributes = [
             'xmlns' => $this->svgNS,
@@ -88,13 +98,13 @@ class HtmlToSvgConverter {
 
         $this->processHTML($html, $group);
 
-        return $this->svg->saveXML();
+        return (string) $this->svg->saveXML();
     }
 
     /**
      * Extrahiert unterstuetzte SVG-Tags aus dem HTML-Fragment und haengt sie an das Ziel-Element an.
      */
-    private function processHTML($html, $parent) {
+    private function processHTML(string $html, \DOMNode $parent): void {
         $elementTypes = 'rect|circle|ellipse|line|polyline|polygon|path|text|g|image';
         $pattern = "/<($elementTypes)([^>]*)(?:>(.*?)<\/\\1>|\/?>)/s";
 
@@ -103,7 +113,7 @@ class HtmlToSvgConverter {
         foreach ($matches as $match) {
             $tagName = $match[1];
             $attributes = $match[2];
-            $content = isset($match[3]) ? $match[3] : '';
+            $content = $match[3] ?? '';
 
             $element = $this->createSvgElement($tagName, $attributes, $content);
             if ($element) {
@@ -112,8 +122,11 @@ class HtmlToSvgConverter {
         }
     }
 
-    private function createSvgElement($tagName, $attributeString, $content = '') {
+    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?\DOMElement {
         $element = $this->svg->createElementNS($this->svgNS, $tagName);
+        if (!($element instanceof \DOMElement)) {
+            return null;
+        }
 
         // Wenn es sich um ein Text-Element handelt, setze die Standard-Schriftart
         if ($tagName === 'text') {
@@ -136,7 +149,7 @@ class HtmlToSvgConverter {
                     $styles['font-family'] = '"Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif';
                 }
             } else {
-                $attrValue = preg_replace('/^(\d+)px$/', '$1', $attrValue);
+                $attrValue = (string) preg_replace('/^(\d+)px$/', '$1', $attrValue);
                 $element->setAttribute($attrName, $attrValue);
             }
         }
@@ -150,9 +163,7 @@ class HtmlToSvgConverter {
 
         if ($tagName === 'text' && !empty(trim($content))) {
             $textContent = html_entity_decode($content, ENT_QUOTES, 'UTF-8');
-            $textNode = $this->svg->createTextNode($textContent);
-            $element->appendChild($textNode);
-
+            $element->appendChild($this->svg->createTextNode($textContent));
             if (!$element->hasAttribute('dominant-baseline')) {
                 $element->setAttribute('dominant-baseline', 'middle');
             }
@@ -164,10 +175,14 @@ class HtmlToSvgConverter {
         return $element;
     }
 
-    private function adjustFontSize($styles) {
+    /**
+     * @param array<string, string|float> $styles
+     * @return array<string, string|float>
+     */
+    private function adjustFontSize(array $styles): array {
         if (isset($styles['font-size'])) {
             // Extrahiere numerischen Wert und einheit
-            preg_match('/(\d+)(px|pt|em|rem)?/', $styles['font-size'], $matches);
+            preg_match('/(\d+)(px|pt|em|rem)?/', (string) $styles['font-size'], $matches);
             if (isset($matches[1])) {
                 $size = floatval($matches[1]);
                 // Berechne die Schriftgröße relativ zur ViewBox-Höhe
@@ -179,7 +194,8 @@ class HtmlToSvgConverter {
         return $styles;
     }
 
-    private function applyStylesToElement($element, $styles) {
+    /** @param array<string, mixed> $styles */
+    private function applyStylesToElement(\DOMElement $element, array $styles): void {
         $styleMap = [
             'fill' => 'fill',
             'stroke' => 'stroke',
@@ -211,18 +227,18 @@ class HtmlToSvgConverter {
                 }
                 // Entferne px nur bei nicht-Font-Size Werten
                 if ($key !== 'font-size') {
-                    $value = preg_replace('/^(\d+)px$/', '$1', $value);
+                    $value = (string) preg_replace('/^(\d+)px$/', '$1', (string) $value);
                 }
-                $element->setAttribute($svgAttr, $value);
+                $element->setAttribute($svgAttr, (string) $value);
             }
         }
     }
 
-    private function processBorderShorthand($element, $border) {
-        $parts = preg_split('/\s+/', trim($border));
+    private function processBorderShorthand(\DOMElement $element, string $border): void {
+        $parts = preg_split('/\s+/', trim($border)) ?: [];
         foreach ($parts as $part) {
             if (preg_match('/^[\d.]+(?:px|em|rem|pt)?$/', $part)) {
-                $width = preg_replace('/[^\d.]/', '', $part);
+                $width = (string) preg_replace('/[^\d.]/', '', $part);
                 $element->setAttribute('stroke-width', $width);
             } elseif (preg_match('/^#|rgb|rgba|hsl|hsla/', $part)) {
                 $element->setAttribute('stroke', $part);
@@ -232,17 +248,18 @@ class HtmlToSvgConverter {
         }
     }
 
-    private function convertTextAlignToAnchor($align) {
+    private function convertTextAlignToAnchor(string $align): string {
         $map = [
             'left' => 'start',
             'center' => 'middle',
             'right' => 'end',
             'justify' => 'start'
         ];
-        return isset($map[$align]) ? $map[$align] : 'start';
+        return $map[$align] ?? 'start';
     }
 
-    private function parseStyles($styleString) {
+    /** @return array<string, string> */
+    private function parseStyles(string $styleString): array {
         $styles = [];
         $declarations = explode(';', trim($styleString));
 

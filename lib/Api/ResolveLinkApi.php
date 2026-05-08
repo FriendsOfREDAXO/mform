@@ -2,6 +2,11 @@
 
 namespace FriendsOfREDAXO\MForm\Api;
 
+use rex_api_function;
+use rex_api_result;
+use rex_response;
+use rex_var_custom_link;
+
 /**
  * API-Endpunkt zum Auflösen eines Custom-Link-Wertes in einen Anzeigenamen.
  *
@@ -10,25 +15,25 @@ namespace FriendsOfREDAXO\MForm\Api;
  *
  * @package FriendsOfREDAXO\MForm
  */
-class ResolveLinkApi extends \rex_api_function
+class ResolveLinkApi extends rex_api_function
 {
     /** @var bool Auch im Frontend verfügbar (wird von JS aus dem Backend-Kontext aufgerufen) */
     protected $published = true;
 
-    public function execute(): \rex_api_result
+    public function execute(): rex_api_result
     {
-        \rex_response::cleanOutputBuffers();
+        rex_response::cleanOutputBuffers();
 
         $value = \rex_request('value', 'string', '');
 
         if ('' === $value) {
-            \rex_response::sendJson(['text' => '']);
+            rex_response::sendJson(['text' => '']);
             exit;
         }
 
-        $text = \rex_var_custom_link::getCustomLinkText($value);
+        $text = rex_var_custom_link::getCustomLinkText($value);
 
-        \rex_response::sendJson(['text' => $text]);
+        rex_response::sendJson(['text' => $text]);
         exit;
     }
 }

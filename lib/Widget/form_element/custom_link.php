@@ -7,67 +7,68 @@
  */
 class rex_form_widget_mform_customlink_element extends rex_form_element
 {
-    private $args = [];
+    /** @var array<string, mixed> */
+    private array $args = [];
 
     // 1. Parameter nicht genutzt, muss aber hier stehen,
     // wg einheitlicher Konstruktorparameter
-    public function __construct($tag = '', ?rex_form_base $table = null, array $attributes = [])
+    public function __construct(string $tag = '', ?rex_form_base $table = null, array $attributes = [])
     {
-        parent::__construct('', $table, $attributes);
+        parent::__construct($tag, $table, $attributes);
     }
 
-    public function setCategoryId($category_id)
+    public function setCategoryId(mixed $categoryId): void
     {
-        $this->args['category'] = $category_id;
+        $this->args['category'] = $categoryId;
     }
 
-    public function setMedia($media)
+    public function setMedia(mixed $media): void
     {
         $this->args['media'] = $media;
     }
 
-    public function setExternal($external)
+    public function setExternal(mixed $external): void
     {
         $this->args['external'] = $external;
     }
 
-    public function setMailto($mailto)
+    public function setMailto(mixed $mailto): void
     {
         $this->args['mailto'] = $mailto;
     }
 
-    public function setIntern($intern)
+    public function setIntern(mixed $intern): void
     {
         $this->args['intern'] = $intern;
     }
 
-    public function setMediaCategoryId($category_id)
+    public function setMediaCategoryId(mixed $categoryId): void
     {
-        $this->args['media_category'] = $category_id;
+        $this->args['media_category'] = $categoryId;
     }
 
-    public function setTypes($types)
+    public function setTypes(mixed $types): void
     {
         $this->args['types'] = $types;
     }
 
-    public function setPhone($phone)
+    public function setPhone(mixed $phone): void
     {
         $this->args['phone'] = $phone;
     }
 
-    public function setYLink($ylink)
+    public function setYLink(mixed $ylink): void
     {
         $this->args['ylink'] = $ylink;
     }
 
-    public function formatElement()
+    public function formatElement(): string
     {
-        static $widget_counter = 1;
+        static $widgetCounter = 1;
 
-        $html = rex_var_custom_link::getWidget($widget_counter, $this->getAttribute('name'), $this->getValue(), $this->args);
+        $html = rex_var_custom_link::getWidget($widgetCounter, (string) $this->getAttribute('name'), $this->getValue(), $this->args);
 
-        ++$widget_counter;
+        ++$widgetCounter;
         return $html;
     }
 }

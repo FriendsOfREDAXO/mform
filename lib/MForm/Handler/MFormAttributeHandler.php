@@ -26,8 +26,9 @@ class MFormAttributeHandler
             case 'size':
                 // is size numeric set number
                 if (is_numeric($value) && $value > 0) {
-                    $item->setSize($value);
-                    $item->attributes['size'] = $value;
+                    $size = (int) $value;
+                    $item->setSize($size);
+                    $item->attributes['size'] = $size;
                 }
                 // is size full set attribute #sizefull# to replace calculateet size height
                 if ('full' == $value) {
@@ -87,6 +88,7 @@ class MFormAttributeHandler
 
     /**
      * @description set attributes array to item
+        * @param array<string, mixed> $attributes
      */
     public static function setAttributes(MFormItem $item, array $attributes): void
     {

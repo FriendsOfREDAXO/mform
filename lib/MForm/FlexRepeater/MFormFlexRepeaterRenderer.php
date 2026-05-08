@@ -2,6 +2,9 @@
 
 namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
+use rex_var_custom_medialist;
+use rex_var_custom_link;
+use rex_var_custom_link_multi;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 
@@ -18,11 +21,6 @@ class MFormFlexRepeaterRenderer
 
             if ($item instanceof MForm) {
                 $html .= self::renderTemplate($item, $level);
-                $i++;
-                continue;
-            }
-
-            if (!($item instanceof MFormItem)) {
                 $i++;
                 continue;
             }
@@ -62,7 +60,7 @@ class MFormFlexRepeaterRenderer
                 $modalLabel = self::getLabelString($item->getLabel());
                 $attrs = $item->getAttributes();
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
-                $align = isset($attrs['data-modal-align']) ? $attrs['data-modal-align'] : 'left';
+                $align = $attrs['data-modal-align'] ?? 'left';
                 $innerHtml = '';
                 $i++;
                 while ($i < count($items)) {
@@ -306,6 +304,9 @@ class MFormFlexRepeaterRenderer
         return sprintf('<div class="form-group mfr-field-group">%s%s%s</div>', $label, $field, $noticeHtml);
     }
 
+    /**
+     * @param array<mixed> $options
+     */
     private static function renderSelectOptions(array $options): string
     {
         $html = '';
@@ -321,14 +322,6 @@ class MFormFlexRepeaterRenderer
             }
         }
         return $html;
-    }
-
-    private static function renderUnsupportedWidgetPlaceholder(string $type): string
-    {
-        return sprintf(
-            '<div class="alert alert-warning">%s</div>',
-            htmlspecialchars('Widget-Typ "' . $type . '" wird im Flex-Repeater derzeit nicht unterstuetzt.', ENT_QUOTES)
-        );
     }
 
     private static function renderRadioGroup(MFormItem $item, string $fieldKey): string
@@ -437,6 +430,9 @@ class MFormFlexRepeaterRenderer
         );
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     private static function renderAttributes(array $attributes): string
     {
         static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id'];
@@ -524,7 +520,7 @@ class MFormFlexRepeaterRenderer
             $args['types'] = (string) $attrs['data-media-type'];
         }
 
-        $html = \rex_var_custom_medialist::getWidget(
+        $html = rex_var_custom_medialist::getWidget(
             $widgetId,
             'mfr_imglist[' . $fieldKey . ']',
             '',
@@ -556,7 +552,7 @@ class MFormFlexRepeaterRenderer
 
         $args = self::mapCustomLinkArgs($attrs, $type);
 
-        $html = \rex_var_custom_link::getWidget(
+        $html = rex_var_custom_link::getWidget(
             $widgetId,
             'mfr_custom_link[' . $fieldKey . ']',
             '',
@@ -581,7 +577,7 @@ class MFormFlexRepeaterRenderer
         $attrs = $item->getAttributes();
         $args = self::mapCustomLinkMultiArgs($attrs);
 
-        $html = \rex_var_custom_link_multi::getWidget(
+        $html = rex_var_custom_link_multi::getWidget(
             '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey),
             'mfr_custom_link_multi[' . $fieldKey . ']',
             '',
@@ -599,6 +595,10 @@ class MFormFlexRepeaterRenderer
         return $html;
     }
 
+    /**
+     * @param array<string, mixed> $attrs
+     * @return array<string, mixed>
+     */
     private static function mapCustomLinkArgs(array $attrs, string $type): array
     {
         $args = [];
@@ -665,6 +665,10 @@ class MFormFlexRepeaterRenderer
         return $args;
     }
 
+    /**
+     * @param array<string, mixed> $attrs
+     * @return array<string, mixed>
+     */
     private static function mapCustomLinkMultiArgs(array $attrs): array
     {
         $args = [];

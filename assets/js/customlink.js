@@ -75,6 +75,9 @@ function customlink_init_widget(element) {
             element.find('a.anchor_link').addClass('active');
         } else if (v.startsWith('redaxo://')) {
             element.find('a.intern_link').addClass('active');
+        } else if (/^\d+$/.test(v)) {
+            // plain numeric article ID (stored without redaxo:// prefix)
+            element.find('a.intern_link').addClass('active');
         } else {
             // Check ylinks first
             let matched = false;
@@ -531,9 +534,9 @@ function customLinkMultiInit(multiWidget) {
                     '</div>'
                 );
 
-                // Pre-fill values before widget init
+                // Pre-fill hidden input; leave text input empty so customlink_init_widget's AJAX resolver can set the display name.
                 $item.find('.rex-js-widget-customlink input[type=hidden]').first().val(val || '');
-                $item.find('.rex-js-widget-customlink input[type=text]').first().val(val || '');
+                // text input intentionally left empty – will be resolved via AJAX on rex:ready
 
                 multiWidget.find('.mform-cl-multi-list').append($item);
                 $(document).trigger('rex:ready', [$item]);
@@ -594,9 +597,25 @@ function customLinkMultiInit(multiWidget) {
         });
     }
 
-    // Sortable via move-up/move-down on drag handle click (simple swap)
-    multiWidget.on('mousedown.clmulti', '.mform-cl-multi-handle', function (e) {
-        // Only drag-to-reorder is complex; skip for now – dragging not wired without dragula/sortable
-        // A future improvement can add sortable library here
-    });
+    // Drag-to-reorder via SortableJS
+    if (typeof window.Sortable === 'function') {
+        var listEl = multiWidget.find('.mform-cl-multi-list').get(0);
+        if (listEl) {
+            var existingSortable = multiWidget.data('clmulti-sortable');
+            if (existingSortable && typeof existingSortable.destroy === 'function') {
+                existingSortable.destroy();
+            }
+            var sortable = new window.Sortable(listEl, {
+                animation: 120,
+                handle: '.mform-cl-multi-handle',
+                draggable: '.mform-cl-multi-item',
+                ghostClass: 'mform-cl-multi-sortable-ghost',
+                chosenClass: 'mform-cl-multi-sortable-chosen',
+                onEnd: function () {
+                    customLinkMultiSerialize(multiWidget);
+                }
+            });
+            multiWidget.data('clmulti-sortable', sortable);
+        }
+    }
 }

@@ -4,14 +4,15 @@ namespace FriendsOfRedaxo\MForm\Utils;
 
 class MFormLayoutPreviewHelper
 {
-    private $builder;
+    private LayoutPreviewBuilder $builder;
 
     public function __construct()
     {
         $this->builder = new LayoutPreviewBuilder();
     }
 
-    public function generateLayoutPreview($config)
+    /** @param array<string, mixed> $config */
+    public function generateLayoutPreview(array $config): string
     {
         $this->builder
             ->setAspectRatio($config['aspectRatio'] ?? '16:9')

@@ -14,7 +14,11 @@ class MFormRepeaterHelper
 {
     private const DISABLED_KEY = '__disabled';
 
-    public static function getRepeaterChildKeys(array $items, $key): array
+    /**
+     * @param array<int, MFormItem|MForm> $items
+     * @return array<string, string>
+     */
+    public static function getRepeaterChildKeys(array $items, int|string $key): array
     {
         $next = false;
         $keys = [];
@@ -31,20 +35,29 @@ class MFormRepeaterHelper
         return $keys;
     }
 
-    public static function getChildKeys($mform): array
+    /** @return array<string, string> */
+    public static function getChildKeys(MForm $mform): array
     {
         $keys = [];
 
         $items = $mform->getItems();
         foreach ($items as $key => $mformItem) {
+            $ikey = (int) $key;
             if ($mformItem instanceof MFormItem) {
                 $nameKey = self::getNameKey($mformItem);
                 if (!empty($nameKey) && $mformItem->getType() === 'repeater') {
                     $keys[$nameKey] = $nameKey;
-                    $keys = array_merge($keys, self::getChildKeys($items[$key+1]));
+                    $nextItem = $items[$ikey + 1] ?? null;
+                    if ($nextItem instanceof MForm) {
+                        $keys = array_merge($keys, self::getChildKeys($nextItem));
+                    }
                 }
-            } else if ($mformItem instanceof MForm && (isset($items[$key-1]) && $items[$key-1] instanceof MFormItem && $items[$key-1]->getType() !== 'repeater')) {
-                $keys = array_merge($keys, self::getChildKeys($mformItem));
+            } else {
+                // $mformItem is MForm here (only other type in the array)
+                $prevItem = $items[$ikey - 1] ?? null;
+                if ($prevItem instanceof MFormItem && $prevItem->getType() !== 'repeater') {
+                    $keys = array_merge($keys, self::getChildKeys($mformItem));
+                }
             }
         }
         return $keys;
@@ -52,6 +65,7 @@ class MFormRepeaterHelper
 
     /**
      * @param array<MFormItem|MForm> $items
+     * @return array<string, mixed>
      */
     public static function prepareChildMForms(array $items, string $key, string $repeaterId, string $group, string $groups, string|null $parentId): array
     {
@@ -71,12 +85,14 @@ class MFormRepeaterHelper
         return $obj;
     }
 
-    public static function prepareChildItems($mform, string $repeaterId, string $group, string $groups, string|null $parentId): array
+    /** @return array<string, mixed> */
+    public static function prepareChildItems(MForm $mform, string $repeaterId, string $group, string $groups, string|null $parentId): array
     {
         $obj = [];
         $items = $mform->getItems();
 //        dump($items);die;
         foreach ($items as $key => $mformItem) {
+            $ikey = (int) $key;
             if ($mformItem instanceof MFormItem) {
                 $nameKey = self::getNameKey($mformItem);
                 // prepare mform items
@@ -84,11 +100,12 @@ class MFormRepeaterHelper
                     // dump($mformItem->getType());
                     switch ($mformItem->getType()) {
                         case 'repeater':
-                            if ($items[$key+1] instanceof MForm) {
+                            $nextItem = $items[$ikey + 1] ?? null;
+                            if ($nextItem instanceof MForm) {
                                 $mformItem->addAttribute('parent_id', $parentId);
                                 // complete the repeater child tree
                                 if (isset($mformItem->getAttributes()['open']) && $mformItem->getAttributes()['open'] === true) {
-                                    $obj[$nameKey] = [self::prepareChildItems($items[$key+1], $repeaterId, $group, $groups, $parentId)];
+                                    $obj[$nameKey] = [self::prepareChildItems($nextItem, $repeaterId, $group, $groups, $parentId)];
                                 } else {
                                     $obj[$nameKey] = [];
                                 }
@@ -137,10 +154,15 @@ class MFormRepeaterHelper
                             break;
                     }
                 }
-            } else if (($mformItem instanceof MForm && !isset($items[$key-1])) || ($mformItem instanceof MForm && (isset($items[$key-1]) && $items[$key-1] instanceof MFormItem && $items[$key-1]->getType() !== 'repeater'))) {
-                $obj = array_merge($obj, self::prepareChildItems($mformItem, $repeaterId, $group, $groups, $parentId));
-                self::addWidgetAttributesByMFormObj($mformItem, $repeaterId, $group, $groups, $parentId);
-            } if ($mformItem instanceof MForm) {
+            } else {
+                // $mformItem is MForm here
+                $prevItem = $items[$ikey - 1] ?? null;
+                if ($prevItem === null || ($prevItem instanceof MFormItem && $prevItem->getType() !== 'repeater')) {
+                    $obj = array_merge($obj, self::prepareChildItems($mformItem, $repeaterId, $group, $groups, $parentId));
+                    self::addWidgetAttributesByMFormObj($mformItem, $repeaterId, $group, $groups, $parentId);
+                }
+            }
+            if ($mformItem instanceof MForm) {
                 foreach ($mformItem->getItems() as $item) {
                     if ($item instanceof MFormItem && $item->getType() === 'collapse') {
                        self::addWidgetAttributes($item, $repeaterId, $group, $groups, $parentId);
@@ -157,7 +179,7 @@ class MFormRepeaterHelper
         return ((is_array($mformItem->getVarId())) ? implode('.', $mformItem->getVarId()) : $mformItem->getVarId());
     }
 
-    private static function addWidgetAttributesByMFormObj(MForm $mform, string $repeaterId, string $group, string $groups, string $parentId): void
+    private static function addWidgetAttributesByMFormObj(MForm $mform, string $repeaterId, string $group, string $groups, string|null $parentId): void
     {
         foreach ($mform->getItems() as $item) {
             if ($item instanceof MFormItem && $item->getType() === 'collapse') {
@@ -201,6 +223,7 @@ class MFormRepeaterHelper
         }
     }
 
+    /** @param array<string, mixed> $item */
     public static function isItemEnabled(array $item): bool
     {
         if (!array_key_exists(self::DISABLED_KEY, $item)) {
@@ -224,10 +247,14 @@ class MFormRepeaterHelper
         return !$value;
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, array<string, mixed>>
+     */
     public static function filterEnabledItems(array $items): array
     {
-        return array_values(array_filter($items, static function ($item): bool {
-            return is_array($item) && self::isItemEnabled($item);
+        return array_values(array_filter($items, static function (array $item): bool {
+            return self::isItemEnabled($item);
         }));
     }
 
@@ -262,6 +289,10 @@ class MFormRepeaterHelper
         return self::prepareItemsForOutput($decoded);
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $items
+     * @return array<int, array<string, mixed>>
+     */
     public static function prepareItemsForOutput(array $items): array
     {
         $result = [];
@@ -281,6 +312,7 @@ class MFormRepeaterHelper
         return $result;
     }
 
+    /** @param array<mixed> $value */
     private static function isRepeaterItemList(array $value): bool
     {
         if ([] === $value) {

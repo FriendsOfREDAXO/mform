@@ -206,6 +206,7 @@ if ($q !== '') {
     $file = $addon->getPath($mform_doc_pages[$func]['file']);
     if (file_exists($file)) {
         $md = rex_file::get($file);
+        $md = is_string($md) ? $md : '';
 
         // Querlinks auflösen
         $md = preg_replace_callback('/\[([^\]]+)\]\(([^)#]+\.md)(#[^)]+)?\)/i', static function ($matches) use ($mform_doc_file_map) {

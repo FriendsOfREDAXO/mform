@@ -7,6 +7,9 @@
 
 namespace FriendsOfRedaxo\MForm\Parser;
 
+use rex_var_custom_medialist;
+use rex_var_custom_linklist;
+use rex_var_custom_link_multi;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
@@ -43,8 +46,11 @@ use function strlen;
 
 class MFormParser
 {
+    /** @var string[] */
     protected array $elements = [];
+    /** @var array<string, mixed> */
     protected array $values = [];
+    /** @var array<string, mixed> */
     protected array $obj = [];
     protected bool $debug = false;
 
@@ -53,7 +59,11 @@ class MFormParser
      */
     protected string $theme = 'mform';
 
-    private function openRepeaterElement(MFormItem $item, string $key, array $items, array &$skipKeys = []): void
+    /**
+     * @param array<int|string, MFormItem|MForm> $items
+     * @param array<int, int|string> $skipKeys
+     */
+    private function openRepeaterElement(MFormItem $item, int|string $key, array $items, array &$skipKeys = []): void
     {
         $this->openFlexRepeaterElement($item, $key, $items, $skipKeys);
     }
@@ -63,7 +73,11 @@ class MFormParser
         $this->closeFlexRepeaterElement($item);
     }
 
-    private function openFlexRepeaterElement(MFormItem $item, string $key, array $items, array &$skipKeys = []): void
+    /**
+     * @param array<int|string, MFormItem|MForm> $items
+     * @param array<int, int|string> $skipKeys
+     */
+    private function openFlexRepeaterElement(MFormItem $item, int|string $key, array $items, array &$skipKeys = []): void
     {
         // Wichtig: Keine Default-Manipulationen fuer den Flex-Repeater selbst.
         // setVarAndIds() escaped String-Werte per htmlspecialchars(); das wuerde
@@ -78,7 +92,7 @@ class MFormParser
             $fieldName = 'REX_INPUT_VALUE[' . implode('][', $varId) . ']';
         } else {
             $varIdString = (string) $varId;
-            if (0 === strpos($varIdString, '[')) {
+            if (str_starts_with($varIdString, '[')) {
                 $fieldName = 'REX_INPUT_VALUE' . $varIdString;
             } else {
                 $fieldName = 'REX_INPUT_VALUE[' . $varIdString . ']';
@@ -221,7 +235,10 @@ class MFormParser
     }
 
 
-    private function openWrapperElement(MFormItem $item, string $key, array $items): void
+    /**
+     * @param array<int|string, MFormItem|MForm> $items
+     */
+    private function openWrapperElement(MFormItem $item, int|string $key, array $items): void
     {
         $element = new MFormElement();
         $attributes = $item->getAttributes();
@@ -269,7 +286,7 @@ class MFormParser
             $collapseButton->setType('collapse-button')
                 ->setClass((empty($item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
-                ->setValue((string) $item->getLabel());
+                ->setValue(is_array($item->getLabel()) ? (string) (array_values($item->getLabel())[0] ?? '') : (string) $item->getLabel());
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
         }
 
@@ -280,14 +297,13 @@ class MFormParser
         // TAB MANIPULATIONS
         if ('start-group-tab' == $item->getType()) {
             $nav = [];
-            /** @var MFormItem $itm */
             foreach ($items as $k => $itm) {
                 if ($itm instanceof MFormItem && $k > $key && ($itm->getGroup() == $item->getGroup() && 'tab' == $itm->getType())) {
                     // add navigation item
                     $element = new MFormElement();
                     $element->setType('tabnavli')
-                        ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . $item->getGroupKey())
-                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . $itm->getLabel())
+                        ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . (string) $item->getGroupKey())
+                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . (is_array($itm->getLabel()) ? (string) (array_values($itm->getLabel())[0] ?? '') : (string) $itm->getLabel()))
                         ->setClass(
                             ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
                             ((array_key_exists('pull-right', $itm->getAttributes()) && true === $itm->getAttributes()['pull-right']) ? ' pull-right' : '') .
@@ -356,7 +372,7 @@ class MFormParser
         $element = new MFormElement();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
-            ->setVarId($item->getVarId())
+            ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
@@ -399,7 +415,7 @@ class MFormParser
         $element = new MFormElement();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
-            ->setVarId($item->getVarId())
+            ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
@@ -435,7 +451,7 @@ class MFormParser
         $element = new MFormElement();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
-            ->setVarId($item->getVarId())
+            ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setType($item->getType())
             ->setClass($item->getClass())
@@ -521,14 +537,14 @@ class MFormParser
             // is size full
             if ('full' == $item->getSize()) {
                 // use count to replace #sizefull# placeholder
-                $itemAttributes = str_replace('#sizefull#', $count, $itemAttributes);
+                $itemAttributes = str_replace('#sizefull#', (string) $count, $itemAttributes);
             }
         }
 
         // create element
         $element = new MFormElement();
         $element->setId($item->getId())
-            ->setVarId($item->getVarId())
+            ->setVarId($this->varIdStr($item))
             ->setType($item->getType())
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
             ->setAttributes($itemAttributes)
@@ -536,7 +552,7 @@ class MFormParser
             ->setOptions($optionElements);
 
         if ($item->isMultiple()) {
-            $element->setVarId($item->getVarId() . '[]');
+            $element->setVarId($this->varIdStr($item) . '[]');
         }
 
         // create templateElement object
@@ -553,7 +569,10 @@ class MFormParser
     /**
      * @description helper method to create option elements
      */
-    private function createOptionElement(MFormItem $item, $key, $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string|array $toggle = ''): string
+    /**
+     * @param string|array<mixed> $toggle
+     */
+    private function createOptionElement(MFormItem $item, int|string $key, mixed $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string|array $toggle = ''): string
     {
         // create element
         $element = new MFormElement();
@@ -589,29 +608,30 @@ class MFormParser
             }
         }
         /* Selected fix @skerbis @dtpop @MC-PMOE */
-        if ($item->multiple && null !== $item->stringValue) {
-            $items_selected = json_decode($item->stringValue, true);
-            $items_default_value = explode(',', $item->getDefaultValue());
+        if ($item->multiple && '' !== $item->stringValue) {
+            $itemsSelected = json_decode($item->stringValue, true);
+            $itemsDefaultValue = explode(',', $item->getDefaultValue());
 
-            $current = explode('][', trim($item->varId, '[]'));
+            $current = explode('][', trim($this->varIdStr($item), '[]'));
 
             // JSON Values 1.x
-            if (isset($current[1]) && isset($items_selected[$current[1]]) && is_array($items_selected[$current[1]]) && (in_array((string) $key, $items_selected[$current[1]]) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value)))) {
+            if (isset($current[1]) && isset($itemsSelected[$current[1]]) && is_array($itemsSelected[$current[1]]) && (in_array((string) $key, $itemsSelected[$current[1]]) || ('add' == $item->getMode() && in_array((string) $key, $itemsDefaultValue)))) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // JSON Values 1.x.x
-            } elseif (isset($current[2]) && isset($items_selected[$current[1]][$current[2]]) && is_array($items_selected[$current[1]][$current[2]]) && in_array((string) $key, $items_selected[$current[1]][$current[2]]) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value))) {
+            } elseif (isset($current[2]) && isset($itemsSelected[$current[1]][$current[2]]) && is_array($itemsSelected[$current[1]][$current[2]]) && in_array((string) $key, $itemsSelected[$current[1]][$current[2]]) || ('add' == $item->getMode() && in_array((string) $key, $itemsDefaultValue))) {
 
                 $element->setAttributes($element->attributes . ' selected');
 
                 // REX_VAL
-            } elseif (!isset($current[1]) && isset($items_selected) && is_array($items_selected) && in_array((string) $key, $items_selected) || ('add' == $item->getMode() && in_array((string) $key, $items_default_value))) {
+            } elseif (!isset($current[1]) && isset($itemsSelected) && is_array($itemsSelected) && in_array((string) $key, $itemsSelected) || ('add' == $item->getMode() && in_array((string) $key, $itemsDefaultValue))) {
                 $element->setAttributes($element->attributes . ' selected');
             }
         } else {
             // set default value or selected
-            if ($selected && ((string) $key == (string) $itemValue || ('add' == $item->getMode() && (string) $key == $item->getDefaultValue()))) {
+            $itemValueStr = is_array($itemValue) ? '' : (string) ($itemValue ?? '');
+            if ($selected && ((string) $key == $itemValueStr || ('add' == $item->getMode() && (string) $key == $item->getDefaultValue()))) {
                 $element->setAttributes($element->attributes . ' selected'); // add attribute selected
             }
         }
@@ -656,16 +676,16 @@ class MFormParser
     /**
      * @description helper method to create check elements [checkbox|radiobutton]
      */
-    private function createCheckElement(MFormItem $item, $key, $value, ?int $count = null): string
+    private function createCheckElement(MFormItem $item, int|string $key, mixed $value, ?int $count = null): string
     {
         // create element
         $element = new MFormElement();
         $element->setValue((string) $key)
             ->setId($item->getId())
-            ->setVarId($item->getVarId())
+            ->setVarId($this->varIdStr($item))
             ->setType($item->getType())
             ->setClass($item->getClass())
-            ->setLabel($value);
+            ->setLabel((string) $value);
 
         $attributes = $item->getAttributes();
 
@@ -717,7 +737,7 @@ class MFormParser
             ? '[' . implode('][', $varIdParts) . ']'
             : (string) $varIdParts;
 
-        $currentValue = (string) $item->getValue();
+        $currentValue = is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? '');
         $selectedValues = '' !== $currentValue
             ? array_flip(array_filter(explode(',', $currentValue)))
             : [];
@@ -772,7 +792,7 @@ class MFormParser
             : (string) $varIdParts;
 
         $uid = 'mform-cs-' . preg_replace('/[^a-z0-9]/i', '-', $varIdStr);
-        $currentValue = (string) $item->getValue();
+        $currentValue = is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? '');
 
         $swatchHtml = '';
         foreach ($item->getOptions() as $value => $label) {
@@ -918,21 +938,19 @@ class MFormParser
                     if (isset($parameter['preview'])) {
                         $mediaArgs['preview'] = $parameter['preview'];
                     }
-                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $item->getVarId() . ']', $item->getValue(), $mediaArgs, false);
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
-                    $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                    $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
                     $dom = new DOMDocument();
                     @$dom->loadHTML(utf8_decode($html));
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
-                    if ($inputs instanceof DOMNodeList) {
-                        $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
-                    }
+                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
                 }
                 break;
             case 'mform-media':
@@ -958,7 +976,7 @@ class MFormParser
                     $mediaArgs['media_category'] = $parameter['category'];
                 }
 
-                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $mediaArgs, false);
+                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -971,11 +989,11 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $value = (!is_string($item->getValue())) ? '' : $item->getValue();
                 if ('medialist' === $item->getType()) {
-                    $html = \rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
+                    $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
                 } else {
-                    /** @var rex_var_imglist $class */
                     $class = 'rex_var_' . $item->getType();
-                    $html = $class::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $value, $parameter);
+                    // @phpstan-ignore-next-line
+                    $html = $class::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
                 }
 
                 $dom = new DOMDocument();
@@ -983,12 +1001,8 @@ class MFormParser
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($selects instanceof DOMNodeList) {
-                    $this->processNodeFormElements($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
-                }
-                if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElements($inputs, $item, 'REX_MEDIALIST_' . $id);
-                }
+                $this->processNodeFormElements($selects, $item, 'REX_MEDIALIST_SELECT_' . $id);
+                $this->processNodeFormElements($inputs, $item, 'REX_MEDIALIST_' . $id);
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
@@ -1050,23 +1064,21 @@ class MFormParser
                     if (isset($parameter['category'])) {
                         $linkArgs['category'] = $parameter['category'];
                     }
-                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $item->getVarId() . ']', $item->getValue(), $linkArgs, false);
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
-                    $html = rex_var_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                    $html = rex_var_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     foreach ($inputs as $input) {
                         $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int)$id);
-                        if ($input instanceof DOMElement) {
-                            if ($input->getAttribute('type') == 'text') {
-                                $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
-                            }
+                        if ($input->getAttribute('type') == 'text') {
+                            $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
                         }
                     }
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
@@ -1089,7 +1101,7 @@ class MFormParser
                     $linkArgs['category'] = $parameter['category'];
                 }
 
-                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $linkArgs, false);
+                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -1099,19 +1111,15 @@ class MFormParser
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
-                $html = \rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $item->getVarId() . ']', $item->getValue(), $parameter);
+                $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
-                if ($selects instanceof DOMNodeList) {
-                    $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
-                }
-                if ($inputs instanceof DOMNodeList) {
-                    $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
-                }
+                $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
 
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
@@ -1129,11 +1137,14 @@ class MFormParser
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
 
-    private function prepareLinkInput(DOMDocument $dom, DOMNodeList $inputs, $item, $attributes): void
+    /**
+     * @param array<string, mixed> $attributes
+     * @param DOMNodeList<DOMElement> $inputs
+     */
+    private function prepareLinkInput(DOMDocument $dom, DOMNodeList $inputs, MFormItem $item, array $attributes): void
     {
         foreach ($inputs as $input) {
-            if ($input instanceof DOMElement) {
-                switch ($input->getAttribute('type')) {
+            switch ($input->getAttribute('type')) {
                     case 'text':
                         if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
                             if ($item->getType() == 'media') {
@@ -1157,26 +1168,24 @@ class MFormParser
                         }
                         break;
                 }
-            }
         }
 
         if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
             $links = $dom->getElementsByTagName('a');
             foreach ($links as $link) {
-                if ($link instanceof DOMElement) {
                     $onclick = $link->getAttribute('onclick');
                     $groups = explode('.',$attributes['groups']);
                     $linkAttributes = '';
                     if (str_contains($onclick, 'openLinkMap')) {
                         $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
                         if (!is_null($attributes['parent_id'])) {
-                            $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                            $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
                         }
                     }
                     if (str_contains($onclick, 'deleteREXLink')) {
                         $linkAttributes = "removeLink(".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
                         if (!is_null($attributes['parent_id'])) {
-                            $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                            $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
                         }
                     }
                     if (str_contains($onclick, 'Media')) {
@@ -1190,16 +1199,18 @@ class MFormParser
                         if (str_contains($onclick, 'viewREXMedialist(')) $method = 'viewMedialist';
                         $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
                         if (!is_null($attributes['parent_id']) && $attributes['parent_id'] != $attributes['repeaterId']) {
-                            $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".((isset($groups[1])) ? $groups[1] : '')."', ".$attributes['repeaterId']."Index)";
+                            $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
                         }
                     }
                     $link->setAttribute('click.prevent', $linkAttributes);
                     $link->removeAttribute('onclick');
-                }
             }
         }
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     private function addClickPrevent(string $body, array $attributes): string
     {
         if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
@@ -1208,18 +1219,17 @@ class MFormParser
         return $body;
     }
 
-    private function processNodeFormElements(DOMNodeList $elements, MFormItem $item, $id = null): void
+    /** @param DOMNodeList<DOMElement> $elements */
+    private function processNodeFormElements(DOMNodeList $elements, MFormItem $item, string|int|null $id = null): void
     {
         foreach ($elements as $element) {
-            if ($element instanceof DOMElement) {
-                $this->processNodeFormElement($element, $item, $id);
-            }
+            $this->processNodeFormElement($element, $item, $id);
         }
     }
 
-    private function processNodeFormElement(DOMElement $element, MFormItem $item, $id = null): void
+    private function processNodeFormElement(DOMElement $element, MFormItem $item, string|int|null $id = null): void
     {
-        if (is_array($item->getAttributes()) && sizeof($item->getAttributes()) > 0) {
+        if (count($item->getAttributes()) > 0) {
             foreach ($item->getAttributes() as $key => $value) {
                 if (is_array($value)) {
                     foreach ($value as $vKey => $vValue) {
@@ -1228,19 +1238,19 @@ class MFormParser
                         }
                     }
                 } else {
-                    $element->setAttribute($key, (string) $value);
+                    $element->setAttribute((string) $key, (string) $value);
                 }
             }
         }
         if (!is_null($id)) {
-            $element->setAttribute('id', $id);
+            $element->setAttribute('id', (string) $id);
         }
     }
 
     private function getWidgetId(MFormItem $item): string
     {
-        $item->setVarId(substr($item->getVarId(), 1, -1));
-        $varId = explode('][', $item->getVarId());
+        $item->setVarId(substr($this->varIdStr($item), 1, -1));
+        $varId = explode('][', $this->varIdStr($item));
 
         foreach ($varId as $key => $val) {
             if (!is_numeric($val)) {
@@ -1257,7 +1267,7 @@ class MFormParser
         $this->executeDefaultManipulations($item, false, false);
 
         foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable', 'anchor' => 'enable'] as $key => $value) {
-            $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
+            $value = (($item->getAttributes()['data-' . $key] ?? $value) == 'enable');
             $key = ('extern' == $key) ? 'external' : $key;
             $key = ('tel' == $key) ? 'phone' : $key;
             $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
@@ -1268,7 +1278,7 @@ class MFormParser
             }
         }
 
-        $item->setId(str_replace(['_', ']', '['], '', random_int(100, 999) . $item->getVarId()));
+        $item->setId(str_replace(['_', ']', '['], '', random_int(100, 999) . $this->varIdStr($item)));
 
         // create templateElement object
         $templateElement = new MFormElement();
@@ -1286,7 +1296,7 @@ class MFormParser
         $html = '';
 
         try {
-            $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $item->getVarId(), $item->getValue(), $parameter, false);
+            $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $this->varIdStr($item), $item->getValue(), $parameter, false);
             $dom = new DOMDocument('1.0', 'utf-8');
             @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
             $div = $dom->getElementsByTagName('div');
@@ -1296,22 +1306,24 @@ class MFormParser
             rex_logger::logException($e);
         }
 
-        if ($div instanceof DOMNodeList) {
+        if (null !== $div) {
             foreach ($div as $divItem) {
-                if ($divItem instanceof DOMElement && $divItem->hasChildNodes()) {
+                if ($divItem->hasChildNodes()) {
                     $divItem->setAttribute('data-id', $item->getId());
-                    $divItem->setAttribute('data-clang', rex_clang::getCurrentId());
+                    $divItem->setAttribute('data-clang', (string) rex_clang::getCurrentId());
                     $divItem->setAttribute('class', $divItem->getAttribute('class') . ' custom-link');
-                    /** @var DOMElement $childNode */
                     foreach ($divItem->childNodes as $childNode) {
+                        if (!($childNode instanceof DOMElement)) {
+                            continue;
+                        }
                         if (($childNode->hasAttribute('class')
                                 && 'form-control' == $childNode->getAttribute('class'))
                             && ($childNode->hasAttribute('value')
                                 && '' == $childNode->getAttribute('value'))) {
-                            $childNode->setAttribute('value', $item->getValue());
-                            if (is_array($item->getAttributes()) && count($item->getAttributes()) > 0) {
+                            $childNode->setAttribute('value', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''));
+                            if (count($item->getAttributes()) > 0) {
                                 foreach ($item->getAttributes() as $key => $value) {
-                                    $childNode->setAttribute($key, $value);
+                                    $childNode->setAttribute((string) $key, (string) $value);
                                 }
                             }
                         }
@@ -1342,11 +1354,24 @@ class MFormParser
         if ($setDefaultClass) MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
     }
 
-    private function getBodyInner(DOMDocument|DOMElement $dom): bool|string
+    /**
+     * Returns the varId as a bracket-notation string.
+     * Array [1, 2] becomes '[1][2]'; string is returned as-is.
+     */
+    private function varIdStr(MFormItem $item): string
+    {
+        $v = $item->getVarId();
+        return is_array($v) ? '[' . implode('][', $v) . ']' : (string) $v;
+    }
+
+    private function getBodyInner(DOMDocument|DOMElement $dom): string
     {
         $html = $dom->C14N(false, true);
+        if ($html === false) {
+            return '';
+        }
         if (str_contains($html, '<body')) {
-            preg_match('/<body>(.*)<\\/body>/ism', $html, $matches);
+            preg_match('/<body>(.*)<\/body>/ism', $html, $matches);
             if (isset($matches[1])) {
                 $html = $matches[1];
             }
@@ -1360,7 +1385,7 @@ class MFormParser
 
         // Forward custom-link type-toggle args to inner widget
         foreach (['intern' => 'enable', 'extern' => 'enable', 'media' => 'enable', 'mailto' => 'enable', 'tel' => 'disable', 'anchor' => 'enable'] as $key => $value) {
-            $value = (((isset($item->getAttributes()['data-' . $key])) ? $item->getAttributes()['data-' . $key] : $value) == 'enable');
+            $value = (($item->getAttributes()['data-' . $key] ?? $value) == 'enable');
             $key = ('extern' == $key) ? 'external' : $key;
             $key = ('tel' == $key) ? 'phone' : $key;
             $item->setParameter(array_merge($item->getParameter(), [$key => $value]));
@@ -1379,10 +1404,13 @@ class MFormParser
             $parameter['btn_add'] = $item->getAttributes()['btn_add'];
         }
 
-        $value = (!is_string($item->getValue())) ? '' : $item->getValue();
-        $html = \rex_var_custom_link_multi::getWidget(
-            $item->getVarId(),
-            'REX_INPUT_VALUE' . $item->getVarId(),
+        // MFormValueHandler decodes stored JSON arrays automatically.
+        // If getValue() is an array (decoded), fall back to the raw JSON string from getStringValue().
+        $rawItemValue = $item->getValue();
+        $value = is_string($rawItemValue) ? $rawItemValue : $item->getStringValue();
+        $html = rex_var_custom_link_multi::getWidget(
+            $this->varIdStr($item),
+            'REX_INPUT_VALUE' . $this->varIdStr($item),
             $value,
             $parameter
         );
@@ -1395,7 +1423,7 @@ class MFormParser
     }
 
     /**
-     * @param MFormItem[] $items
+     * @param array<int|string, MFormItem|MForm> $items
      */
     private function parseFormFields(array $items): void
     {
@@ -1415,8 +1443,7 @@ class MFormParser
                         $item = $mformItem;
                     }
 
-                    if ($item instanceof MFormItem) {
-                        switch ($item->getType()) {
+                    switch ($item->getType()) {
                             // OPEN REPEATER
                             case 'repeater':
                                 $this->openRepeaterElement($item, $key, $items, $skipKeys);
@@ -1520,7 +1547,6 @@ class MFormParser
                                 $this->generateMediaElement($item);
                                 break;
                         }
-                    }
                 }
             }
         } catch (Exception $e) {
@@ -1571,10 +1597,14 @@ class MFormParser
                 ->setInfoTooltipIcon($item->getInfoTooltipIcon())
                 ->setType('tooltip-info');
 
-            $item->setLabel($item->getLabel() . $this->parseElement($tooltip, 'base'));
+            $currentLabel = $item->getLabel();
+            $item->setLabel((is_array($currentLabel) ? '' : (string) $currentLabel) . $this->parseElement($tooltip, 'base'));
         }
     }
 
+    /**
+     * @param array<int|string, MFormItem|MForm> $items
+     */
     public function parse(array $items, ?string $theme = null, bool $showWrapper = true, bool $debug = false): string
     {
         $this->debug = $debug;
@@ -1628,7 +1658,7 @@ class MFormParser
 
     private function parseElement(MFormElement $element, string $fragmentType): string
     {
-        $element->setValue((is_array($element->value)) ? '' : $element->value);
+        $element->setValue($element->value);
 
         $fragment = new rex_fragment();
 
@@ -1647,6 +1677,9 @@ class MFormParser
         }
     }
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     private function parseAttributes(array $attributes): string
     {
         $inlineAttributes = '';
