@@ -21,7 +21,7 @@ $intro = '<p>'
     . '<strong>Hinweis:</strong> Der Form Builder bietet bewusst nur eine kuratierte Auswahl der haeufigsten MForm-Felder, '
     . 'um einen einfachen Einstieg zu ermoeglichen. Spezielle Felder wie <code>addRadioImgField</code>, '
     . '<code>addColorSwatchField</code>, <code>addToggleCheckboxField</code>, <code>addInputField</code> mit eigenen Typen, '
-    . 'verschachtelte Layouts (Fieldset, Column, Collapse, Modal) oder Conditional Fieldsets sind weiterhin '
+    . 'Layouts wie Column/Collapse/Modal oder Conditional Fieldsets sind weiterhin '
     . 'direkt im PHP-Code verfuegbar &ndash; siehe <a href="https://github.com/FriendsOfREDAXO/mform/tree/main/docs" target="_blank" rel="noopener">MForm-Doku</a>. '
     . 'Der generierte Code laesst sich beliebig erweitern.'
     . '</div>';
@@ -81,6 +81,7 @@ $body = <<<'HTML'
         <ul class="mform-fb__field-list" data-fb-palette-wrap>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="repeater">Flex Repeater</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="tab">Tab</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
         </ul>
         <div class="mform-fb__actions">
             <button type="button" class="btn btn-default" data-fb-action="clear">Alles loeschen</button>

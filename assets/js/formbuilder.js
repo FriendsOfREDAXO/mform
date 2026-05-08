@@ -105,7 +105,9 @@
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
                         'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
             tab:         { label: 'Tab', method: 'addTabElement',
-                props: ['label', 'tabPullRight'] }
+                props: ['label', 'tabPullRight'] },
+            fieldset:    { label: 'Fieldset', method: 'addFieldsetArea',
+                props: ['label'] }
         };
 
         var state = [];
@@ -177,7 +179,7 @@
                 repeaterBtnClass: '',
                 // Tab
                 tabPullRight: false,
-                children: (type === 'repeater' || type === 'tab') ? [] : null
+                children: (type === 'repeater' || type === 'tab' || type === 'fieldset') ? [] : null
             };
         }
 
@@ -252,7 +254,7 @@
 
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
-            var hasChildren = item.type === 'repeater' || item.type === 'tab';
+            var hasChildren = item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset';
             var collapseBtn = hasChildren
                 ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen"><i class="rex-icon fa-chevron-' + (builderCollapsed[item.uid] ? 'right' : 'down') + '"></i></button>'
                 : '';
@@ -275,7 +277,7 @@
             });
             el.appendChild(head);
 
-            if (item.type === 'repeater' || item.type === 'tab') {
+            if (item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset') {
                 var nested = document.createElement('div');
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
@@ -284,7 +286,8 @@
                     nested.style.display = 'none';
                 }
                 if (item.children.length === 0) {
-                    nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + (item.type === 'tab' ? 'Tab' : 'Repeater') + ' oben anklicken und dann links ein Feld waehlen</p>';
+                    var hintWord = item.type === 'tab' ? 'Tab' : (item.type === 'fieldset' ? 'Fieldset' : 'Repeater');
+                    nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + hintWord + ' oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
                     item.children.forEach(function (c) { nested.appendChild(renderItem(c, depth + 1)); });
                 }
@@ -482,6 +485,11 @@
                     setTimeout(doRender, 0);
                     return;
                 }
+                if (type === 'fieldset' && depthOf(evt.to) > 0) {
+                    alert('Fieldsets koennen nur auf der obersten Ebene platziert werden.');
+                    setTimeout(doRender, 0);
+                    return;
+                }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
                 setTimeout(function () { doRender(); selectItem(newItem); }, 0);
@@ -501,6 +509,11 @@
             }
             if (item.type === 'tab' && depthOf(evt.to) > 0) {
                 alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
+                setTimeout(doRender, 0);
+                return;
+            }
+            if (item.type === 'fieldset' && depthOf(evt.to) > 0) {
+                alert('Fieldsets koennen nur auf der obersten Ebene platziert werden.');
                 setTimeout(doRender, 0);
                 return;
             }
@@ -801,6 +814,12 @@
             return indent + '$mform->addTabElement(' + args + ');';
         }
 
+        function renderFieldsetStmt(item, indent) {
+            var inner = renderRepeaterInner(item, indent);
+            var legend = item.label || '';
+            return indent + '$mform->addFieldsetArea(' + phpStr(legend) + ', MForm::factory()\n' + inner + ');';
+        }
+
         function repeaterCfg(item) {
             var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
             var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
@@ -861,6 +880,8 @@
                     // First tab in a contiguous run is opened by default.
                     var isFirstTab = idx === 0 || state[idx - 1].type !== 'tab';
                     lines.push(renderTabStmt(item, '', isFirstTab));
+                } else if (item.type === 'fieldset') {
+                    lines.push(renderFieldsetStmt(item, ''));
                 } else {
                     lines.push(renderField(item, item.id, '') + ';');
                 }
@@ -1099,6 +1120,23 @@
                 } else if (item.type === 'repeater') {
                     body.push(renderRepeaterBlock(item, ''));
                     body.push('');
+                } else if (item.type === 'fieldset') {
+                    if (item.label) {
+                        body.push('// ----- Fieldset: ' + item.label + ' -----');
+                    } else {
+                        body.push('// ----- Fieldset -----');
+                    }
+                    (item.children || []).forEach(function (c) {
+                        if (c.type === 'repeater') {
+                            body.push(renderRepeaterBlock(c, ''));
+                            body.push('');
+                        } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
+                            // ueberspringen
+                        } else {
+                            body.push(renderTopLevelVar(c));
+                            body.push('');
+                        }
+                    });
                 } else if (item.type === 'headline' || item.type === 'description' || item.type === 'html') {
                     // ueberspringen
                 } else {
