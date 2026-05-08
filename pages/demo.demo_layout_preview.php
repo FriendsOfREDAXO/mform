@@ -171,6 +171,12 @@ $renderBlock('Layout: Gallery + Accordion', $code5, $preview5);
 
 // =====================================================================
 // HtmlToSvgConverter – module thumbnails
+//
+// Achtung: Trotz des Namens unterstuetzt der Konverter nur SVG-Tags
+// (rect, circle, ellipse, line, polyline, polygon, path, text, g, image).
+// Echte HTML-Tags wie <div>, <h1>, <p> werden ignoriert.
+// Was der Konverter aus dem HTML-Universum versteht, sind die CSS-aehnlichen
+// style-Attribute (background, color, border, font-size) auf diesen SVG-Tags.
 // =====================================================================
 
 $svgRenderBlock = static function (string $title, string $code, string $svgFragment, array $attrs): void {
@@ -240,6 +246,35 @@ $svgRenderBlock(
     . '<rect x="80" y="180" width="380" height="10" fill="#cbd5e1" rx="2"/>'
     . '<circle cx="500" cy="420" r="50" fill="#10b981"/>',
     ['viewBox' => '0 0 600 480']
+);
+
+// ---- 7b) HTML-style attributes (the actual reason for the name) --------
+$code7b = <<<'PHP'
+// Statt SVG-Attribute (fill, stroke, stroke-width) lassen sich auch
+// HTML/CSS-Style-Shorthands auf SVG-Tags verwenden:
+$converter = new HtmlToSvgConverter();
+echo $converter->convertToImgTag('
+    <rect x="20" y="20" width="760" height="120"
+          style="background: #1d4ed8; border: 4px solid #fbbf24"/>
+    <text x="400" y="100"
+          style="color: white; font-size: 28px; text-align: center">
+        HTML-Style-Attribute
+    </text>
+    <rect x="20" y="180" width="360" height="160"
+          style="background: #f3f4f6; border: 2px dashed #9ca3af"/>
+    <rect x="420" y="180" width="360" height="160"
+          style="background: #10b981; border: 2px solid #047857"/>
+', ['viewBox' => '0 0 800 360']);
+PHP;
+
+$svgRenderBlock(
+    'HtmlToSvgConverter – HTML-Style-Attribute auf SVG-Tags',
+    $code7b,
+    '<rect x="20" y="20" width="760" height="120" style="background: #1d4ed8; border: 4px solid #fbbf24"/>'
+    . '<text x="400" y="100" style="color: white; font-size: 28px; text-align: center">HTML-Style-Attribute</text>'
+    . '<rect x="20" y="180" width="360" height="160" style="background: #f3f4f6; border: 2px dashed #9ca3af"/>'
+    . '<rect x="420" y="180" width="360" height="160" style="background: #10b981; border: 2px solid #047857"/>',
+    ['viewBox' => '0 0 800 360']
 );
 
 // ---- 8) Base64 data URL direct usage -----------------------------------
