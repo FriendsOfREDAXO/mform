@@ -1,5 +1,21 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta4
+
+### Fixed
+
+- **Flex-Repeater: Custom-Link-Widgets korrekt gerendert** – `addCustomLinkField()`, `addMFormLinkField()`, `addMediaField()`, `addMFormMediaField()` und `addCustomLinkMultipleField()` zeigten im Flex-Repeater zuvor den Platzhalter „Widget-Typ nicht unterstützt". Sie werden jetzt als vollständige Widgets gerendert.
+- **Flex-Repeater: Bilderliste vollständig identisch zum normalen Widget** – `addImagelistField()` nutzt jetzt `rex_var_custom_medialist::getWidget()` direkt und rendert damit das vollständige Widget mit Galerie/Raster/Listen-Ansicht, View-Toggle und vertikaler Toolbar – identisch zur Nutzung außerhalb des Flex-Repeaters. Zuvor wurde nur ein einfaches Skelett ohne Preview und Ansichts-Umschalter angezeigt.
+- **Flex-Repeater: Readonly-Felder korrekt gerendert** – `addTextReadonlyField()` und `addTextareaReadonlyField()` gaben zuvor einen leeren String zurück. Werden jetzt als `readonly`-Input/Textarea dargestellt.
+- **Flex-Repeater: Radio- und Checkbox-Styling** – `addRadioField()` und `addCheckboxField()` rendern jetzt Bootstrap-3-konforme `<div class="radio">` / `<div class="checkbox">`-Wrapper statt nackter `radio-inline`-Labels. Vertikale Abstände und Ausrichtung korrigiert.
+- **Flex-Repeater: Dead-Code entfernt** – Unreachable-Code-Block nach dem `custom-link-multi`-Case im Renderer bereinigt.
+- **Custom-Link-Widget: Artikelname bei vorhandenem Wert** – Beim Initialisieren eines Custom-Link-Widgets mit bereits gesetztem Wert (z. B. aus dem Flex-Repeater) wird der gespeicherte Wert per AJAX über den neuen Endpunkt `rex-api-call=mform_resolve_link` zu einem lesbaren Namen aufgelöst (Artikelname statt nackter ID/URL). Die API-Klasse ist namespaced (`FriendsOfREDAXO\MForm\Api\ResolveLinkApi`) und wird via `rex_api_function::register()` registriert.
+- **Custom-Link-Multi: Trash-Icon** – Der Entfernen-Button je Eintrag zeigt jetzt ein `fa-trash`-Symbol statt des durchgestrichenen Link-Icons.
+- **Custom-Link: E-Mail-Validierung** – Die `mailto:`-Eingabe prüft vor dem Speichern, ob die eingegebene E-Mail-Adresse syntaktisch valide ist. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
+- **Custom-Link: Telefon-Validierung** – Die `tel:`-Eingabe lässt nur Ziffern, `+`, `-`, Leerzeichen und Klammern zu. Ungültige Eingaben werden mit einem Hinweis abgelehnt.
+
+---
+
 ## Version 9.0.0-beta3
 
 ### Neu

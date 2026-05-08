@@ -46,6 +46,8 @@ Für eine Schritt-für-Schritt-Einführung gibt es den **[FOR-Tutorial-Bereich](
 
 Wer von MBlock migriert, findet den Einstieg in [docs/08_mblock_migration.md](docs/08_mblock_migration.md).
 
+Für komponentenorientierte Frontend-Ausgabe siehe [docs/14_fragments_output.md](docs/14_fragments_output.md).
+
 ## Installation
 
 Direkt über den REDAXO-Installer installierbar — nach `mform` suchen, herunterladen und aktivieren.

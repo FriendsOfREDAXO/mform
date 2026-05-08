@@ -163,21 +163,36 @@ class MFormFlexRepeaterRenderer
             case 'link':
             case 'custom-link':
             case 'media':
-            case 'imagelist':
-            case 'custom-link-multi':
-                return self::wrapFormGroup($label, self::renderUnsupportedWidgetPlaceholder($type), $item);
+            case 'mform-link':
+            case 'mform-media':
+                return self::wrapFormGroup($label, self::renderCustomLinkWidget($type, $fieldKey, $item), $item);
 
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s>', $class, $key, $attrs),
-                    $item
-                );
+            case 'custom-link-multi':
+                return self::wrapFormGroup($label, self::renderCustomLinkMultiWidget($fieldKey, $item), $item);
 
             case 'medialist':
                 return self::wrapFormGroup($label, self::renderListWidget('medialist', $key, $item), $item);
 
+            case 'imglist':
+            case 'imagelist':
+                return self::wrapFormGroup($label, self::renderListWidget('imglist', $key, $item), $item);
+
             case 'linklist':
                 return self::wrapFormGroup($label, self::renderListWidget('linklist', $key, $item), $item);
+
+            case 'text-readonly':
+                return self::wrapFormGroup(
+                    $label,
+                    sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s readonly>', $class, $key, $attrs),
+                    $item
+                );
+
+            case 'textarea-readonly':
+                return self::wrapFormGroup(
+                    $label,
+                    sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s readonly></textarea>', $class, $key, $attrs),
+                    $item
+                );
 
             case 'headline':
                 $val = is_string($item->getValue()) ? $item->getValue() : '';
@@ -318,10 +333,11 @@ class MFormFlexRepeaterRenderer
 
     private static function renderRadioGroup(MFormItem $item, string $fieldKey): string
     {
-        $html = '';
+        $html = '<div class="mfr-radio-group">';
         foreach ($item->getOptions() as $key => $value) {
-            $html .= sprintf('<label class="radio-inline"><input type="radio" data-mfr-field="%s" value="%s"> %s</label>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
+            $html .= sprintf('<div class="radio"><label><input type="radio" data-mfr-field="%s" value="%s"> %s</label></div>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
         }
+        $html .= '</div>';
         return $html;
     }
 
@@ -331,13 +347,14 @@ class MFormFlexRepeaterRenderer
         if (1 === count($options)) {
             $key = (string) array_key_first($options);
             $value = reset($options);
-            return sprintf('<label><input type="checkbox" data-mfr-field="%s" value="%s"> %s</label>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars($key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
+            return sprintf('<div class="checkbox"><label><input type="checkbox" data-mfr-field="%s" value="%s"> %s</label></div>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars($key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
         }
 
-        $html = '';
+        $html = '<div class="mfr-checkbox-inline-group">';
         foreach ($options as $key => $value) {
             $html .= sprintf('<label class="checkbox-inline"><input type="checkbox" data-mfr-field="%s" value="%s"> %s</label>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
         }
+        $html .= '</div>';
         return $html;
     }
 
@@ -439,6 +456,14 @@ class MFormFlexRepeaterRenderer
 
     private static function renderListWidget(string $type, string $fieldKey, MFormItem $item): string
     {
+        // imglist uses rex_var_custom_medialist::getWidget() directly to get the full
+        // gallery/grid/list view with preview, view toggle and vertical toolbar –
+        // identical to the normal (non-repeater) imglist widget.
+        if ('imglist' === $type) {
+            return self::renderImglistWidget($fieldKey, $item);
+        }
+
+        // medialist and linklist use a lightweight skeleton initialised by list-widget.js
         $attrs = $item->getAttributes();
         $params = '';
 
@@ -457,7 +482,6 @@ class MFormFlexRepeaterRenderer
             }
         }
 
-        $buttons = '';
         if ('medialist' === $type) {
             $buttons = '<a href="#" class="btn btn-popup mform-list-btn" data-action="open" title="Mediapool oeffnen"><i class="rex-icon rex-icon-open-mediapool"></i></a>'
                 . '<a href="#" class="btn btn-popup mform-list-btn" data-action="add" title="Mediapool hinzufuegen"><i class="rex-icon rex-icon-add-media"></i></a>'
@@ -480,6 +504,232 @@ class MFormFlexRepeaterRenderer
             . '</div>'
             . '<div class="mform-list-toolbar">' . $buttons . '</div>'
             . '</div>';
+    }
+
+    private static function renderImglistWidget(string $fieldKey, MFormItem $item): string
+    {
+        $attrs = $item->getAttributes();
+        $widgetId = '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey);
+
+        $args = [
+            'view'    => 'gallery',
+            'views'   => 'gallery,grid,list',
+            'toolbar' => 'vertical',
+        ];
+
+        if (isset($attrs['data-media-category']) && '' !== (string) $attrs['data-media-category']) {
+            $args['category'] = (string) $attrs['data-media-category'];
+        }
+        if (isset($attrs['data-media-type']) && '' !== (string) $attrs['data-media-type']) {
+            $args['types'] = (string) $attrs['data-media-type'];
+        }
+
+        $html = \rex_var_custom_medialist::getWidget(
+            $widgetId,
+            'mfr_imglist[' . $fieldKey . ']',
+            '',
+            $args
+        );
+
+        // Add rex-js-widget-imglist class (mirrors what rex_var_imglist::getWidget() does)
+        $html = str_replace(
+            'mform-list-widget mform-list-widget-medialist',
+            'mform-list-widget mform-list-widget-medialist rex-js-widget-imglist',
+            $html
+        );
+
+        // Mark the hidden value input so the Flex-Repeater JS reads/writes it
+        $html = preg_replace(
+            '/(<input\s+type="hidden"[^>]*class="[^"]*mform-list-value[^"]*"[^>]*)(>)/i',
+            '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
+            $html,
+            1
+        ) ?? $html;
+
+        return $html;
+    }
+
+    private static function renderCustomLinkWidget(string $type, string $fieldKey, MFormItem $item): string
+    {
+        $attrs = $item->getAttributes();
+        $widgetId = '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey);
+
+        $args = self::mapCustomLinkArgs($attrs, $type);
+
+        $html = \rex_var_custom_link::getWidget(
+            $widgetId,
+            'mfr_custom_link[' . $fieldKey . ']',
+            '',
+            $args,
+            false
+        );
+
+        // Flex-Repeater liest/schreibt nur Felder mit data-mfr-field.
+        // Daher das eigentliche Value-Hidden des Widgets markieren.
+        $html = preg_replace(
+            '/(<input\s+type="hidden"[^>]*id="REX_LINK_[^"]+"[^>]*)(>)/i',
+            '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
+            $html,
+            1
+        ) ?? $html;
+
+        return $html;
+    }
+
+    private static function renderCustomLinkMultiWidget(string $fieldKey, MFormItem $item): string
+    {
+        $attrs = $item->getAttributes();
+        $args = self::mapCustomLinkMultiArgs($attrs);
+
+        $html = \rex_var_custom_link_multi::getWidget(
+            '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey),
+            'mfr_custom_link_multi[' . $fieldKey . ']',
+            '',
+            $args
+        );
+
+        // Flex-Repeater liest/schreibt nur Felder mit data-mfr-field.
+        $html = preg_replace(
+            '/(<input\s+type="hidden"[^>]*class="[^"]*mform-cl-multi-value[^"]*"[^>]*)(>)/i',
+            '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
+            $html,
+            1
+        ) ?? $html;
+
+        return $html;
+    }
+
+    private static function mapCustomLinkArgs(array $attrs, string $type): array
+    {
+        $args = [];
+
+        $map = [
+            'intern' => ['intern', 'data-intern'],
+            'external' => ['external', 'data-extern'],
+            'media' => ['media', 'data-media'],
+            'mailto' => ['mailto', 'data-mailto'],
+            'phone' => ['phone', 'data-tel'],
+            'anchor' => ['anchor', 'data-anchor'],
+        ];
+
+        foreach ($map as $target => $sourceKeys) {
+            foreach ($sourceKeys as $sourceKey) {
+                if (!array_key_exists($sourceKey, $attrs)) {
+                    continue;
+                }
+                $args[$target] = self::normalizeEnableDisableValue($attrs[$sourceKey]);
+                break;
+            }
+        }
+
+        if (isset($attrs['data-link-category'])) {
+            $args['category'] = $attrs['data-link-category'];
+        } elseif (isset($attrs['catId'])) {
+            $args['category'] = $attrs['catId'];
+        }
+
+        if (isset($attrs['data-media-category'])) {
+            $args['media_category'] = $attrs['data-media-category'];
+        }
+        if (isset($attrs['data-media-type'])) {
+            $args['types'] = $attrs['data-media-type'];
+        } elseif (isset($attrs['data-types'])) {
+            $args['types'] = $attrs['data-types'];
+        }
+        if (isset($attrs['data-extern-link-prefix'])) {
+            $args['external_prefix'] = $attrs['data-extern-link-prefix'];
+        }
+        if (isset($attrs['ylink'])) {
+            $args['ylink'] = $attrs['ylink'];
+        }
+
+        // link/media im Flex-Repeater auf custom-link Widget einschränken
+        if ('link' === $type || 'mform-link' === $type) {
+            $args = array_merge([
+                'intern' => 1,
+                'external' => 0,
+                'media' => 0,
+                'mailto' => 0,
+                'phone' => 0,
+            ], $args);
+        } elseif ('media' === $type || 'mform-media' === $type) {
+            $args = array_merge([
+                'intern' => 0,
+                'external' => 0,
+                'media' => 1,
+                'mailto' => 0,
+                'phone' => 0,
+            ], $args);
+        }
+
+        return $args;
+    }
+
+    private static function mapCustomLinkMultiArgs(array $attrs): array
+    {
+        $args = [];
+
+        $map = [
+            'intern' => ['intern', 'data-intern'],
+            'extern' => ['extern', 'external', 'data-extern'],
+            'media' => ['media', 'data-media'],
+            'mailto' => ['mailto', 'data-mailto'],
+            'phone' => ['phone', 'data-tel'],
+            'anchor' => ['anchor', 'data-anchor'],
+        ];
+
+        foreach ($map as $target => $sourceKeys) {
+            foreach ($sourceKeys as $sourceKey) {
+                if (!array_key_exists($sourceKey, $attrs)) {
+                    continue;
+                }
+                $args[$target] = self::normalizeEnableDisableValue($attrs[$sourceKey]);
+                break;
+            }
+        }
+
+        if (isset($attrs['data-link-category'])) {
+            $args['category'] = $attrs['data-link-category'];
+        } elseif (isset($attrs['catId'])) {
+            $args['category'] = $attrs['catId'];
+        }
+
+        if (isset($attrs['data-media-category'])) {
+            $args['media_category'] = $attrs['data-media-category'];
+        }
+        if (isset($attrs['data-media-type'])) {
+            $args['types'] = $attrs['data-media-type'];
+        } elseif (isset($attrs['data-types'])) {
+            $args['types'] = $attrs['data-types'];
+        }
+        if (isset($attrs['data-extern-link-prefix'])) {
+            $args['external_prefix'] = $attrs['data-extern-link-prefix'];
+        }
+        if (isset($attrs['ylink'])) {
+            $args['ylink'] = $attrs['ylink'];
+        }
+        if (isset($attrs['btn_add'])) {
+            $args['btn_add'] = $attrs['btn_add'];
+        }
+
+        return $args;
+    }
+
+    private static function normalizeEnableDisableValue(mixed $value): int
+    {
+        if (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+
+        $normalized = strtolower(trim((string) $value));
+        if (in_array($normalized, ['enable', '1', 'true', 'yes', 'on'], true)) {
+            return 1;
+        }
+        if (in_array($normalized, ['disable', '0', 'false', 'no', 'off'], true)) {
+            return 0;
+        }
+
+        return '' === $normalized ? 0 : 1;
     }
 
     public static function extractFieldKey(mixed $varId): string

@@ -4,6 +4,37 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Fixes & Verbesserungen in beta4
+
+### Flex-Repeater: Alle Link- und Media-Widgets vollständig unterstützt
+
+Folgende Widgets rendern jetzt korrekt im Flex-Repeater – zuvor wurde fälschlicherweise ein Fehler-Platzhalter angezeigt:
+
+| Widget | Methode |
+|--------|---------|
+| Custom-Link (alle Modi) | `addCustomLinkField()` |
+| Custom-Link (mehrere Links) | `addCustomLinkMultipleField()` |
+| REDAXO-Artikel-Link | `addLinkField()`, `addMFormLinkField()` |
+| Medium | `addMediaField()`, `addMFormMediaField()` |
+| Bilderliste | `addImagelistField()` |
+
+Readonly-Felder (`addTextReadonlyField()`, `addTextareaReadonlyField()`) werden ebenfalls korrekt gerendert.
+
+### Custom-Link: Artikelname bei Vorab-Wert
+
+Wird ein Custom-Link-Widget im Flex-Repeater mit einem bereits gespeicherten Wert initialisiert (z. B. `8` oder `redaxo://8`), wird der zugehörige Artikelname per AJAX aufgelöst und im sichtbaren Textfeld angezeigt – statt der nackten ID.
+
+### Custom-Link: Eingabe-Validierung
+
+- **mailto**: Ungültige E-Mail-Adressen werden mit Fehlermeldung abgelehnt
+- **tel**: Nur Ziffern, `+`, `-`, Leerzeichen und Klammern zulässig
+
+### Custom-Link-Multi: Papierkorb-Icon
+
+Der Entfernen-Button je Eintrag zeigt jetzt ein `fa-trash`-Symbol.
+
+---
+
 ## Flex-Repeater – wiederholende Inhalte
 
 Der Flex-Repeater war bereits vorhanden. In MForm 9 wurde er technisch überarbeitet und deutlich robuster in der REDAXO-Umgebung umgesetzt.
@@ -162,4 +193,6 @@ MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. F
 | [10_outside_modules.md](10_outside_modules.md) | MForm außerhalb von Modulen verwenden |
 | [11_tutorial_modul.md](11_tutorial_modul.md) | Komplettes Modul-Tutorial |
 | [12_checkbox_group.md](12_checkbox_group.md) | CheckboxGroup-Widget inkl. Radio-Mode |
+| [13_api_reference.md](13_api_reference.md) | Vollständige API-Referenz öffentlicher Klassen und Methoden |
+| [14_fragments_output.md](14_fragments_output.md) | Ausgabe über REDAXO-Fragmente und mfragment-Komponenten |
 | [06_advanced.md](06_advanced.md) | ColorSwatch-Feld, RadioColorField, RadioImgField, ConditionalFieldset |

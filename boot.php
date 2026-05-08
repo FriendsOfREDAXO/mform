@@ -5,6 +5,8 @@
  * @license MIT
  */
 
+rex_api_function::register('mform_resolve_link', \FriendsOfREDAXO\MForm\Api\ResolveLinkApi::class);
+
 if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'ytemplates'));
     

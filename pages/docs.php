@@ -91,6 +91,16 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-clone',
         'file'  => 'docs/09_templates.md',
     ],
+    'api_reference' => [
+        'title' => rex_i18n::msg('mform_docs_api_reference'),
+        'icon'  => 'rex-icon fa-code',
+        'file'  => 'docs/13_api_reference.md',
+    ],
+    'fragments_output' => [
+        'title' => rex_i18n::msg('mform_docs_fragments_output'),
+        'icon'  => 'rex-icon fa-cubes',
+        'file'  => 'docs/14_fragments_output.md',
+    ],
     'readme' => [
         'title' => rex_i18n::msg('mform_docs_readme'),
         'icon'  => 'rex-icon fa-book',

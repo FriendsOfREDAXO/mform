@@ -98,7 +98,7 @@ class rex_var_custom_link_multi extends rex_var
             . '</span>'
             . $widgetHtml
             . '<a href="#" class="btn btn-popup mform-cl-multi-remove" title="' . rex_i18n::msg('mform_cl_multi_remove') . '">'
-            . '<i class="rex-icon rex-icon-delete-link"></i>'
+            . '<i class="rex-icon fa-trash"></i>'
             . '</a>'
             . '</div>';
     }

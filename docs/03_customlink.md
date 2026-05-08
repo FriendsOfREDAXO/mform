@@ -4,10 +4,10 @@ Das Custom-Link-Widget bündelt mehrere Link-Typen in einem Feld.
 
 ## Verfügbarkeit
 
-| Methode | Klassisches Modul | `rex_form` | YForm | `REX_VAR` |
-|---|---|---|---|---|
-| `addCustomLinkField` | ja | ja | ja | ja |
-| `addCustomLinkMultipleField` | ja | ja | ja | ja |
+| Methode | Klassisches Modul | Flex-Repeater | `rex_form` | YForm | `REX_VAR` |
+|---|---|---|---|---|---|
+| `addCustomLinkField` | ja | ja | ja | ja | ja |
+| `addCustomLinkMultipleField` | ja | ja | ja | ja | ja |
 
 ## Klassisches Modul
 

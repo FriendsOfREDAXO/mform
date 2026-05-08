@@ -118,6 +118,27 @@ function customlink_init_widget(element) {
     id = customlinkResolveWidgetId(element);
     element.data('id', id);
     element.find('ul.dropdown-menu').attr('id', 'mform_ylink_' + id);
+
+    // In dynamischen Kontexten (z. B. Flex-Repeater) wird oft nur der Hidden-Wert gesetzt.
+    // Wenn das sichtbare Feld leer ist, aber ein Linkwert vorhanden ist, den Namen per AJAX auflösen.
+    if ((!showed_input.val() || String(showed_input.val()).trim() === '') && hidden_input.val() && String(hidden_input.val()).trim() !== '') {
+        var rawValue = hidden_input.val();
+        $.getJSON(
+            'index.php',
+            { 'rex-api-call': 'mform_resolve_link', value: rawValue },
+            function (data) {
+                if (data && data.text && showed_input.val() === '') {
+                    showed_input.val(data.text);
+                }
+            }
+        ).fail(function () {
+            // Fallback: Rohwert anzeigen
+            if (showed_input.val() === '') {
+                showed_input.val(rawValue);
+            }
+        });
+    }
+
     element.toggleClass('is-empty', !(hidden_input.val() && String(hidden_input.val()).trim() !== ''));
     updateActiveButton(hidden_input.val());
     syncMediaPreviewButton(hidden_input.val());
@@ -287,13 +308,21 @@ function customlink_init_widget(element) {
 
             hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
 
-            let mailto_link = promptValue('Mail', value, 'mailto:');
+            let mailto_link = promptValue('E-Mail-Adresse', value, 'mailto:');
 
-            if (mailto_link !== 'mailto:' && mailto_link !== "" && mailto_link !== undefined && mailto_link != null) {
+            if (mailto_link !== 'mailto:' && mailto_link !== '' && mailto_link !== undefined && mailto_link != null) {
                 if (!String(mailto_link).startsWith('mailto:')) {
                     mailto_link = 'mailto:' + mailto_link;
                 }
-                setLinkValue(mailto_link, mailto_link);
+                // E-Mail-Validierung
+                let emailPart = String(mailto_link).replace(/^mailto:/i, '').split('?')[0];
+                let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailPart)) {
+                    window.alert('Bitte eine gültige E-Mail-Adresse eingeben.');
+                    setLinkValue(value, text);
+                } else {
+                    setLinkValue(mailto_link, mailto_link);
+                }
             }
             if (mailto_link == null) {
                 setLinkValue(value, text);
@@ -312,13 +341,21 @@ function customlink_init_widget(element) {
 
             hidden_input.attr('id', 'REX_LINK_' + id).addClass('form-control').attr('readonly', true);
 
-            let tel_link = promptValue('Telephone', value, 'tel:');
+            let tel_link = promptValue('Telefonnummer (z. B. +49 30 123456)', value, 'tel:');
 
-            if (tel_link !== 'tel:' && tel_link !== "" && tel_link !== undefined && tel_link != null) {
+            if (tel_link !== 'tel:' && tel_link !== '' && tel_link !== undefined && tel_link != null) {
                 if (!String(tel_link).startsWith('tel:')) {
                     tel_link = 'tel:' + tel_link;
                 }
-                setLinkValue(tel_link, tel_link);
+                // Telefon-Validierung: nur Ziffern, +, -, Leerzeichen, Klammern
+                let telPart = String(tel_link).replace(/^tel:/i, '');
+                let telRegex = /^[\d\s+\-().]{3,}$/;
+                if (!telRegex.test(telPart)) {
+                    window.alert('Bitte eine gültige Telefonnummer eingeben (Ziffern, +, -, Leerzeichen, Klammern).');
+                    setLinkValue(value, text);
+                } else {
+                    setLinkValue(tel_link, tel_link);
+                }
             }
             if (tel_link == null) {
                 setLinkValue(value, text);
@@ -465,6 +502,48 @@ function customLinkMultiInit(multiWidget) {
     if (multiWidget.data('clmulti-init')) return;
     multiWidget.data('clmulti-init', true);
 
+    // Hydrate existing JSON values (e.g. in Flex-Repeater rows) when no items are pre-rendered.
+    if (multiWidget.find('.mform-cl-multi-item').length === 0) {
+        let template = multiWidget.data('template');
+        let raw = multiWidget.find('> input.mform-cl-multi-value').val();
+        let parsed = [];
+
+        if (typeof raw === 'string' && raw.trim() !== '') {
+            try {
+                let decoded = JSON.parse(raw);
+                if (Array.isArray(decoded)) {
+                    parsed = decoded;
+                }
+            } catch (e) {
+                parsed = [];
+            }
+        }
+
+        if (template && parsed.length > 0) {
+            parsed.forEach(function (val) {
+                let idx = 'clm' + randId();
+                let itemHtml = template.split('CMLIDX').join(idx);
+                let $item = $(
+                    '<div class="mform-cl-multi-item">' +
+                    '<span class="mform-cl-multi-handle" title="Verschieben"><i class="rex-icon fa-bars"></i></span>' +
+                    itemHtml +
+                    '<a href="#" class="btn btn-popup mform-cl-multi-remove" title="Entfernen"><i class="rex-icon fa-trash"></i></a>' +
+                    '</div>'
+                );
+
+                // Pre-fill values before widget init
+                $item.find('.rex-js-widget-customlink input[type=hidden]').first().val(val || '');
+                $item.find('.rex-js-widget-customlink input[type=text]').first().val(val || '');
+
+                multiWidget.find('.mform-cl-multi-list').append($item);
+                $(document).trigger('rex:ready', [$item]);
+                customLinkMultiBindItem($item, multiWidget);
+            });
+
+            customLinkMultiSerialize(multiWidget);
+        }
+    }
+
     // Bind existing items
     multiWidget.find('.mform-cl-multi-item').each(function () {
         customLinkMultiBindItem($(this), multiWidget);
@@ -484,7 +563,7 @@ function customLinkMultiInit(multiWidget) {
             '<div class="mform-cl-multi-item">' +
             '<span class="mform-cl-multi-handle" title="Verschieben"><i class="rex-icon fa-bars"></i></span>' +
             itemHtml +
-            '<a href="#" class="btn btn-popup mform-cl-multi-remove" title="Entfernen"><i class="rex-icon rex-icon-delete-link"></i></a>' +
+            '<a href="#" class="btn btn-popup mform-cl-multi-remove" title="Entfernen"><i class="rex-icon fa-trash"></i></a>' +
             '</div>'
         );
 

@@ -474,6 +474,44 @@ body.rex-theme-dark .mfr-btn-copy {
 }
 
 /* ============================================================
+   Radio / Checkbox im Repeater-Body
+   ============================================================ */
+.mfr-item-body .radio,
+.mfr-nested-body .radio {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.mfr-item-body .radio:first-child,
+.mfr-nested-body .radio:first-child {
+    margin-top: 0;
+}
+
+.mfr-item-body .radio:last-child,
+.mfr-nested-body .radio:last-child {
+    margin-bottom: 0;
+}
+
+.mfr-radio-group,
+.mfr-checkbox-inline-group {
+    padding-top: 4px;
+}
+
+.mfr-checkbox-inline-group .checkbox-inline {
+    padding-top: 0;
+}
+
+.mfr-checkbox-inline-group .checkbox-inline + .checkbox-inline {
+    margin-left: 10px;
+}
+
+.mfr-item-body .checkbox,
+.mfr-nested-body .checkbox {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+/* ============================================================
    Template-spezifische Elemente im Item-Body
    ============================================================ */
 .mfr-template-headline h4 {

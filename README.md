@@ -46,6 +46,8 @@ For a step-by-step introduction, check out the **[FOR Tutorial](https://friendso
 
 MBlock users looking to migrate should start with [docs/08_mblock_migration.md](docs/08_mblock_migration.md).
 
+For component-driven frontend output, see [docs/14_fragments_output.md](docs/14_fragments_output.md).
+
 ## Installation
 
 Install directly via the REDAXO Installer — search for `mform`, download and activate.
