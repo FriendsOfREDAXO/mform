@@ -150,6 +150,7 @@ mform_docs_mblock_migration = Migration von MBlock
 mform_docs_templates = Templates und Defaults
 mform_docs_api_reference = API-Referenz
 mform_docs_fragments_output = Ausgabe mit REDAXO-Fragmenten und mfragment
+mform_docs_mform_output = MFormOutput – Fluent Module Output
 mform_docs_readme = README
 mform_docs_security = Sicherheit
 mform_docs_toc = Inhaltsverzeichnis

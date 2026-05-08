@@ -149,8 +149,7 @@ mform_docs_repeater = Repeater
 mform_docs_mblock_migration = Migration from MBlock
 mform_docs_templates = Templates and Defaults
 mform_docs_api_reference = API Reference
-mform_docs_fragments_output = Output with REDAXO Fragments and mfragment
-mform_docs_readme = README
+mform_docs_fragments_output = Output with REDAXO Fragments and mfragmentmform_docs_mform_output = MFormOutput – Fluent Module Outputmform_docs_readme = README
 mform_docs_security = Security
 mform_docs_toc = Table of Contents
 mform_docs_toc_filter = Filter
