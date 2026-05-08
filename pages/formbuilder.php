@@ -87,6 +87,18 @@ $body = <<<'HTML'
                 <label>Placeholder</label>
                 <input type="text" class="form-control" data-fb-prop="placeholder">
             </div>
+            <div class="form-group" data-fb-prop-group="notice">
+                <label>Hinweistext <small>(notice / Hilfetext unter dem Feld)</small></label>
+                <input type="text" class="form-control" data-fb-prop="notice">
+            </div>
+            <div class="form-group" data-fb-prop-group="cssClass">
+                <label>CSS-Klassen</label>
+                <input type="text" class="form-control" data-fb-prop="cssClass" placeholder="z. B. mt-3 text-muted">
+            </div>
+            <div class="form-group" data-fb-prop-group="rows">
+                <label>Zeilen <small>(rows fuer Textarea)</small></label>
+                <input type="number" class="form-control" data-fb-prop="rows" min="1">
+            </div>
             <div class="form-group" data-fb-prop-group="options">
                 <label>Optionen <small>(eine pro Zeile, optional <code>key=label</code>)</small></label>
                 <textarea class="form-control" rows="5" data-fb-prop="options"></textarea>
@@ -98,7 +110,7 @@ $body = <<<'HTML'
             </div>
             <div class="form-group" data-fb-prop-group="tinymce">
                 <label class="checkbox">
-                    <input type="checkbox" data-fb-prop="tinymce"> TinyMCE-Editor (class="tinymce-editor")
+                    <input type="checkbox" data-fb-prop="tinymce"> TinyMCE-Editor
                 </label>
             </div>
             <div class="form-group" data-fb-prop-group="full">
@@ -106,6 +118,52 @@ $body = <<<'HTML'
                     <input type="checkbox" data-fb-prop="full"> setFull()
                 </label>
             </div>
+
+            <!-- CustomLink: Linktypen -->
+            <div class="form-group" data-fb-prop-group="clTypeIntern">
+                <label>Linktypen</label>
+                <div>
+                    <label class="checkbox" style="display:inline-block; margin-right:.75em">
+                        <input type="checkbox" data-fb-prop="clTypeIntern"> Intern
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" data-fb-prop-group="clTypeExtern">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="clTypeExtern"> Extern</label>
+            </div>
+            <div class="form-group" data-fb-prop-group="clTypeMedia">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="clTypeMedia"> Media</label>
+            </div>
+            <div class="form-group" data-fb-prop-group="clTypeMailto">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="clTypeMailto"> Mailto</label>
+            </div>
+            <div class="form-group" data-fb-prop-group="clTypeTel">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="clTypeTel"> Tel</label>
+            </div>
+
+            <!-- CustomLink: Beschraenkungen -->
+            <div class="form-group" data-fb-prop-group="linkCategory">
+                <label>Intern-Link Start-Kategorie <small>(data-link-category)</small></label>
+                <input type="number" class="form-control" data-fb-prop="linkCategory" min="0">
+            </div>
+            <div class="form-group" data-fb-prop-group="mediaCategory">
+                <label>Media Start-Kategorie <small>(data-media-category)</small></label>
+                <input type="number" class="form-control" data-fb-prop="mediaCategory" min="0">
+            </div>
+            <div class="form-group" data-fb-prop-group="externPrefix">
+                <label>Extern-Link Prefix <small>(data-extern-link-prefix)</small></label>
+                <input type="text" class="form-control" data-fb-prop="externPrefix" placeholder="https://www.">
+            </div>
+            <div class="form-group" data-fb-prop-group="mediaType">
+                <label>Media-Typen <small>(data-media-type, z. B. <code>jpg,png,pdf</code>)</small></label>
+                <input type="text" class="form-control" data-fb-prop="mediaType" placeholder="jpg,png,pdf">
+            </div>
+
+            <div class="form-group" data-fb-prop-group="btnAdd">
+                <label>Add-Button-Label <small>(btn_add fuer Multi-Custom-Link)</small></label>
+                <input type="text" class="form-control" data-fb-prop="btnAdd" placeholder="Link hinzufuegen">
+            </div>
+
             <div class="form-group" data-fb-prop-group="repeaterMin">
                 <label>Min Items</label>
                 <input type="number" class="form-control" data-fb-prop="repeaterMin" min="0">
