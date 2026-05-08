@@ -258,65 +258,67 @@
                     onUpdate: handleSortUpdate,
                     onRemove: handleSortRemove
                 });
-
-                var collapseEl = head.querySelector('[data-fb-collapse]');
-                if (collapseEl) {
-                    collapseEl.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        builderCollapsed[item.uid] = !builderCollapsed[item.uid];
-                        renderCanvas();
-                    });
-                }
             }
 
-            head.querySelector('[data-fb-remove]').addEventListener('click', function (e) {
-                e.stopPropagation();
-                removeItem(item.uid);
-                if (activeItem === item) { activeItem = null; renderProps(); }
+            return el;
+        }
+
+        // Single delegated click handler for all item action buttons.
+        $canvas.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-fb-remove], [data-fb-duplicate], [data-fb-copy-item], [data-fb-paste-after], [data-fb-collapse]');
+            if (!btn) return;
+            var itemEl = btn.closest('[data-uid]');
+            if (!itemEl) return;
+            e.stopPropagation();
+            e.preventDefault();
+            var uid = itemEl.dataset.uid;
+            var item = findItem(uid);
+            if (!item) return;
+
+            if (btn.hasAttribute('data-fb-remove')) {
+                removeItem(uid);
+                if (activeItem && activeItem.uid === uid) { activeItem = null; renderProps(); }
                 renderCanvas();
                 emitCode();
-            });
-
-            head.querySelector('[data-fb-duplicate]').addEventListener('click', function (e) {
-                e.stopPropagation();
-                var pos = findParentList(item.uid);
-                if (!pos) return;
-                var clone = deepCloneWithNewIds(item);
-                pos.list.splice(pos.index + 1, 0, clone);
+                return;
+            }
+            if (btn.hasAttribute('data-fb-collapse')) {
+                builderCollapsed[uid] = !builderCollapsed[uid];
+                renderCanvas();
+                return;
+            }
+            if (btn.hasAttribute('data-fb-duplicate')) {
+                var posD = findParentList(uid);
+                if (!posD) return;
+                var cloneD = deepCloneWithNewIds(item);
+                posD.list.splice(posD.index + 1, 0, cloneD);
                 renderCanvas();
                 emitCode();
-                selectItem(clone);
-            });
-
-            head.querySelector('[data-fb-copy-item]').addEventListener('click', function (e) {
-                e.stopPropagation();
+                selectItem(cloneD);
+                return;
+            }
+            if (btn.hasAttribute('data-fb-copy-item')) {
                 clipboard = JSON.parse(JSON.stringify(item));
                 var msg = document.querySelector('[data-fb-copy-msg]');
                 if (msg) { msg.textContent = 'Element in Zwischenablage'; setTimeout(function () { msg.textContent = ''; }, 1500); }
-            });
-
-            head.querySelector('[data-fb-paste-after]').addEventListener('click', function (e) {
-                e.stopPropagation();
+                return;
+            }
+            if (btn.hasAttribute('data-fb-paste-after')) {
                 if (!clipboard) {
                     alert('Zwischenablage ist leer. Erst auf Kopieren druecken.');
                     return;
                 }
-                var pos = findParentList(item.uid);
-                if (!pos) return;
-                var clone = deepCloneWithNewIds(clipboard);
-                // Don't allow pasting a repeater that would exceed depth
-                if (clone.type === 'repeater' && depth + 1 > MAX_REPEATER_DEPTH) {
-                    alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
-                    return;
-                }
-                pos.list.splice(pos.index + 1, 0, clone);
+                var posP = findParentList(uid);
+                if (!posP) return;
+                var cloneP = deepCloneWithNewIds(clipboard);
+                renderCanvas(); // ensure DOM in sync before depth check
+                posP.list.splice(posP.index + 1, 0, cloneP);
                 renderCanvas();
                 emitCode();
-                selectItem(clone);
-            });
-
-            return el;
-        }
+                selectItem(cloneP);
+                return;
+            }
+        });
 
         function renderCanvas() {
             $canvas.innerHTML = '';
