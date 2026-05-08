@@ -907,21 +907,52 @@
         }
 
         function renderTopLevelVar(item) {
-            return '$' + varNameFor(item) + ' = ' + topLevelExpr(item) + ';';
+            var lines = [];
+            var name = varNameFor(item);
+            var lbl = item.label ? ' (' + item.label + ')' : '';
+            var hint = topLevelHint(item);
+            lines.push('// ' + item.type + lbl + (hint ? ' \u2013 ' + hint : ''));
+            lines.push('$' + name + ' = ' + topLevelExpr(item) + ';');
+            return lines.join('\n');
+        }
+
+        // Kurzer Hinweis zum Inhaltstyp / wie man das Feld benutzt.
+        function topLevelHint(item) {
+            switch (item.type) {
+                case 'media':       return 'Dateiname in /media/, z.B. mit rex_url::media($name) verlinken';
+                case 'medialist':   return 'Array von Dateinamen';
+                case 'imagelist':   return 'Array von Bilddateinamen';
+                case 'link':        return 'Artikel-ID (int), z.B. rex_getUrl($id)';
+                case 'linklist':    return 'String "id1,id2,..." \u2013 ggf. weiter zerlegen';
+                case 'customlink':  return 'gemischtes Format (Artikel-ID, URL, mailto:, tel: oder media://)';
+                case 'customlinkmultiple': return 'Array gemischter Link-Strings';
+                case 'checkbox':    return 'Array der ausgewaehlten Werte';
+                case 'select':
+                case 'radio':       return 'einzelner ausgewaehlter Wert';
+                case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
+                case 'hidden':      return 'verstecktes Feld';
+                default:            return '';
+            }
+        }
+
+        // Kurzer Hinweis fuer Repeater-Children (gleich wie Top-Level, kompakter).
+        function childHint(child) {
+            return topLevelHint(child);
         }
 
         function renderRepeaterBlock(item, indent, rowVar) {
             indent = indent || '';
             rowVar = rowVar || 'row';
             var lines = [];
-            var src;
+            var name = varNameFor(item);
+            var lbl = item.label ? ' (' + item.label + ')' : '';
+
             if (rowVar === 'row') {
-                // Top-Level Repeater: aus REX_VALUE dekodieren
-                src = '\\FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']")';
-                lines.push(indent + '$' + varNameFor(item) + ' = ' + src + ';');
-                lines.push(indent + 'foreach ($' + varNameFor(item) + ' as $' + rowVar + ') {');
+                lines.push(indent + '// Repeater' + lbl + ' \u2013 dekodierte Items als Array von Zeilen');
+                lines.push(indent + '$' + name + ' = \\FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']");');
+                lines.push(indent + 'foreach ($' + name + ' as $' + rowVar + ') {');
             } else {
-                // Verschachtelter Repeater: bereits Array
+                lines.push(indent + '// verschachtelter Repeater' + lbl);
                 lines.push(indent + 'foreach ((array) ($row[' + phpStr(item.__childKey) + '] ?? []) as $' + rowVar + ') {');
             }
 
@@ -932,13 +963,17 @@
                 if (c.type === 'repeater') {
                     c.__childKey = key;
                     var sub = renderRepeaterBlock(c, inner, rowVar === 'row' ? 'row2' : 'row3');
-                    // Ersetzen $row[ -> $rowVar[ in dem Sub-Block (greift nur die gefuellten ?? Zugriffe)
                     if (rowVar !== 'row') {
                         sub = sub.replace(/\$row\[/g, '$' + rowVar + '[');
                     }
                     lines.push(sub);
                     delete c.__childKey;
+                } else if (c.type === 'headline' || c.type === 'description') {
+                    // ueberspringen
                 } else {
+                    var clbl = c.label ? ' (' + c.label + ')' : '';
+                    var ch = childHint(c);
+                    lines.push(inner + '// ' + c.type + clbl + (ch ? ' \u2013 ' + ch : ''));
                     var line = inner + '$' + key + ' = ' + childExpr(c, key) + ';';
                     if (rowVar !== 'row') {
                         line = line.replace(/\$row\[/g, '$' + rowVar + '[');
@@ -956,30 +991,43 @@
                 return;
             }
             var lines = [];
+            lines.push('// =============================================================');
             lines.push('// Modul-Output: Variablen aus den Eingabefeldern befuellen.');
-            lines.push('// Ausgabe / HTML / Escaping nach Bedarf selbst ergaenzen.');
+            lines.push('// Variablennamen werden aus den Labels abgeleitet (slugify:');
+            lines.push('//   Kleinbuchstaben, Umlaute -> ae/oe/ue/ss, Sonderzeichen -> _).');
+            lines.push('// Ohne Label wird ein Fallback wie field_<id> verwendet.');
+            lines.push('// HTML, Escaping (rex_escape), Fallbacks etc. nach Bedarf selbst');
+            lines.push('// ergaenzen.');
+            lines.push('// =============================================================');
             lines.push('');
             state.forEach(function (item) {
                 if (item.type === 'tab') {
-                    if (item.label) lines.push('// ----- Tab: ' + item.label + ' -----');
+                    if (item.label) {
+                        lines.push('// ----- Tab: ' + item.label + ' -----');
+                    } else {
+                        lines.push('// ----- Tab -----');
+                    }
                     (item.children || []).forEach(function (c) {
                         if (c.type === 'repeater') {
                             lines.push(renderRepeaterBlock(c, ''));
                         } else if (c.type === 'headline' || c.type === 'description') {
-                            // sind reine Form-Strukturhinweise, ueberspringen
+                            // ueberspringen
                         } else {
                             lines.push(renderTopLevelVar(c));
                         }
+                        lines.push('');
                     });
                 } else if (item.type === 'repeater') {
                     lines.push(renderRepeaterBlock(item, ''));
+                    lines.push('');
                 } else if (item.type === 'headline' || item.type === 'description') {
                     // ueberspringen
                 } else {
                     lines.push(renderTopLevelVar(item));
+                    lines.push('');
                 }
             });
-            $output.textContent = lines.join('\n');
+            $output.textContent = lines.join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
         }
 
         // ---- Init -----------------------------------------------------------
