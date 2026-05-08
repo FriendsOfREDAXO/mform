@@ -111,7 +111,7 @@ class MFormParser
 
         $btnText = $attrs['btn_text'] ?? rex_i18n::msg('mform_flex_repeater_add');
         $btnClass = ' ' . ($attrs['btn_class'] ?? 'btn-primary');
-        $copyPaste = isset($attrs['copy_paste']) && $attrs['copy_paste'];
+        $copyPaste = !isset($attrs['copy_paste']) || $attrs['copy_paste'];
         $label = '';
         if (!empty($item->getLabel())) {
             $itemLabel = $item->getLabel();
@@ -127,7 +127,7 @@ class MFormParser
         $min = (int) ($attrs['min'] ?? 0);
         $max = (int) ($attrs['max'] ?? 0);
         $collapsed = isset($attrs['collapsed']) && $attrs['collapsed'] ? 'true' : 'false';
-        $firstOpen = !isset($attrs['first_open']) || $attrs['first_open'] ? 'true' : 'false';
+        $firstOpen = isset($attrs['first_open']) && $attrs['first_open'] ? 'true' : 'false';
         $showToggleAll = !isset($attrs['show_toggle_all']) || $attrs['show_toggle_all'] ? 'true' : 'false';
         $open = !isset($attrs['open']) || $attrs['open'] ? 'true' : 'false';
         $defaultCount = isset($attrs['default_count']) ? (int) $attrs['default_count'] : 0;

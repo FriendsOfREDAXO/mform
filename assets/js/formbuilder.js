@@ -138,9 +138,9 @@
                 repeaterMax: '',
                 repeaterDefaultCount: '',
                 repeaterCollapsed: false,
-                repeaterFirstOpen: type === 'repeater' ? true : false,
+                repeaterFirstOpen: false,
                 repeaterShowToggleAll: type === 'repeater' ? true : false,
-                repeaterCopyPaste: false,
+                repeaterCopyPaste: type === 'repeater' ? true : false,
                 repeaterConfirmDelete: type === 'repeater' ? true : false,
                 repeaterOpen: type === 'repeater' ? true : false,
                 repeaterConfirmDeleteMsg: '',
@@ -694,13 +694,13 @@
             if (defCnt !== null && !isNaN(defCnt)) parts.push("'default_count' => " + defCnt);
             if (item.label) parts.push("'label' => " + phpStr(item.label));
             // Flags only emit when DIFFERENT from MForm core default.
-            // Core defaults: collapsed=false, first_open=true, show_toggle_all=true,
-            //                open=true, copy_paste=false, confirm_delete=true.
+            // Core defaults: collapsed=false, first_open=false, show_toggle_all=true,
+            //                open=true, copy_paste=true, confirm_delete=true.
             if (item.repeaterCollapsed === true) parts.push("'collapsed' => true");
-            if (item.repeaterFirstOpen === false) parts.push("'first_open' => false");
+            if (item.repeaterFirstOpen === true) parts.push("'first_open' => true");
             if (item.repeaterShowToggleAll === false) parts.push("'show_toggle_all' => false");
             if (item.repeaterOpen === false) parts.push("'open' => false");
-            if (item.repeaterCopyPaste === true) parts.push("'copy_paste' => true");
+            if (item.repeaterCopyPaste === false) parts.push("'copy_paste' => false");
             if (item.repeaterConfirmDelete === false) parts.push("'confirm_delete' => false");
             if (item.repeaterConfirmDeleteMsg) parts.push("'confirm_delete_msg' => " + phpStr(item.repeaterConfirmDeleteMsg));
             if (item.repeaterBtnText) parts.push("'btn_text' => " + phpStr(item.repeaterBtnText));
