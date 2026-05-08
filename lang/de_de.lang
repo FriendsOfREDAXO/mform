@@ -64,6 +64,7 @@ mform_example_repeater_tinymce_nested_repeater = Nested Repeater mit TinyMCE [2 
 mform_example_repeater_widgets_repeater = MForm-Widget-Elemente im Repeater [2 Ebenen]
 mform_example_repeater_copy_paste_repeater = Flex Repeater mit Copy/Paste [addFlexRepeaterElement]
 mform_example_repeater_full_feature_lab = Full Feature Testlab [Collapse, Widgets, Radio-Image, Repeater]
+mform_example_repeater_content_module = Content-Pflege-Modul [Output via MFormOutput]
 
 mform_example_description_base = Die "Basis Beispiele" beinhalten die Basis-Aufrufe der jeweiligen MForm-Element, ohne jegliche "Extras", Erweiterungen und Validierungen.
 mform_example_description_extended = Die "Extended Beispiele" zeigen über die "Basis Beispiele" hinausgehend, wie mit MForm Elemente um Attribute, Options, Parameter, Label etc. erweitert werden können.

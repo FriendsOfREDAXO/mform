@@ -250,3 +250,81 @@ echo MFormOutput::from('REX_VALUE[1]')
 ## Sicherheit
 
 `MFormOutput` führt **keinen** Escape auf Item-Werten durch — nur auf Tag-Attributen, die du selbst übergibst (`listAttrs`, Klassen). Im Template-Callback bist **du** für `rex_escape()` zuständig. Das gilt auch für `renderFragment()`.
+
+## Single-Value Helfer
+
+Neben dem fluenten Repeater-Wrapper bietet `MFormOutput` statische Helfer für klassische `REX_VALUE[…]`-Felder. Sie enthalten echte Logik (Parsing, Mapping, Word-Splitting) und sind **kein** 1:1-Wrapper für Core-Methoden.
+
+### `link()` und `linkUrl()`
+
+Auflösung gespeicherter Link-Werte aus `addCustomLinkField` / `addLinkField` / YForm `custom_link`:
+
+| Eingabe | Verhalten |
+|---|---|
+| `rex-article://12` | `rex_getUrl(12)` |
+| `rex-article://12-2` | `rex_getUrl(12, 2)` (mit clang) |
+| `rex-media://foo.jpg` | `rex_url::media('foo.jpg')` |
+| `tel:`, `mailto:` | unverändert |
+| `https://…` | unverändert, externer Link bekommt automatisch `target="_blank"` + `rel="noopener"` |
+| `42` (numerisch) | `rex_getUrl(42)` |
+
+```php
+// Nur die URL:
+$url = MFormOutput::linkUrl('REX_VALUE[3]');
+
+// Fertiges <a>:
+echo MFormOutput::link('REX_VALUE[3]', 'Mehr erfahren', ['class' => 'btn btn-primary']);
+
+// Linktext leer → Artikeltitel bzw. URL als Fallback
+echo MFormOutput::link('rex-article://12');
+```
+
+### `picture()`
+
+Erzeugt ein vollständiges `<picture>` aus einer Media-Query → media_manager-Type-Map:
+
+```php
+echo MFormOutput::picture('REX_MEDIA[1]', [
+    '(min-width: 1200px)' => 'hero_desktop',
+    '(min-width: 768px)'  => 'hero_tablet',
+    '(max-width: 767px)'  => 'hero_mobile',
+], ['class' => 'w-100', 'loading' => 'lazy']);
+```
+
+Der `<img>`-Fallback nutzt den letzten Type als `src`. Das `alt`-Attribut wird aus den Mediapool-Metadaten (`title`) übernommen, kann aber via `$imgAttrs['alt']` überschrieben werden.
+
+### `mediaList()`
+
+Splittet einen CSV-Wert von `addMedialistField` / `addImagelistField` und liefert nur tatsächlich existierende `rex_media`-Instanzen:
+
+```php
+foreach (MFormOutput::mediaList('REX_VALUE[5]') as $media) {
+    echo MFormOutput::tag('img', [
+        'src' => rex_url::media($media->getFileName()),
+        'alt' => $media->getValue('title') ?? '',
+    ]);
+}
+```
+
+### `richtext()`
+
+Markiert TinyMCE/WYSIWYG-Output als bereits-HTML (kein doppeltes Escape) und filtert optional die erlaubten Tags:
+
+```php
+echo MFormOutput::richtext('REX_VALUE[2]');
+// optional: nur bestimmte Tags zulassen
+echo MFormOutput::richtext('REX_VALUE[2]', ['p', 'br', 'strong', 'em', 'a', 'ul', 'li']);
+```
+
+### `excerpt()`
+
+Plaintext-Auszug aus HTML, getrimmt auf N Wörter (collapsed Whitespace, decodierte Entities):
+
+```php
+$teaser = MFormOutput::excerpt('REX_VALUE[2]', 30);
+echo MFormOutput::tag('p', ['class' => 'text-muted'], rex_escape($teaser));
+```
+
+## Beispiel-Modul
+
+Im Backend unter **Demos → Repeater** steht das Beispiel **„Content-Pflege-Modul [Output via MFormOutput]"** zur Installation bereit. Es zeigt einen typischen redaktionellen Workflow: Headline + Intro als Single-Values plus einen Repeater mit Titel, TinyMCE-Text, Hauptbild, Link und Galerie — komplett über `MFormOutput::from()->renderGrid()` und die Single-Value-Helfer (`picture`, `link`, `richtext`, `excerpt`, `mediaList`) ausgegeben.

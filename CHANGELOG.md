@@ -1,5 +1,25 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta8
+
+### Neu
+
+- **`MFormOutput`** (`FriendsOfRedaxo\MForm\Output\MFormOutput`) – Fluent, immutable Output-Helper für Repeater-Daten:
+  - Chainable: `filter`, `where`, `sort`, `reverse`, `limit`, `skip`, `page`, `map`
+  - Terminals: `all`, `first`, `last`, `count`, `isEmpty`, `pluck`, `group`
+  - Empty-State: `whenEmpty()`
+  - Render-API: `render`, `renderList`, `renderGrid`, `renderChunks`, `renderFragment`
+  - Framework-Presets für `renderGrid()`: `GRID_BOOTSTRAP`, `GRID_TAILWIND`, `GRID_UIKIT`, `GRID_NONE` – inkl. globalem Default via `setDefaultGridFramework()`
+  - **`MFormOutput::tag()`** – HTML-Builder mit Class-Array-Support, Boolean-Attributen (HTML5), automatisch escaped Werten und Auto-Close für Void-Tags
+- **Single-Value Helfer** für klassische `REX_VALUE[…]`-Felder:
+  - `linkUrl()` / `link()` – auflöst `rex-article://`, `rex-media://`, `mailto:`, `tel:`, externe URLs und numerische Artikel-IDs; setzt automatisch `target="_blank" rel="noopener"` für externe Links
+  - `picture()` – baut `<picture>` aus einer Media-Query → media_manager-Type-Map, nimmt `alt` aus Mediapool-Metadaten
+  - `mediaList()` – splittet CSV von `addMedialistField`/`addImagelistField` zu existierenden `rex_media`-Instanzen
+  - `richtext()` – semantischer Marker für TinyMCE-Output (kein doppeltes Escape), optional Tag-Whitelist
+  - `excerpt()` – Plaintext-Auszug aus HTML, getrimmt auf N Wörter
+- **Demo-Modul „Content-Pflege-Modul [Output via MFormOutput]"** (`Backend → Demos → Repeater`) – realer redaktioneller Workflow: Headline + Intro + Repeater-Sektionen mit Titel, TinyMCE-Text, Hauptbild, Link und Galerie, ausgegeben über `MFormOutput`.
+- **Doku-Seite „MFormOutput – Fluent Module Output"** (`Backend → MForm → Dokumentation → MFormOutput`) – mit Framework-Vergleichstabelle, `tag()`-Beispielen, Single-Value-Helfern und Sicherheitshinweis.
+
 ## Version 9.0.0-beta7
 
 ### Neu

@@ -438,6 +438,213 @@ final class MFormOutput
     }
 
     /**
+     * Resolves a link value to a URL string.
+     *
+     * Accepts the formats produced by REDAXO core, the mform `custom_link`
+     * widget and YForm `custom_link`:
+     *   - numeric article ID            → `rex_getUrl($id)`
+     *   - `rex-article://<id>`          → resolved via `rex_getUrl()`
+     *   - `rex-media://<filename>`      → resolved via `rex_url::media()`
+     *   - `tel:`, `mailto:` prefixes    → returned as-is
+     *   - everything else (URL/anchor)  → returned as-is
+     *
+     * Returns an empty string for empty/invalid input.
+     */
+    public static function linkUrl(string $value): string
+    {
+        $value = trim($value);
+        if ('' === $value) {
+            return '';
+        }
+
+        if (1 === preg_match('#^rex-article://(\d+)(?:-(\d+))?$#', $value, $m)) {
+            $clangId = isset($m[2]) ? (int) $m[2] : null;
+            return null === $clangId ? \rex_getUrl((int) $m[1]) : \rex_getUrl((int) $m[1], $clangId);
+        }
+
+        if (1 === preg_match('#^rex-media://(.+)$#', $value, $m)) {
+            return \rex_url::media($m[1]);
+        }
+
+        if (ctype_digit($value)) {
+            return \rex_getUrl((int) $value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Renders a link tag from a stored link value.
+     *
+     * Auto-detects external URLs (sets `target="_blank" rel="noopener"`),
+     * `mailto:` / `tel:` and REDAXO-internal references. The link text
+     * defaults to the article title (for article references) or the URL.
+     *
+     * @param array<string, scalar|array<int, string>|null> $attrs
+     */
+    public static function link(string $value, ?string $text = null, array $attrs = []): string
+    {
+        $value = trim($value);
+        if ('' === $value) {
+            return '';
+        }
+
+        $url = self::linkUrl($value);
+
+        if (null === $text) {
+            $text = '';
+            if (1 === preg_match('#^rex-article://(\d+)#', $value, $m)) {
+                $article = \rex_article::get((int) $m[1]);
+                $text = null !== $article ? $article->getName() : '';
+            }
+            if ('' === $text) {
+                $text = $url;
+            }
+        }
+
+        // Auto target/rel for external URLs (not for tel:/mailto:/internal/rex-media)
+        $isExternal = 1 === preg_match('#^https?://#i', $url);
+        if ($isExternal && !isset($attrs['target'])) {
+            $attrs['target'] = '_blank';
+            $attrs['rel'] = isset($attrs['rel']) ? $attrs['rel'] : 'noopener';
+        }
+
+        $attrs = ['href' => $url] + $attrs;
+
+        return self::tag('a', $attrs, \rex_escape($text));
+    }
+
+    /**
+     * Builds a `<picture>` element from a media_manager type map.
+     *
+     * Each source maps a CSS media query to a media_manager type. The
+     * `<img>` fallback uses the smallest source by default and the
+     * file's metadata title/alt as `alt` attribute (overridable via
+     * `$imgAttrs`).
+     *
+     * Example:
+     *   MFormOutput::picture('hero.jpg', [
+     *       '(min-width: 1200px)' => 'hero_desktop',
+     *       '(min-width: 768px)'  => 'hero_tablet',
+     *       '(max-width: 767px)'  => 'hero_mobile',
+     *   ], ['class' => 'w-full']);
+     *
+     * @param array<string, string>                              $sources   media query → media_manager type
+     * @param array<string, scalar|array<int, string>|null>      $imgAttrs  attributes for the fallback `<img>`
+     */
+    public static function picture(string $filename, array $sources, array $imgAttrs = []): string
+    {
+        $filename = trim($filename);
+        if ('' === $filename) {
+            return '';
+        }
+
+        $media = \rex_media::get($filename);
+        $alt = null !== $media ? (string) $media->getValue('title') : '';
+        if (!isset($imgAttrs['alt'])) {
+            $imgAttrs['alt'] = $alt;
+        }
+
+        $sourceTags = '';
+        $smallestType = null;
+        foreach ($sources as $mediaQuery => $type) {
+            $sourceTags .= self::tag('source', [
+                'srcset' => \rex_media_manager::getUrl($type, $filename),
+                'media'  => $mediaQuery,
+            ]);
+            $smallestType = $type;
+        }
+
+        $imgAttrs = [
+            'src' => null !== $smallestType ? \rex_media_manager::getUrl($smallestType, $filename) : \rex_url::media($filename),
+        ] + $imgAttrs;
+
+        return self::tag('picture', [], $sourceTags . self::tag('img', $imgAttrs));
+    }
+
+    /**
+     * Splits a comma-separated mform Imagelist/Medialist value into
+     * `rex_media` instances, dropping non-existing entries.
+     *
+     * Accepts the format `"file1.jpg,file2.png,…"` produced by mform's
+     * widget for-mediaList / Imagelist field.
+     *
+     * @return array<int, \rex_media>
+     */
+    public static function mediaList(string $csv): array
+    {
+        $csv = trim($csv);
+        if ('' === $csv) {
+            return [];
+        }
+
+        $files = preg_split('/\s*,\s*/', $csv) ?: [];
+        $result = [];
+        foreach ($files as $file) {
+            if ('' === $file) {
+                continue;
+            }
+            $media = \rex_media::get($file);
+            if (null !== $media) {
+                $result[] = $media;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Passes through TinyMCE / WYSIWYG HTML for output.
+     *
+     * Acts as a documented marker that the caller is *not* meant to
+     * additionally `rex_escape()` the value (it is rendered HTML).
+     * Optionally strips disallowed top-level tags.
+     *
+     * @param array<int, string>|null $allowedTags If given, all tags
+     *                                             except those listed are stripped.
+     */
+    public static function richtext(string $html, ?array $allowedTags = null): string
+    {
+        if (null === $allowedTags) {
+            return $html;
+        }
+
+        $allowed = '';
+        foreach ($allowedTags as $tag) {
+            $allowed .= '<' . $tag . '>';
+        }
+
+        return strip_tags($html, $allowed);
+    }
+
+    /**
+     * Builds a plain-text excerpt from HTML.
+     *
+     * - strips all HTML tags
+     * - decodes HTML entities
+     * - collapses whitespace
+     * - cuts to N words and appends `$suffix` if anything was cut
+     *
+     * @param int $words Maximum number of words (must be >= 1)
+     */
+    public static function excerpt(string $html, int $words, string $suffix = '…'): string
+    {
+        $words = max(1, $words);
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim((string) preg_replace('/\s+/u', ' ', $text));
+        if ('' === $text) {
+            return '';
+        }
+
+        $parts = preg_split('/\s+/u', $text) ?: [];
+        if (count($parts) <= $words) {
+            return $text;
+        }
+
+        return implode(' ', array_slice($parts, 0, $words)) . $suffix;
+    }
+
+    /**
      * Builds an attribute string ` k="v" k="v"` from an attrs array.
      *
      * - `class` may be a string or string[] (joined with space, deduplicated)

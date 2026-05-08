@@ -49,6 +49,7 @@ mform_example_wrapper_inline = Éléments de formulaire en ligne
 mform_example_wrapper_tabs = Éléments d'enveloppe d'onglet
 mform_example_repeater_single_repeater = Répéteur 1 niveau (simple)
 mform_example_repeater_nested_repeater = Répéteur 2 niveaux (imbriqué)
+mform_example_repeater_content_module = Module d’édition de contenu [sortie via MFormOutput]
 
 mform_example_description_base = Les "Exemples de base" incluent les appels de base des éléments MForm, sans aucun "extra", extensions et validations.
 mform_example_description_extended = Les "Exemples avancés" montrent comment les éléments MForm peuvent être étendus avec des attributs, des options, des paramètres, des étiquettes, etc. au-delà des "Exemples de base".
