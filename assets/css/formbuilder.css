@@ -210,6 +210,28 @@ body.rex-has-theme:not(.rex-theme-light) .mform-fb__item-btn:hover {
     margin-bottom: 4px;
 }
 
+/* Bootstrap .checkbox uses position:relative + padding-left:20px on label and
+   absolute-positioned input. In our schmaler Sidebar bricht das nach links aus.
+   Wir vereinheitlichen Checkboxen auf eine simple inline-Variante. */
+.mform-fb__props .form-group label.checkbox,
+.mform-fb__props label.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 0;
+    margin: 0;
+    min-height: 0;
+}
+
+.mform-fb__props label.checkbox input[type="checkbox"] {
+    position: static;
+    margin: 0;
+}
+
+.mform-fb__props label.checkbox small {
+    color: #9ca3af;
+}
+
 .mform-fb__code-bar {
     display: flex;
     align-items: center;
