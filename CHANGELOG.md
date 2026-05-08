@@ -1,6 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.0.0-beta8
+## Version 9.0.0-beta7
 
 ### Neu
 
@@ -19,11 +19,6 @@
   - `excerpt()` – Plaintext-Auszug aus HTML, getrimmt auf N Wörter
 - **Demo-Modul „Content-Pflege-Modul [Output via MFormOutput]"** (`Backend → Demos → Repeater`) – realer redaktioneller Workflow: Headline + Intro + Repeater-Sektionen mit Titel, TinyMCE-Text, Hauptbild, Link und Galerie, ausgegeben über `MFormOutput`.
 - **Doku-Seite „MFormOutput – Fluent Module Output"** (`Backend → MForm → Dokumentation → MFormOutput`) – mit Framework-Vergleichstabelle, `tag()`-Beispielen, Single-Value-Helfern und Sicherheitshinweis.
-
-## Version 9.0.0-beta7
-
-### Neu
-
 - **SECURITY.md** – Verantwortungsvolle Offenlegung über GitHub Security Advisory, Versionsmatrix, Reaktionszeiten nach CVSS-Schweregrad und klar abgegrenzter Scope. Über die Doku-Seite **Sicherheit** im Backend (`Backend → MForm → Dokumentation → Sicherheit`) auch direkt einsehbar.
 - **GitHub Action „Static Analysis“** (`.github/workflows/static-analysis.yml`) – läuft bei Push, PR und manuell (`workflow_dispatch`):
   - PHP-Lint Matrix (8.1, 8.2, 8.3, 8.4)
