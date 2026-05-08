@@ -232,16 +232,16 @@
         }
 
         // Tree-aware: depth of the deepest nested repeater chain inside `item`.
-        // Returns 0 for a repeater without nested repeaters, 1 for one nested level, ...
-        // For non-repeater items, returns 0 (no contribution to repeater chain depth).
+        // Counts only repeater nesting (Tabs/Fieldsets sind UI-Wrapper und
+        // zaehlen nicht als eigene Repeater-Ebene), aber traversiert dadurch).
         function maxRepeaterSubtreeDepth(item) {
-            if (!item || item.type !== 'repeater') return 0;
+            if (!item) return 0;
+            var children = item.children || [];
             var deepest = 0;
-            (item.children || []).forEach(function (c) {
-                if (c.type === 'repeater') {
-                    var d = 1 + maxRepeaterSubtreeDepth(c);
-                    if (d > deepest) deepest = d;
-                }
+            children.forEach(function (c) {
+                var add = (c.type === 'repeater') ? 1 : 0;
+                var d = add + maxRepeaterSubtreeDepth(c);
+                if (d > deepest) deepest = d;
             });
             return deepest;
         }
@@ -249,7 +249,7 @@
         // True if dropping `item` (any type) into a list at builder-depth `targetDepth`
         // would exceed MAX_REPEATER_DEPTH considering the moved item's own subtree.
         function wouldExceedRepeaterDepth(item, targetDepth) {
-            if (!item || item.type !== 'repeater') return false;
+            if (!item) return false;
             return targetDepth + maxRepeaterSubtreeDepth(item) > MAX_REPEATER_DEPTH;
         }
 
@@ -293,7 +293,11 @@
                 var nested = document.createElement('div');
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
-                nested.dataset.fbDepth = String(depth + 1);
+                // Repeater-Depth zaehlt nur durch Repeater-Container. Tabs und
+                // Fieldsets sind reine Layout-Wrapper und verbrauchen keine
+                // Repeater-Ebene.
+                var nextDepth = item.type === 'repeater' ? (depth + 1) : depth;
+                nested.dataset.fbDepth = String(nextDepth);
                 if (builderCollapsed[item.uid]) {
                     nested.style.display = 'none';
                 }
@@ -301,7 +305,7 @@
                     var hintWord = item.type === 'tab' ? 'Tab' : (item.type === 'fieldset' ? 'Fieldset' : 'Repeater');
                     nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + hintWord + ' oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
-                    item.children.forEach(function (c) { nested.appendChild(renderItem(c, depth + 1)); });
+                    item.children.forEach(function (c) { nested.appendChild(renderItem(c, nextDepth)); });
                 }
                 el.appendChild(nested);
 
@@ -376,10 +380,6 @@
                 }
                 if (clipboard.type === 'tab' && targetDepth > 0) {
                     alert('Tabs koennen nur auf der obersten Ebene eingefuegt werden.');
-                    return;
-                }
-                if (clipboard.type === 'fieldset' && targetDepth > 0) {
-                    alert('Fieldsets koennen nur auf der obersten Ebene eingefuegt werden.');
                     return;
                 }
                 if (wouldExceedRepeaterDepth(clipboard, targetDepth)) {
@@ -519,11 +519,6 @@
                     setTimeout(doRender, 0);
                     return;
                 }
-                if (type === 'fieldset' && depthOf(evt.to) > 0) {
-                    alert('Fieldsets koennen nur auf der obersten Ebene platziert werden.');
-                    setTimeout(doRender, 0);
-                    return;
-                }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
                 setTimeout(function () { doRender(); selectItem(newItem); }, 0);
@@ -544,11 +539,6 @@
             }
             if (item.type === 'tab' && depthOf(evt.to) > 0) {
                 alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
-                setTimeout(doRender, 0);
-                return;
-            }
-            if (item.type === 'fieldset' && depthOf(evt.to) > 0) {
-                alert('Fieldsets koennen nur auf der obersten Ebene platziert werden.');
                 setTimeout(doRender, 0);
                 return;
             }
@@ -597,8 +587,8 @@
             if (!type) return;
             var newItem = makeItem(type);
 
-            // Tabs and Fieldsets are top-level only.
-            if (type === 'tab' || type === 'fieldset') {
+            // Tabs are top-level only (Fieldsets duerfen ueberall liegen).
+            if (type === 'tab') {
                 state.push(newItem);
                 renderCanvas();
                 emitCode();
@@ -909,6 +899,14 @@
                 + ')';
         }
 
+        // Inside a factory()-Chain darf auch ein Fieldset als Wrapper liegen.
+        // ->addFieldsetArea($legend, MForm::factory()->...)
+        function renderInnerFieldsetChainLink(item, indent) {
+            var inner = renderRepeaterInner(item, indent);
+            var legend = item.label || '';
+            return indent + '->addFieldsetArea(' + phpStr(legend) + ', MForm::factory()\n' + inner + ')';
+        }
+
         function renderTabStmt(item, indent, isFirst) {
             var inner = renderRepeaterInner(item, indent);
             var label = item.label || '';
@@ -961,6 +959,9 @@
             }
             var keyPool = {};
             var lines = children.map(function (c) {
+                if (c.type === 'fieldset') {
+                    return renderInnerFieldsetChainLink(c, indent + '        ');
+                }
                 var key = slugify(c.label, 'field_' + c.id);
                 var base = key, n = 2;
                 while (keyPool[key]) { key = base + '_' + n++; }
@@ -1191,7 +1192,13 @@
 
             var inner = indent + '    ';
             var usedKeys = {};
-            (item.children || []).forEach(function (c) {
+            // Fieldsets innerhalb des Repeaters sind reine UI-Wrapper -> Kinder hochziehen.
+            flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+                if (entry.kind === 'fs-marker') {
+                    lines.push(inner + entry.text);
+                    return;
+                }
+                var c = entry.item;
                 var key = childKeyFor(c, usedKeys);
                 if (c.type === 'repeater') {
                     c.__childKey = key;
@@ -1219,6 +1226,24 @@
             return lines.join('\n');
         }
 
+        // Fieldsets sind reine Layout-Wrapper ohne eigene Speicherung. Fuer den
+        // Output-Code werden sie aufgeloest. Marker-Kommentare bleiben aber als
+        // visueller Trenner erhalten. Verschachtelte Fieldsets werden rekursiv
+        // entpackt.
+        function flattenFieldsetChildren(children) {
+            var out = [];
+            (children || []).forEach(function (c) {
+                if (c.type === 'fieldset') {
+                    var legend = c.label ? ': ' + c.label : '';
+                    out.push({ kind: 'fs-marker', text: '// ----- Fieldset' + legend + ' -----' });
+                    flattenFieldsetChildren(c.children || []).forEach(function (e) { out.push(e); });
+                    return;
+                }
+                out.push({ kind: 'item', item: c });
+            });
+            return out;
+        }
+
         function emitOutputCode() {
             if (state.length === 0) {
                 $output.textContent = '// Noch keine Felder hinzugefuegt.';
@@ -1244,7 +1269,9 @@
                     } else {
                         body.push('// ----- Tab -----');
                     }
-                    (item.children || []).forEach(function (c) {
+                    flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+                        if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
+                        var c = entry.item;
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
@@ -1264,7 +1291,9 @@
                     } else {
                         body.push('// ----- Fieldset -----');
                     }
-                    (item.children || []).forEach(function (c) {
+                    flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+                        if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
+                        var c = entry.item;
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
