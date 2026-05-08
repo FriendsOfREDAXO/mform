@@ -83,12 +83,16 @@
                         'clTypeIntern', 'clTypeExtern', 'clTypeMedia', 'clTypeMailto', 'clTypeTel',
                         'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
             repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
-                props: ['label', 'repeaterMin', 'repeaterMax'] }
+                props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
+                        'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll',
+                        'repeaterCopyPaste', 'repeaterConfirmDelete', 'repeaterConfirmDeleteMsg',
+                        'repeaterBtnText', 'repeaterBtnClass'] }
         };
 
         var state = [];
         var nextId = 1;
         var activeItem = null;
+        var clipboard = null; // shallow item clone in memory for paste
 
         var $canvas = document.querySelector('[data-fb-canvas]');
         var $palette = document.querySelector('[data-fb-palette]');
@@ -132,6 +136,15 @@
                 // Repeater
                 repeaterMin: '',
                 repeaterMax: '',
+                repeaterDefaultCount: '',
+                repeaterCollapsed: type === 'repeater' ? true : false,
+                repeaterFirstOpen: type === 'repeater' ? true : false,
+                repeaterShowToggleAll: type === 'repeater' ? true : false,
+                repeaterCopyPaste: type === 'repeater' ? true : false,
+                repeaterConfirmDelete: type === 'repeater' ? true : false,
+                repeaterConfirmDeleteMsg: '',
+                repeaterBtnText: '',
+                repeaterBtnClass: '',
                 children: type === 'repeater' ? [] : null
             };
         }
@@ -148,13 +161,27 @@
             return null;
         }
 
-        function removeItem(uid, list) {
+        function deepCloneWithNewIds(item) {
+            var copy = JSON.parse(JSON.stringify(item));
+            function reId(node) {
+                node.uid = 'fb-' + (Math.random().toString(36).slice(2, 8));
+                node.id = nextId++;
+                if (node.children) node.children.forEach(reId);
+            }
+            reId(copy);
+            return copy;
+        }
+
+        function findParentList(uid, list) {
             list = list || state;
             for (var i = 0; i < list.length; i++) {
-                if (list[i].uid === uid) { list.splice(i, 1); return true; }
-                if (list[i].children && removeItem(uid, list[i].children)) return true;
+                if (list[i].uid === uid) return { list: list, index: i };
+                if (list[i].children) {
+                    var hit = findParentList(uid, list[i].children);
+                    if (hit) return hit;
+                }
             }
-            return false;
+            return null;
         }
 
         // Tree-aware: if a repeater contains a repeater, that's depth 1.
@@ -173,6 +200,10 @@
 
         // ---- Rendering ------------------------------------------------------
 
+        // Track collapsed state per UID inside the BUILDER (not the same as the
+        // repeater's runtime `collapsed` option which only affects the rendered form).
+        var builderCollapsed = {};
+
         function renderItem(item, depth) {
             var el = document.createElement('div');
             el.className = 'mform-fb__item mform-fb__item--' + item.type;
@@ -180,15 +211,24 @@
 
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
+            var collapseBtn = item.type === 'repeater'
+                ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen">' + (builderCollapsed[item.uid] ? '▸' : '▾') + '</button>'
+                : '';
             head.innerHTML =
                 '<span class="mform-fb__item-handle">::</span>' +
+                collapseBtn +
                 '<span class="mform-fb__item-type">' + item.type + '</span>' +
                 '<span class="mform-fb__item-label"></span>' +
                 '<span class="mform-fb__item-id">id ' + item.id + '</span>' +
-                '<button type="button" class="mform-fb__item-remove" data-fb-remove>x</button>';
+                '<span class="mform-fb__item-actions">' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-duplicate title="Duplizieren">⎘</button>' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-copy-item title="Kopieren">⧉</button>' +
+                    '<button type="button" class="mform-fb__item-btn" data-fb-paste-after title="Aus Zwischenablage einfuegen">⎘+</button>' +
+                '</span>' +
+                '<button type="button" class="mform-fb__item-remove" data-fb-remove title="Loeschen">x</button>';
             head.querySelector('.mform-fb__item-label').textContent = item.label || item.type;
             head.addEventListener('click', function (e) {
-                if (e.target.closest('[data-fb-remove]')) return;
+                if (e.target.closest('button')) return;
                 selectItem(item);
             });
             el.appendChild(head);
@@ -198,6 +238,9 @@
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
                 nested.dataset.fbDepth = String(depth + 1);
+                if (builderCollapsed[item.uid]) {
+                    nested.style.display = 'none';
+                }
                 if (item.children.length === 0) {
                     nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder Repeater oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
@@ -213,6 +256,15 @@
                     onUpdate: handleSortUpdate,
                     onRemove: handleSortRemove
                 });
+
+                var collapseEl = head.querySelector('[data-fb-collapse]');
+                if (collapseEl) {
+                    collapseEl.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        builderCollapsed[item.uid] = !builderCollapsed[item.uid];
+                        renderCanvas();
+                    });
+                }
             }
 
             head.querySelector('[data-fb-remove]').addEventListener('click', function (e) {
@@ -221,6 +273,44 @@
                 if (activeItem === item) { activeItem = null; renderProps(); }
                 renderCanvas();
                 emitCode();
+            });
+
+            head.querySelector('[data-fb-duplicate]').addEventListener('click', function (e) {
+                e.stopPropagation();
+                var pos = findParentList(item.uid);
+                if (!pos) return;
+                var clone = deepCloneWithNewIds(item);
+                pos.list.splice(pos.index + 1, 0, clone);
+                renderCanvas();
+                emitCode();
+                selectItem(clone);
+            });
+
+            head.querySelector('[data-fb-copy-item]').addEventListener('click', function (e) {
+                e.stopPropagation();
+                clipboard = JSON.parse(JSON.stringify(item));
+                var msg = document.querySelector('[data-fb-copy-msg]');
+                if (msg) { msg.textContent = 'Element in Zwischenablage'; setTimeout(function () { msg.textContent = ''; }, 1500); }
+            });
+
+            head.querySelector('[data-fb-paste-after]').addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (!clipboard) {
+                    alert('Zwischenablage ist leer. Erst auf Kopieren druecken.');
+                    return;
+                }
+                var pos = findParentList(item.uid);
+                if (!pos) return;
+                var clone = deepCloneWithNewIds(clipboard);
+                // Don't allow pasting a repeater that would exceed depth
+                if (clone.type === 'repeater' && depth + 1 > MAX_REPEATER_DEPTH) {
+                    alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                    return;
+                }
+                pos.list.splice(pos.index + 1, 0, clone);
+                renderCanvas();
+                emitCode();
+                selectItem(clone);
             });
 
             return el;
@@ -596,10 +686,21 @@
         function repeaterCfg(item) {
             var minVal = item.repeaterMin !== '' ? parseInt(item.repeaterMin, 10) : null;
             var maxVal = item.repeaterMax !== '' ? parseInt(item.repeaterMax, 10) : null;
+            var defCnt = item.repeaterDefaultCount !== '' ? parseInt(item.repeaterDefaultCount, 10) : null;
             var parts = [];
             if (minVal !== null && !isNaN(minVal)) parts.push("'min' => " + minVal);
             if (maxVal !== null && !isNaN(maxVal)) parts.push("'max' => " + maxVal);
+            if (defCnt !== null && !isNaN(defCnt)) parts.push("'default_count' => " + defCnt);
             if (item.label) parts.push("'label' => " + phpStr(item.label));
+            // Flags only emit when DIFFERENT from MForm default (default true for collapsed/first_open/show_toggle_all)
+            if (item.repeaterCollapsed === false) parts.push("'collapsed' => false");
+            if (item.repeaterFirstOpen === false) parts.push("'first_open' => false");
+            if (item.repeaterShowToggleAll === false) parts.push("'show_toggle_all' => false");
+            if (item.repeaterCopyPaste === true) parts.push("'copy_paste' => true");
+            if (item.repeaterConfirmDelete === true) parts.push("'confirm_delete' => true");
+            if (item.repeaterConfirmDeleteMsg) parts.push("'confirm_delete_msg' => " + phpStr(item.repeaterConfirmDeleteMsg));
+            if (item.repeaterBtnText) parts.push("'btn_text' => " + phpStr(item.repeaterBtnText));
+            if (item.repeaterBtnClass) parts.push("'btn_class' => " + phpStr(item.repeaterBtnClass));
             return parts.length ? '[' + parts.join(', ') + ']' : '';
         }
 

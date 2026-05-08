@@ -172,6 +172,37 @@ $body = <<<'HTML'
                 <label>Max Items</label>
                 <input type="number" class="form-control" data-fb-prop="repeaterMax" min="0">
             </div>
+            <div class="form-group" data-fb-prop-group="repeaterDefaultCount">
+                <label>Default Count <small>(automatisch erzeugte Items beim ersten Aufruf)</small></label>
+                <input type="number" class="form-control" data-fb-prop="repeaterDefaultCount" min="0">
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterCollapsed">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterCollapsed"> Items eingeklappt anzeigen <small>(collapsed)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterFirstOpen">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterFirstOpen"> Erstes Item geoeffnet <small>(first_open)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterShowToggleAll">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterShowToggleAll"> "Alle ein-/ausklappen"-Button <small>(show_toggle_all)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterCopyPaste">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterCopyPaste"> Kopieren/Einfuegen erlauben <small>(copy_paste)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterConfirmDelete">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterConfirmDelete"> Loeschen bestaetigen <small>(confirm_delete)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterConfirmDeleteMsg">
+                <label>Bestaetigungs-Text <small>(confirm_delete_msg)</small></label>
+                <input type="text" class="form-control" data-fb-prop="repeaterConfirmDeleteMsg">
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterBtnText">
+                <label>Add-Button-Text <small>(btn_text)</small></label>
+                <input type="text" class="form-control" data-fb-prop="repeaterBtnText" placeholder="Hinzufuegen">
+            </div>
+            <div class="form-group" data-fb-prop-group="repeaterBtnClass">
+                <label>Add-Button-Klasse <small>(btn_class)</small></label>
+                <input type="text" class="form-control" data-fb-prop="repeaterBtnClass" placeholder="btn-primary">
+            </div>
         </form>
     </div>
 </div>
