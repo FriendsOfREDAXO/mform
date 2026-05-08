@@ -61,9 +61,6 @@ jobs:
             php-cs-fixer fix --dry-run --diff --ansi --rules=@PSR12 lib pages
           fi
 
-  # TODO: rexstan-Job hinzufuegen, sobald CI-Setup fuer REDAXO-Core verfuegbar ist.
-  # Aktuell laeuft Rexstan lokal via Docker (siehe README), CI braucht ein vollstaendiges REDAXO-Test-Setup.
-
   rexstan:
     name: rexstan
     runs-on: ubuntu-latest
@@ -112,7 +109,7 @@ jobs:
           php redaxo_cms/redaxo/bin/console config:set --type boolean debug.enabled true
           php redaxo_cms/redaxo/bin/console config:set --type boolean debug.throw_always_exception true
 
-      # Addon kopieren + Rexstan installieren
+      # Addon kopieren + Rexstan + YForm (Dependency fuer mform/lib/yform/value/*) installieren
       - name: Copy and install Addons
         run: |
           rsync -av \
@@ -121,9 +118,27 @@ jobs:
             --exclude='.git' \
             --exclude='redaxo_cms' \
             './' "redaxo_cms/redaxo/src/addons/${ADDON_KEY}"
+          redaxo_cms/redaxo/bin/console install:download 'yform' '^4.2'
+          redaxo_cms/redaxo/bin/console package:install 'yform'
           redaxo_cms/redaxo/bin/console install:download 'rexstan' '^3.0'
           redaxo_cms/redaxo/bin/console package:install 'rexstan'
           redaxo_cms/redaxo/bin/console package:install "${ADDON_KEY}"
+
+      # rexstan user-config.neon explizit setzen: phpVersion=8.3 + YForm-Vendor scannen
+      - name: Configure rexstan (phpVersion + scan paths)
+        run: |
+          mkdir -p redaxo_cms/redaxo/data/addons/rexstan
+          cat > redaxo_cms/redaxo/data/addons/rexstan/user-config.neon <<'NEON'
+          # CI auto-generated rexstan user-config
+          includes: {  }
+          parameters:
+              level: 5
+              phpVersion: 80300
+              scanDirectories:
+                  - ../../../../redaxo/src/addons/yform/lib/
+                  - ../../../../redaxo/src/addons/yform/vendor/
+              reportUnmatchedIgnoredErrors: false
+          NEON
 
       # Optional: addon-spezifischer Bootstrap (.tools/rexstan.php) wird ausgefuehrt, falls vorhanden
       - name: Execute addon rexstan bootstrap (optional)

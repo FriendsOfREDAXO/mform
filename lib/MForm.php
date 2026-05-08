@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -53,7 +54,7 @@ class MForm extends MFormElements
         return self::$useCustomLinkForClassicWidgets;
     }
 
-    function __construct(?string $theme = null, bool $debug = false)
+    public function __construct(?string $theme = null, bool $debug = false)
     {
         $this->setTheme((!is_null($theme)) ? $theme : '');
         $this->setDebug($debug);

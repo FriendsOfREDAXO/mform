@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -47,12 +48,17 @@ class MFormModuleHelper
     public static function mergeOutputConfig(array $defaultConfig = [], array $config = []): array
     {
         foreach ($config as $key => $value) {
-            if (!array_key_exists($key, $defaultConfig))
+            if (!array_key_exists($key, $defaultConfig)) {
                 $defaultConfig[$key] = $value;
+            }
         }
         foreach ($defaultConfig as $key => $value) {
-            if (is_array($value) && isset($config[$key]) && is_array($config[$key])) $config[$key] = self::mergeOutputConfig($value, $config[$key]);
-            if (isset($config[$key]) && $config[$key] != 'mfragment_default') $defaultConfig[$key] = $config[$key];
+            if (is_array($value) && isset($config[$key]) && is_array($config[$key])) {
+                $config[$key] = self::mergeOutputConfig($value, $config[$key]);
+            }
+            if (isset($config[$key]) && $config[$key] != 'mfragment_default') {
+                $defaultConfig[$key] = $config[$key];
+            }
         }
         return $defaultConfig;
     }

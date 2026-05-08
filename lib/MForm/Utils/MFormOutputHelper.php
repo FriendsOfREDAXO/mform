@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -229,7 +230,7 @@ class MFormOutputHelper
             $item['customlink_class'] = ' media';
             $item['filename'] = $item['link'];
             $item['extension'] = pathinfo($item['link'], PATHINFO_EXTENSION);
-            
+
             // Add media manager type if exists
             if (class_exists('rex_media_manager') && ($media = rex_media::get($item['link']))) {
                 $item['metadata'] = [
@@ -239,20 +240,20 @@ class MFormOutputHelper
                     'height' => $media->getHeight(),
                     'mimetype' => $media->getType()
                 ];
-                
+
                 // Use media title if no text is explicitly set
                 if ('' !== (string) $media->getTitle() && '' === ($item['text'] ?? '')) {
                     $item['customlink_text'] = $media->getTitle();
                 }
             }
-        } 
+        }
         // Handle internal REDAXO links (rex:// or redaxo://)
         elseif (str_starts_with($item['link'], 'rex://') || str_starts_with($item['link'], 'redaxo://')) {
             $item['type'] = 'internal';
             $prefix = str_starts_with($item['link'], 'rex://') ? 'rex://' : 'redaxo://';
             $articleId = (int) substr($item['link'], strlen($prefix));
             $clangId = rex_clang::getCurrentId();
-            
+
             $item['article_id'] = $articleId;
             $item['clang_id'] = $clangId;
             $item['customlink_url'] = rex_getUrl($articleId, $clangId);
@@ -281,7 +282,7 @@ class MFormOutputHelper
             $item['type'] = 'internal';
             $articleId = (int) $item['link'];
             $clangId = rex_clang::getCurrentId();
-            
+
             $item['article_id'] = $articleId;
             $item['clang_id'] = $clangId;
             $item['customlink_url'] = rex_getUrl($articleId, $clangId);
@@ -315,7 +316,7 @@ class MFormOutputHelper
             if ($urlComponents) {
                 $item['protocol'] = $urlComponents['scheme'] ?? null;
                 $item['domain'] = $urlComponents['host'] ?? null;
-                
+
                 // Special handling for tel: and mailto: links
                 if (isset($urlComponents['scheme'])) {
                     if ($urlComponents['scheme'] === 'tel') {
@@ -360,12 +361,12 @@ class MFormOutputHelper
     /**
      * Returns only the URL for a given link value
      * Accepts either a CustomLink array or any link string
-     * 
+     *
      * @param array<string, mixed>|string $item The CustomLink array or link string
      * @param bool $externBlank Whether external links should open in new tab
      * @return string The processed URL
      */
-    public static function getCustomLinkUrl(array|string $item, bool $externBlank = true): string 
+    public static function getCustomLinkUrl(array|string $item, bool $externBlank = true): string
     {
         // If we get an array, check for different possible keys
         if (is_array($item)) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Visual Form Builder for MForm.
  *

@@ -7,7 +7,8 @@ use DOMDocument;
 /**
  * Konvertiert einfachen HTML/SVG-nahen Markup in ein eigenstaendiges SVG.
  */
-class HtmlToSvgConverter {
+class HtmlToSvgConverter
+{
     /** @phpstan-ignore property.onlyWritten */
     private DOMDocument $dom;
     private DOMDocument $svg;
@@ -15,7 +16,8 @@ class HtmlToSvgConverter {
     private int $viewBoxWidth = 800;
     private int $viewBoxHeight = 600;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->dom = new DOMDocument();
         $this->svg = new DOMDocument();
         libxml_use_internal_errors(true);
@@ -25,7 +27,8 @@ class HtmlToSvgConverter {
      * Gibt das erzeugte SVG direkt als Base64-Data-URL zurueck.
      */
     /** @param array<string, mixed> $attributes */
-    public function convertToBase64(string $html, array $attributes = []): string {
+    public function convertToBase64(string $html, array $attributes = []): string
+    {
         $svg = $this->convert($html, $attributes);
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
@@ -34,7 +37,8 @@ class HtmlToSvgConverter {
      * Verpackt das erzeugte SVG in ein img-Tag fuer die direkte Ausgabe.
      */
     /** @param array<string, mixed> $attributes */
-    public function convertToImgTag(string $html, array $attributes = []): string {
+    public function convertToImgTag(string $html, array $attributes = []): string
+    {
         $dataUrl = $this->convertToBase64($html, array_merge([
             'viewBox' => '0 0 2780 2780'
         ], $attributes));
@@ -60,7 +64,8 @@ class HtmlToSvgConverter {
      * Baut aus dem uebergebenen Markup ein vollstaendiges SVG-Dokument.
      */
     /** @param array<string, mixed> $attributes */
-    public function convert(string $html, array $attributes = []): string {
+    public function convert(string $html, array $attributes = []): string
+    {
         $this->svg = new DOMDocument('1.0', 'UTF-8');
         $this->svg->formatOutput = true;
 
@@ -104,7 +109,8 @@ class HtmlToSvgConverter {
     /**
      * Extrahiert unterstuetzte SVG-Tags aus dem HTML-Fragment und haengt sie an das Ziel-Element an.
      */
-    private function processHTML(string $html, \DOMNode $parent): void {
+    private function processHTML(string $html, \DOMNode $parent): void
+    {
         $elementTypes = 'rect|circle|ellipse|line|polyline|polygon|path|text|g|image';
         $pattern = "/<($elementTypes)([^>]*)(?:>(.*?)<\/\\1>|\/?>)/s";
 
@@ -122,7 +128,8 @@ class HtmlToSvgConverter {
         }
     }
 
-    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?\DOMElement {
+    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?\DOMElement
+    {
         $element = $this->svg->createElementNS($this->svgNS, $tagName);
         if (!($element instanceof \DOMElement)) {
             return null;
@@ -145,7 +152,7 @@ class HtmlToSvgConverter {
                 $styles = $this->parseStyles($attrValue);
                 // Füge die Monospace-Schriftart zu den bestehenden Styles hinzu
                 if ($tagName === 'text' && !isset($styles['font-family'])) {
-//                    $styles['font-family'] = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace';
+                    //                    $styles['font-family'] = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace';
                     $styles['font-family'] = '"Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif';
                 }
             } else {
@@ -179,7 +186,8 @@ class HtmlToSvgConverter {
      * @param array<string, string|float> $styles
      * @return array<string, string|float>
      */
-    private function adjustFontSize(array $styles): array {
+    private function adjustFontSize(array $styles): array
+    {
         if (isset($styles['font-size'])) {
             // Extrahiere numerischen Wert und einheit
             preg_match('/(\d+)(px|pt|em|rem)?/', (string) $styles['font-size'], $matches);
@@ -195,7 +203,8 @@ class HtmlToSvgConverter {
     }
 
     /** @param array<string, mixed> $styles */
-    private function applyStylesToElement(\DOMElement $element, array $styles): void {
+    private function applyStylesToElement(\DOMElement $element, array $styles): void
+    {
         $styleMap = [
             'fill' => 'fill',
             'stroke' => 'stroke',
@@ -234,7 +243,8 @@ class HtmlToSvgConverter {
         }
     }
 
-    private function processBorderShorthand(\DOMElement $element, string $border): void {
+    private function processBorderShorthand(\DOMElement $element, string $border): void
+    {
         $parts = preg_split('/\s+/', trim($border)) ?: [];
         foreach ($parts as $part) {
             if (preg_match('/^[\d.]+(?:px|em|rem|pt)?$/', $part)) {
@@ -248,7 +258,8 @@ class HtmlToSvgConverter {
         }
     }
 
-    private function convertTextAlignToAnchor(string $align): string {
+    private function convertTextAlignToAnchor(string $align): string
+    {
         $map = [
             'left' => 'start',
             'center' => 'middle',
@@ -259,7 +270,8 @@ class HtmlToSvgConverter {
     }
 
     /** @return array<string, string> */
-    private function parseStyles(string $styleString): array {
+    private function parseStyles(string $styleString): array
+    {
         $styles = [];
         $declarations = explode(';', trim($styleString));
 

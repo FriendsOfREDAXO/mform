@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -19,8 +20,8 @@ use FriendsOfRedaxo\MForm\Utils\HtmlToSvgConverter;
 use FriendsOfRedaxo\MForm\Utils\MFormLayoutPreviewHelper;
 use rex_addon;
 use rex_be_controller;
-
 use rex_path;
+
 use function array_key_exists;
 use function count;
 use function is_array;
@@ -397,25 +398,25 @@ abstract class MFormElements
         $newOptions = [];
 
         if (null !== $options) {
-        foreach ($options as $key => $option) {
-            if (isset($option['config'])) {
-                $layoutHelper = new MFormLayoutPreviewHelper();
-                $svg = $layoutHelper->generateLayoutPreview($option['config']);
-                $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
-            } else if (is_array($option) && isset($option['image'])) {
-                $newOptions[$key] = $option['image'] . "<span>{$option['label']}</span>";
-            } else if (is_array($option) && isset($option['svgIconSet'])) {
-                $converter = new HtmlToSvgConverter();
-                $attr = [
-                    'width' => '110px',
-                    'height' => '110px'
-                ];
-                $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
-                $newOptions[$key] = $img . "<span>{$option['label']}</span>";
-            } else if (is_array($option) && isset($option['label']) && isset($option['img'])) {
-                $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
+            foreach ($options as $key => $option) {
+                if (isset($option['config'])) {
+                    $layoutHelper = new MFormLayoutPreviewHelper();
+                    $svg = $layoutHelper->generateLayoutPreview($option['config']);
+                    $newOptions[$key] = "<img src=\"{$svg}\"><span>{$option['label']}</span>";
+                } elseif (is_array($option) && isset($option['image'])) {
+                    $newOptions[$key] = $option['image'] . "<span>{$option['label']}</span>";
+                } elseif (is_array($option) && isset($option['svgIconSet'])) {
+                    $converter = new HtmlToSvgConverter();
+                    $attr = [
+                        'width' => '110px',
+                        'height' => '110px'
+                    ];
+                    $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
+                    $newOptions[$key] = $img . "<span>{$option['label']}</span>";
+                } elseif (is_array($option) && isset($option['label']) && isset($option['img'])) {
+                    $newOptions[$key] = "<img src=\"{$option['img']}\"><span>{$option['label']}</span>";
+                }
             }
-        }
         } // end null check
         $attributes['form-group-class'] = 'mform-inline-img-radios mform-inline-radios';
 
@@ -435,17 +436,17 @@ abstract class MFormElements
     {
         $newOptions = [];
         if (null !== $options) {
-        foreach ($options as $key => $option) {
-            if (is_array($option) && isset($option['label']) && isset($option['icon'])) {
-                $newOptions[$key] = "<i class=\"{$option['icon']}\"></i><span> {$option['label']}</span>";
+            foreach ($options as $key => $option) {
+                if (is_array($option) && isset($option['label']) && isset($option['icon'])) {
+                    $newOptions[$key] = "<i class=\"{$option['icon']}\"></i><span> {$option['label']}</span>";
+                }
             }
-        }
         }
         $attributes['form-group-class'] = 'mform-inline-icon-radios mform-inline-radios';
 
         //        $this->addHtml('<div class="mform-inline-icon-radios mform-inline-radios">');
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
-//        $this->addHtml('</div>');
+        //        $this->addHtml('</div>');
         return $this;
     }
 
@@ -457,21 +458,21 @@ abstract class MFormElements
     {
         $newOptions = [];
         if (null !== $options) {
-        foreach ($options as $key => $option) {
-            if (is_array($option) && isset($option['label']) && isset($option['color'])) {
-                if ($option['color'] == 'transparent') {
-                    $newOptions[$key] = "<span style=\"background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 0, 0, 1) 50%, rgba(255, 0, 0, 1) 100%);\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
-                } else {
-                    $newOptions[$key] = "<span style=\"background-color:{$option['color']}\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
+            foreach ($options as $key => $option) {
+                if (is_array($option) && isset($option['label']) && isset($option['color'])) {
+                    if ($option['color'] == 'transparent') {
+                        $newOptions[$key] = "<span style=\"background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 0, 0, 1) 50%, rgba(255, 0, 0, 1) 100%);\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
+                    } else {
+                        $newOptions[$key] = "<span style=\"background-color:{$option['color']}\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
+                    }
                 }
             }
         }
-        }
         $attributes['form-group-class'] = 'mform-inline-color-radios mform-inline-radios';
 
-//        $this->addHtml('<div class="mform-inline-color-radios mform-inline-radios">');
+        //        $this->addHtml('<div class="mform-inline-color-radios mform-inline-radios">');
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
-//        $this->addHtml('</div>');
+        //        $this->addHtml('</div>');
         return $this;
     }
 
@@ -619,10 +620,14 @@ abstract class MFormElements
     /** @param array<string, mixed> $inputsConfig */
     public function addInputs(float|int|string|null $id, string $filename, array $inputsConfig = []): static
     {
-        if ($id === null) $id = '';
+        if ($id === null) {
+            $id = '';
+        }
         $inputsConfig['id'] = $id;
         if ('' !== $filename) {
-            if (substr($filename,(strlen($filename) - 1), 1) == '/') $filename = substr($filename, 0, strlen($filename) - 1);
+            if (substr($filename, (strlen($filename) - 1), 1) == '/') {
+                $filename = substr($filename, 0, strlen($filename) - 1);
+            }
             $basename = pathinfo($filename, PATHINFO_BASENAME);
             if (str_contains($filename, '.php')) {
                 $filename = substr($filename, 0, strlen($filename) - 4);
@@ -712,8 +717,7 @@ abstract class MFormElements
         if ($this->item->getType() == 'html') {
             $prevItem = $this->items[(count($this->items) - 1)];
             if ($prevItem instanceof MFormItem) {
-                switch ($prevItem->getType())
-                {
+                switch ($prevItem->getType()) {
                     case 'radio':
                     case 'checkbox':
                     case 'select':

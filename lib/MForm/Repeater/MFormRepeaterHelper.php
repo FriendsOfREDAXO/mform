@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -28,7 +29,7 @@ class MFormRepeaterHelper
                 // prepare obj array
                 $keys = array_merge($keys, self::getChildKeys($itm));
                 $next = false;
-            } else if ($k == $key) {
+            } elseif ($k == $key) {
                 $next = true;
             }
         }
@@ -77,7 +78,7 @@ class MFormRepeaterHelper
                 // prepare obj array
                 $obj = array_merge($obj, self::prepareChildItems($itm, $repeaterId, $group, $groups, $parentId));
                 $next = false;
-            } else if ($k == $key) {
+            } elseif ($k == $key) {
                 $next = true;
             }
         }
@@ -90,7 +91,7 @@ class MFormRepeaterHelper
     {
         $obj = [];
         $items = $mform->getItems();
-//        dump($items);die;
+        //        dump($items);die;
         foreach ($items as $key => $mformItem) {
             $ikey = (int) $key;
             if ($mformItem instanceof MFormItem) {
@@ -112,6 +113,7 @@ class MFormRepeaterHelper
                             } else {
                                 $obj[$nameKey] = [];
                             }
+                            // no break
                         case 'close-repeater':
                             $mformItem->addAttribute('group', 'field')
                                 ->addAttribute('groups', 'group.' . $nameKey)
@@ -140,10 +142,12 @@ class MFormRepeaterHelper
                                 $mformItem->addAttribute('repeater_cke', 1);
                                 $mformItem->setClass($mformItem->getClass() . ' hidden');
                             }
+                            // no break
                         case 'checkbox':
                             foreach ($mformItem->getOptions() as $k => $option) {
                                 $mformItem->addAttribute('data-value', (string) $k);
                             }
+                            // no break
                         case 'multiselect':
                         case 'select':
                         default:
@@ -164,7 +168,7 @@ class MFormRepeaterHelper
             if ($mformItem instanceof MForm) {
                 foreach ($mformItem->getItems() as $item) {
                     if ($item instanceof MFormItem && $item->getType() === 'collapse') {
-                       self::addWidgetAttributes($item, $repeaterId, $group, $groups, $parentId);
+                        self::addWidgetAttributes($item, $repeaterId, $group, $groups, $parentId);
                     }
                 }
             }
@@ -193,7 +197,7 @@ class MFormRepeaterHelper
             $nameKey = self::getNameKey($mformItem);
         }
         $mformItem->addAttribute('x-model', $group . '[\'' . $nameKey . '\']')
-            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((null !== $parentId && '' !== $parentId && $parentId != $repeaterId)?"+'-".$parentId."-'+".$parentId.'Index':''))
+            ->addAttribute(':id', "'".$nameKey.'-'.$repeaterId."-'+".$repeaterId."Index".((null !== $parentId && '' !== $parentId && $parentId != $repeaterId) ? "+'-".$parentId."-'+".$parentId.'Index' : ''))
             ->addAttribute('group', $group)
             ->addAttribute('groups', $groups)
             ->addAttribute('repeaterId', $repeaterId)
@@ -210,11 +214,11 @@ class MFormRepeaterHelper
             $mformItem->setToggleOptions($toggleOptions);
         }
 
-//        if($nameKey == '') {
-//            dump($mformItem);
-//        }
+        //        if($nameKey == '') {
+        //            dump($mformItem);
+        //        }
 
-//        dump([$repeaterId, $parentId]);
+        //        dump([$repeaterId, $parentId]);
 
         if (isset($mformItem->getAttributes()['data-toggle-item'])) {
             $mformItem->addAttribute(':data-toggle-item', "'" . $mformItem->getAttributes()['data-toggle-item'] . "-'+" . $repeaterId . "Index" . ((null !== $parentId && '' !== $parentId && $parentId != $repeaterId) ? "+'-'+" . $parentId . 'Index' : ''));

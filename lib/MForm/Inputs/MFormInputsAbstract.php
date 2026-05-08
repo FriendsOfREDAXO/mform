@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -41,7 +42,9 @@ abstract class MFormInputsAbstract
     {
         $idPrefix = (null === $id) ? '' : (string) $id;
         $configForm = MForm::factory()->setShowWrapper(false);
-        if (!isset($this->config['configKeys']) || !is_array($this->config['configKeys'])) return $configForm;
+        if (!isset($this->config['configKeys']) || !is_array($this->config['configKeys'])) {
+            return $configForm;
+        }
         $keys = $this->config['configKeys'];
         if (in_array('bgImg', $keys) && isset($this->config['bgImg']) && $this->config['bgImg'] === true) {
             $configForm->addMediaField($idPrefix . 'bgImg', ['preview' => 1], null, ['label' => $this->config['bgImgLabel']]);
@@ -56,10 +59,15 @@ abstract class MFormInputsAbstract
 
                 if (isset($this->config[$key . 'Toggle']) && $this->config[$key . 'Toggle'] === true) {
                     $configForm->addToggleCheckboxField($idPrefix . $key . 'Custom', [1 => ('' !== (string) ($this->config[$key . 'ToggleLabel'] ?? '')) ? $this->config[$key . 'ToggleLabel'] : 'Custom "' . $key . '"'], ['label' => $this->config[$key . 'Label'], 'data-toggle-item' => 'collapse' . $key]);
-                    $configForm->addForm(MForm::factory()
-                        ->addCollapseElement('link', MForm::factory()
-                            ->addRadioImgField($idPrefix . $key, $this->config[$key], ['label' => ''], $this->config[$key . 'DefaultValue'])
-                            , false, true, ['data-group-collapse-id' => 'collapse' . $key]
+                    $configForm->addForm(
+                        MForm::factory()
+                        ->addCollapseElement(
+                            'link',
+                            MForm::factory()
+                            ->addRadioImgField($idPrefix . $key, $this->config[$key], ['label' => ''], $this->config[$key . 'DefaultValue']),
+                            false,
+                            true,
+                            ['data-group-collapse-id' => 'collapse' . $key]
                         )
                     );
                 } else {

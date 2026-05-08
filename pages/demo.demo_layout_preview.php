@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Demo: HtmlToSvgConverter + LayoutPreviewBuilder.
  *
@@ -92,9 +93,9 @@ $builder2 = $mkBuilder('4:3');
 $builder2->addSection()
     ->addColumn('2/3')
         ->addElement('image', 'left', '16:9')
-        ->addElement('text',  'left', '3:1')
+        ->addElement('text', 'left', '3:1')
     ->addColumn('1/3')
-        ->addElement('list',  'left', '3:4');
+        ->addElement('list', 'left', '3:4');
 $preview2 = '<img src="' . rex_escape($builder2->render(), 'html_attr') . '" alt="Sidebar Layout" style="max-width:100%;border:1px solid #ddd;border-radius:4px;">';
 $renderBlock('Layout: Main + Sidebar', $code2, $preview2);
 
@@ -141,7 +142,7 @@ PHP;
 
 $builder4 = $mkBuilder('3:2');
 $builder4->addSection()
-    ->addColumn('1/2')->addElement('form',  'left', '1:1')
+    ->addColumn('1/2')->addElement('form', 'left', '1:1')
     ->addColumn('1/2')->addElement('image', 'left', '1:1');
 $preview4 = '<img src="' . rex_escape($builder4->render(), 'html_attr') . '" alt="Contact Layout" style="max-width:100%;border:1px solid #ddd;border-radius:4px;">';
 $renderBlock('Layout: Kontakt (Form + Bild)', $code4, $preview4);

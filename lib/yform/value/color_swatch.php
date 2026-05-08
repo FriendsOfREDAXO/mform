@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author MForm Contributors
  * @package redaxo5

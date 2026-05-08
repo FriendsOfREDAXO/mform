@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -350,7 +351,7 @@ class MFormParser
     {
         // create templateElement object
         $element = new MFormElement();
-        $element->setOutput((is_string($item->getValue())?$item->getValue():''))
+        $element->setOutput((is_string($item->getValue()) ? $item->getValue() : ''))
             ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setClass($item->getClass()) // set output to replace in template
             ->setType($item->getType())
@@ -1145,65 +1146,79 @@ class MFormParser
     {
         foreach ($inputs as $input) {
             switch ($input->getAttribute('type')) {
-                    case 'text':
-                        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
-                            if ($item->getType() == 'media') {
-                                $item->addAttribute('x-model', $attributes['x-model']);
-                            } else {
-                                $item->addAttribute('x-model', $attributes['x-model'] . '.name');
-                            }
-                            $this->processNodeFormElement($input, $item);
-                            $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id']))?"+'-'+".$attributes['parent_id'].'Index':'')."+'_NAME'");
+                case 'text':
+                    if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+                        if ($item->getType() == 'media') {
+                            $item->addAttribute('x-model', $attributes['x-model']);
                         } else {
-                            $this->processNodeFormElement($input, $item);
+                            $item->addAttribute('x-model', $attributes['x-model'] . '.name');
                         }
-                        break;
-                    case 'hidden':
-                        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
-                            $item->addAttribute('x-model', $attributes['x-model'] . '.id');
-                            $this->processNodeFormElement($input, $item);
-                            $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id']))?"+'-'+".$attributes['parent_id'].'Index':''));
-                        } else {
-                            $this->processNodeFormElement($input, $item);
-                        }
-                        break;
-                }
+                        $this->processNodeFormElement($input, $item);
+                        $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id'])) ? "+'-'+".$attributes['parent_id'].'Index' : '')."+'_NAME'");
+                    } else {
+                        $this->processNodeFormElement($input, $item);
+                    }
+                    break;
+                case 'hidden':
+                    if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+                        $item->addAttribute('x-model', $attributes['x-model'] . '.id');
+                        $this->processNodeFormElement($input, $item);
+                        $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id'])) ? "+'-'+".$attributes['parent_id'].'Index' : ''));
+                    } else {
+                        $this->processNodeFormElement($input, $item);
+                    }
+                    break;
+            }
         }
 
         if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
             $links = $dom->getElementsByTagName('a');
             foreach ($links as $link) {
-                    $onclick = $link->getAttribute('onclick');
-                    $groups = explode('.',$attributes['groups']);
-                    $linkAttributes = '';
-                    if (str_contains($onclick, 'openLinkMap')) {
-                        $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                        if (!is_null($attributes['parent_id'])) {
-                            $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
-                        }
+                $onclick = $link->getAttribute('onclick');
+                $groups = explode('.', $attributes['groups']);
+                $linkAttributes = '';
+                if (str_contains($onclick, 'openLinkMap')) {
+                    $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                    if (!is_null($attributes['parent_id'])) {
+                        $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
                     }
-                    if (str_contains($onclick, 'deleteREXLink')) {
-                        $linkAttributes = "removeLink(".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                        if (!is_null($attributes['parent_id'])) {
-                            $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
-                        }
+                }
+                if (str_contains($onclick, 'deleteREXLink')) {
+                    $linkAttributes = "removeLink(".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                    if (!is_null($attributes['parent_id'])) {
+                        $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
                     }
-                    if (str_contains($onclick, 'Media')) {
-                        $method = 'openMedia';
-                        if (str_contains($onclick, 'addREXMedia(')) $method = 'addMedia';
-                        if (str_contains($onclick, 'deleteREXMedia(')) $method = 'deleteMedia';
-                        if (str_contains($onclick, 'viewREXMedia(')) $method = 'viewMedia';
-                        if (str_contains($onclick, 'openREXMedialist(')) $method = 'openMedialist';
-                        if (str_contains($onclick, 'addREXMedialist(')) $method = 'addMedialist';
-                        if (str_contains($onclick, 'deleteREXMedialist(')) $method = 'deleteMedialist';
-                        if (str_contains($onclick, 'viewREXMedialist(')) $method = 'viewMedialist';
-                        $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                        if (!is_null($attributes['parent_id']) && $attributes['parent_id'] != $attributes['repeaterId']) {
-                            $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
-                        }
+                }
+                if (str_contains($onclick, 'Media')) {
+                    $method = 'openMedia';
+                    if (str_contains($onclick, 'addREXMedia(')) {
+                        $method = 'addMedia';
                     }
-                    $link->setAttribute('click.prevent', $linkAttributes);
-                    $link->removeAttribute('onclick');
+                    if (str_contains($onclick, 'deleteREXMedia(')) {
+                        $method = 'deleteMedia';
+                    }
+                    if (str_contains($onclick, 'viewREXMedia(')) {
+                        $method = 'viewMedia';
+                    }
+                    if (str_contains($onclick, 'openREXMedialist(')) {
+                        $method = 'openMedialist';
+                    }
+                    if (str_contains($onclick, 'addREXMedialist(')) {
+                        $method = 'addMedialist';
+                    }
+                    if (str_contains($onclick, 'deleteREXMedialist(')) {
+                        $method = 'deleteMedialist';
+                    }
+                    if (str_contains($onclick, 'viewREXMedialist(')) {
+                        $method = 'viewMedialist';
+                    }
+                    $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
+                    if (!is_null($attributes['parent_id']) && $attributes['parent_id'] != $attributes['repeaterId']) {
+                        $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
+                    }
+                }
+                $link->setAttribute('click.prevent', $linkAttributes);
+                $link->removeAttribute('onclick');
             }
         }
     }
@@ -1350,8 +1365,12 @@ class MFormParser
     private function executeDefaultManipulations(MFormItem $item, bool $setCustomId = true, bool $setDefaultClass = true): void
     {
         MFormItemManipulator::setVarAndIds($item); // transform ids for template usage
-        if ($setCustomId) MFormItemManipulator::setCustomId($item); // set optional custom id
-        if ($setDefaultClass) MFormItemManipulator::setDefaultClass($item); // set default class for r5 mform default theme
+        if ($setCustomId) {
+            MFormItemManipulator::setCustomId($item);
+        } // set optional custom id
+        if ($setDefaultClass) {
+            MFormItemManipulator::setDefaultClass($item);
+        } // set default class for r5 mform default theme
     }
 
     /**
@@ -1444,109 +1463,109 @@ class MFormParser
                     }
 
                     switch ($item->getType()) {
-                            // OPEN REPEATER
-                            case 'repeater':
-                                $this->openRepeaterElement($item, $key, $items, $skipKeys);
-                                break;
+                        // OPEN REPEATER
+                        case 'repeater':
+                            $this->openRepeaterElement($item, $key, $items, $skipKeys);
+                            break;
                             // CLOSE REPEATER
-                            case 'close-repeater':
-                                $this->closeRepeaterElement($item);
-                                break;
+                        case 'close-repeater':
+                            $this->closeRepeaterElement($item);
+                            break;
 
                             // OPEN WRAPPER ELEMENT
-                            case 'tab':
-                            case 'fieldset':
-                            case 'collapse':
-                            case 'inline':
-                            case 'column':
-                            case 'modal':
-                            case 'start-group-tab':
-                            case 'start-group-collapse':
-                            case 'start-group-inline':
-                            case 'start-group-column':
-                                $this->openWrapperElement($item, $key, $items);
-                                break;
+                        case 'tab':
+                        case 'fieldset':
+                        case 'collapse':
+                        case 'inline':
+                        case 'column':
+                        case 'modal':
+                        case 'start-group-tab':
+                        case 'start-group-collapse':
+                        case 'start-group-inline':
+                        case 'start-group-column':
+                            $this->openWrapperElement($item, $key, $items);
+                            break;
                             // CLOSE WRAPPER ELEMENT
-                            case 'close-tab':
-                            case 'close-fieldset':
-                            case 'close-collapse':
-                            case 'close-inline':
-                            case 'close-column':
-                            case 'close-modal':
-                            case 'close-group-tab':
-                            case 'close-group-collapse':
-                            case 'close-group-inline':
-                            case 'close-group-column':
-                                $this->closeWrapperElement($item->getType());
-                                break;
+                        case 'close-tab':
+                        case 'close-fieldset':
+                        case 'close-collapse':
+                        case 'close-inline':
+                        case 'close-column':
+                        case 'close-modal':
+                        case 'close-group-tab':
+                        case 'close-group-collapse':
+                        case 'close-group-inline':
+                        case 'close-group-column':
+                            $this->closeWrapperElement($item->getType());
+                            break;
 
                             // FORM ELEMENTS
-                            case 'html':
-                            case 'headline':
-                            case 'description':
-                            case 'alert':
-                                $this->generateLineElement($item);
-                                break;
-                            case 'color':
-                            case 'email':
-                            case 'url':
-                            case 'tel':
-                            case 'search':
-                            case 'number':
-                            case 'range':
-                            case 'date':
-                            case 'time':
-                            case 'datetime':
-                            case 'datetime-local':
-                            case 'month':
-                            case 'week':
-                            case 'text':
-                            case 'text-readonly':
-                                $this->generateInputElement($item);
-                                break;
-                            case 'hidden':
-                                $this->generateHiddenInputElement($item);
-                                break;
-                            case 'markitup':
-                            case 'textarea':
-                            case 'textarea-readonly':
-                                $this->generateAreaElement($item);
-                                break;
-                            case 'select':
-                            case 'multiselect':
-                                $this->generateOptionsElement($item);
-                                break;
-                            case 'radio':
-                                $this->generateRadioElement($item);
-                                break;
-                            case 'checkbox':
-                            case 'multicheckbox':
-                                $this->generateCheckboxElement($item);
-                                break;
-                            case 'checkbox-group':
-                                $this->generateCheckboxGroupElement($item);
-                                break;
-                            case 'color-swatch':
-                                $this->generateColorSwatchElement($item);
-                                break;
-                            case 'link':
-                            case 'mform-link':
-                            case 'linklist':
-                                $this->generateLinkElement($item);
-                                break;
-                            case 'custom-link':
-                                $this->generateCustomLinkElement($item);
-                                break;
-                            case 'custom-link-multi':
-                                $this->generateCustomLinkMultiElement($item);
-                                break;
-                            case 'media':
-                            case 'mform-media':
-                            case 'medialist':
-                            case 'imglist':
-                                $this->generateMediaElement($item);
-                                break;
-                        }
+                        case 'html':
+                        case 'headline':
+                        case 'description':
+                        case 'alert':
+                            $this->generateLineElement($item);
+                            break;
+                        case 'color':
+                        case 'email':
+                        case 'url':
+                        case 'tel':
+                        case 'search':
+                        case 'number':
+                        case 'range':
+                        case 'date':
+                        case 'time':
+                        case 'datetime':
+                        case 'datetime-local':
+                        case 'month':
+                        case 'week':
+                        case 'text':
+                        case 'text-readonly':
+                            $this->generateInputElement($item);
+                            break;
+                        case 'hidden':
+                            $this->generateHiddenInputElement($item);
+                            break;
+                        case 'markitup':
+                        case 'textarea':
+                        case 'textarea-readonly':
+                            $this->generateAreaElement($item);
+                            break;
+                        case 'select':
+                        case 'multiselect':
+                            $this->generateOptionsElement($item);
+                            break;
+                        case 'radio':
+                            $this->generateRadioElement($item);
+                            break;
+                        case 'checkbox':
+                        case 'multicheckbox':
+                            $this->generateCheckboxElement($item);
+                            break;
+                        case 'checkbox-group':
+                            $this->generateCheckboxGroupElement($item);
+                            break;
+                        case 'color-swatch':
+                            $this->generateColorSwatchElement($item);
+                            break;
+                        case 'link':
+                        case 'mform-link':
+                        case 'linklist':
+                            $this->generateLinkElement($item);
+                            break;
+                        case 'custom-link':
+                            $this->generateCustomLinkElement($item);
+                            break;
+                        case 'custom-link-multi':
+                            $this->generateCustomLinkMultiElement($item);
+                            break;
+                        case 'media':
+                        case 'mform-media':
+                        case 'medialist':
+                        case 'imglist':
+                            $this->generateMediaElement($item);
+                            break;
+                    }
                 }
             }
         } catch (Exception $e) {

@@ -23,8 +23,8 @@ class MformYformHelper
         $select = in_array('multiple', $columns) ? ', `multiple`' : '';
 
         $fields = $sql->getArray('SELECT `table_name`, `name`' . $select . ' FROM `' . rex_yform_manager_field::table() . '` WHERE `type_id`="value" AND `type_name` IN("custom_link","imagelist")');
-		#\dump($fields);
-		
+        #\dump($fields);
+
         $fields = rex_extension::registerPoint(new rex_extension_point('YFORM_MEDIA_IS_IN_USE', $fields));
 
         if (!count($fields)) {
@@ -34,14 +34,14 @@ class MformYformHelper
         $tables = [];
         $escapedFilename = $sql->escape($params['filename']);
         $likePattern = $sql->escape('%' . $params['filename'] . '%');
-        
+
         foreach ($fields as $field) {
             $tableName = (string) $field['table_name'];
-            
+
             // Check field type to determine search method
             $fieldTypeResult = $sql->getArray('SELECT `type_name` FROM `' . rex_yform_manager_field::table() . '` WHERE `table_name` = "' . $tableName . '" AND `name` = "' . $field['name'] . '"');
             $fieldType = $fieldTypeResult[0]['type_name'] ?? '';
-            
+
             if ($fieldType === 'imagelist' || (isset($field['multiple']) && 1 == $field['multiple'])) {
                 // For imagelist (comma-separated list) use FIND_IN_SET
                 $condition = 'FIND_IN_SET(' . $escapedFilename . ', ' . $sql->escapeIdentifier((string) $field['name']) . ')';
@@ -49,7 +49,7 @@ class MformYformHelper
                 // For custom_link (JSON format) use LIKE
                 $condition = $sql->escapeIdentifier((string) $field['name']) . ' LIKE ' . $likePattern;
             }
-            
+
             $tables[$tableName][] = $condition;
         }
 
