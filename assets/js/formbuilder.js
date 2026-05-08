@@ -50,7 +50,7 @@
             text:        { label: 'Text', method: 'addTextField',
                 props: ['label', 'defaultValue', 'placeholder', 'notice', 'cssClass', 'required', 'full'] },
             textarea:    { label: 'Textarea', method: 'addTextAreaField',
-                props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'tinymceProfile', 'required', 'full'] },
             select:      { label: 'Select', method: 'addSelectField',
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required', 'full'] },
             radio:       { label: 'Radio', method: 'addRadioField',
@@ -122,6 +122,7 @@
                 required: false,
                 full: false,
                 tinymce: false,
+                tinymceProfile: '',
                 // CustomLink
                 clTypeIntern: type === 'customlink' || type === 'customlinkmultiple',
                 clTypeExtern: type === 'customlink' || type === 'customlinkmultiple',
@@ -361,6 +362,12 @@
                 g.style.display = available.indexOf(g.dataset.fbPropGroup) !== -1 ? '' : 'none';
             });
 
+            // tinymceProfile-Group nur sichtbar wenn TinyMCE aktiviert ist
+            var profileGroup = $propsForm.querySelector('[data-fb-prop-group="tinymceProfile"]');
+            if (profileGroup && !activeItem.tinymce) {
+                profileGroup.style.display = 'none';
+            }
+
             $propsForm.querySelectorAll('[data-fb-prop]').forEach(function (input) {
                 var key = input.dataset.fbProp;
                 var val = activeItem[key];
@@ -375,6 +382,9 @@
             if (!input) return;
             var key = input.dataset.fbProp;
             activeItem[key] = input.type === 'checkbox' ? input.checked : input.value;
+            if (key === 'tinymce') {
+                renderProps();
+            }
             if (key === 'label') {
                 $canvas.querySelectorAll('[data-uid="' + activeItem.uid + '"] > .mform-fb__item-head .mform-fb__item-label').forEach(function (lbl) {
                     lbl.textContent = activeItem.label || activeItem.type;
@@ -564,13 +574,18 @@
             if (item.rows && item.type === 'textarea') a.rows = item.rows;
             if (item.btnAdd && item.type === 'customlinkmultiple') a.btn_add = item.btnAdd;
 
-            // CSS class merge: tinymce-editor + user classes
+            // CSS class merge: tiny-editor + user classes
             var classes = [];
             if (item.tinymce && item.type === 'textarea') {
-                classes.push('form-control', 'tinymce-editor');
+                classes.push('form-control', 'tiny-editor');
             }
             if (item.cssClass) classes.push(item.cssClass);
             if (classes.length) a['class'] = classes.join(' ');
+
+            // TinyMCE Profil
+            if (item.tinymce && item.tinymceProfile && item.type === 'textarea') {
+                a['data-profile'] = item.tinymceProfile;
+            }
 
             // CustomLink data-* toggles
             if (item.type === 'customlink' || item.type === 'customlinkmultiple') {
