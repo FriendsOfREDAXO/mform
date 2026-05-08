@@ -112,6 +112,10 @@
 
         var state = [];
         var nextId = 1;
+        // Klassische REDAXO-Module haben pro Slot-Typ ein Limit von 20 (REX_VALUE / REX_MEDIA / REX_LINK / ...).
+        // Der Builder vergibt fortlaufende IDs; ueber 20 hinaus werden Werte ggf. nicht mehr persistiert.
+        var MAX_FIELD_ID = 20;
+        var slotWarningShown = false;
         var activeItem = null;
         var clipboard = null; // shallow item clone in memory for paste
         var outputUses = { outputHelper: false, repeaterHelper: false };
@@ -227,18 +231,26 @@
             return null;
         }
 
-        // Tree-aware: if a repeater contains a repeater, that's depth 1.
+        // Tree-aware: depth of the deepest nested repeater chain inside `item`.
+        // Returns 0 for a repeater without nested repeaters, 1 for one nested level, ...
+        // For non-repeater items, returns 0 (no contribution to repeater chain depth).
         function maxRepeaterSubtreeDepth(item) {
-            if (item.type !== 'repeater') return -1;
-            var max = 0;
+            if (!item || item.type !== 'repeater') return 0;
+            var deepest = 0;
             (item.children || []).forEach(function (c) {
                 if (c.type === 'repeater') {
-                    var d = 1 + (maxRepeaterSubtreeDepth(c) === -1 ? 0 : 1 + maxRepeaterSubtreeDepth(c));
-                    // Simpler: recurse
+                    var d = 1 + maxRepeaterSubtreeDepth(c);
+                    if (d > deepest) deepest = d;
                 }
             });
-            // simpler: iterative via children
-            return 0;
+            return deepest;
+        }
+
+        // True if dropping `item` (any type) into a list at builder-depth `targetDepth`
+        // would exceed MAX_REPEATER_DEPTH considering the moved item's own subtree.
+        function wouldExceedRepeaterDepth(item, targetDepth) {
+            if (!item || item.type !== 'repeater') return false;
+            return targetDepth + maxRepeaterSubtreeDepth(item) > MAX_REPEATER_DEPTH;
         }
 
         // ---- Rendering ------------------------------------------------------
@@ -353,8 +365,28 @@
                 }
                 var posP = findParentList(uid);
                 if (!posP) return;
+                // Determine builder-depth of the target list.
+                // Top-level list = state -> depth 0. Otherwise climb the DOM.
+                var targetDepth = 0;
+                if (posP.list !== state) {
+                    // Find any element inside this list to read data-fb-depth from.
+                    var sample = $canvas.querySelector('[data-uid="' + uid + '"]');
+                    var nestedEl = sample ? sample.closest('[data-fb-nested]') : null;
+                    if (nestedEl) targetDepth = parseInt(nestedEl.dataset.fbDepth, 10) || 0;
+                }
+                if (clipboard.type === 'tab' && targetDepth > 0) {
+                    alert('Tabs koennen nur auf der obersten Ebene eingefuegt werden.');
+                    return;
+                }
+                if (clipboard.type === 'fieldset' && targetDepth > 0) {
+                    alert('Fieldsets koennen nur auf der obersten Ebene eingefuegt werden.');
+                    return;
+                }
+                if (wouldExceedRepeaterDepth(clipboard, targetDepth)) {
+                    alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                    return;
+                }
                 var cloneP = deepCloneWithNewIds(clipboard);
-                renderCanvas(); // ensure DOM in sync before depth check
                 posP.list.splice(posP.index + 1, 0, cloneP);
                 renderCanvas();
                 emitCode();
@@ -480,6 +512,8 @@
                     setTimeout(doRender, 0);
                     return;
                 }
+                // New item from palette has no children, so subtree depth is 0; depthOf check above
+                // is sufficient for palette inserts.
                 if (type === 'tab' && depthOf(evt.to) > 0) {
                     alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
                     setTimeout(doRender, 0);
@@ -502,7 +536,8 @@
             var item = findItem(uid);
             if (!item) { setTimeout(doRender, 0); return; }
 
-            if (item.type === 'repeater' && depthOf(evt.to) > MAX_REPEATER_DEPTH) {
+            // For an EXISTING repeater being moved, also account for its own subtree depth.
+            if (item.type === 'repeater' && wouldExceedRepeaterDepth(item, depthOf(evt.to))) {
                 alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
                 setTimeout(doRender, 0);
                 return;
@@ -561,14 +596,27 @@
             var type = li.dataset.type;
             if (!type) return;
             var newItem = makeItem(type);
-            if (type === 'repeater') {
-                if (activeItem && activeItem.type === 'repeater') {
-                    // Active repeater is depth 0 (top level only) -> insert nested
-                    activeItem.children.push(newItem);
-                } else {
-                    state.push(newItem);
+
+            // Tabs and Fieldsets are top-level only.
+            if (type === 'tab' || type === 'fieldset') {
+                state.push(newItem);
+                renderCanvas();
+                emitCode();
+                selectItem(newItem);
+                return;
+            }
+
+            // If an active repeater/tab/fieldset is selected, attempt to insert as child.
+            // Otherwise append at top level.
+            var canNestInto = activeItem && (activeItem.type === 'repeater' || activeItem.type === 'tab' || activeItem.type === 'fieldset');
+            if (canNestInto) {
+                // Determine builder-depth of the active container's children list.
+                var nestedEl = $canvas.querySelector('[data-fb-nested="' + activeItem.uid + '"]');
+                var childDepth = nestedEl ? (parseInt(nestedEl.dataset.fbDepth, 10) || 0) : 1;
+                if (type === 'repeater' && childDepth > MAX_REPEATER_DEPTH) {
+                    alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
+                    return;
                 }
-            } else if (activeItem && activeItem.type === 'repeater') {
                 activeItem.children.push(newItem);
             } else {
                 state.push(newItem);
@@ -601,26 +649,69 @@
             emitCode();
         });
 
+        // Robust clipboard helper with execCommand fallback for non-secure contexts.
+        function copyToClipboard(text, msgEl) {
+            function showMsg(label, ttl) {
+                if (!msgEl) return;
+                msgEl.textContent = label;
+                setTimeout(function () { msgEl.textContent = ''; }, ttl || 1500);
+            }
+            function fallback() {
+                try {
+                    var ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    var ok = document.execCommand && document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    showMsg(ok ? 'kopiert' : 'Kopieren fehlgeschlagen', ok ? 1500 : 2500);
+                } catch (err) {
+                    showMsg('Kopieren fehlgeschlagen', 2500);
+                    if (typeof console !== 'undefined' && console.error) { console.error(err); }
+                }
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function () {
+                    showMsg('kopiert', 1500);
+                }).catch(function (err) {
+                    if (typeof console !== 'undefined' && console.warn) { console.warn('clipboard.writeText failed, falling back', err); }
+                    fallback();
+                });
+            } else {
+                fallback();
+            }
+        }
+
         document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
-            navigator.clipboard.writeText($code.textContent).then(function () {
-                var msg = document.querySelector('[data-fb-copy-msg]');
-                msg.textContent = 'kopiert';
-                setTimeout(function () { msg.textContent = ''; }, 1500);
-            });
+            copyToClipboard($code.textContent, document.querySelector('[data-fb-copy-msg]'));
         });
 
         document.querySelector('[data-fb-action="copy-output"]').addEventListener('click', function () {
-            navigator.clipboard.writeText($output.textContent).then(function () {
-                var msg = document.querySelector('[data-fb-copy-output-msg]');
-                msg.textContent = 'kopiert';
-                setTimeout(function () { msg.textContent = ''; }, 1500);
-            });
+            copyToClipboard($output.textContent, document.querySelector('[data-fb-copy-output-msg]'));
         });
 
         // ---- Code generation ------------------------------------------------
 
         function phpStr(s) {
-            return "'" + String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+            // PHP single-quoted strings: only \\ and \' are interpreted as escapes.
+            // Newlines or carriage returns inside a literal would still be valid but
+            // produce ugly multi-line code; we keep them as actual line breaks for
+            // strings without quotes/backslashes, but switch to double-quoted when
+            // the input contains \n or \r so the generated PHP stays single-line.
+            var str = String(s);
+            if (/[\r\n]/.test(str)) {
+                // Use double quotes with proper escaping.
+                return '"' + str
+                    .replace(/\\/g, '\\\\')
+                    .replace(/"/g, '\\"')
+                    .replace(/\$/g, '\\$')
+                    .replace(/\r/g, '\\r')
+                    .replace(/\n/g, '\\n') + '"';
+            }
+            return "'" + str.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
         }
 
         function parseOptions(raw) {
@@ -723,19 +814,37 @@
             var line = method + '(' + idLit;
 
             switch (item.type) {
-                case 'select':
+                case 'select': {
+                    // Signature: addSelectField(id, options?, attributes?, size=1, defaultValue?)
+                    line += ', ' + optionsArray(parseOptions(item.options));
+                    var hasDefault = !!item.defaultValue;
+                    if (attrPhp || hasDefault) line += ', ' + (attrPhp || 'null');
+                    if (hasDefault) line += ', 1, ' + phpStr(item.defaultValue);
+                    break;
+                }
                 case 'radio':
-                case 'checkbox':
+                case 'checkbox': {
+                    // Signature: addRadio/CheckboxField(id, options?, attributes?, defaultValue?)
+                    line += ', ' + optionsArray(parseOptions(item.options));
+                    var hasDef = !!item.defaultValue;
+                    if (attrPhp || hasDef) line += ', ' + (attrPhp || 'null');
+                    if (hasDef) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
                 case 'checkboxgroup':
+                    // Signature: addCheckboxGroupField(id, options?, attributes?)
+                    // (default-value via 'default-value' in attributes, handled in attrsForItem)
                     line += ', ' + optionsArray(parseOptions(item.options));
                     if (attrPhp) line += ', ' + attrPhp;
-                    if (item.defaultValue && item.type !== 'checkboxgroup') line += ', ' + phpStr(item.defaultValue);
                     break;
                 case 'text':
-                case 'textarea':
-                    if (attrPhp) line += ', ' + attrPhp;
-                    if (item.defaultValue) line += ', null, ' + phpStr(item.defaultValue);
+                case 'textarea': {
+                    // Signature: addText/TextAreaField(id, attributes?, defaultValue?)
+                    var hasD = !!item.defaultValue;
+                    if (attrPhp || hasD) line += ', ' + (attrPhp || 'null');
+                    if (hasD) line += ', ' + phpStr(item.defaultValue);
                     break;
+                }
                 case 'hidden':
                     line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
                     break;
@@ -743,10 +852,11 @@
                 case 'medialist':
                 case 'imagelist':
                 case 'link':
-                case 'linklist':
+                case 'linklist': {
                     var catLit = item.category ? (parseInt(item.category, 10) || phpStr(item.category)) : 'null';
                     line += ', null, ' + catLit + (attrPhp ? ', ' + attrPhp : '');
                     break;
+                }
                 case 'customlink':
                     if (attrPhp) line += ', ' + attrPhp;
                     if (item.defaultValue) line += ', ' + phpStr(item.defaultValue);
@@ -889,7 +999,31 @@
             lines.push('');
             lines.push('echo $mform->show();');
             $code.textContent = lines.join('\n');
+            // Warn once when any used id exceeds the conventional REX_VALUE/REX_MEDIA/... slot limit.
+            var maxId = collectMaxId(state);
+            var slotMsg = document.querySelector('[data-fb-slot-warning]');
+            if (slotMsg) {
+                if (maxId > MAX_FIELD_ID) {
+                    slotMsg.style.display = '';
+                    slotMsg.textContent = 'Warnung: hoechste verwendete Slot-ID ist ' + maxId + '. Klassische REDAXO-Module unterstuetzen pro Typ nur die Slots 1\u201320 (REX_VALUE/REX_MEDIA/REX_LINK/...). IDs darueber werden ggf. nicht persistiert.';
+                } else {
+                    slotMsg.style.display = 'none';
+                    slotMsg.textContent = '';
+                }
+            }
             emitOutputCode();
+        }
+
+        function collectMaxId(list) {
+            var max = 0;
+            (list || []).forEach(function (it) {
+                if (typeof it.id === 'number' && it.id > max) max = it.id;
+                if (it.children) {
+                    var sub = collectMaxId(it.children);
+                    if (sub > max) max = sub;
+                }
+            });
+            return max;
         }
 
         // ---- Output-Code (Modul-Output) -------------------------------------

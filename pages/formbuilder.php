@@ -95,6 +95,7 @@ $body = <<<'HTML'
         </div>
 
         <h4 style="margin-top:1.5em">Eingabe (Modul-Input)</h4>
+        <div class="alert alert-warning" style="display:none" data-fb-slot-warning></div>
         <div class="mform-fb__code-bar">
             <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy">Code kopieren</button>
             <span class="mform-fb__copy-msg" data-fb-copy-msg></span>

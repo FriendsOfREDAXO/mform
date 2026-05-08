@@ -257,9 +257,12 @@ Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repe
 
 Verfügbare Optionen im Repeater-Array:
 
-- `collapsed` (bool, default: `true`): Initial alle Items reduziert anzeigen.
-- `first_open` (bool, default: `true`): Erstes Item trotz `collapsed=true` geöffnet lassen.
+- `collapsed` (bool, default: `false`): Initial alle Items reduziert anzeigen.
+- `first_open` (bool, default: `false`): Erstes Item trotz `collapsed=true` geoeffnet lassen.
 - `show_toggle_all` (bool, default: `true`): Button "Alle auf / zu" in der Toolbar anzeigen.
+- `open` (bool, default: `true`): Toolbar / Aktionen sind nutzbar; bei `false` wird die Bedienoberflaeche eingefroren (read-only Anzeige).
+- `copy_paste` (bool, default: `true`): Pro Item ein Kopieren-Button und ein Einfuegen-Button in der Toolbar.
+- `confirm_delete` (bool, default: `true`): Loeschen eines Items mit Sicherheitsabfrage.
 
 ### Sortable-Kompatibilität
 
@@ -375,14 +378,15 @@ echo $mform->show();
 |--------|-----|---------|--------------|
 | `label` | string | `''` | Bezeichnung über dem Repeater |
 | `btn_text` | string | `'Add'` | Text des Hinzufügen-Buttons |
-| `collapsed` | bool | `true` | Items initial zugeklappt |
-| `first_open` | bool | `true` | Erstes Item trotz `collapsed` offen |
+| `collapsed` | bool | `false` | Items initial zugeklappt |
+| `first_open` | bool | `false` | Erstes Item trotz `collapsed` offen |
 | `show_toggle_all` | bool | `true` | „Alle auf/zu"-Button in Toolbar |
 | `min` | int | `0` | Mindestanzahl Items |
 | `max` | int | `0` | Maximalanzahl Items (0 = unbegrenzt) |
-| `confirm_delete` | bool | `false` | Löschen mit Bestätigung |
+| `confirm_delete` | bool | `true` | Loeschen mit Bestaetigung |
 | `confirm_delete_msg` | string | `''` | Text der Bestätigungsmeldung |
-| `copy_paste` | bool | `false` | Kopieren/Einfügen-Funktion aktivieren |
+| `copy_paste` | bool | `true` | Kopieren/Einfügen-Funktion aktivieren |
+| `open` | bool | `true` | Toolbar / Bedienung aktiv (`false` = read-only) |
 
 ---
 
