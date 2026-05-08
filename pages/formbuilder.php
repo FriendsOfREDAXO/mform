@@ -12,12 +12,12 @@
 
 $addon = rex_addon::get('mform');
 
-$intro = '<p>'
+$infoModalBody = '<p>'
     . 'Klicke ein Feld in der linken Palette an um es einzufuegen. Reihenfolge per Drag&Drop am Griff aendern. '
     . 'Per Klick auf ein eingefuegtes Feld oeffnet sich rechts der Eigenschaftsdialog. '
     . 'Im unteren Bereich entsteht in Echtzeit der MForm-PHP-Code zum Kopieren.'
     . '</p>'
-    . '<div class="alert alert-info" style="margin-top:1em">'
+    . '<div class="alert alert-info" style="margin-top:1em;margin-bottom:0">'
     . '<strong>Hinweis:</strong> Der Form Builder bietet bewusst nur eine kuratierte Auswahl der haeufigsten MForm-Felder, '
     . 'um einen einfachen Einstieg zu ermoeglichen. Spezielle Felder wie <code>addRadioImgField</code>, '
     . '<code>addColorSwatchField</code>, <code>addToggleCheckboxField</code>, <code>addInputField</code> mit eigenen Typen, '
@@ -49,11 +49,6 @@ if ([] === $tinyProfiles) {
     $tinyProfileHtml .= '</select>';
 }
 
-$fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_info'), false);
-$fragment->setVar('body', $intro, false);
-echo $fragment->parse('core/page/section.php');
-
 $body = <<<'HTML'
 <div id="mform-fb" class="mform-fb">
     <div class="mform-fb__palette">
@@ -84,7 +79,8 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
         </ul>
         <div class="mform-fb__actions">
-            <button type="button" class="btn btn-default" data-fb-action="clear">Alles loeschen</button>
+            <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#mform-fb-info"><i class="rex-icon fa-info-circle"></i> Hilfe &amp; Hinweise</button>
+            <button type="button" class="btn btn-default btn-block" data-fb-action="clear" style="margin-top:6px">Alles loeschen</button>
         </div>
     </div>
 
@@ -290,3 +286,19 @@ $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_formbuilder'), false);
 $fragment->setVar('body', $body, false);
 echo $fragment->parse('core/page/section.php');
+
+// Info-Modal (Bootstrap 3) -- wird ueber den Hilfe-Button in der Palette geoeffnet.
+echo '<div class="modal fade" id="mform-fb-info" tabindex="-1" role="dialog" aria-labelledby="mform-fb-info-title" aria-hidden="true">'
+    . '<div class="modal-dialog modal-lg" role="document">'
+    . '<div class="modal-content">'
+    . '<div class="modal-header">'
+    . '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+    . '<h4 class="modal-title" id="mform-fb-info-title">' . rex_i18n::msg('mform_info') . '</h4>'
+    . '</div>'
+    . '<div class="modal-body">' . $infoModalBody . '</div>'
+    . '<div class="modal-footer">'
+    . '<button type="button" class="btn btn-default" data-dismiss="modal">Schliessen</button>'
+    . '</div>'
+    . '</div>'
+    . '</div>'
+    . '</div>';
