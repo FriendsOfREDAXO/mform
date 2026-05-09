@@ -533,9 +533,88 @@ body.rex-theme-dark .mfr-btn-copy {
 
 /* ============================================================
    Feldgruppen im Repeater
+   Default-Layout: Label links, Feld rechts (analog form-horizontal),
+   responsive auf kleinen Screens gestapelt.
    ============================================================ */
 .mfr-field-group {
+    display: grid;
+    grid-template-columns: minmax(140px, 25%) 1fr;
+    gap: 4px 15px;
+    align-items: start;
     margin-bottom: .75rem;
+}
+
+.mfr-field-group > .control-label {
+    text-align: right;
+    padding-top: 7px;
+    margin-bottom: 0;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+/* help-block (Notice) gehoert in die Feld-Spalte */
+.mfr-field-group > .help-block {
+    grid-column: 2;
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+/* Wenn kein Label da ist: Feld nimmt volle Breite */
+.mfr-field-group:not(:has(> .control-label)) > * {
+    grid-column: 1 / -1;
+}
+
+/* Stacked auf schmalen Screens */
+@media (max-width: 767px) {
+    .mfr-field-group {
+        grid-template-columns: 1fr;
+    }
+    .mfr-field-group > .control-label {
+        text-align: left;
+        padding-top: 0;
+    }
+    .mfr-field-group > .help-block {
+        grid-column: 1;
+    }
+}
+
+/* ============================================================
+   Fieldset / Collapse / Modal-Buttons im Repeater-Body
+   ============================================================ */
+.mfr-item-body fieldset,
+.mfr-nested-body fieldset {
+    border: 1px solid var(--mfr-border);
+    border-radius: var(--mfr-border-radius);
+    padding: .65rem .9rem .15rem;
+    margin: .25rem 0 .85rem;
+    min-width: 0;
+}
+
+.mfr-item-body fieldset > legend,
+.mfr-nested-body fieldset > legend {
+    width: auto;
+    padding: 0 .5rem;
+    margin-bottom: 0;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    color: var(--mfr-color-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.mfr-item-body > .btn-white.btn-block,
+.mfr-nested-body > .btn-white.btn-block,
+.mfr-item-body .collapse-group > .btn-white.btn-block,
+.mfr-nested-body .collapse-group > .btn-white.btn-block {
+    margin-bottom: .5rem;
+}
+
+.mfr-item-body > .collapse,
+.mfr-nested-body > .collapse,
+.mfr-item-body > .collapse-group,
+.mfr-nested-body > .collapse-group {
+    margin-bottom: .5rem;
 }
 
 /* ============================================================
