@@ -336,7 +336,7 @@ class MFormFlexRepeaterRenderer
             . '<button type="button" class="btn btn-xs mfr-btn-nested-toggle" title="Aufklappen/Zuklappen"><i class="rex-icon fa-square-o"></i></button>'
             . '<button type="button" class="btn btn-xs btn-danger mfr-btn-nested-remove" title="Entfernen"><i class="rex-icon fa-trash"></i></button>'
             . '</div></div>'
-            . '<div class="mfr-nested-body form-horizontal" style="display:none">%s</div>'
+            . '<div class="mfr-nested-body mform form-horizontal" style="display:none">%s</div>'
             . '</div></template></div>',
             htmlspecialchars($fieldKey, ENT_QUOTES),
             $labelHtml,
