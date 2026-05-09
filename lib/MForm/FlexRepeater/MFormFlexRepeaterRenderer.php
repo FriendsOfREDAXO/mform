@@ -98,13 +98,14 @@ class MFormFlexRepeaterRenderer
             // FIELDSET: <fieldset><legend>..</legend>..inner..</fieldset>
             if ('fieldset' === $type) {
                 $attrs = $item->getAttributes();
-                $legend = isset($attrs['legend']) && '' !== (string) $attrs['legend']
-                    ? '<legend>' . (string) $attrs['legend'] . '</legend>' // Legend ist Entwickler-HTML
+                // Legend kommt aus addFieldsetArea(...) und wird vom AttributeHandler
+                // ueber setLegend() auf das Item gesetzt (nicht in attributes['legend']).
+                $legendStr = (string) $item->getLegend();
+                $legend = '' !== $legendStr
+                    ? '<legend>' . $legendStr . '</legend>' // Legend ist Entwickler-HTML
                     : '';
                 $cls = htmlspecialchars($item->getClass(), ENT_QUOTES);
-                $attrFiltered = $attrs;
-                unset($attrFiltered['legend']);
-                $attrHtml = self::renderAttributes($attrFiltered);
+                $attrHtml = self::renderAttributes($attrs);
                 $html .= sprintf('<fieldset class="%s"%s>%s', $cls, $attrHtml, $legend);
                 ++$i;
                 continue;
