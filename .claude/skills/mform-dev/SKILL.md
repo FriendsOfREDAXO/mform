@@ -1,6 +1,5 @@
 ---
-name: mform-dev
-description: MForm addon development skill. Use when working on FriendsOfREDAXO mform, especially fields, wrappers, flex repeater, custom link widgets, YForm value types, rex_form integration, docs, changelog, README synchronization, compatibility, or code-quality checks.
+name: mformdescription: MForm addon development skill. Use when working on FriendsOfREDAXO mform, especially fields, wrappers, flex repeater, custom link widgets, YForm value types, rex_form integration, docs, changelog, README synchronization, compatibility, or code-quality checks.
 ---
 
 # MForm Development Skill
