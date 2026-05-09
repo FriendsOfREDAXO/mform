@@ -336,7 +336,7 @@ class MFormFlexRepeaterRenderer
             . '<button type="button" class="btn btn-xs mfr-btn-nested-toggle" title="Aufklappen/Zuklappen"><i class="rex-icon fa-square-o"></i></button>'
             . '<button type="button" class="btn btn-xs btn-danger mfr-btn-nested-remove" title="Entfernen"><i class="rex-icon fa-trash"></i></button>'
             . '</div></div>'
-            . '<div class="mfr-nested-body" style="display:none">%s</div>'
+            . '<div class="mfr-nested-body form-horizontal" style="display:none">%s</div>'
             . '</div></template></div>',
             htmlspecialchars($fieldKey, ENT_QUOTES),
             $labelHtml,
@@ -361,7 +361,7 @@ class MFormFlexRepeaterRenderer
         }
         // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons),
         // wie auch im klassischen MFormParser-Pfad ausserhalb des Repeaters.
-        return sprintf('<label class="control-label">%s</label>', $label);
+        return $label;
     }
 
     private static function wrapFormGroup(string $label, string $field, MFormItem $item): string
@@ -371,7 +371,22 @@ class MFormFlexRepeaterRenderer
         if ('' !== $notice) {
             $noticeHtml = sprintf('<p class="help-block">%s</p>', htmlspecialchars($notice, ENT_QUOTES));
         }
-        return sprintf('<div class="form-group mfr-field-group">%s%s%s</div>', $label, $field, $noticeHtml);
+        // Bootstrap-3 form-horizontal Markup (col-sm-3 / col-sm-9). Die Layout-Variante
+        // (vertical/inline) wird per CSS via [data-mfr-layout] auf dem .mfr-container
+        // ueberschrieben.
+        if ('' === $label) {
+            return sprintf(
+                '<div class="form-group mfr-field-group"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                $field,
+                $noticeHtml,
+            );
+        }
+        return sprintf(
+            '<div class="form-group mfr-field-group"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            $label,
+            $field,
+            $noticeHtml,
+        );
     }
 
     /**

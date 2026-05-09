@@ -533,49 +533,50 @@ body.rex-theme-dark .mfr-btn-copy {
 
 /* ============================================================
    Feldgruppen im Repeater
-   Default-Layout: Label links, Feld rechts (analog form-horizontal),
-   responsive auf kleinen Screens gestapelt.
+   Default-Layout: Bootstrap-3 form-horizontal (Label col-sm-3 /
+   Feld col-sm-9). Layout per Container ueber data-mfr-layout
+   steuerbar:
+   - horizontal (default)  Label links / Feld rechts (col-sm-*)
+   - vertical              Label oben / Feld unten (col-sm-12)
+   - inline                Label oben kompakt / Feld unten
+   Spaltenbreite optional via attribute label_width => '<n>'
+   (n in 1..11) auf addRepeaterElement(...).
    ============================================================ */
 .mfr-field-group {
-    display: grid;
-    grid-template-columns: minmax(140px, 25%) 1fr;
-    gap: 4px 15px;
-    align-items: start;
     margin-bottom: .75rem;
 }
 
-.mfr-field-group > .control-label {
-    text-align: right;
-    padding-top: 7px;
-    margin-bottom: 0;
-    font-weight: 700;
+.mfr-item-body.form-horizontal .mfr-field-group .control-label,
+.mfr-nested-body.form-horizontal .mfr-field-group .control-label {
     word-break: break-word;
 }
 
-/* help-block (Notice) gehoert in die Feld-Spalte */
-.mfr-field-group > .help-block {
-    grid-column: 2;
-    margin-top: 4px;
-    margin-bottom: 0;
+/* Vertical / Inline Layout: Label oben, Feld darunter, volle Breite. */
+.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .control-label,
+.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .mfr-field-col,
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label,
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .mfr-field-col {
+    float: none;
+    width: 100%;
+    text-align: left;
+    padding-top: 0;
 }
 
-/* Wenn kein Label da ist: Feld nimmt volle Breite */
-.mfr-field-group:not(:has(> .control-label)) > * {
-    grid-column: 1 / -1;
+.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .control-label,
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label {
+    margin-bottom: 4px;
+    font-weight: 700;
 }
 
-/* Stacked auf schmalen Screens */
-@media (max-width: 767px) {
-    .mfr-field-group {
-        grid-template-columns: 1fr;
-    }
-    .mfr-field-group > .control-label {
-        text-align: left;
-        padding-top: 0;
-    }
-    .mfr-field-group > .help-block {
-        grid-column: 1;
-    }
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group {
+    margin-bottom: .4rem;
+}
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mfr-color-muted);
+    text-transform: uppercase;
+    letter-spacing: .03em;
 }
 
 /* ============================================================

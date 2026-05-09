@@ -27,6 +27,9 @@ use function count;
 use function is_array;
 use function is_callable;
 use function is_int;
+use function strlen;
+
+use const PATHINFO_BASENAME;
 
 abstract class MFormElements
 {
@@ -189,9 +192,9 @@ abstract class MFormElements
     {
         $hideToggleLinks = ($hideToggleLinks) ? 'true' : 'false';
         $attributes = array_merge($attributes, [
-            'data-group-accordion' => (int)$accordion,
+            'data-group-accordion' => (int) $accordion,
             'data-group-hide-toggle-links' => $hideToggleLinks,
-            'data-group-open-collapse' => $openCollapse
+            'data-group-open-collapse' => $openCollapse,
         ]);
 
         return $this->addElement('collapse', null, null, $attributes)
@@ -215,7 +218,6 @@ abstract class MFormElements
      * @param string                        $btnClass   Additional CSS class(es) for the trigger button (default: btn-default)
      * @param array<string, mixed> $attributes Additional HTML attributes for the trigger button
      * @param bool                          $parse      Whether to parse the sub-form immediately
-     * @param bool                          $showWrapper
      */
     public function addModalElement(string $label = '', callable|MForm|string|null $form = null, string $btnClass = 'btn-default', string $align = 'left', array $attributes = [], bool $parse = false, bool $showWrapper = false): static
     {
@@ -239,7 +241,7 @@ abstract class MFormElements
         array $attributes = [],
         bool $parse = false,
         bool $showWrapper = false,
-        string $action = 'show'
+        string $action = 'show',
     ): static {
         $class = trim(($attributes['class'] ?? '') . ' mform-conditional-target');
         $attributes['class'] = $class;
@@ -252,7 +254,7 @@ abstract class MFormElements
     }
 
     /**
-     * @param array<string, mixed> $attributes ['btn_text' => 'Add Repeater Item', 'btn_class' => 'btn-default', 'confirm_delete_msg' => 'Do you really want to delete this item?']
+     * @param array<string, mixed> $attributes ['btn_text' => 'Add Repeater Item', 'btn_class' => 'btn-default', 'confirm_delete_msg' => 'Do you really want to delete this item?', 'layout' => 'horizontal'|'vertical'|'inline']
      */
     public function addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false, bool $showWrapper = false): static
     {
@@ -409,7 +411,7 @@ abstract class MFormElements
                     $converter = new HtmlToSvgConverter();
                     $attr = [
                         'width' => '110px',
-                        'height' => '110px'
+                        'height' => '110px',
                     ];
                     $img = $converter->convertToImgTag($option['svgIconSet'], $attr);
                     $newOptions[$key] = $img . "<span>{$option['label']}</span>";
@@ -460,7 +462,7 @@ abstract class MFormElements
         if (null !== $options) {
             foreach ($options as $key => $option) {
                 if (is_array($option) && isset($option['label']) && isset($option['color'])) {
-                    if ($option['color'] == 'transparent') {
+                    if ('transparent' == $option['color']) {
                         $newOptions[$key] = "<span style=\"background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0) 50%, rgba(255, 0, 0, 1) 50%, rgba(255, 0, 0, 1) 100%);\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
                     } else {
                         $newOptions[$key] = "<span style=\"background-color:{$option['color']}\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"{$option['label']}\"></span>";
@@ -495,7 +497,7 @@ abstract class MFormElements
      */
     public function addCheckboxGroupField(float|int|string $id, ?array $options = null, ?array $attributes = null): static
     {
-        $attributes = $attributes ?? [];
+        $attributes ??= [];
         $attributes['form-group-class'] = 'mform-checkbox-group-wrapper';
         return $this->addElement('checkbox-group', $id, null, $attributes, $options);
     }
@@ -620,12 +622,12 @@ abstract class MFormElements
     /** @param array<string, mixed> $inputsConfig */
     public function addInputs(float|int|string|null $id, string $filename, array $inputsConfig = []): static
     {
-        if ($id === null) {
+        if (null === $id) {
             $id = '';
         }
         $inputsConfig['id'] = $id;
         if ('' !== $filename) {
-            if (substr($filename, (strlen($filename) - 1), 1) == '/') {
+            if ('/' == substr($filename, strlen($filename) - 1, 1)) {
                 $filename = substr($filename, 0, strlen($filename) - 1);
             }
             $basename = pathinfo($filename, PATHINFO_BASENAME);
@@ -633,9 +635,9 @@ abstract class MFormElements
                 $filename = substr($filename, 0, strlen($filename) - 4);
             }
             $file = (file_exists(rex_path::addon('mform/inputs', $filename . '.php'))) ? rex_path::addon('mform/inputs', $filename . '.php') : $filename . '.php';
-            if (rex_addon::exists('mfragment') &&
-                rex_addon::get('mfragment')->isAvailable() &&
-                file_exists(rex_path::addon('mfragment/inputs', $filename . '.php'))) {
+            if (rex_addon::exists('mfragment')
+                && rex_addon::get('mfragment')->isAvailable()
+                && file_exists(rex_path::addon('mfragment/inputs', $filename . '.php'))) {
                 $file = rex_path::addon('mfragment/inputs', $filename . '.php');
             }
             if (file_exists($file)) {
@@ -714,8 +716,8 @@ abstract class MFormElements
     public function setToggleOptions(array $options): static
     {
         $item = $this->item;
-        if ($this->item->getType() == 'html') {
-            $prevItem = $this->items[(count($this->items) - 1)];
+        if ('html' == $this->item->getType()) {
+            $prevItem = $this->items[count($this->items) - 1];
             if ($prevItem instanceof MFormItem) {
                 switch ($prevItem->getType()) {
                     case 'radio':

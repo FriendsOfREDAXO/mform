@@ -1,5 +1,24 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta8
+
+### Fixed
+
+- **FlexRepeater: `setToggleOptions()` auf Selects funktioniert wieder** – nach dem Refactor in beta1 (mform_repeater2) wurden `setToggleOptions(...)` und das daraus entstehende `data-toggle="collapse"` / `data-toggle-item` im Repeater-Template ignoriert. Der `MFormFlexRepeaterRenderer` setzt jetzt automatisch `data-toggle="collapse"` auf Selects mit Toggle-Options und `data-toggle-item` auf den passenden `<option>`s, analog zum klassischen MForm-Pfad außerhalb des Repeaters. Damit greift `initMFormCollapses` aus `assets/mform.js` auch in geklonten Repeater-Items (über den `rex:ready`-Trigger des FlexRepeaters).
+- **FlexRepeater: `addCollapseElement()` und `addFieldsetArea()` rendern wieder** – beide Wrapper-Typen wurden im FlexRepeater-Template komplett verworfen (kein `case`). Sie werden jetzt analog zum `mform_wrapper.php`-Fragment ausgegeben, inkl. `<a data-toggle="collapse">`-Button, `.collapse[data-group-collapse-id=…]`-Wrapper und `<fieldset><legend>`.
+- **FlexRepeater: HTML in Labels (z. B. FontAwesome-Icons) wird wieder gerendert** – `renderLabel`, `renderModalBlock`, `renderNestedRepeaterContainer` und das Container-Label in `MFormParser::openFlexRepeaterElement` haben Labels per `htmlspecialchars` escaped, wodurch z. B. `<i class="fas fa-tag"></i>` als Text dargestellt wurde. Labels gelten jetzt – wie im klassischen MForm-Pfad – als Entwickler-HTML und werden roh durchgereicht. Feld-Werte (Headline, Description, Alert) bleiben weiterhin escaped.
+
+### Neu
+
+- **FlexRepeater Layout-Steuerung** – `addRepeaterElement($id, $form, ..., ['layout' => 'horizontal'|'vertical'|'inline'])` (Default `horizontal`) steuert die Default-Darstellung der Felder im Repeater-Item:
+  - `horizontal` (Default): Label links / Feld rechts via CSS-Grid (analog Bootstrap `form-horizontal`), responsive ab `<768px` gestapelt.
+  - `vertical`: Label oben, Feld unten (klassisch gestapelt).
+  - `inline`: kompakte Stapel-Darstellung mit kleinen Uppercase-Labels.
+  - Optional `'label_width' => '30%'` (oder px) für explizite Label-Spaltenbreite via CSS-Variable `--mfr-label-width` auf `.mfr-container`.
+- **FlexRepeater: Default-Styles für Wrapper im Item-Body** – `<fieldset>` aus `addFieldsetArea()` bekommt sichtbares Border + dezent gestylten `<legend>`; Collapse-Buttons und `.collapse`-Wrapper haben sauberen vertikalen Abstand. Kein Theme-Override nötig für saubere Default-Optik.
+
+---
+
 ## Version 9.0.0-beta7
 
 ### Neu

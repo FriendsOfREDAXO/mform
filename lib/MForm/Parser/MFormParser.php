@@ -139,6 +139,13 @@ class MFormParser
 
         $addonDebug = (int) ((bool) rex_addon::get('mform')->getConfig('debug', false));
 
+        // Layout: horizontal (default, Label links / Feld rechts via Bootstrap col-sm-3/col-sm-9)
+        // | vertical (gestapelt) | inline (kompakt gestapelt)
+        $layout = isset($attrs['layout']) ? (string) $attrs['layout'] : 'horizontal';
+        if (!in_array($layout, ['horizontal', 'vertical', 'inline'], true)) {
+            $layout = 'horizontal';
+        }
+
         $innerForm = null;
         foreach ($items as $k => $itm) {
             if ($k > $key && $itm instanceof MForm) {
@@ -154,7 +161,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d">%s',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s">%s',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -168,6 +175,7 @@ class MFormParser
             htmlspecialchars($confirmDeleteMsg, ENT_QUOTES),
             $addonDebug,
             $copyPaste ? 1 : 0,
+            htmlspecialchars($layout, ENT_QUOTES),
             $label,
         );
 
@@ -202,7 +210,7 @@ class MFormParser
         $this->elements[] = '<div class="mfr-items-list"></div>';
 
         $this->elements[] = sprintf(
-            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button>%s<button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body">%s</div></div></template>',
+            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button>%s<button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body form-horizontal">%s</div></div></template>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_up'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_down'), ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),
