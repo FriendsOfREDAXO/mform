@@ -146,11 +146,214 @@ class MFormFlexRepeaterRenderer
                 continue;
             }
 
+            // COLLAPSE-GROUP: Wrapper fuer mehrere Collapses, ermoeglicht Standalone-Toggle
+            // ueber initMFormLinkCollapse (Klick auf Button toggelt naechsten .collapse).
+            if ('start-group-collapse' === $type) {
+                $attrs = $item->getAttributes();
+                if (!isset($attrs['data-group-accordion'])) {
+                    $attrs['data-group-accordion'] = 0;
+                }
+                unset($attrs['data-group-collapse-id']);
+                $cls = trim('collapse-group ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
+                ++$i;
+                continue;
+            }
+            if ('close-group-collapse' === $type) {
+                $html .= '</div>';
+                ++$i;
+                continue;
+            }
+
+            // COLUMN-GROUP: Bootstrap-3 row + col-* divs
+            if ('start-group-column' === $type) {
+                $cls = trim('row ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                ++$i;
+                continue;
+            }
+            if ('column' === $type) {
+                $cls = $item->getClass();
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                ++$i;
+                continue;
+            }
+            if ('close-column' === $type || 'close-group-column' === $type) {
+                $html .= '</div>';
+                ++$i;
+                continue;
+            }
+
+            // INLINE-GROUP: form-inline Wrapper
+            if ('start-group-inline' === $type) {
+                $cls = trim('form-inline ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                ++$i;
+                continue;
+            }
+            if ('inline' === $type) {
+                $cls = trim('form-inline mfr-inline ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                ++$i;
+                continue;
+            }
+            if ('close-inline' === $type || 'close-group-inline' === $type) {
+                $html .= '</div>';
+                ++$i;
+                continue;
+            }
+
+            // TAB-GROUP: Bootstrap-3 nav-tabs + tab-content. IDs muessen pro Item-Klon
+            // eindeutig sein, daher Platzhalter __MFRTAB_<n>__ verwenden, die JS in
+            // _renderItem() durch eine Item-spezifische UID ersetzt.
+            if ('start-group-tab' === $type) {
+                $tabsMeta = self::collectTabsForGroup($items, $i);
+                $navHtml = '';
+                foreach ($tabsMeta as $idx => $meta) {
+                    $tabIcon = isset($meta['attrs']['tab-icon']) ? '<i class="rex-icon ' . htmlspecialchars((string) $meta['attrs']['tab-icon'], ENT_QUOTES) . '"></i> ' : '';
+                    $navClass = trim(
+                        ((isset($meta['attrs']['nav-class'])) ? (string) $meta['attrs']['nav-class'] . ' ' : '')
+                        . ((isset($meta['attrs']['pull-right']) && true === $meta['attrs']['pull-right']) ? 'pull-right ' : '')
+                        . ((isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab']) ? 'active' : ''),
+                    );
+                    $navHtml .= sprintf(
+                        '<li role="presentation" class="%s"><a href="#__MFRTAB_%d__" aria-controls="__MFRTAB_%d__" role="tab" data-toggle="tab" data-tab-item="__MFRTAB_%d__">%s%s</a></li>',
+                        htmlspecialchars($navClass, ENT_QUOTES),
+                        $idx,
+                        $idx,
+                        $idx,
+                        $tabIcon,
+                        $meta['label'], // Label ist Entwickler-HTML
+                    );
+                }
+                $cls = trim('nav mform-tabs rex-page-nav ' . $item->getClass());
+                $html .= sprintf(
+                    '<div class="%s"%s><ul class="nav nav-tabs" role="tablist">%s</ul><div class="tab-content">',
+                    htmlspecialchars($cls, ENT_QUOTES),
+                    self::renderAttributes($item->getAttributes()),
+                    $navHtml,
+                );
+                ++$i;
+                continue;
+            }
+            if ('tab' === $type) {
+                $tabIdx = self::tabIndexInGroup($items, $i);
+                $attrs = $item->getAttributes();
+                $isActive = isset($attrs['data-group-open-tab']) && true === $attrs['data-group-open-tab'];
+                unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab']);
+                $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
+                $html .= sprintf(
+                    '<div role="tabpanel" id="__MFRTAB_%d__" class="%s"%s>',
+                    $tabIdx,
+                    htmlspecialchars($cls, ENT_QUOTES),
+                    self::renderAttributes($attrs),
+                );
+                ++$i;
+                continue;
+            }
+            if ('close-tab' === $type) {
+                $html .= '</div>';
+                ++$i;
+                continue;
+            }
+            if ('close-group-tab' === $type) {
+                $html .= '</div></div>';
+                ++$i;
+                continue;
+            }
+
             $html .= self::renderField($item);
             ++$i;
         }
 
         return $html;
+    }
+
+    /**
+     * Sammelt fuer ein <start-group-tab> alle direkt darin enthaltenen <tab>-Items
+     * inkl. Label und Attributen, um die Tab-Navigation aufzubauen.
+     *
+     * @param array<int, MFormItem|MForm> $items
+     * @return list<array{label: string, attrs: array<string, mixed>}>
+     */
+    private static function collectTabsForGroup(array $items, int $startIdx): array
+    {
+        $tabs = [];
+        $depth = 0;
+        $count = count($items);
+        for ($j = $startIdx + 1; $j < $count; ++$j) {
+            $it = $items[$j];
+            if (!$it instanceof MFormItem) {
+                continue;
+            }
+            $t = $it->getType();
+            if ('start-group-tab' === $t) {
+                ++$depth;
+                continue;
+            }
+            if ('close-group-tab' === $t) {
+                if (0 === $depth) {
+                    return $tabs;
+                }
+                --$depth;
+                continue;
+            }
+            if (0 === $depth && 'tab' === $t) {
+                $tabs[] = [
+                    'label' => self::getLabelString($it->getLabel()),
+                    'attrs' => $it->getAttributes(),
+                ];
+            }
+        }
+        return $tabs;
+    }
+
+    /**
+     * Findet den 0-basierten Index eines tab-Items innerhalb seiner Tab-Gruppe.
+     *
+     * @param array<int, MFormItem|MForm> $items
+     */
+    private static function tabIndexInGroup(array $items, int $tabIdx): int
+    {
+        // Rueckwaerts zum start-group-tab laufen (auf gleicher Verschachtelungsebene)
+        $depth = 0;
+        $start = -1;
+        for ($j = $tabIdx - 1; $j >= 0; --$j) {
+            $it = $items[$j];
+            if (!$it instanceof MFormItem) {
+                continue;
+            }
+            $t = $it->getType();
+            if ('close-group-tab' === $t) {
+                ++$depth;
+            } elseif ('start-group-tab' === $t) {
+                if (0 === $depth) {
+                    $start = $j;
+                    break;
+                }
+                --$depth;
+            }
+        }
+        if ($start < 0) {
+            return 0;
+        }
+        $idx = 0;
+        $depth = 0;
+        for ($j = $start + 1; $j < $tabIdx; ++$j) {
+            $it = $items[$j];
+            if (!$it instanceof MFormItem) {
+                continue;
+            }
+            $t = $it->getType();
+            if ('start-group-tab' === $t) {
+                ++$depth;
+            } elseif ('close-group-tab' === $t) {
+                --$depth;
+            } elseif (0 === $depth && 'tab' === $t) {
+                ++$idx;
+            }
+        }
+        return $idx;
     }
 
     private static function renderField(MFormItem $item): string

@@ -449,6 +449,29 @@
 
             itemEl.dataset.mfrIndex = String(index);
 
+            // Replace __MFRID__ und __MFRTAB_<n>__ placeholders auch im nested-Kontext.
+            if (itemEl.innerHTML.indexOf('__MFRID__') !== -1) {
+                let lastModalId = null;
+                itemEl.innerHTML = itemEl.innerHTML.replace(/__MFRID__/g, function () {
+                    if (lastModalId === null) {
+                        lastModalId = uid('mfr-modal');
+                        return lastModalId;
+                    }
+                    const id = lastModalId;
+                    lastModalId = null;
+                    return id;
+                });
+            }
+            if (itemEl.innerHTML.indexOf('__MFRTAB_') !== -1) {
+                const tabMap = {};
+                itemEl.innerHTML = itemEl.innerHTML.replace(/__MFRTAB_(\d+)__/g, function (_m, n) {
+                    if (!tabMap[n]) {
+                        tabMap[n] = uid('mfr-tab');
+                    }
+                    return tabMap[n];
+                });
+            }
+
             // Felder befüllen
             itemEl.querySelectorAll('[data-mfr-field]').forEach(function (field) {
                 const key = field.dataset.mfrField;
@@ -841,6 +864,18 @@
                     const id = lastModalId;
                     lastModalId = null;
                     return id;
+                });
+            }
+
+            // Replace __MFRTAB_<n>__ placeholders with stable per-item UIDs.
+            // Same <n> within the same item must resolve to the same id (href + tab-pane id + aria-controls).
+            if (itemEl.innerHTML.indexOf('__MFRTAB_') !== -1) {
+                const tabMap = {};
+                itemEl.innerHTML = itemEl.innerHTML.replace(/__MFRTAB_(\d+)__/g, function (_m, n) {
+                    if (!tabMap[n]) {
+                        tabMap[n] = uid('mfr-tab');
+                    }
+                    return tabMap[n];
                 });
             }
 
