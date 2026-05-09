@@ -11,11 +11,20 @@
 ### Neu
 
 - **FlexRepeater Layout-Steuerung** – `addRepeaterElement($id, $form, ..., ['layout' => 'horizontal'|'vertical'|'inline'])` (Default `horizontal`) steuert die Default-Darstellung der Felder im Repeater-Item:
-  - `horizontal` (Default): Label links / Feld rechts via CSS-Grid (analog Bootstrap `form-horizontal`), responsive ab `<768px` gestapelt.
+  - `horizontal` (Default): Label links (`col-sm-3`) / Feld rechts (`col-sm-9`) via Bootstrap-3 `form-horizontal`-Markup.
   - `vertical`: Label oben, Feld unten (klassisch gestapelt).
   - `inline`: kompakte Stapel-Darstellung mit kleinen Uppercase-Labels.
-  - Optional `'label_width' => '30%'` (oder px) für explizite Label-Spaltenbreite via CSS-Variable `--mfr-label-width` auf `.mfr-container`.
 - **FlexRepeater: Default-Styles für Wrapper im Item-Body** – `<fieldset>` aus `addFieldsetArea()` bekommt sichtbares Border + dezent gestylten `<legend>`; Collapse-Buttons und `.collapse`-Wrapper haben sauberen vertikalen Abstand. Kein Theme-Override nötig für saubere Default-Optik.
+- **FlexRepeater: `.mfr-item-body` und `.mfr-nested-body` sind jetzt `.mform`-Scopes** – damit greifen Toggle-/Collapse-Helfer aus `assets/mform.js` (`getParentMForm()`, `initMFormSelectCollapse`, `initMFormToggleCollapse`) sauber pro Repeater-Item statt auf den Top-Level-`.mform` zurueckzufallen.
+
+### Architektur-Notiz fuer kuenftige Anpassungen
+
+Damit es nicht wieder dazu kommt, dass das Modul-Input das gesamte Formular gleichzeitig togglet:
+
+- **Jeder klonbare Item-Body braucht einen eigenen `.mform`-Wrapper.** Toggle-/Collapse-Logik in `assets/mform.js` arbeitet ueber `getParentMForm()` und sucht den naechsten `.mform`-Vorfahren als Scope. Ohne eigenen Scope greift der Selektor auf den globalen Modul-Wrapper.
+- **Bootstrap-3 ist Pflicht-Annahme** im Backend (kein Flex/Grid, kein `:has()`). Layout im Repeater bitte ueber `form-horizontal` + `col-sm-*`-Markup im PHP-Renderer aufbauen, nicht ueber neues Custom-Grid. Spaeterer Bootstrap-Exit wird so auf einen Schlag in `MFormFlexRepeaterRenderer::wrapFormGroup()` und im klassischen `mform_default.php`-Fragment moeglich.
+- **Toggle-IDs (`data-group-collapse-id`, `data-toggle-item`) sind nur innerhalb eines `.mform`-Scopes eindeutig.** Im FlexRepeater duerfen Item-Klone die selbe ID tragen, weil der Scope der Item-Body ist. Beim Hinzufuegen weiterer wiederholbarer Strukturen (z. B. neue Nested-Container) immer `<div class="mform ...">` als Wurzel verwenden.
+- **Layout-Schalter gehen ueber `data-mfr-layout` am Container**, nicht ueber inline `style`/CSS-Variablen am Item. Custom-Themes hooken sich ueber `.mfr-container[data-mfr-layout="…"]` ein.
 
 ---
 
