@@ -1,6 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.0.0-beta8
+## Version 9.0.0-beta7
 
 ### Fixed
 
@@ -30,7 +30,7 @@ Damit es nicht wieder dazu kommt, dass das Modul-Input das gesamte Formular glei
 
 ---
 
-## Version 9.0.0-beta7
+Nonst noch
 
 ### Neu
 
