@@ -271,6 +271,88 @@ Verfügbare Optionen im Repeater-Array:
 
 ---
 
+## Wrapper im Repeater (Tabs, Collapse, Fieldset, Inline, Columns)
+
+Seit **9.0.0-beta8** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerhalb eines Repeater-Items. Damit lassen sich komplexe Item-Layouts wie im klassischen MForm-Pfad aufbauen – inkl. Bootstrap-3-Tabs, Collapse-Gruppen, Fieldsets mit Legend, Form-Inline und Spalten-Grids.
+
+| Wrapper | Methode | Markup im Repeater-Item |
+|---------|---------|-------------------------|
+| Tabs | `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()` | Bootstrap-3 `nav-tabs` + `tab-content` |
+| Collapse (mit Toggle-Button) | `addCollapseElement()` | `<a data-toggle="collapse">` + `.collapse[data-group-collapse-id=…]` |
+| Collapse-Gruppe (Standalone-Toggle) | `addStartGroupCollapse()` / `addCloseGroupCollapse()` | `.collapse-group[data-group-accordion=0\|1]` |
+| Fieldset | `addFieldsetArea($legend, …)` | `<fieldset><legend>…</legend>…</fieldset>` |
+| Form-Inline | `addStartGroupInline()` / `addCloseGroupInline()` | `<div class="form-inline">` |
+| Spalten-Grid | `addStartGroupColumn()` / `addColumn('col-sm-6')` / `addCloseColumn()` / `addCloseGroupColumn()` | BS3 `row` + `col-*` |
+| Modal | `addModalElement()` | Bootstrap-3 Modal-Block |
+
+### Tabs im Repeater
+
+Tab-Panel-IDs muessen pro Item-Klon eindeutig sein. Der Renderer schreibt deshalb Platzhalter `__MFRTAB_<n>__` in die Tab-`href`s, `aria-controls` und Tab-Pane-`id`s. `flex-repeater.js _renderItem()` ersetzt die Platzhalter beim Klonen jedes Items durch eine eindeutige UID (gleiche `n` → gleiche UID, damit Nav-Link und Pane matchen). Aktive Tabs werden ueber `data-group-open-tab => true` markiert (setzt `active` auf `<li>` und `tab-pane`).
+
+```php
+$itemForm = MForm::factory()
+    ->addStartGroupTab('itemTabs')
+        ->addTab('itemTabs', ['data-group-open-tab' => true, 'tab-icon' => 'fa-info'])
+            ->setLabel('Allgemein')
+            ->addTextField('title', ['label' => 'Titel'])
+        ->addCloseTab()
+        ->addTab('itemTabs')
+            ->setLabel('Erweitert')
+            ->addTextareaField('text', ['label' => 'Text'])
+        ->addCloseTab()
+    ->addCloseGroupTab();
+
+$mform->addRepeaterElement(1, $itemForm);
+```
+
+### Collapse mit `setToggleOptions()`
+
+Selects mit `setToggleOptions()` togglen auch im Repeater zuverlaessig. Der Renderer setzt automatisch `data-toggle="collapse"` auf den Select und `data-toggle-item="…"` an den Options. Toggle-IDs sind innerhalb des Repeater-Item-Bodys gescoped (eigener `.mform`-Wrapper), darum duerfen verschiedene Items dieselbe Collapse-ID tragen, ohne sich gegenseitig zu beeinflussen.
+
+```php
+$itemForm = MForm::factory()
+    ->addSelectField('mode', ['label' => 'Modus'], [1 => 'Text', 2 => 'Bild'])
+        ->setToggleOptions([1 => 'modeText', 2 => 'modeImage'])
+    ->addCollapseElement('', MForm::factory()
+        ->addTextareaField('text', ['label' => 'Text'])
+        ->show(),
+        false, true, ['data-group-collapse-id' => 'modeText']
+    )
+    ->addCollapseElement('', MForm::factory()
+        ->addMediaField('image', ['label' => 'Bild'])
+        ->show(),
+        false, true, ['data-group-collapse-id' => 'modeImage']
+    );
+```
+
+### Fieldset mit Legend
+
+```php
+$itemForm = MForm::factory()
+    ->addFieldsetArea('Kontaktdaten', MForm::factory()
+        ->addTextField('name', ['label' => 'Name'])
+        ->addEmailField('mail', ['label' => 'E-Mail'])
+    );
+```
+
+### Spalten-Grid (Bootstrap 3)
+
+```php
+$itemForm = MForm::factory()
+    ->addStartGroupColumn()
+        ->addColumn('col-sm-6')
+            ->addTextField('left', ['label' => 'Links'])
+        ->addCloseColumn()
+        ->addColumn('col-sm-6')
+            ->addTextField('right', ['label' => 'Rechts'])
+        ->addCloseColumn()
+    ->addCloseGroupColumn();
+```
+
+> **Hinweis Bootstrap-3:** Der Repeater nutzt durchgaengig `form-horizontal` mit `col-sm-3`/`col-sm-9`-Spalten und `row` + `col-*`-Grids. Kein Flex/Grid-CSS, kein `:has()`. Die Layout-Variante des Repeaters laesst sich ueber `addRepeaterElement($id, $form, [...], ['layout' => 'horizontal'|'vertical'|'inline'])` umschalten.
+
+---
+
 ## Media- und Link-Felder im Repeater
 
 Der Flex-Repeater speichert alle Werte in einem JSON-Objekt. Daher gelten hier **andere Key-Konventionen als in MBlock**.
