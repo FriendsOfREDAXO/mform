@@ -8,9 +8,6 @@
 
 namespace FriendsOfRedaxo\MForm\Parser;
 
-use rex_var_custom_medialist;
-use rex_var_custom_linklist;
-use rex_var_custom_link_multi;
 use DOMDocument;
 use DOMElement;
 use DOMNodeList;
@@ -20,7 +17,6 @@ use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
-use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
 use rex_addon;
@@ -30,9 +26,10 @@ use rex_extension_point;
 use rex_fragment;
 use rex_i18n;
 use rex_logger;
-use rex_var;
 use rex_var_custom_link;
-use rex_var_imglist;
+use rex_var_custom_link_multi;
+use rex_var_custom_linklist;
+use rex_var_custom_medialist;
 use rex_var_link;
 use rex_var_media;
 use rex_view;
@@ -43,11 +40,16 @@ use function in_array;
 use function is_array;
 use function is_int;
 use function is_string;
-use function strlen;
+use function sprintf;
+
+use const COUNT_RECURSIVE;
+use const ENT_QUOTES;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 
 class MFormParser
 {
-    /** @var string[] */
+    /** @var array<string> */
     protected array $elements = [];
     /** @var array<string, mixed> */
     protected array $values = [];
@@ -55,9 +57,6 @@ class MFormParser
     protected array $obj = [];
     protected bool $debug = false;
 
-    /**
-     * @var string
-     */
     protected string $theme = 'mform';
 
     /**
@@ -122,7 +121,8 @@ class MFormParser
             } else {
                 $labelStr = (string) $itemLabel;
             }
-            $label = '<label class="control-label mfr-label">' . htmlspecialchars($labelStr, ENT_QUOTES) . '</label>';
+            // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons).
+            $label = '<label class="control-label mfr-label">' . $labelStr . '</label>';
         }
 
         $min = (int) ($attrs['min'] ?? 0);
@@ -168,32 +168,32 @@ class MFormParser
             htmlspecialchars($confirmDeleteMsg, ENT_QUOTES),
             $addonDebug,
             $copyPaste ? 1 : 0,
-            $label
+            $label,
         );
 
         $copyPasteButtons = $copyPaste ? sprintf(
             '<button type="button" class="btn btn-xs mfr-btn-copy" title="%s"><i class="rex-icon fa-copy"></i></button><button type="button" class="btn btn-xs mfr-btn-paste-after" title="%s" style="display:none"><i class="rex-icon fa-paste"></i></button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_copy'), ENT_QUOTES),
-            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_after'), ENT_QUOTES)
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_after'), ENT_QUOTES),
         ) : '';
 
         $pasteButton = $copyPaste ? sprintf(
             '<button type="button" class="btn btn-default mfr-btn-paste" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
-            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES)
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
         ) : '';
 
         $toggleAllButton = sprintf(
             '<button type="button" class="btn btn-default mfr-btn-toggle-all" title="%s"><i class="rex-icon fa-square-o"></i> %s</button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES),
-            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES)
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES),
         );
 
         $toolbarToggle = ('true' === $showToggleAll) ? $toggleAllButton : '';
         $toolbarAdd = sprintf(
             '<button type="button" class="btn btn-mform-repeater%s mfr-btn-add"><i class="rex-icon fa-plus-circle"></i> %s</button>',
             htmlspecialchars($btnClass, ENT_QUOTES),
-            htmlspecialchars($btnText, ENT_QUOTES)
+            htmlspecialchars($btnText, ENT_QUOTES),
         );
         $toolbarGroup = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButton . '</div>';
 
@@ -210,7 +210,7 @@ class MFormParser
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_visibility'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_remove'), ENT_QUOTES),
-            $templateHtml
+            $templateHtml,
         );
 
         $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroup . '</div>';
@@ -219,13 +219,13 @@ class MFormParser
             $this->elements[] = sprintf(
                 '<textarea name="%s" class="mfr-value" style="width:100%%;height:150px;font-family:monospace;font-size:12px">%s</textarea>',
                 htmlspecialchars($fieldName, ENT_QUOTES),
-                htmlspecialchars((string) $jsonValue, ENT_QUOTES)
+                htmlspecialchars((string) $jsonValue, ENT_QUOTES),
             );
         } else {
             $this->elements[] = sprintf(
                 '<input type="hidden" name="%s" class="mfr-value" value="%s">',
                 htmlspecialchars($fieldName, ENT_QUOTES),
-                htmlspecialchars((string) $jsonValue, ENT_QUOTES)
+                htmlspecialchars((string) $jsonValue, ENT_QUOTES),
             );
         }
     }
@@ -234,7 +234,6 @@ class MFormParser
     {
         $this->elements[] = '</div><!-- /mfr-container -->';
     }
-
 
     /**
      * @param array<int|string, MFormItem|MForm> $items
@@ -285,7 +284,7 @@ class MFormParser
             }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
-                ->setClass(((('' === $item->getLabel() || [] === $item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links']))) ? ' hidden' : '')
+                ->setClass((('' === $item->getLabel() || [] === $item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
                 ->setValue(is_array($item->getLabel()) ? (string) (array_values($item->getLabel())[0] ?? '') : (string) $item->getLabel());
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
@@ -351,7 +350,7 @@ class MFormParser
     {
         // create templateElement object
         $element = new MFormElement();
-        $element->setOutput((is_string($item->getValue()) ? $item->getValue() : ''))
+        $element->setOutput(is_string($item->getValue()) ? $item->getValue() : '')
             ->setAttributes($this->parseAttributes($item->getAttributes()))
             ->setClass($item->getClass()) // set output to replace in template
             ->setType($item->getType())
@@ -485,8 +484,8 @@ class MFormParser
         }
         $itemAttributes = $this->parseAttributes($attributes); // parse attributes for output
 
-        if ($item->isMultiple() && is_array($item->getValue()) &&
-            count($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {
+        if ($item->isMultiple() && is_array($item->getValue())
+            && count($item->getValue()) == count($item->getValue(), COUNT_RECURSIVE)) {
             $item->setValue(implode(',', $item->getValue()));
         }
 
@@ -583,7 +582,7 @@ class MFormParser
 
         if ('' !== $toggle && [] !== $toggle) {
             $attributes = [];
-            if (is_array($toggle) && count($toggle) == 2) {
+            if (is_array($toggle) && 2 == count($toggle)) {
                 $attributes[':data-toggle-item'] = $toggle[1];
                 $toggle = null;
             }
@@ -617,12 +616,10 @@ class MFormParser
 
             // JSON Values 1.x
             if (isset($current[1]) && isset($itemsSelected[$current[1]]) && is_array($itemsSelected[$current[1]]) && (in_array((string) $key, $itemsSelected[$current[1]]) || ('add' == $item->getMode() && in_array((string) $key, $itemsDefaultValue)))) {
-
                 $element->setAttributes($element->attributes . ' selected');
 
                 // JSON Values 1.x.x
             } elseif (isset($current[2]) && isset($itemsSelected[$current[1]][$current[2]]) && is_array($itemsSelected[$current[1]][$current[2]]) && in_array((string) $key, $itemsSelected[$current[1]][$current[2]]) || ('add' == $item->getMode() && in_array((string) $key, $itemsDefaultValue))) {
-
                 $element->setAttributes($element->attributes . ' selected');
 
                 // REX_VAL
@@ -697,7 +694,7 @@ class MFormParser
         // add data toggle
         if (count($item->getToggleOptions()) > 0 && array_key_exists($key, $item->getToggleOptions())) {
             $toggle = $item->getToggleOptions();
-            if (is_array($item->getToggleOptions()[$key]) && count($item->getToggleOptions()[$key]) == 2) {
+            if (is_array($item->getToggleOptions()[$key]) && 2 == count($item->getToggleOptions()[$key])) {
                 $attributes[':data-toggle-item'] = $item->getToggleOptions()[$key][1];
                 $toggle = null;
             }
@@ -746,8 +743,8 @@ class MFormParser
         $uid = 'mform-cbg-' . preg_replace('/[^a-z0-9]/i', '-', $varIdStr);
 
         $attrs = $item->getAttributes();
-        $layout = isset($attrs['layout']) && $attrs['layout'] === 'vertical' ? ' mform-cbg--vertical' : '';
-        $modeAttr = isset($attrs['mode']) && $attrs['mode'] === 'radio' ? ' data-mode="radio"' : '';
+        $layout = isset($attrs['layout']) && 'vertical' === $attrs['layout'] ? ' mform-cbg--vertical' : '';
+        $modeAttr = isset($attrs['mode']) && 'radio' === $attrs['mode'] ? ' data-mode="radio"' : '';
 
         $html = '<div class="mform-checkbox-group' . $layout . '"' . $modeAttr . ' data-cbg-id="' . htmlspecialchars($uid, ENT_QUOTES) . '">';
         $html .= '<input type="hidden"'
@@ -808,14 +805,14 @@ class MFormParser
                     htmlspecialchars($strVal, ENT_QUOTES),
                     $styleAttr,
                     $dataPreview,
-                    htmlspecialchars($labelStr, ENT_QUOTES)
+                    htmlspecialchars($labelStr, ENT_QUOTES),
                 );
             } else {
                 $swatchHtml .= sprintf(
                     '<button type="button" class="mform-cs-swatch" data-value="%s" style="background-color:%s" title="%s"></button>',
                     htmlspecialchars($strVal, ENT_QUOTES),
                     htmlspecialchars($strVal, ENT_QUOTES),
-                    htmlspecialchars($labelStr, ENT_QUOTES)
+                    htmlspecialchars($labelStr, ENT_QUOTES),
                 );
             }
         }
@@ -838,7 +835,7 @@ class MFormParser
             htmlspecialchars($uid, ENT_QUOTES),
             htmlspecialchars($varIdStr, ENT_QUOTES),
             htmlspecialchars($currentValue, ENT_QUOTES),
-            $swatchHtml
+            $swatchHtml,
         );
 
         $templateElement = new MFormElement();
@@ -920,13 +917,13 @@ class MFormParser
                     // custom_link-Widget, speichert aber in REX_INPUT_MEDIA – Format bleibt kompatibel
                     $inputSlot = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                     $mediaArgs = [
-                        'media'    => 1,
-                        'intern'   => 0,
+                        'media' => 1,
+                        'intern' => 0,
                         'external' => 0,
-                        'mailto'   => 0,
-                        'phone'    => 0,
-                        'anchor'   => 0,
-                        'class'    => $item->class,
+                        'mailto' => 0,
+                        'phone' => 0,
+                        'anchor' => 0,
+                        'class' => $item->class,
                     ];
                     if (isset($parameter['types'])) {
                         $mediaArgs['types'] = $parameter['types'];
@@ -959,13 +956,13 @@ class MFormParser
                 $id = $this->getWidgetId($item);
 
                 $mediaArgs = [
-                    'media'    => 1,
-                    'intern'   => 0,
+                    'media' => 1,
+                    'intern' => 0,
                     'external' => 0,
-                    'mailto'   => 0,
-                    'phone'    => 0,
-                    'anchor'   => 0,
-                    'class'    => $item->class,
+                    'mailto' => 0,
+                    'phone' => 0,
+                    'anchor' => 0,
+                    'class' => $item->class,
                 ];
                 if (isset($parameter['types'])) {
                     $mediaArgs['types'] = $parameter['types'];
@@ -1054,13 +1051,13 @@ class MFormParser
                     // custom_link-Widget, speichert aber in REX_INPUT_LINK – Format bleibt kompatibel
                     $inputSlot = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
                     $linkArgs = [
-                        'intern'   => 1,
+                        'intern' => 1,
                         'external' => 0,
-                        'media'    => 0,
-                        'mailto'   => 0,
-                        'phone'    => 0,
-                        'anchor'   => 0,
-                        'class'    => $item->class,
+                        'media' => 0,
+                        'mailto' => 0,
+                        'phone' => 0,
+                        'anchor' => 0,
+                        'class' => $item->class,
                     ];
                     if (isset($parameter['category'])) {
                         $linkArgs['category'] = $parameter['category'];
@@ -1077,8 +1074,8 @@ class MFormParser
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     foreach ($inputs as $input) {
-                        $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int)$id);
-                        if ($input->getAttribute('type') == 'text') {
+                        $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int) $id);
+                        if ('text' == $input->getAttribute('type')) {
                             $input->setAttribute('id', $input->getAttribute('id') . '_NAME');
                         }
                     }
@@ -1090,13 +1087,13 @@ class MFormParser
                 $id = $this->getWidgetId($item);
 
                 $linkArgs = [
-                    'intern'   => 1,
+                    'intern' => 1,
                     'external' => 0,
-                    'media'    => 0,
-                    'mailto'   => 0,
-                    'phone'    => 0,
-                    'anchor'   => 0,
-                    'class'    => $item->class,
+                    'media' => 0,
+                    'mailto' => 0,
+                    'phone' => 0,
+                    'anchor' => 0,
+                    'class' => $item->class,
                 ];
                 if (isset($parameter['category'])) {
                     $linkArgs['category'] = $parameter['category'];
@@ -1147,23 +1144,23 @@ class MFormParser
         foreach ($inputs as $input) {
             switch ($input->getAttribute('type')) {
                 case 'text':
-                    if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
-                        if ($item->getType() == 'media') {
+                    if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
+                        if ('media' == $item->getType()) {
                             $item->addAttribute('x-model', $attributes['x-model']);
                         } else {
                             $item->addAttribute('x-model', $attributes['x-model'] . '.name');
                         }
                         $this->processNodeFormElement($input, $item);
-                        $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id'])) ? "+'-'+".$attributes['parent_id'].'Index' : '')."+'_NAME'");
+                        $input->setAttribute(':id', "'" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . 'Index' . ((isset($attributes['parent_id'])) ? "+'-'+" . $attributes['parent_id'] . 'Index' : '') . "+'_NAME'");
                     } else {
                         $this->processNodeFormElement($input, $item);
                     }
                     break;
                 case 'hidden':
-                    if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+                    if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
                         $item->addAttribute('x-model', $attributes['x-model'] . '.id');
                         $this->processNodeFormElement($input, $item);
-                        $input->setAttribute(':id', "'".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index".((isset($attributes['parent_id'])) ? "+'-'+".$attributes['parent_id'].'Index' : ''));
+                        $input->setAttribute(':id', "'" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . 'Index' . ((isset($attributes['parent_id'])) ? "+'-'+" . $attributes['parent_id'] . 'Index' : ''));
                     } else {
                         $this->processNodeFormElement($input, $item);
                     }
@@ -1171,22 +1168,22 @@ class MFormParser
             }
         }
 
-        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+        if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
             $links = $dom->getElementsByTagName('a');
             foreach ($links as $link) {
                 $onclick = $link->getAttribute('onclick');
                 $groups = explode('.', $attributes['groups']);
                 $linkAttributes = '';
                 if (str_contains($onclick, 'openLinkMap')) {
-                    $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                    if (!is_null($attributes['parent_id'])) {
-                        $linkAttributes = "addLink('".$attributes['item_name_key']."-'+".$attributes['repeaterId']."Index+'-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
+                    $linkAttributes = "addLink('" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . 'Index, ' . $attributes['repeaterId'] . "Index, '" . $attributes['item_name_key'] . "')";
+                    if (null !== $attributes['parent_id']) {
+                        $linkAttributes = "addLink('" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . "Index+'-'+" . $attributes['parent_id'] . 'Index, ' . $attributes['parent_id'] . "Index, '" . $attributes['item_name_key'] . "', '" . ($groups[1] ?? '') . "', " . $attributes['repeaterId'] . 'Index)';
                     }
                 }
                 if (str_contains($onclick, 'deleteREXLink')) {
-                    $linkAttributes = "removeLink(".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                    if (!is_null($attributes['parent_id'])) {
-                        $linkAttributes = "removeLink(".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
+                    $linkAttributes = 'removeLink(' . $attributes['repeaterId'] . "Index, '" . $attributes['item_name_key'] . "')";
+                    if (null !== $attributes['parent_id']) {
+                        $linkAttributes = 'removeLink(' . $attributes['parent_id'] . "Index, '" . $attributes['item_name_key'] . "', '" . ($groups[1] ?? '') . "', " . $attributes['repeaterId'] . 'Index)';
                     }
                 }
                 if (str_contains($onclick, 'Media')) {
@@ -1212,9 +1209,9 @@ class MFormParser
                     if (str_contains($onclick, 'viewREXMedialist(')) {
                         $method = 'viewMedialist';
                     }
-                    $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index, ".$attributes['repeaterId']."Index, '".$attributes['item_name_key']."')";
-                    if (!is_null($attributes['parent_id']) && $attributes['parent_id'] != $attributes['repeaterId']) {
-                        $linkAttributes = "$method('".$attributes['item_name_key']."-".$attributes['repeaterId']."-'+".$attributes['repeaterId']."Index+'-".$attributes['parent_id']."-'+".$attributes['parent_id']."Index, ".$attributes['parent_id']."Index, '".$attributes['item_name_key']."', '".($groups[1] ?? '')."', ".$attributes['repeaterId']."Index)";
+                    $linkAttributes = "$method('" . $attributes['item_name_key'] . '-' . $attributes['repeaterId'] . "-'+" . $attributes['repeaterId'] . 'Index, ' . $attributes['repeaterId'] . "Index, '" . $attributes['item_name_key'] . "')";
+                    if (null !== $attributes['parent_id'] && $attributes['parent_id'] != $attributes['repeaterId']) {
+                        $linkAttributes = "$method('" . $attributes['item_name_key'] . '-' . $attributes['repeaterId'] . "-'+" . $attributes['repeaterId'] . "Index+'-" . $attributes['parent_id'] . "-'+" . $attributes['parent_id'] . 'Index, ' . $attributes['parent_id'] . "Index, '" . $attributes['item_name_key'] . "', '" . ($groups[1] ?? '') . "', " . $attributes['repeaterId'] . 'Index)';
                     }
                 }
                 $link->setAttribute('click.prevent', $linkAttributes);
@@ -1228,7 +1225,7 @@ class MFormParser
      */
     private function addClickPrevent(string $body, array $attributes): string
     {
-        if (isset($attributes['repeater_link']) && $attributes['repeater_link'] === true) {
+        if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
             $body = str_replace('click.prevent', '@click.prevent', $body);
         }
         return $body;
@@ -1257,7 +1254,7 @@ class MFormParser
                 }
             }
         }
-        if (!is_null($id)) {
+        if (null !== $id) {
             $element->setAttribute('id', (string) $id);
         }
     }
@@ -1355,7 +1352,7 @@ class MFormParser
         $templateElement = rex_extension::registerPoint(
             new rex_extension_point('mform/mformParser.generateCustomLinkElement', $templateElement, [
                 'item' => $item,
-            ])
+            ]),
         );
 
         // add to output element array
@@ -1386,7 +1383,7 @@ class MFormParser
     private function getBodyInner(DOMDocument|DOMElement $dom): string
     {
         $html = $dom->C14N(false, true);
-        if ($html === false) {
+        if (false === $html) {
             return '';
         }
         if (str_contains($html, '<body')) {
@@ -1431,7 +1428,7 @@ class MFormParser
             $this->varIdStr($item),
             'REX_INPUT_VALUE' . $this->varIdStr($item),
             $value,
-            $parameter
+            $parameter,
         );
 
         $templateElement->setElement($html)
@@ -1450,7 +1447,6 @@ class MFormParser
             if (count($items) > 0) {
                 $skipKeys = [];
                 foreach ($items as $key => $item) {
-
                     if (in_array($key, $skipKeys, true)) {
                         continue;
                     }
@@ -1593,7 +1589,7 @@ class MFormParser
         $label->setId($item->getId());
 
         if (array_key_exists(':id', $item->getAttributes())) {
-            $label->setId($item->getId() . '" :for="'.$item->getAttributes()[':id']);
+            $label->setId($item->getId() . '" :for="' . $item->getAttributes()[':id']);
         }
 
         $label->setValue($labelString)
@@ -1627,7 +1623,7 @@ class MFormParser
     public function parse(array $items, ?string $theme = null, bool $showWrapper = true, bool $debug = false): string
     {
         $this->debug = $debug;
-        if (!is_null($theme) && $theme != $this->theme) {
+        if (null !== $theme && $theme != $this->theme) {
             $this->theme = $theme;
         }
 

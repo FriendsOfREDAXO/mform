@@ -2,11 +2,21 @@
 
 namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
-use rex_var_custom_medialist;
-use rex_var_custom_link;
-use rex_var_custom_link_multi;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use rex_var_custom_link;
+use rex_var_custom_link_multi;
+use rex_var_custom_medialist;
+
+use function array_key_exists;
+use function count;
+use function in_array;
+use function is_array;
+use function is_bool;
+use function is_string;
+use function sprintf;
+
+use const ENT_QUOTES;
 
 class MFormFlexRepeaterRenderer
 {
@@ -21,7 +31,7 @@ class MFormFlexRepeaterRenderer
 
             if ($item instanceof MForm) {
                 $html .= self::renderTemplate($item, $level);
-                $i++;
+                ++$i;
                 continue;
             }
 
@@ -42,7 +52,7 @@ class MFormFlexRepeaterRenderer
                         $i = $skip + 1;
                         break;
                     }
-                    $skip++;
+                    ++$skip;
                 }
                 if ($skip >= count($items)) {
                     $i = $skip;
@@ -51,7 +61,7 @@ class MFormFlexRepeaterRenderer
             }
 
             if ('close-repeater' === $type) {
-                $i++;
+                ++$i;
                 continue;
             }
 
@@ -62,11 +72,11 @@ class MFormFlexRepeaterRenderer
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
                 $align = $attrs['data-modal-align'] ?? 'left';
                 $innerHtml = '';
-                $i++;
+                ++$i;
                 while ($i < count($items)) {
                     $inner = $items[$i];
                     if ($inner instanceof MFormItem && 'close-modal' === $inner->getType()) {
-                        $i++;
+                        ++$i;
                         break;
                     }
                     if ($inner instanceof MForm) {
@@ -74,19 +84,69 @@ class MFormFlexRepeaterRenderer
                     } elseif ($inner instanceof MFormItem) {
                         $innerHtml .= self::renderField($inner);
                     }
-                    $i++;
+                    ++$i;
                 }
                 $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml);
                 continue;
             }
 
             if ('close-modal' === $type) {
-                $i++;
+                ++$i;
+                continue;
+            }
+
+            // FIELDSET: <fieldset><legend>..</legend>..inner..</fieldset>
+            if ('fieldset' === $type) {
+                $attrs = $item->getAttributes();
+                $legend = isset($attrs['legend']) && '' !== (string) $attrs['legend']
+                    ? '<legend>' . (string) $attrs['legend'] . '</legend>' // Legend ist Entwickler-HTML
+                    : '';
+                $cls = htmlspecialchars($item->getClass(), ENT_QUOTES);
+                $attrFiltered = $attrs;
+                unset($attrFiltered['legend']);
+                $attrHtml = self::renderAttributes($attrFiltered);
+                $html .= sprintf('<fieldset class="%s"%s>%s', $cls, $attrHtml, $legend);
+                ++$i;
+                continue;
+            }
+            if ('close-fieldset' === $type) {
+                $html .= '</fieldset>';
+                ++$i;
+                continue;
+            }
+
+            // COLLAPSE: Toggle-Button + .collapse-Wrapper (kompatibel mit assets/mform.js initMFormCollapses)
+            if ('collapse' === $type) {
+                $attrs = $item->getAttributes();
+                $labelStr = self::getLabelString($item->getLabel()); // Entwickler-HTML, nicht escapen
+                $hideToggleLinks = isset($attrs['data-group-hide-toggle-links']) && 'true' === (string) $attrs['data-group-hide-toggle-links'];
+                $openCollapse = isset($attrs['data-group-open-collapse']) && (1 === (int) $attrs['data-group-open-collapse'] || true === $attrs['data-group-open-collapse']);
+                $isAccordion = isset($attrs['data-group-accordion']) && 1 === (int) $attrs['data-group-accordion'];
+                $btnAttrs = ' data-toggle="collapse"';
+                if (!$isAccordion) {
+                    $btnAttrs .= ' data-collapse-open="' . ($openCollapse ? 1 : 0) . '"';
+                }
+                $btnAttrs .= ' aria-expanded="' . ($openCollapse ? 'true' : 'false') . '"';
+                $btnHidden = ('' === $labelStr || $hideToggleLinks) ? ' hidden' : '';
+                $btnHtml = sprintf('<a class="btn btn-white btn-block%s"%s>%s</a>', $btnHidden, $btnAttrs, $labelStr);
+
+                // Wrapper-Attribute bereinigen wie im Fragment
+                $wrapperAttrs = $attrs;
+                unset($wrapperAttrs['data-group-hide-toggle-links'], $wrapperAttrs['data-group-accordion'], $wrapperAttrs['data-group-open-collapse']);
+                $cls = trim('collapse ' . $item->getClass() . ($openCollapse ? ' in' : ''));
+                $wrapperAttrHtml = self::renderAttributes($wrapperAttrs);
+                $html .= $btnHtml . sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), $wrapperAttrHtml);
+                ++$i;
+                continue;
+            }
+            if ('close-collapse' === $type) {
+                $html .= '</div>';
+                ++$i;
                 continue;
             }
 
             $html .= self::renderField($item);
-            $i++;
+            ++$i;
         }
 
         return $html;
@@ -97,7 +157,14 @@ class MFormFlexRepeaterRenderer
         $type = $item->getType();
         $fieldKey = self::extractFieldKey($item->getVarId());
         $label = self::renderLabel($item);
-        $attrs = self::renderAttributes($item->getAttributes());
+        $itemAttributes = $item->getAttributes();
+        $toggleOptions = $item->getToggleOptions();
+        // Wenn ToggleOptions definiert sind, automatisch data-toggle="collapse" auf select setzen
+        // (analog zum klassischen MFormParser-Pfad ausserhalb des Repeaters).
+        if (count($toggleOptions) > 0 && in_array($type, ['select', 'multiselect'], true) && !isset($itemAttributes['data-toggle'])) {
+            $itemAttributes = array_merge(['data-toggle' => 'collapse'], $itemAttributes);
+        }
+        $attrs = self::renderAttributes($itemAttributes);
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
 
@@ -118,14 +185,14 @@ class MFormFlexRepeaterRenderer
                 return self::wrapFormGroup(
                     $label,
                     sprintf('<input type="%s" class="form-control %s" data-mfr-field="%s" value=""%s>', htmlspecialchars($type, ENT_QUOTES), $class, $key, $attrs),
-                    $item
+                    $item,
                 );
 
             case 'textarea':
                 return self::wrapFormGroup(
                     $label,
                     sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s></textarea>', $class, $key, $attrs),
-                    $item
+                    $item,
                 );
 
             case 'hidden':
@@ -134,15 +201,15 @@ class MFormFlexRepeaterRenderer
             case 'select':
                 return self::wrapFormGroup(
                     $label,
-                    sprintf('<select class="form-control %s" data-mfr-field="%s"%s>%s</select>', $class, $key, $attrs, self::renderSelectOptions($item->getOptions())),
-                    $item
+                    sprintf('<select class="form-control %s" data-mfr-field="%s"%s>%s</select>', $class, $key, $attrs, self::renderSelectOptions($item->getOptions(), $toggleOptions)),
+                    $item,
                 );
 
             case 'multiselect':
                 return self::wrapFormGroup(
                     $label,
-                    sprintf('<select class="form-control %s" data-mfr-field="%s" multiple="multiple"%s>%s</select>', $class, $key, $attrs, self::renderSelectOptions($item->getOptions())),
-                    $item
+                    sprintf('<select class="form-control %s" data-mfr-field="%s" multiple="multiple"%s>%s</select>', $class, $key, $attrs, self::renderSelectOptions($item->getOptions(), $toggleOptions)),
+                    $item,
                 );
 
             case 'radio':
@@ -182,14 +249,14 @@ class MFormFlexRepeaterRenderer
                 return self::wrapFormGroup(
                     $label,
                     sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s readonly>', $class, $key, $attrs),
-                    $item
+                    $item,
                 );
 
             case 'textarea-readonly':
                 return self::wrapFormGroup(
                     $label,
                     sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s readonly></textarea>', $class, $key, $attrs),
-                    $item
+                    $item,
                 );
 
             case 'headline':
@@ -217,26 +284,26 @@ class MFormFlexRepeaterRenderer
     {
         $alignClass = match ($align) {
             'center' => 'text-center',
-            'right'  => 'text-right',
-            default  => 'text-left',
+            'right' => 'text-right',
+            default => 'text-left',
         };
         // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
-        return '<div class="form-group mfr-modal-wrapper">'.
-            '<div class="col-sm-12 ' . $alignClass . '">'.
-            '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"'.
-            ' data-toggle="modal" data-target="#__MFRID__">'.
-            '<i class="fa fa-cog"></i> ' . htmlspecialchars($label, ENT_QUOTES) . '</button>'.
-            '</div></div>'.
-            '<div class="modal fade mfr-modal" id="__MFRID__" tabindex="-1" role="dialog">'.
-            '<div class="modal-dialog" role="document"><div class="modal-content">'.
-            '<div class="modal-header">'.
-            '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>'.
-            '<h4 class="modal-title">' . htmlspecialchars($label, ENT_QUOTES) . '</h4>'.
-            '</div>'.
-            '<div class="modal-body" style="padding: 15px 30px"><div class="mform form-horizontal">' . $innerHtml . '</div></div>'.
-            '<div class="modal-footer">'.
-            '<button type="button" class="btn btn-primary" data-dismiss="modal">Übernehmen</button>'.
-            '</div>'.
+        return '<div class="form-group mfr-modal-wrapper">' .
+            '<div class="col-sm-12 ' . $alignClass . '">' .
+            '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"' .
+            ' data-toggle="modal" data-target="#__MFRID__">' .
+            '<i class="fa fa-cog"></i> ' . $label . '</button>' .
+            '</div></div>' .
+            '<div class="modal fade mfr-modal" id="__MFRID__" tabindex="-1" role="dialog">' .
+            '<div class="modal-dialog" role="document"><div class="modal-content">' .
+            '<div class="modal-header">' .
+            '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>' .
+            '<h4 class="modal-title">' . $label . '</h4>' .
+            '</div>' .
+            '<div class="modal-body" style="padding: 15px 30px"><div class="mform form-horizontal">' . $innerHtml . '</div></div>' .
+            '<div class="modal-footer">' .
+            '<button type="button" class="btn btn-primary" data-dismiss="modal">Übernehmen</button>' .
+            '</div>' .
             '</div></div></div>';
     }
 
@@ -249,7 +316,8 @@ class MFormFlexRepeaterRenderer
 
         $labelHtml = '';
         if ('' !== $label) {
-            $labelHtml = sprintf('<div class="mfr-nested-label">%s</div>', htmlspecialchars($label, ENT_QUOTES));
+            // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. Icons).
+            $labelHtml = sprintf('<div class="mfr-nested-label">%s</div>', $label);
         }
 
         return sprintf(
@@ -273,7 +341,7 @@ class MFormFlexRepeaterRenderer
             htmlspecialchars($fieldKey, ENT_QUOTES),
             $labelHtml,
             htmlspecialchars($btnText, ENT_QUOTES),
-            $innerTemplate
+            $innerTemplate,
         );
     }
 
@@ -291,7 +359,9 @@ class MFormFlexRepeaterRenderer
         if ('' === $label) {
             return '';
         }
-        return sprintf('<label class="control-label">%s</label>', htmlspecialchars($label, ENT_QUOTES));
+        // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons),
+        // wie auch im klassischen MFormParser-Pfad ausserhalb des Repeaters.
+        return sprintf('<label class="control-label">%s</label>', $label);
     }
 
     private static function wrapFormGroup(string $label, string $field, MFormItem $item): string
@@ -306,22 +376,45 @@ class MFormFlexRepeaterRenderer
 
     /**
      * @param array<mixed> $options
+     * @param array<mixed> $toggleOptions Map optionKey => collapseId (oder [collapseId, alpineExpr])
      */
-    private static function renderSelectOptions(array $options): string
+    private static function renderSelectOptions(array $options, array $toggleOptions = []): string
     {
         $html = '';
         foreach ($options as $key => $value) {
             if (is_array($value)) {
                 $groupOptions = '';
                 foreach ($value as $vKey => $vValue) {
-                    $groupOptions .= sprintf('<option value="%s">%s</option>', htmlspecialchars((string) $vKey, ENT_QUOTES), htmlspecialchars((string) $vValue, ENT_QUOTES));
+                    $toggleAttr = self::buildToggleItemAttr($vKey, $toggleOptions);
+                    $groupOptions .= sprintf('<option value="%s"%s>%s</option>', htmlspecialchars((string) $vKey, ENT_QUOTES), $toggleAttr, htmlspecialchars((string) $vValue, ENT_QUOTES));
                 }
                 $html .= sprintf('<optgroup label="%s">%s</optgroup>', htmlspecialchars((string) $key, ENT_QUOTES), $groupOptions);
             } else {
-                $html .= sprintf('<option value="%s">%s</option>', htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
+                $toggleAttr = self::buildToggleItemAttr($key, $toggleOptions);
+                $html .= sprintf('<option value="%s"%s>%s</option>', htmlspecialchars((string) $key, ENT_QUOTES), $toggleAttr, htmlspecialchars((string) $value, ENT_QUOTES));
             }
         }
         return $html;
+    }
+
+    /**
+     * @param array<mixed> $toggleOptions
+     */
+    private static function buildToggleItemAttr(int|string $key, array $toggleOptions): string
+    {
+        if (!array_key_exists($key, $toggleOptions)) {
+            return '';
+        }
+        $val = $toggleOptions[$key];
+        if (is_array($val)) {
+            $val = isset($val[0]) ? (string) $val[0] : '';
+        } else {
+            $val = (string) $val;
+        }
+        if ('' === $val) {
+            return '';
+        }
+        return ' data-toggle-item="' . htmlspecialchars($val, ENT_QUOTES) . '"';
     }
 
     private static function renderRadioGroup(MFormItem $item, string $fieldKey): string
@@ -354,27 +447,27 @@ class MFormFlexRepeaterRenderer
     private static function renderCheckboxGroupWidget(MFormItem $item, string $fieldKey): string
     {
         $attrs = $item->getAttributes();
-        $layout = isset($attrs['layout']) && $attrs['layout'] === 'vertical' ? ' mform-cbg--vertical' : '';
-        $modeAttr = isset($attrs['mode']) && $attrs['mode'] === 'radio' ? ' data-mode="radio"' : '';
+        $layout = isset($attrs['layout']) && 'vertical' === $attrs['layout'] ? ' mform-cbg--vertical' : '';
+        $modeAttr = isset($attrs['mode']) && 'radio' === $attrs['mode'] ? ' data-mode="radio"' : '';
         $uid = 'mfr-cbg-' . preg_replace('/[^a-z0-9]/i', '-', $fieldKey) . '-' . substr(md5($fieldKey), 0, 6);
 
         $html = sprintf(
             '<div class="mform-checkbox-group%s"%s data-cbg-id="%s">',
             $layout,
             $modeAttr,
-            htmlspecialchars($uid, ENT_QUOTES)
+            htmlspecialchars($uid, ENT_QUOTES),
         );
         // hidden input mit data-mfr-field – wird vom Flex-Repeater gelesen/geschrieben
         $html .= sprintf(
             '<input type="hidden" id="%s" data-mfr-field="%s" value="" class="mform-cbg-value">',
             htmlspecialchars($uid, ENT_QUOTES),
-            htmlspecialchars($fieldKey, ENT_QUOTES)
+            htmlspecialchars($fieldKey, ENT_QUOTES),
         );
         foreach ($item->getOptions() as $key => $label) {
             $html .= sprintf(
                 '<label class="mform-cbg-option" data-value="%s"><span class="mform-cbg-indicator"></span>%s</label>',
                 htmlspecialchars((string) $key, ENT_QUOTES),
-                htmlspecialchars((string) $label, ENT_QUOTES)
+                htmlspecialchars((string) $label, ENT_QUOTES),
             );
         }
         $html .= '</div>';
@@ -399,14 +492,14 @@ class MFormFlexRepeaterRenderer
                     htmlspecialchars($strVal, ENT_QUOTES),
                     $styleAttr,
                     $dataPreview,
-                    htmlspecialchars($labelStr, ENT_QUOTES)
+                    htmlspecialchars($labelStr, ENT_QUOTES),
                 );
             } else {
                 $swatchHtml .= sprintf(
                     '<button type="button" class="mform-cs-swatch" data-value="%s" style="background-color:%s" title="%s"></button>',
                     htmlspecialchars($strVal, ENT_QUOTES),
                     htmlspecialchars($strVal, ENT_QUOTES),
-                    htmlspecialchars($labelStr, ENT_QUOTES)
+                    htmlspecialchars($labelStr, ENT_QUOTES),
                 );
             }
         }
@@ -426,7 +519,7 @@ class MFormFlexRepeaterRenderer
             . '</div>',
             htmlspecialchars($uid, ENT_QUOTES),
             htmlspecialchars($fieldKey, ENT_QUOTES),
-            $swatchHtml
+            $swatchHtml,
         );
     }
 
@@ -508,8 +601,8 @@ class MFormFlexRepeaterRenderer
         $widgetId = '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey);
 
         $args = [
-            'view'    => 'gallery',
-            'views'   => 'gallery,grid,list',
+            'view' => 'gallery',
+            'views' => 'gallery,grid,list',
             'toolbar' => 'vertical',
         ];
 
@@ -524,14 +617,14 @@ class MFormFlexRepeaterRenderer
             $widgetId,
             'mfr_imglist[' . $fieldKey . ']',
             '',
-            $args
+            $args,
         );
 
         // Add rex-js-widget-imglist class (mirrors what rex_var_imglist::getWidget() does)
         $html = str_replace(
             'mform-list-widget mform-list-widget-medialist',
             'mform-list-widget mform-list-widget-medialist rex-js-widget-imglist',
-            $html
+            $html,
         );
 
         // Mark the hidden value input so the Flex-Repeater JS reads/writes it
@@ -539,7 +632,7 @@ class MFormFlexRepeaterRenderer
             '/(<input\s+type="hidden"[^>]*class="[^"]*mform-list-value[^"]*"[^>]*)(>)/i',
             '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
             $html,
-            1
+            1,
         ) ?? $html;
 
         return $html;
@@ -557,7 +650,7 @@ class MFormFlexRepeaterRenderer
             'mfr_custom_link[' . $fieldKey . ']',
             '',
             $args,
-            false
+            false,
         );
 
         // Flex-Repeater liest/schreibt nur Felder mit data-mfr-field.
@@ -566,7 +659,7 @@ class MFormFlexRepeaterRenderer
             '/(<input\s+type="hidden"[^>]*id="REX_LINK_[^"]+"[^>]*)(>)/i',
             '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
             $html,
-            1
+            1,
         ) ?? $html;
 
         return $html;
@@ -581,7 +674,7 @@ class MFormFlexRepeaterRenderer
             '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey),
             'mfr_custom_link_multi[' . $fieldKey . ']',
             '',
-            $args
+            $args,
         );
 
         // Flex-Repeater liest/schreibt nur Felder mit data-mfr-field.
@@ -589,7 +682,7 @@ class MFormFlexRepeaterRenderer
             '/(<input\s+type="hidden"[^>]*class="[^"]*mform-cl-multi-value[^"]*"[^>]*)(>)/i',
             '$1 data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"$2',
             $html,
-            1
+            1,
         ) ?? $html;
 
         return $html;
