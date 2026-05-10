@@ -33,7 +33,7 @@ page:
             itemClass: pull-right
 
 requires:
-    php: '>=8.0'
+    php: '>=8.4'
     redaxo: '^5.17.0'
 
 conflicts:

@@ -1,5 +1,15 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.0.0-beta8 (unveröffentlicht)
+
+### Geändert
+
+- **PHP-Mindestversion auf 8.4 angehoben** – MForm setzt nun `php: '>=8.4'` voraus. Ältere PHP-Versionen werden nicht mehr unterstützt.
+- **DOM-Modernisierung: `\Dom\HTMLDocument` statt libxml-Workarounds** – Alle `new DOMDocument` + `@loadHTML(...)` -Muster in `MFormParser` wurden auf `\Dom\HTMLDocument::createFromString($html, LIBXML_NOERROR)` umgestellt. Damit entfallen das `<?xml encoding="utf-8"?>`-Prefix, der `@`-Suppressor und der `utf8_decode()`-Aufruf (seit PHP 8.2 deprecated). Die interne Serialisierung wechselt von C14N-XML auf HTML5-`innerHTML`/`outerHTML`.
+- **`HtmlToSvgConverter` nutzt `\Dom\XMLDocument`** – Die SVG-Generierung verwendet jetzt `\Dom\XMLDocument::createEmpty()`. Das ungenutzte `$dom`-Property und der globale `libxml_use_internal_errors(true)`-Aufruf wurden entfernt. Typangaben wurden auf `\Dom\Element` und `\Dom\Node` aktualisiert.
+
+---
+
 ## Version 9.0.0-beta7
 
 ### Fixed

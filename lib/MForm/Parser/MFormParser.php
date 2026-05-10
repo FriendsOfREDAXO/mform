@@ -8,9 +8,7 @@
 
 namespace FriendsOfRedaxo\MForm\Parser;
 
-use DOMDocument;
-use DOMElement;
-use DOMNodeList;
+use Dom\HTMLDocument;
 use Exception;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormElement;
@@ -897,7 +895,7 @@ class MFormParser
      */
     private function generateMediaElement(MFormItem $item): void
     {
-        $dom = new DOMDocument();
+        $dom = HTMLDocument::createFromString('', LIBXML_NOERROR);
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
@@ -945,15 +943,13 @@ class MFormParser
                         $mediaArgs['preview'] = $parameter['preview'];
                     }
                     $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
-                    $dom = new DOMDocument('1.0', 'utf-8');
-                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
                     $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
-                    $dom = new DOMDocument();
-                    @$dom->loadHTML(utf8_decode($html));
+                    $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                     $this->processNodeFormElements($inputs, $item, 'REX_MEDIA_' . (int) $id);
@@ -984,8 +980,7 @@ class MFormParser
 
                 $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
 
-                $dom = new DOMDocument('1.0', 'utf-8');
-                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                 $inputs = $dom->getElementsByTagName('input');
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
@@ -1002,8 +997,7 @@ class MFormParser
                     $html = $class::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
                 }
 
-                $dom = new DOMDocument();
-                @$dom->loadHTML(utf8_decode($html));
+                $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
@@ -1031,7 +1025,7 @@ class MFormParser
      */
     private function generateLinkElement(MFormItem $item): void
     {
-        $dom = new DOMDocument();
+        $dom = HTMLDocument::createFromString('', LIBXML_NOERROR);
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
@@ -1071,15 +1065,13 @@ class MFormParser
                         $linkArgs['category'] = $parameter['category'];
                     }
                     $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
-                    $dom = new DOMDocument('1.0', 'utf-8');
-                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
                     $html = rex_var_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
-                    $dom = new DOMDocument('1.0', 'utf-8');
-                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                     $inputs = $dom->getElementsByTagName('input');
                     foreach ($inputs as $input) {
                         $this->processNodeFormElement($input, $item, 'REX_LINK_' . (int) $id);
@@ -1109,8 +1101,7 @@ class MFormParser
 
                 $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
 
-                $dom = new DOMDocument('1.0', 'utf-8');
-                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                 $inputs = $dom->getElementsByTagName('input');
                 $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 break;
@@ -1119,8 +1110,7 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
 
-                $dom = new DOMDocument('1.0', 'utf-8');
-                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
+                $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
                 $selects = $dom->getElementsByTagName('select');
                 $inputs = $dom->getElementsByTagName('input');
 
@@ -1145,9 +1135,8 @@ class MFormParser
 
     /**
      * @param array<string, mixed> $attributes
-     * @param DOMNodeList<DOMElement> $inputs
      */
-    private function prepareLinkInput(DOMDocument $dom, DOMNodeList $inputs, MFormItem $item, array $attributes): void
+    private function prepareLinkInput(HTMLDocument $dom, \Dom\HTMLCollection $inputs, MFormItem $item, array $attributes): void
     {
         foreach ($inputs as $input) {
             switch ($input->getAttribute('type')) {
@@ -1239,15 +1228,14 @@ class MFormParser
         return $body;
     }
 
-    /** @param DOMNodeList<DOMElement> $elements */
-    private function processNodeFormElements(DOMNodeList $elements, MFormItem $item, string|int|null $id = null): void
+    private function processNodeFormElements(\Dom\HTMLCollection $elements, MFormItem $item, string|int|null $id = null): void
     {
         foreach ($elements as $element) {
             $this->processNodeFormElement($element, $item, $id);
         }
     }
 
-    private function processNodeFormElement(DOMElement $element, MFormItem $item, string|int|null $id = null): void
+    private function processNodeFormElement(\Dom\Element $element, MFormItem $item, string|int|null $id = null): void
     {
         if (count($item->getAttributes()) > 0) {
             foreach ($item->getAttributes() as $key => $value) {
@@ -1317,8 +1305,7 @@ class MFormParser
 
         try {
             $html = rex_var_custom_link::getWidget($item->getId(), 'REX_INPUT_VALUE' . $this->varIdStr($item), $item->getValue(), $parameter, false);
-            $dom = new DOMDocument('1.0', 'utf-8');
-            @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
+            $dom = HTMLDocument::createFromString($html, LIBXML_NOERROR);
             $div = $dom->getElementsByTagName('div');
             $inputs = $dom->getElementsByTagName('input');
             $this->prepareLinkInput($dom, $inputs, $item, $attributes);
@@ -1333,7 +1320,7 @@ class MFormParser
                     $divItem->setAttribute('data-clang', (string) rex_clang::getCurrentId());
                     $divItem->setAttribute('class', $divItem->getAttribute('class') . ' custom-link');
                     foreach ($divItem->childNodes as $childNode) {
-                        if (!($childNode instanceof DOMElement)) {
+                        if (!($childNode instanceof \Dom\Element)) {
                             continue;
                         }
                         if (($childNode->hasAttribute('class')
@@ -1388,19 +1375,12 @@ class MFormParser
         return is_array($v) ? '[' . implode('][', $v) . ']' : (string) $v;
     }
 
-    private function getBodyInner(DOMDocument|DOMElement $dom): string
+    private function getBodyInner(HTMLDocument|\Dom\Element $dom): string
     {
-        $html = $dom->C14N(false, true);
-        if (false === $html) {
-            return '';
+        if ($dom instanceof HTMLDocument) {
+            return $dom->body?->innerHTML ?? '';
         }
-        if (str_contains($html, '<body')) {
-            preg_match('/<body>(.*)<\/body>/ism', $html, $matches);
-            if (isset($matches[1])) {
-                $html = $matches[1];
-            }
-        }
-        return $html;
+        return $dom->outerHTML ?? '';
     }
 
     private function generateCustomLinkMultiElement(MFormItem $item): void
