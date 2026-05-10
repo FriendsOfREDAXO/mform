@@ -895,7 +895,7 @@ class MFormParser
      */
     private function generateMediaElement(MFormItem $item): void
     {
-        $dom = HTMLDocument::createFromString('', LIBXML_NOERROR);
+        $dom = HTMLDocument::createFromString('<html></html>', LIBXML_NOERROR);
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
@@ -1025,7 +1025,7 @@ class MFormParser
      */
     private function generateLinkElement(MFormItem $item): void
     {
-        $dom = HTMLDocument::createFromString('', LIBXML_NOERROR);
+        $dom = HTMLDocument::createFromString('<html></html>', LIBXML_NOERROR);
         $inputValue = false;
 
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
