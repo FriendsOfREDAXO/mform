@@ -127,6 +127,7 @@
         var $output = document.querySelector('[data-fb-output]');
         var $propsForm = document.querySelector('[data-fb-props-form]');
         var $propsEmpty = document.querySelector('[data-fb-props-empty]');
+        var mformUi = window.mformUi || null;
 
         $canvas.dataset.fbDepth = '0';
 
@@ -639,48 +640,65 @@
             emitCode();
         });
 
-        // Robust clipboard helper with execCommand fallback for non-secure contexts.
+        function showCopyMessage(msgEl, label, ttl) {
+            if (!msgEl) return;
+            msgEl.textContent = label;
+            setTimeout(function () { msgEl.textContent = ''; }, ttl || 1500);
+        }
+
         function copyToClipboard(text, msgEl) {
-            function showMsg(label, ttl) {
-                if (!msgEl) return;
-                msgEl.textContent = label;
-                setTimeout(function () { msgEl.textContent = ''; }, ttl || 1500);
+            if (!mformUi || typeof mformUi.copyTextToClipboard !== 'function') {
+                showCopyMessage(msgEl, 'Kopieren nicht verfuegbar', 2500);
+                return;
             }
-            function fallback() {
-                try {
-                    var ta = document.createElement('textarea');
-                    ta.value = text;
-                    ta.setAttribute('readonly', '');
-                    ta.style.position = 'fixed';
-                    ta.style.opacity = '0';
-                    document.body.appendChild(ta);
-                    ta.select();
-                    var ok = document.execCommand && document.execCommand('copy');
-                    document.body.removeChild(ta);
-                    showMsg(ok ? 'kopiert' : 'Kopieren fehlgeschlagen', ok ? 1500 : 2500);
-                } catch (err) {
-                    showMsg('Kopieren fehlgeschlagen', 2500);
-                    if (typeof console !== 'undefined' && console.error) { console.error(err); }
-                }
+
+            mformUi.copyTextToClipboard(text).then(function () {
+                showCopyMessage(msgEl, 'kopiert', 1500);
+            }).catch(function () {
+                showCopyMessage(msgEl, 'Kopieren fehlgeschlagen', 2500);
+            });
+        }
+
+        function setCodeText(target, value) {
+            if (mformUi && typeof mformUi.setCodeText === 'function') {
+                mformUi.setCodeText(target, value);
+                return;
             }
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(function () {
-                    showMsg('kopiert', 1500);
-                }).catch(function (err) {
-                    if (typeof console !== 'undefined' && console.warn) { console.warn('clipboard.writeText failed, falling back', err); }
-                    fallback();
-                });
-            } else {
-                fallback();
+
+            target.value = value;
+        }
+
+        function getCodeText(target) {
+            if (mformUi && typeof mformUi.getCodeText === 'function') {
+                return mformUi.getCodeText(target);
             }
+
+            return target.value || '';
+        }
+
+        function initCodeViewers() {
+            if (!mformUi || typeof mformUi.enhanceReadonlyCode !== 'function') {
+                return;
+            }
+
+            mformUi.enhanceReadonlyCode($code, {
+                containerClass: 'mform-fb__code-viewer',
+                minHeight: 240,
+                language: 'php'
+            });
+            mformUi.enhanceReadonlyCode($output, {
+                containerClass: 'mform-fb__code-viewer',
+                minHeight: 240,
+                language: 'php'
+            });
         }
 
         document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
-            copyToClipboard($code.textContent, document.querySelector('[data-fb-copy-msg]'));
+            copyToClipboard(getCodeText($code), document.querySelector('[data-fb-copy-msg]'));
         });
 
         document.querySelector('[data-fb-action="copy-output"]').addEventListener('click', function () {
-            copyToClipboard($output.textContent, document.querySelector('[data-fb-copy-output-msg]'));
+            copyToClipboard(getCodeText($output), document.querySelector('[data-fb-copy-output-msg]'));
         });
 
         // ---- Code generation ------------------------------------------------
@@ -976,7 +994,13 @@
 
         function emitCode() {
             if (state.length === 0) {
-                $code.textContent = '// Noch keine Felder hinzugefuegt.';
+                setCodeText($code, '// Noch keine Felder hinzugefuegt.');
+                setCodeText($output, '// Noch keine Felder hinzugefuegt.');
+                var emptySlotMsg = document.querySelector('[data-fb-slot-warning]');
+                if (emptySlotMsg) {
+                    emptySlotMsg.style.display = 'none';
+                    emptySlotMsg.textContent = '';
+                }
                 return;
             }
             var lines = [];
@@ -999,7 +1023,7 @@
             });
             lines.push('');
             lines.push('echo $mform->show();');
-            $code.textContent = lines.join('\n');
+            setCodeText($code, lines.join('\n'));
             // Warn once when any used id exceeds the conventional REX_VALUE/REX_MEDIA/... slot limit.
             var maxId = collectMaxId(state);
             var slotMsg = document.querySelector('[data-fb-slot-warning]');
@@ -1246,7 +1270,7 @@
 
         function emitOutputCode() {
             if (state.length === 0) {
-                $output.textContent = '// Noch keine Felder hinzugefuegt.';
+                setCodeText($output, '// Noch keine Felder hinzugefuegt.');
                 return;
             }
             // Tracking, welche use-Statements wir brauchen.
@@ -1324,12 +1348,13 @@
                 head.push('');
             }
 
-            $output.textContent = head.concat(body).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd();
+            setCodeText($output, head.concat(body).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd());
         }
 
         // ---- Init -----------------------------------------------------------
 
         renderCanvas();
         emitCode();
+        initCodeViewers();
     } // end run()
 })();

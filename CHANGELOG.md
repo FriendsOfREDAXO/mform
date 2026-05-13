@@ -1,69 +1,35 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.0.0-beta7
+## Version 9.0.0
 
-### Fixed
-
-- **FlexRepeater: `setToggleOptions()` auf Selects funktioniert wieder** – nach dem Refactor in beta1 (mform_repeater2) wurden `setToggleOptions(...)` und das daraus entstehende `data-toggle="collapse"` / `data-toggle-item` im Repeater-Template ignoriert. Der `MFormFlexRepeaterRenderer` setzt jetzt automatisch `data-toggle="collapse"` auf Selects mit Toggle-Options und `data-toggle-item` auf den passenden `<option>`s, analog zum klassischen MForm-Pfad außerhalb des Repeaters. Damit greift `initMFormCollapses` aus `assets/mform.js` auch in geklonten Repeater-Items (über den `rex:ready`-Trigger des FlexRepeaters).
-- **FlexRepeater: `addCollapseElement()` und `addFieldsetArea()` rendern wieder** – beide Wrapper-Typen wurden im FlexRepeater-Template komplett verworfen (kein `case`). Sie werden jetzt analog zum `mform_wrapper.php`-Fragment ausgegeben, inkl. `<a data-toggle="collapse">`-Button, `.collapse[data-group-collapse-id=…]`-Wrapper und `<fieldset><legend>`.
-- **FlexRepeater: `addFieldsetArea($legend, …)` zeigt das Legend wieder** – der `MFormAttributeHandler` leitet den Schluessel `legend` aus den Attributes auf `MFormItem::setLegend()` um, der Renderer las aber aus `getAttributes()['legend']` und bekam dort immer einen Leerstring. Der Renderer liest Legend jetzt ueber `$item->getLegend()`, analog zum klassischen `MFormParser::openWrapperElement`-Pfad.
-- **FlexRepeater: weitere Wrapper-Typen rendern wieder** – `tab` / `start-group-tab` / `close-tab` / `close-group-tab`, `inline` / `start-group-inline` / `close-inline` / `close-group-inline`, `column` / `start-group-column` / `close-column` / `close-group-column` und `start-group-collapse` / `close-group-collapse` fielen seit beta1 in den `default`-Case und wurden komplett verworfen. Sie werden jetzt mit Bootstrap-3-Markup ausgegeben (`nav-tabs` + `tab-content`, `form-inline`, `row` + `col-*`, `collapse-group`). Tab-IDs nutzen einen Platzhalter `__MFRTAB_<n>__`, der in `flex-repeater.js` `_renderItem()` pro Item-Klon durch eine eindeutige UID ersetzt wird (gleiche `n` → gleiche UID, damit `href`, Tab-Pane-`id` und `aria-controls` matchen). Damit aktiviert `start-group-collapse` jetzt auch Standalone-Collapse-Toggle ueber `initMFormLinkCollapse`.
-- **FlexRepeater: HTML in Labels (z. B. FontAwesome-Icons) wird wieder gerendert** – `renderLabel`, `renderModalBlock`, `renderNestedRepeaterContainer` und das Container-Label in `MFormParser::openFlexRepeaterElement` haben Labels per `htmlspecialchars` escaped, wodurch z. B. `<i class="fas fa-tag"></i>` als Text dargestellt wurde. Labels gelten jetzt – wie im klassischen MForm-Pfad – als Entwickler-HTML und werden roh durchgereicht. Feld-Werte (Headline, Description, Alert) bleiben weiterhin escaped.
+MForm 9 fasst den neuen FlexRepeater-Standardpfad, die modernisierte Link-/Media-API, neue Feld- und Wrapper-Typen, den visuellen Form Builder sowie umfangreiche Stabilitäts- und Doku-Arbeiten in einem Major Release zusammen. Die Detailhistorie der Betas bleibt unten erhalten; diese Sektion bündelt die 9er Änderungen release-tauglich.
 
 ### Neu
 
-- **FlexRepeater Layout-Steuerung** – `addRepeaterElement($id, $form, ..., ['layout' => 'horizontal'|'vertical'|'inline'])` (Default `horizontal`) steuert die Default-Darstellung der Felder im Repeater-Item:
-  - `horizontal` (Default): Label links (`col-sm-3`) / Feld rechts (`col-sm-9`) via Bootstrap-3 `form-horizontal`-Markup.
-  - `vertical`: Label oben, Feld unten (klassisch gestapelt).
-  - `inline`: kompakte Stapel-Darstellung mit kleinen Uppercase-Labels.
-- **FlexRepeater: Default-Styles für Wrapper im Item-Body** – `<fieldset>` aus `addFieldsetArea()` bekommt sichtbares Border + dezent gestylten `<legend>`; Collapse-Buttons und `.collapse`-Wrapper haben sauberen vertikalen Abstand. Kein Theme-Override nötig für saubere Default-Optik.
-- **FlexRepeater: `.mfr-item-body` und `.mfr-nested-body` sind jetzt `.mform`-Scopes** – damit greifen Toggle-/Collapse-Helfer aus `assets/mform.js` (`getParentMForm()`, `initMFormSelectCollapse`, `initMFormToggleCollapse`) sauber pro Repeater-Item statt auf den Top-Level-`.mform` zurueckzufallen.
+- **Neuer Standardpfad für wiederholbare Inhalte** – `addFlexRepeaterElement()` etabliert den FlexRepeater als robusten Repeater für REDAXO-Backend-Kontexte, inklusive Drag-and-Drop, stabiler Editor-Initialisierung, Copy/Paste, Aktiv/Inaktiv-Status, Toggle-All und verschachtelten Strukturen.
+- **Neue Feld- und Wrapper-Typen** – hinzugekommen sind u. a. `addConditionalFieldsetArea()`, `addModalElement()`, `addColorSwatchField()`, `addCustomLinkMultipleField()` sowie die YForm-Value-Types `custom_link_multi` und `color_swatch`.
+- **Modernisierte Link-/Media-Integration** – mit `MFormOutputHelper::createLinkData()` / `normalizeLinkData()`, `normalizeRepeaterItems()`, `useCustomLinkForClassicWidgets(true)`, `addMFormMediaField()` und der überarbeiteten Custom-Link-Integration lassen sich klassische Widgets und neue Linkformate einheitlich verarbeiten.
+- **Visueller Form Builder** – neue Backend-Seite zum Zusammenklicken von MForm-Modulen mit Live-PHP-Code-Generator, Repeater-/Wrapper-Support und Copy-Funktion für Input- und Output-Code.
+- **`MFormOutput` für Frontend-Ausgabe** – neuer Fluent-Output-Helper mit Filter-, Sortier-, Gruppen-, Render- und Tag-API sowie Single-Value-Helfern wie `linkUrl()`, `picture()`, `mediaList()`, `richtext()` und `excerpt()`.
+- **Template- und Projektintegration** – `registerTemplate()`, `fromTemplate()` und `applyTemplate()` ergänzen MForm um eine wiederverwendbare Template-Registry für projektweite Defaults.
 
-### Architektur-Notiz fuer kuenftige Anpassungen
+### Verbesserungen
 
-Damit es nicht wieder dazu kommt, dass das Modul-Input das gesamte Formular gleichzeitig togglet:
+- **FlexRepeater funktional ausgebaut** – Layout-Steuerung (`horizontal`, `vertical`, `inline`), Wrapper-Support für Tabs, Collapse, Fieldsets, Inline- und Column-Gruppen, bessere Default-Styles und sauberes Scoping über eigene `.mform`-Container pro Item.
+- **Link-, Media- und Listen-Widgets deutlich robuster** – Imagelist, Medialist, Linklist, Custom-Link und Multi-Link verhalten sich im Repeater und nach Reload konsistenter, inklusive Vorschau, Validierung und Popup-Übernahme.
+- **Dokumentation, Demos und Backend-Navigation erweitert** – neue Einstiegsseite „Was ist neu in MForm 9?“, MFormOutput-Doku, Security-Seite, zusätzliche Demo-Module und konsistentere Backend-Struktur.
+- **Code-Ausgabe komfortabler** – Copy-to-Clipboard ist nun zentralisiert und robust; falls das `code`-Addon installiert ist, werden Doku-Codeblöcke und Form-Builder-Code read-only über Monaco dargestellt.
 
-- **Jeder klonbare Item-Body braucht einen eigenen `.mform`-Wrapper.** Toggle-/Collapse-Logik in `assets/mform.js` arbeitet ueber `getParentMForm()` und sucht den naechsten `.mform`-Vorfahren als Scope. Ohne eigenen Scope greift der Selektor auf den globalen Modul-Wrapper.
-- **Bootstrap-3 ist Pflicht-Annahme** im Backend (kein Flex/Grid, kein `:has()`). Layout im Repeater bitte ueber `form-horizontal` + `col-sm-*`-Markup im PHP-Renderer aufbauen, nicht ueber neues Custom-Grid. Spaeterer Bootstrap-Exit wird so auf einen Schlag in `MFormFlexRepeaterRenderer::wrapFormGroup()` und im klassischen `mform_default.php`-Fragment moeglich.
-- **Toggle-IDs (`data-group-collapse-id`, `data-toggle-item`) sind nur innerhalb eines `.mform`-Scopes eindeutig.** Im FlexRepeater duerfen Item-Klone die selbe ID tragen, weil der Scope der Item-Body ist. Beim Hinzufuegen weiterer wiederholbarer Strukturen (z. B. neue Nested-Container) immer `<div class="mform ...">` als Wurzel verwenden.
-- **Layout-Schalter gehen ueber `data-mfr-layout` am Container**, nicht ueber inline `style`/CSS-Variablen am Item. Custom-Themes hooken sich ueber `.mfr-container[data-mfr-layout="…"]` ein.
+### Stabilität und Qualität
 
----
+- **Viele Repeater- und Wrapper-Regressionen behoben** – darunter Rendering von Widgets, Readonly-Feldern, Tabs, Collapse, Fieldsets, Legends, Label-HTML, Toggle-Optionen, TinyMCE-/CKE5-Reinit und MBlock-Reindexing.
+- **Statische Analyse und Codebasis aufgeräumt** – Rexstan auf 0 Fehler gebracht, `empty()`-Verwendungen bereinigt, veraltete TODOs entfernt und Doku-spezifisches Inline-CSS/JS in eigene Assets ausgelagert.
+- **CI- und Sicherheitsartefakte ergänzt** – `SECURITY.md` sowie GitHub-Workflow für Linting, PHP-CS-Fixer und Rexstan sind Teil des 9er Releases.
 
-Nonst noch
+### Hinweise
 
-### Neu
-
-- **`MFormOutput`** (`FriendsOfRedaxo\MForm\Output\MFormOutput`) – Fluent, immutable Output-Helper für Repeater-Daten:
-  - Chainable: `filter`, `where`, `sort`, `reverse`, `limit`, `skip`, `page`, `map`
-  - Terminals: `all`, `first`, `last`, `count`, `isEmpty`, `pluck`, `group`
-  - Empty-State: `whenEmpty()`
-  - Render-API: `render`, `renderList`, `renderGrid`, `renderChunks`, `renderFragment`
-  - Framework-Presets für `renderGrid()`: `GRID_BOOTSTRAP`, `GRID_TAILWIND`, `GRID_UIKIT`, `GRID_NONE` – inkl. globalem Default via `setDefaultGridFramework()`
-  - **`MFormOutput::tag()`** – HTML-Builder mit Class-Array-Support, Boolean-Attributen (HTML5), automatisch escaped Werten und Auto-Close für Void-Tags
-- **Single-Value Helfer** für klassische `REX_VALUE[…]`-Felder:
-  - `linkUrl()` / `link()` – auflöst `rex-article://`, `rex-media://`, `mailto:`, `tel:`, externe URLs und numerische Artikel-IDs; setzt automatisch `target="_blank" rel="noopener"` für externe Links
-  - `picture()` – baut `<picture>` aus einer Media-Query → media_manager-Type-Map, nimmt `alt` aus Mediapool-Metadaten
-  - `mediaList()` – splittet CSV von `addMedialistField`/`addImagelistField` zu existierenden `rex_media`-Instanzen
-  - `richtext()` – semantischer Marker für TinyMCE-Output (kein doppeltes Escape), optional Tag-Whitelist
-  - `excerpt()` – Plaintext-Auszug aus HTML, getrimmt auf N Wörter
-- **Demo-Modul „Content-Pflege-Modul [Output via MFormOutput]"** (`Backend → Demos → Repeater`) – realer redaktioneller Workflow: Headline + Intro + Repeater-Sektionen mit Titel, TinyMCE-Text, Hauptbild, Link und Galerie, ausgegeben über `MFormOutput`.
-- **Doku-Seite „MFormOutput – Fluent Module Output"** (`Backend → MForm → Dokumentation → MFormOutput`) – mit Framework-Vergleichstabelle, `tag()`-Beispielen, Single-Value-Helfern und Sicherheitshinweis.
-- **SECURITY.md** – Verantwortungsvolle Offenlegung über GitHub Security Advisory, Versionsmatrix, Reaktionszeiten nach CVSS-Schweregrad und klar abgegrenzter Scope. Über die Doku-Seite **Sicherheit** im Backend (`Backend → MForm → Dokumentation → Sicherheit`) auch direkt einsehbar.
-- **GitHub Action „Static Analysis“** (`.github/workflows/static-analysis.yml`) – läuft bei Push, PR und manuell (`workflow_dispatch`):
-  - PHP-Lint Matrix (8.1, 8.2, 8.3, 8.4)
-  - PHP-CS-Fixer Dry-Run (`@PSR12`-Fallback, falls keine eigene Konfig vorhanden)
-  - **Rexstan** (`^3.0`) auf Basis des aktuellen REDAXO-Latest-Release, scope-begrenzt auf das mform-Addon
-
-### Code-Qualität
-
-- **`empty()` aus `lib/` und `pages/` entfernt** – alle ~50 Vorkommen durch strikte Vergleiche ersetzt (`'' !== $x`, `[] !== $x`, `null !== $x`). Stabilere Semantik, keine impliziten Falsy-Casts mehr.
-- **TODO-Marker aufgelöst** – veraltete `// TODO`- und `/** TODO */`-Blöcke in `MFormElements.php` und `MFormRepeaterHelper.php` entweder umgesetzt oder durch erklärende Kommentare ersetzt.
-- **Inline-CSS/JS aus `pages/docs.php` ausgelagert** in `assets/css/docs.css` und `assets/js/docs.js`. Assets werden in `boot.php` nur auf den Doku-Seiten registriert. Cache-Busting übernimmt REDAXO automatisch.
-
-### Fixed
-
-- **Doku: TOC-Filter funktioniert wieder nach PJAX-Navigation** – `assets/js/docs.js` initialisiert sich jetzt über `rex:ready` (jQuery) statt nur über `DOMContentLoaded`. Init-Routinen sind idempotent (Marker-basiert), keine Doppel-Bindings beim Re-Init.
+- Bestehende Module bleiben weitgehend kompatibel; für bestimmte MBlock-Szenarien mit klassischen Link-/Media-Widgets wird `MForm::useCustomLinkForClassicWidgets(true)` empfohlen.
+- Für Repeater-Ausgabe mit Online/Offline-Status ist `MFormRepeaterHelper::decode()` der bevorzugte Pfad statt reinem `json_decode()`.
 
 ---
 

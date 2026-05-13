@@ -6,30 +6,56 @@
 (function ($) {
     'use strict';
 
-    function initCopyButtons(root) {
-        root.querySelectorAll('.rex-docs pre').forEach(function (pre) {
-            if (pre.querySelector('.btn-copy-code')) {
+    function getCodeBlocks(root) {
+        return root.querySelectorAll('.rex-docs pre, pre.rex-code');
+    }
+
+    function setCopyButtonState(button, label, isSuccess) {
+        button.textContent = label;
+        button.classList.toggle('copied', !!isSuccess);
+        button.classList.toggle('copy-failed', isSuccess === false);
+
+        window.setTimeout(function () {
+            button.textContent = 'Kopieren';
+            button.classList.remove('copied');
+            button.classList.remove('copy-failed');
+        }, isSuccess === false ? 2500 : 2000);
+    }
+
+    function initCodeBlocks(root) {
+        getCodeBlocks(root).forEach(function (pre) {
+            if (pre.dataset.mformCodeInit === '1') {
                 return;
             }
+
+            pre.dataset.mformCodeInit = '1';
+
+            var wrapper = document.createElement('div');
+            wrapper.className = 'mform-docs-code';
+            pre.parentNode.insertBefore(wrapper, pre);
+            wrapper.appendChild(pre);
+
             var btn = document.createElement('button');
             btn.className = 'btn-copy-code';
             btn.type = 'button';
             btn.textContent = 'Kopieren';
             btn.addEventListener('click', function () {
-                var code = pre.querySelector('code');
-                if (!code) {
+                if (!window.mformUi || typeof window.mformUi.getCodeText !== 'function') {
                     return;
                 }
-                navigator.clipboard.writeText(code.textContent || '').then(function () {
-                    btn.textContent = '\u2713 Kopiert';
-                    btn.classList.add('copied');
-                    setTimeout(function () {
-                        btn.textContent = 'Kopieren';
-                        btn.classList.remove('copied');
-                    }, 2000);
+
+                var codeText = window.mformUi.getCodeText(pre);
+                if (!codeText) {
+                    return;
+                }
+
+                window.mformUi.copyTextToClipboard(codeText).then(function () {
+                    setCopyButtonState(btn, '\u2713 Kopiert', true);
+                }).catch(function () {
+                    setCopyButtonState(btn, 'Fehlgeschlagen', false);
                 });
             });
-            pre.appendChild(btn);
+            wrapper.appendChild(btn);
         });
     }
 
@@ -49,7 +75,7 @@
     }
 
     function init() {
-        initCopyButtons(document);
+        initCodeBlocks(document);
         initTocFilter(document);
     }
 

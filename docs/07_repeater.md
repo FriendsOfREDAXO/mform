@@ -273,7 +273,7 @@ Verfügbare Optionen im Repeater-Array:
 
 ## Wrapper im Repeater (Tabs, Collapse, Fieldset, Inline, Columns)
 
-Seit **9.0.0-beta8** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerhalb eines Repeater-Items. Damit lassen sich komplexe Item-Layouts wie im klassischen MForm-Pfad aufbauen – inkl. Bootstrap-3-Tabs, Collapse-Gruppen, Fieldsets mit Legend, Form-Inline und Spalten-Grids.
+Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerhalb eines Repeater-Items. Damit lassen sich komplexe Item-Layouts wie im klassischen MForm-Pfad aufbauen – inkl. Bootstrap-3-Tabs, Collapse-Gruppen, Fieldsets mit Legend, Form-Inline und Spalten-Grids.
 
 | Wrapper | Methode | Markup im Repeater-Item |
 |---------|---------|-------------------------|

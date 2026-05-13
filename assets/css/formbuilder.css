@@ -505,17 +505,20 @@ body.rex-theme-dark .mform-fb {
     border: 1px solid var(--fb-code-border);
     padding: 12px;
     border-radius: 4px;
+    min-height: 240px;
     max-height: 360px;
     overflow: auto;
     font-size: 12px;
     line-height: 1.55;
     white-space: pre;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    width: 100%;
+    resize: vertical;
+    box-sizing: border-box;
 }
 
-.mform-fb__code code {
-    background: transparent;
-    color: inherit;
-    padding: 0;
-    font-size: inherit;
+.mform-fb__code-viewer {
+    border: 1px solid var(--fb-code-border);
+    border-radius: 4px;
+    overflow: hidden;
 }

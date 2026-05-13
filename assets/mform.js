@@ -478,3 +478,224 @@ $(document).off('click.mformCsGlobal').on('click.mformCsGlobal', function (e) {
         $('.mform-cs-popup').removeClass('mform-cs-popup--open');
     }
 });
+
+(function () {
+    'use strict';
+
+    var monacoLoaderPromise = null;
+
+    function fallbackCopyText(text) {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', 'readonly');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.pointerEvents = 'none';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            return !!(document.execCommand && document.execCommand('copy'));
+        } finally {
+            document.body.removeChild(textarea);
+        }
+    }
+
+    function getCodeSourceText(sourceElement) {
+        if (!sourceElement) {
+            return '';
+        }
+
+        if ('value' in sourceElement) {
+            return sourceElement.value || '';
+        }
+
+        if (sourceElement.tagName === 'PRE') {
+            var codeElement = sourceElement.querySelector('code');
+            return codeElement ? (codeElement.textContent || '') : (sourceElement.textContent || '');
+        }
+
+        return sourceElement.textContent || '';
+    }
+
+    function setCodeSourceText(sourceElement, value) {
+        if (!sourceElement) {
+            return;
+        }
+
+        if ('value' in sourceElement) {
+            sourceElement.value = value;
+        } else if (sourceElement.tagName === 'PRE') {
+            var codeElement = sourceElement.querySelector('code');
+            if (codeElement) {
+                codeElement.textContent = value;
+            } else {
+                sourceElement.textContent = value;
+            }
+        } else {
+            sourceElement.textContent = value;
+        }
+
+        if (sourceElement._mformMonacoEditor && sourceElement._mformMonacoEditor.getValue() !== value) {
+            sourceElement._mformMonacoEditor.setValue(value);
+        }
+    }
+
+    function normalizeEditorLanguage(language) {
+        var map = {
+            js: 'javascript',
+            ts: 'typescript',
+            htmlmixed: 'html',
+            xml: 'html',
+            yml: 'yaml',
+            txt: 'plaintext'
+        };
+        var normalized = (language || '').toString().trim().toLowerCase();
+        return map[normalized] || normalized || 'plaintext';
+    }
+
+    function inferEditorLanguage(sourceElement, fallbackLanguage) {
+        var candidates = [];
+
+        if (sourceElement && sourceElement.dataset) {
+            candidates.push(sourceElement.dataset.mformCodeLanguage || '');
+            candidates.push(sourceElement.dataset.language || '');
+            candidates.push(sourceElement.dataset.mode || '');
+        }
+
+        if (sourceElement && sourceElement.classList) {
+            Array.prototype.slice.call(sourceElement.classList).forEach(function (className) {
+                if (className.indexOf('language-') === 0) {
+                    candidates.push(className.slice(9));
+                }
+                if (className.indexOf('rex-code-') === 0) {
+                    candidates.push(className.slice(9));
+                }
+            });
+        }
+
+        if (sourceElement && sourceElement.tagName === 'PRE') {
+            var codeElement = sourceElement.querySelector('code');
+            if (codeElement) {
+                return inferEditorLanguage(codeElement, fallbackLanguage);
+            }
+        }
+
+        candidates.push(fallbackLanguage || '');
+
+        for (var i = 0; i < candidates.length; i++) {
+            var normalized = normalizeEditorLanguage(candidates[i]);
+            if (normalized) {
+                return normalized;
+            }
+        }
+
+        return 'plaintext';
+    }
+
+    function loadCodeAddonMonaco() {
+        if (typeof monaco !== 'undefined') {
+            return Promise.resolve(monaco);
+        }
+
+        if (typeof MonacoLoader === 'undefined') {
+            return Promise.resolve(null);
+        }
+
+        if (!monacoLoaderPromise) {
+            monacoLoaderPromise = MonacoLoader.load().then(function () {
+                return typeof monaco !== 'undefined' ? monaco : null;
+            }).catch(function (error) {
+                monacoLoaderPromise = null;
+                if (typeof console !== 'undefined' && console.warn) {
+                    console.warn('[mform] Monaco konnte nicht geladen werden.', error);
+                }
+                return null;
+            });
+        }
+
+        return monacoLoaderPromise;
+    }
+
+    function getPreferredMonacoTheme() {
+        var body = document.body;
+        var prefersDark = !!(body && (body.classList.contains('rex-theme-dark') || body.classList.contains('rex-is-dark')));
+
+        if (!prefersDark && window.matchMedia) {
+            prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        return prefersDark ? 'vs-dark' : 'vs';
+    }
+
+    window.mformUi = window.mformUi || {};
+
+    window.mformUi.copyTextToClipboard = function (text) {
+        var value = String(text || '');
+
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext) {
+            return navigator.clipboard.writeText(value).catch(function () {
+                if (!fallbackCopyText(value)) {
+                    throw new Error('Clipboard copy failed');
+                }
+            });
+        }
+
+        if (fallbackCopyText(value)) {
+            return Promise.resolve();
+        }
+
+        return Promise.reject(new Error('Clipboard API unavailable'));
+    };
+
+    window.mformUi.getCodeText = getCodeSourceText;
+    window.mformUi.setCodeText = setCodeSourceText;
+
+    window.mformUi.enhanceReadonlyCode = function (sourceElement, options) {
+        if (!sourceElement) {
+            return Promise.resolve(null);
+        }
+
+        var hostElement = options && options.hostElement ? options.hostElement : sourceElement;
+        if (hostElement.dataset.mformCodeViewerReady === '1') {
+            return Promise.resolve(sourceElement._mformMonacoEditor || null);
+        }
+
+        return loadCodeAddonMonaco().then(function (loadedMonaco) {
+            if (!loadedMonaco) {
+                return null;
+            }
+
+            var height = (options && options.height) || Math.max(hostElement.offsetHeight || 0, (options && options.minHeight) || 220);
+            var container = document.createElement('div');
+            container.className = (options && options.containerClass) || 'mform-code-viewer';
+            container.style.height = height + 'px';
+            container.style.width = '100%';
+
+            hostElement.parentNode.insertBefore(container, hostElement.nextSibling);
+            hostElement.style.display = 'none';
+
+            var editor = loadedMonaco.editor.create(container, {
+                value: getCodeSourceText(sourceElement),
+                language: inferEditorLanguage(sourceElement, options && options.language),
+                theme: getPreferredMonacoTheme(),
+                readOnly: true,
+                domReadOnly: true,
+                automaticLayout: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                wordWrap: 'on',
+                renderWhitespace: 'selection',
+                fontSize: 13
+            });
+
+            sourceElement._mformMonacoEditor = editor;
+            sourceElement._mformMonacoContainer = container;
+            hostElement.dataset.mformCodeViewerReady = '1';
+
+            return editor;
+        });
+    };
+})();

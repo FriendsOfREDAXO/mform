@@ -9,11 +9,21 @@ mark {
     border-radius: 2px;
 }
 
-.rex-docs pre {
+.mform-docs-code {
     position: relative;
 }
 
-.rex-docs .btn-copy-code {
+.mform-docs-code pre {
+    max-height: 28rem;
+    overflow: auto;
+    padding-top: 2.6rem;
+}
+
+.mform-docs-code pre.rex-code {
+    white-space: pre;
+}
+
+.mform-docs-code .btn-copy-code {
     position: absolute;
     top: 5px;
     right: 5px;
@@ -29,13 +39,20 @@ mark {
     z-index: 10;
 }
 
-.rex-docs pre:hover .btn-copy-code {
+.mform-docs-code:hover .btn-copy-code {
     opacity: 1;
 }
 
-.rex-docs .btn-copy-code.copied {
+.mform-docs-code .btn-copy-code.copied {
     background: #5bb75b;
     color: #fff;
     border-color: #5bb75b;
+    opacity: 1;
+}
+
+.mform-docs-code .btn-copy-code.copy-failed {
+    background: #d9534f;
+    color: #fff;
+    border-color: #d9534f;
     opacity: 1;
 }

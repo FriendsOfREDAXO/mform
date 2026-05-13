@@ -97,14 +97,14 @@ $body = <<<'HTML'
             <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy">Code kopieren</button>
             <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
         </div>
-        <pre class="mform-fb__code"><code data-fb-code>// Noch keine Felder hinzugefuegt.</code></pre>
+        <textarea class="mform-fb__code" data-fb-code data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
 
         <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
         <div class="mform-fb__code-bar">
             <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
             <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
         </div>
-        <pre class="mform-fb__code"><code data-fb-output>// Noch keine Felder hinzugefuegt.</code></pre>
+        <textarea class="mform-fb__code" data-fb-output data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
     </div>
 
     <div class="mform-fb__props" data-fb-props>
