@@ -2,13 +2,13 @@
 
 ## Version 9.0.0
 
-MForm 9 fasst den neuen FlexRepeater-Standardpfad, die modernisierte Link-/Media-API, neue Feld- und Wrapper-Typen, den visuellen Form Builder sowie umfangreiche Stabilitäts- und Doku-Arbeiten in einem Major Release zusammen. Die Detailhistorie der Betas bleibt unten erhalten; diese Sektion bündelt die 9er Änderungen release-tauglich.
+MForm 9 fasst den neuen FlexRepeater-Standardpfad, die modernisierte Link-/Media-API, neue Feld- und Wrapper-Typen, den visuellen Form Builder sowie umfangreiche Stabilitäts- und Doku-Arbeiten in einem Major Release zusammen. Die Detailhistorie der Betas bleibt unten erhalten; diese Sektion bündelt die 9er Änderungen release-tauglich. Alle Änderungen wurden unter Wahrung der Kompatibilität umgesetzt.
 
 ### Neu
 
-- **Neuer Standardpfad für wiederholbare Inhalte** – `addFlexRepeaterElement()` etabliert den FlexRepeater als robusten Repeater für REDAXO-Backend-Kontexte, inklusive Drag-and-Drop, stabiler Editor-Initialisierung, Copy/Paste, Aktiv/Inaktiv-Status, Toggle-All und verschachtelten Strukturen.
+- **Neuer Standardpfad für wiederholbare Inhalte** – `addFlexRepeaterElement()` etabliert den FlexRepeater als robusten Repeater für REDAXO-Backend-Kontexte, inklusive Drag-and-Drop, stabiler Editor-Initialisierung, Copy/Paste, Aktiv/Inaktiv-Status, Toggle-All und verschachtelten Strukturen. `addRepeaterElement()` kann weiterhin verwendet werden; bestehende Repeater-Setups funktionieren also weiter und koennen schrittweise auf den neuen FlexRepeater-Pfad umgestellt werden, ohne dass bestehende Module pauschal neu gebaut werden muessen.
 - **Neue Feld- und Wrapper-Typen** – hinzugekommen sind u. a. `addConditionalFieldsetArea()`, `addModalElement()`, `addColorSwatchField()`, `addCustomLinkMultipleField()` sowie die YForm-Value-Types `custom_link_multi` und `color_swatch`.
-- **Modernisierte Link-/Media-Integration** – mit `MFormOutputHelper::createLinkData()` / `normalizeLinkData()`, `normalizeRepeaterItems()`, `useCustomLinkForClassicWidgets(true)`, `addMFormMediaField()` und der überarbeiteten Custom-Link-Integration lassen sich klassische Widgets und neue Linkformate einheitlich verarbeiten.
+- **Modernisierte Link-/Media-Integration** – MForm bringt eigene Widgets mit und ersetzt die Systemwidgets. Mit `MFormOutputHelper::createLinkData()` / `normalizeLinkData()`, `normalizeRepeaterItems()`, `useCustomLinkForClassicWidgets(true)`, `addMFormMediaField()` und der überarbeiteten Custom-Link-Integration lassen sich klassische Widgets und neue Linkformate einheitlich verarbeiten.
 - **Visueller Form Builder** – neue Backend-Seite zum Zusammenklicken von MForm-Modulen mit Live-PHP-Code-Generator, Repeater-/Wrapper-Support und Copy-Funktion für Input- und Output-Code.
 - **`MFormOutput` für Frontend-Ausgabe** – neuer Fluent-Output-Helper mit Filter-, Sortier-, Gruppen-, Render- und Tag-API sowie Single-Value-Helfern wie `linkUrl()`, `picture()`, `mediaList()`, `richtext()` und `excerpt()`.
 - **Template- und Projektintegration** – `registerTemplate()`, `fromTemplate()` und `applyTemplate()` ergänzen MForm um eine wiederverwendbare Template-Registry für projektweite Defaults.
@@ -29,6 +29,7 @@ MForm 9 fasst den neuen FlexRepeater-Standardpfad, die modernisierte Link-/Media
 ### Hinweise
 
 - Bestehende Module bleiben weitgehend kompatibel; für bestimmte MBlock-Szenarien mit klassischen Link-/Media-Widgets wird `MForm::useCustomLinkForClassicWidgets(true)` empfohlen.
+- Klassische Systemwidgets werden in diesem Kontext durch MForm-Widgets ersetzt.
 - Für Repeater-Ausgabe mit Online/Offline-Status ist `MFormRepeaterHelper::decode()` der bevorzugte Pfad statt reinem `json_decode()`.
 
 ---
