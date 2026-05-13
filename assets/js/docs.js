@@ -7,6 +7,46 @@
     'use strict';
 
     function initCopyButtons(root) {
+        function setCopiedState(btn) {
+            btn.textContent = '\u2713 Kopiert';
+            btn.classList.add('copied');
+            setTimeout(function () {
+                btn.textContent = 'Kopieren';
+                btn.classList.remove('copied');
+            }, 2000);
+        }
+
+        function copyText(text, onSuccess) {
+            function fallback() {
+                try {
+                    var ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    var ok = document.execCommand && document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    if (ok) {
+                        onSuccess();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            if (
+                navigator.clipboard &&
+                typeof navigator.clipboard.writeText === 'function' &&
+                window.isSecureContext
+            ) {
+                navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
+                return;
+            }
+            fallback();
+        }
+
         root.querySelectorAll('.rex-docs pre').forEach(function (pre) {
             if (pre.querySelector('.btn-copy-code')) {
                 return;
@@ -20,13 +60,8 @@
                 if (!code) {
                     return;
                 }
-                navigator.clipboard.writeText(code.textContent || '').then(function () {
-                    btn.textContent = '\u2713 Kopiert';
-                    btn.classList.add('copied');
-                    setTimeout(function () {
-                        btn.textContent = 'Kopieren';
-                        btn.classList.remove('copied');
-                    }, 2000);
+                copyText(code.textContent || '', function () {
+                    setCopiedState(btn);
                 });
             });
             pre.appendChild(btn);
