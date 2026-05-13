@@ -26,13 +26,16 @@
                     ta.style.opacity = '0';
                     document.body.appendChild(ta);
                     ta.select();
+                    // Legacy fallback for non-secure contexts where Clipboard API is unavailable.
                     var ok = document.execCommand && document.execCommand('copy');
                     document.body.removeChild(ta);
                     if (ok) {
                         onSuccess();
                     }
                 } catch (e) {
-                    // ignore
+                    if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+                        console.warn('MForm docs copy fallback failed.', e);
+                    }
                 }
             }
 
