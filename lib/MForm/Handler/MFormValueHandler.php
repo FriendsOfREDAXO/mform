@@ -28,9 +28,14 @@ class MFormValueHandler
     public static function loadRexVars(): array
     {
         $sliceId = rex_request('slice_id', 'int', false);
+        $function = rex_request('function', 'string', '');
         $result = [];
 
-        if ($sliceId) {
+        // When adding a new slice (function=add), the slice_id parameter refers to the
+        // predecessor slice (the one after which the new slice will be inserted), not to
+        // a slice being edited. Loading values from the predecessor would pre-fill the
+        // new slice form with foreign data, so we skip the lookup in that case.
+        if ($sliceId && 'add' !== $function) {
             $table = rex::getTablePrefix() . 'article_slice';
             $fields = '*';
             $where = 'id="' . $sliceId . '"';
