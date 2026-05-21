@@ -276,6 +276,24 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="tabPullRight">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="tabPullRight"> Tab rechts ausrichten <small>(pull right)</small></label>
             </div>
+            <div class="form-group" data-fb-prop-group="tabIcon">
+                <label>Tab-Icon <small>(tab-icon, z. B. <code>fa-cog</code>)</small></label>
+                <input type="text" class="form-control" data-fb-prop="tabIcon" placeholder="fa-cog">
+            </div>
+            <div class="form-group" data-fb-prop-group="tabStyle">
+                <label>Tab-Stil</label>
+                <select class="form-control" data-fb-prop="tabStyle">
+                    <option value="">Standard</option>
+                    <option value="modern">modern</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="tabLayout">
+                <label>Tab-Layout</label>
+                <select class="form-control" data-fb-prop="tabLayout">
+                    <option value="">Standard</option>
+                    <option value="vertical">vertical (Navigation links)</option>
+                </select>
+            </div>
         </form>
     </div>
 </div>

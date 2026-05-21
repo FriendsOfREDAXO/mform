@@ -105,7 +105,7 @@
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
                         'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
             tab:         { label: 'Tab', method: 'addTabElement',
-                props: ['label', 'tabPullRight'] },
+                props: ['label', 'tabPullRight', 'tabIcon', 'tabStyle', 'tabLayout'] },
             fieldset:    { label: 'Fieldset', method: 'addFieldsetArea',
                 props: ['label'] }
         };
@@ -184,6 +184,9 @@
                 repeaterBtnClass: '',
                 // Tab
                 tabPullRight: false,
+                tabIcon: '',
+                tabStyle: '',
+                tabLayout: '',
                 children: (type === 'repeater' || type === 'tab' || type === 'fieldset') ? [] : null
             };
         }
@@ -379,10 +382,6 @@
                     var nestedEl = sample ? sample.closest('[data-fb-nested]') : null;
                     if (nestedEl) targetDepth = parseInt(nestedEl.dataset.fbDepth, 10) || 0;
                 }
-                if (clipboard.type === 'tab' && targetDepth > 0) {
-                    alert('Tabs koennen nur auf der obersten Ebene eingefuegt werden.');
-                    return;
-                }
                 if (wouldExceedRepeaterDepth(clipboard, targetDepth)) {
                     alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
                     return;
@@ -515,11 +514,6 @@
                 }
                 // New item from palette has no children, so subtree depth is 0; depthOf check above
                 // is sufficient for palette inserts.
-                if (type === 'tab' && depthOf(evt.to) > 0) {
-                    alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
-                    setTimeout(doRender, 0);
-                    return;
-                }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
                 setTimeout(function () { doRender(); selectItem(newItem); }, 0);
@@ -538,12 +532,6 @@
                 setTimeout(doRender, 0);
                 return;
             }
-            if (item.type === 'tab' && depthOf(evt.to) > 0) {
-                alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
-                setTimeout(doRender, 0);
-                return;
-            }
-
             removeItem(uid);
             toList.splice(evt.newIndex, 0, item);
             setTimeout(doRender, 0);
@@ -587,15 +575,6 @@
             var type = li.dataset.type;
             if (!type) return;
             var newItem = makeItem(type);
-
-            // Tabs are top-level only (Fieldsets duerfen ueberall liegen).
-            if (type === 'tab') {
-                state.push(newItem);
-                renderCanvas();
-                emitCode();
-                selectItem(newItem);
-                return;
-            }
 
             // If an active repeater/tab/fieldset is selected, attempt to insert as child.
             // Otherwise append at top level.
@@ -930,6 +909,13 @@
             var label = item.label || '';
             var openTab = isFirst ? 'true' : 'false';
             var args = phpStr(label) + ', MForm::factory()\n' + inner;
+            var tabAttrs = tabAttrsPhp(item);
+            if (tabAttrs) {
+                if (item.tabPullRight) {
+                    return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', true, ' + tabAttrs + ');';
+                }
+                return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', false, ' + tabAttrs + ');';
+            }
             // Drop trailing args we can default; only emit pullRight if true
             if (item.tabPullRight) {
                 return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', true);';
@@ -938,6 +924,32 @@
                 return indent + '$mform->addTabElement(' + args + ', true);';
             }
             return indent + '$mform->addTabElement(' + args + ');';
+        }
+
+        function renderInnerTabChainLink(item, indent, isFirst) {
+            var inner = renderRepeaterInner(item, indent);
+            var label = item.label || '';
+            var openTab = isFirst ? 'true' : 'false';
+            var args = phpStr(label) + ', MForm::factory()\n' + inner;
+            var tabAttrs = tabAttrsPhp(item);
+            if (tabAttrs) {
+                return indent + '->addTabElement(' + args + ', ' + openTab + ', ' + (item.tabPullRight ? 'true' : 'false') + ', ' + tabAttrs + ')';
+            }
+            if (item.tabPullRight) {
+                return indent + '->addTabElement(' + args + ', ' + openTab + ', true)';
+            }
+            if (isFirst) {
+                return indent + '->addTabElement(' + args + ', true)';
+            }
+            return indent + '->addTabElement(' + args + ')';
+        }
+
+        function tabAttrsPhp(item) {
+            var attrs = {};
+            if (item.tabIcon) attrs['tab-icon'] = item.tabIcon;
+            if (item.tabStyle) attrs['tab-style'] = item.tabStyle;
+            if (item.tabLayout) attrs['tab-layout'] = item.tabLayout;
+            return attrsToPhp(attrs);
         }
 
         function renderFieldsetStmt(item, indent) {
@@ -976,17 +988,26 @@
                 return indent + '        // Felder hier ablegen\n';
             }
             var keyPool = {};
+            var prevWasTab = false;
             var lines = children.map(function (c) {
                 if (c.type === 'fieldset') {
+                    prevWasTab = false;
                     return renderInnerFieldsetChainLink(c, indent + '        ');
+                }
+                if (c.type === 'tab') {
+                    var isFirstTab = !prevWasTab;
+                    prevWasTab = true;
+                    return renderInnerTabChainLink(c, indent + '        ', isFirstTab);
                 }
                 var key = slugify(c.label, 'field_' + c.id);
                 var base = key, n = 2;
                 while (keyPool[key]) { key = base + '_' + n++; }
                 keyPool[key] = true;
                 if (c.type === 'repeater') {
+                    prevWasTab = false;
                     return renderInnerRepeaterChainLink(c, key, indent + '        ');
                 }
+                prevWasTab = false;
                 return renderInnerChainLink(c, key, indent + '        ');
             });
             return lines.join('\n') + '\n';
