@@ -53,17 +53,20 @@ Der Visual Form Builder (eingeführt in 9.0.0-beta6) deckt aktuell 16 Feldtypen 
 
 ### Tasks
 
+- 9.1 Fokus (priorisiert):
 - [ ] `addColorSwatchField()` – Color-Swatch (klein)
 - [ ] `addModalElement()` – Bootstrap-Modal als Sub-Form (mittel)
+- [ ] `addToggleCheckboxField()` – Switch-Checkbox (klein)
+- [ ] `addAlertInfo/Warning/Danger/Success` – Alert-Varianten als eigene Palette-Items (klein)
+
+- Nach 9.2 ausgelagert: siehe Issue [#425](https://github.com/FriendsOfREDAXO/mform/issues/425)
 - [ ] `addCollapseElement()` – Collapse-Container (mittel)
 - [ ] `addAccordionElement()` – Accordion-Container (mittel)
 - [ ] `addColumnElement()` – Bootstrap-Spalte (mittel)
 - [ ] `addInlineElement()` – Inline-Group (klein)
-- [ ] `addToggleCheckboxField()` – Switch-Checkbox (klein)
 - [ ] `addMultiSelectField()` – Multi-Select (klein)
 - [ ] `addRadioImgField()`, `addRadioIconField()`, `addRadioColorField()` – visuelle Radios (mittel)
 - [ ] `addTextReadOnlyField()`, `addTextAreaReadOnlyField()` – Readonly-Varianten (klein)
-- [ ] `addAlertInfo/Warning/Danger/Success` – Alert-Varianten als eigene Palette-Items (klein)
 - [ ] `addConditionalFieldsetArea()` – Conditional-Wrapper (groß; Properties-Panel mit Bedingungs-Editor)
 
 Pro Feldtyp:
