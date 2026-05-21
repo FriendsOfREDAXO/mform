@@ -8,6 +8,17 @@
 - **Optionale Tab-Modernisierung** – Tab-Navigation kann optional als modernisierte Variante gerendert werden über `tab-style => 'modern'` bzw. `data-group-tab-style => 'modern'`.
 - **Optionale vertikale Tab-Navigation** – Tabs können optional links neben dem Inhalt dargestellt werden über `tab-layout => 'vertical'` bzw. `data-group-tab-layout => 'vertical'` (inkl. Mobile-Fallback auf gestapelte Ansicht).
 - **Font-Awesome-Icons je Tab** – Icon-Unterstützung über `tab-icon` bleibt erhalten und funktioniert weiterhin in den neuen Tab-Varianten.
+- **Form Builder erweitert (Issue #403, 9.1 Scope)** – neue Palette-/Generator-Unterstützung für `addColorSwatchField()`, `addToggleCheckboxField()`, `addModalElement()` sowie Alert-Elemente (`addAlertInfo/Warning/Danger/Success`).
+
+### Verbesserungen
+
+- **ColorSwatch-UX im Form Builder** – zusätzliche Hilfe im Eigenschaften-Panel, Beispiel-Palette per Klick und erweiterte Options-Syntax für CSS-Klassen-Swatches mit optionaler Preview-Farbe (z. B. `.text-primary=Primaer CSS|#2f77bc`).
+- **Barrierefreiheit bei Tabs verbessert** – ARIA-Zustände und Verknüpfungen wurden für Standard-Tabs und Repeater-Tabs ergänzt (`aria-selected`, `aria-controls`, `aria-labelledby`).
+
+### Behoben
+
+- **Tab-Active-Class im Parser** – fehlendes Leerzeichen beim Anhängen von `active` korrigiert, damit bestehende Klassen nicht zu ungültigen Tokens zusammenlaufen.
+- **Dokubeispiele korrigiert** – fehlerhafte Beispiele in der Wrapper-/Repeater-Doku angepasst (`addCheckboxField`-Parameter, `addTextAreaField`-Methodenname).
 
 ### Kompatibilität
 
