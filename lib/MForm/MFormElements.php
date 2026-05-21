@@ -180,6 +180,16 @@ abstract class MFormElements
     /** @param array<string, mixed> $attributes */
     public function addTabElement(string $label = '', mixed $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false, bool $showWrapper = false): static
     {
+        if (isset($attributes['tab-layout']) && !isset($attributes['data-group-tab-layout'])) {
+            $attributes['data-group-tab-layout'] = $attributes['tab-layout'];
+            unset($attributes['tab-layout']);
+        }
+
+        if (isset($attributes['tab-style']) && !isset($attributes['data-group-tab-style'])) {
+            $attributes['data-group-tab-style'] = $attributes['tab-style'];
+            unset($attributes['tab-style']);
+        }
+
         $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
             ->setLabel($label)

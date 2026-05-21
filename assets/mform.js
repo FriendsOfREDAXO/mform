@@ -190,14 +190,84 @@ function initMFormSelectPicker(mform) {
 
 function initMFormTabs(mform) {
     mform.find('.mform-tabs').each(function () {
-        let wrapper = $(this);
-        $(this).find('ul[role=tablist] a').unbind().bind('click', function () {
-            let tab = wrapper.find('div[data-tab-group-nav-tab-id=' + $(this).data('tab-item') + ']'),
-                uid = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-            tab.attr('id', uid);
-            $(this).attr('href', '#' + uid);
-            $('#' + uid).tab("show");
+        let wrapper = $(this),
+            nav = wrapper.children('ul[role=tablist]').first(),
+            panes = wrapper.children('.tab-content').first().children('.tab-pane');
+
+        if (!nav.length || !panes.length) {
+            return;
+        }
+
+        function ensureAriaLinking() {
+            let baseId = 'mform-tab-' + Math.random().toString(36).slice(2, 10);
+
+            nav.find('[data-mform-tab-toggle]').each(function (idx) {
+                let link = $(this),
+                    tabId = String(link.data('tab-item')),
+                    pane = panes.filter(function () {
+                        return String($(this).attr('data-tab-group-nav-tab-id')) === tabId;
+                    }).first();
+
+                if (!pane.length) {
+                    return;
+                }
+
+                let linkId = link.attr('id');
+                if (!linkId) {
+                    linkId = baseId + '-tab-' + idx;
+                    link.attr('id', linkId);
+                }
+
+                let paneId = pane.attr('id');
+                if (!paneId) {
+                    paneId = baseId + '-panel-' + idx;
+                    pane.attr('id', paneId);
+                }
+
+                link.attr('aria-controls', paneId);
+                pane.attr('aria-labelledby', linkId);
+            });
+        }
+
+        function activateTab(tabId) {
+            let links = nav.find('[data-mform-tab-toggle]'),
+                targetLink = links.filter(function () {
+                    return String($(this).data('tab-item')) === String(tabId);
+                }).first();
+
+            if (!targetLink.length) {
+                targetLink = links.first();
+                tabId = String(targetLink.data('tab-item'));
+            }
+
+            nav.find('li[role=presentation]').removeClass('active');
+            links.attr('aria-selected', 'false');
+            targetLink.closest('li[role=presentation]').addClass('active');
+            targetLink.attr('aria-selected', 'true');
+
+            panes.removeClass('active');
+            panes.filter(function () {
+                return String($(this).attr('data-tab-group-nav-tab-id')) === String(tabId);
+            }).first().addClass('active');
+        }
+
+        wrapper.off('click.mformTabs').on('click.mformTabs', '[data-mform-tab-toggle]', function (e) {
+            if ($(this).closest('ul[role=tablist]')[0] !== nav[0]) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            activateTab($(this).data('tab-item'));
         });
+
+        ensureAriaLinking();
+
+        let activeLink = nav.find('li.active [data-mform-tab-toggle]').first();
+        if (activeLink.length) {
+            activateTab(activeLink.data('tab-item'));
+        } else {
+            activateTab(nav.find('[data-mform-tab-toggle]').first().data('tab-item'));
+        }
     });
 }
 

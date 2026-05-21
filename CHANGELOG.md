@@ -1,6 +1,36 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
-#
-# Version 9.0.1
+
+## Version 9.1.0
+
+### Neu
+
+- **Tabs als ID-freie Implementierung** – `addTabElement()` funktioniert jetzt stabil in verschachtelten und dynamischen Kontexten (z. B. FlexRepeater, Fieldset, Collapse, Modal), ohne Bootstrap-ID-Verkabelung und ohne Kollisionen zwischen geklonten Instanzen.
+- **Optionale Tab-Modernisierung** – Tab-Navigation kann optional als modernisierte Variante gerendert werden über `tab-style => 'modern'` bzw. `data-group-tab-style => 'modern'`.
+- **Optionale vertikale Tab-Navigation** – Tabs können optional links neben dem Inhalt dargestellt werden über `tab-layout => 'vertical'` bzw. `data-group-tab-layout => 'vertical'` (inkl. Mobile-Fallback auf gestapelte Ansicht).
+- **Font-Awesome-Icons je Tab** – Icon-Unterstützung über `tab-icon` bleibt erhalten und funktioniert weiterhin in den neuen Tab-Varianten.
+- **Form Builder erweitert (Issue #403, 9.1 Scope)** – neue Palette-/Generator-Unterstützung für `addColorSwatchField()`, `addToggleCheckboxField()`, `addModalElement()` sowie Alert-Elemente (`addAlertInfo/Warning/Danger/Success`).
+
+### Verbesserungen
+
+- **ColorSwatch-UX im Form Builder** – zusätzliche Hilfe im Eigenschaften-Panel, Beispiel-Palette per Klick und erweiterte Options-Syntax für CSS-Klassen-Swatches mit optionaler Preview-Farbe (z. B. `.text-primary=Primaer CSS|#2f77bc`).
+- **Palette-Suche im Form Builder** – Live-Filter über Feld- und Wrapper-Typen inkl. Alias-Suche (z. B. `color`, `alert`, `link`) und Leerzustand-Hinweis bei keinen Treffern.
+- **Schneller Fokus auf die Suche** – `/` fokussiert direkt das Suchfeld in der Palette.
+- **Bessere Übersicht bei langen Listen** – Feld- und Wrapper-Liste haben jetzt eine maximale Höhe mit eigenem Scrollbereich in der linken Palette.
+- **Barrierefreiheit bei Tabs verbessert** – ARIA-Zustände und Verknüpfungen wurden für Standard-Tabs und Repeater-Tabs ergänzt (`aria-selected`, `aria-controls`, `aria-labelledby`).
+
+### Behoben
+
+- **Tab-Active-Class im Parser** – fehlendes Leerzeichen beim Anhängen von `active` korrigiert, damit bestehende Klassen nicht zu ungültigen Tokens zusammenlaufen.
+- **Dokubeispiele korrigiert** – fehlerhafte Beispiele in der Wrapper-/Repeater-Doku angepasst (`addCheckboxField`-Parameter, `addTextAreaField`-Methodenname).
+
+### Kompatibilität
+
+- Standardverhalten bleibt unverändert: Ohne neue Attribute bleiben Tabs visuell und funktional wie bisher.
+- Bestehende Module mit `addTabElement()` bleiben kompatibel.
+
+---
+
+## Version 9.0.1
 
 ### Behoben
 

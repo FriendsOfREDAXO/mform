@@ -70,6 +70,8 @@
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass', 'required'] },
             checkbox:    { label: 'Checkbox', method: 'addCheckboxField',
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
+            togglecheckbox: { label: 'Toggle Checkbox', method: 'addToggleCheckboxField',
+                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
             checkboxgroup: { label: 'Checkbox Group', method: 'addCheckboxGroupField',
                 props: ['label', 'defaultValue', 'options', 'cbgLayout', 'cbgMode', 'notice', 'cssClass'] },
             hidden:      { label: 'Hidden', method: 'addHiddenField',
@@ -78,8 +80,18 @@
                 props: ['label'] },
             description: { label: 'Description', method: 'addDescription',
                 props: ['label'] },
+            alertinfo:   { label: 'Alert Info', method: 'addAlertInfo',
+                props: ['alertText'] },
+            alertwarning: { label: 'Alert Warning', method: 'addAlertWarning',
+                props: ['alertText'] },
+            alertdanger: { label: 'Alert Danger', method: 'addAlertDanger',
+                props: ['alertText'] },
+            alertsuccess: { label: 'Alert Success', method: 'addAlertSuccess',
+                props: ['alertText'] },
             html:        { label: 'HTML-Block', method: 'addHtml',
                 props: ['htmlContent'] },
+            colorswatch: { label: 'Color Swatch', method: 'addColorSwatchField',
+                props: ['label', 'defaultValue', 'options', 'colorSwatchHelp', 'notice', 'cssClass'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
                 props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
@@ -105,9 +117,11 @@
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
                         'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
             tab:         { label: 'Tab', method: 'addTabElement',
-                props: ['label', 'tabPullRight'] },
+                props: ['label', 'tabPullRight', 'tabIcon', 'tabStyle', 'tabLayout'] },
             fieldset:    { label: 'Fieldset', method: 'addFieldsetArea',
-                props: ['label'] }
+                props: ['label'] },
+            modal:       { label: 'Modal', method: 'addModalElement',
+                props: ['label', 'modalBtnClass', 'modalAlign'] }
         };
 
         var state = [];
@@ -123,6 +137,8 @@
         var $canvas = document.querySelector('[data-fb-canvas]');
         var $palette = document.querySelector('[data-fb-palette]');
         var $paletteWrap = document.querySelector('[data-fb-palette-wrap]');
+        var $paletteSearch = document.querySelector('[data-fb-palette-search]');
+        var $paletteEmpty = document.querySelector('[data-fb-palette-empty]');
         var $code = document.querySelector('[data-fb-code]');
         var $output = document.querySelector('[data-fb-output]');
         var $propsForm = document.querySelector('[data-fb-props-form]');
@@ -135,7 +151,7 @@
 
         function makeItem(type) {
             var def = TYPES[type];
-            return {
+            var item = {
                 uid: 'fb-' + (Math.random().toString(36).slice(2, 8)),
                 id: nextId++,
                 type: type,
@@ -158,6 +174,7 @@
                 cbgMode: 'checkbox',
                 // HTML-Block
                 htmlContent: '',
+                alertText: (type === 'alertinfo' || type === 'alertwarning' || type === 'alertdanger' || type === 'alertsuccess') ? 'Hinweis' : '',
                 // CustomLink
                 clTypeIntern: type === 'customlink' || type === 'customlinkmultiple',
                 clTypeExtern: type === 'customlink' || type === 'customlinkmultiple',
@@ -184,8 +201,15 @@
                 repeaterBtnClass: '',
                 // Tab
                 tabPullRight: false,
-                children: (type === 'repeater' || type === 'tab' || type === 'fieldset') ? [] : null
+                tabIcon: '',
+                tabStyle: '',
+                tabLayout: '',
+                // Modal
+                modalBtnClass: 'btn-default',
+                modalAlign: 'left',
+                children: (type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal') ? [] : null
             };
+            return item;
         }
 
         function findItem(uid, list) {
@@ -267,7 +291,7 @@
 
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
-            var hasChildren = item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset';
+            var hasChildren = item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset' || item.type === 'modal';
             var collapseBtn = hasChildren
                 ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen"><i class="rex-icon fa-chevron-' + (builderCollapsed[item.uid] ? 'right' : 'down') + '"></i></button>'
                 : '';
@@ -290,7 +314,7 @@
             });
             el.appendChild(head);
 
-            if (item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset') {
+            if (item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset' || item.type === 'modal') {
                 var nested = document.createElement('div');
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
@@ -303,7 +327,7 @@
                     nested.style.display = 'none';
                 }
                 if (item.children.length === 0) {
-                    var hintWord = item.type === 'tab' ? 'Tab' : (item.type === 'fieldset' ? 'Fieldset' : 'Repeater');
+                    var hintWord = item.type === 'tab' ? 'Tab' : (item.type === 'fieldset' ? 'Fieldset' : (item.type === 'modal' ? 'Modal' : 'Repeater'));
                     nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + hintWord + ' oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
                     item.children.forEach(function (c) { nested.appendChild(renderItem(c, nextDepth)); });
@@ -378,10 +402,6 @@
                     var sample = $canvas.querySelector('[data-uid="' + uid + '"]');
                     var nestedEl = sample ? sample.closest('[data-fb-nested]') : null;
                     if (nestedEl) targetDepth = parseInt(nestedEl.dataset.fbDepth, 10) || 0;
-                }
-                if (clipboard.type === 'tab' && targetDepth > 0) {
-                    alert('Tabs koennen nur auf der obersten Ebene eingefuegt werden.');
-                    return;
                 }
                 if (wouldExceedRepeaterDepth(clipboard, targetDepth)) {
                     alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
@@ -477,6 +497,71 @@
             emitCode();
         });
 
+        $propsForm.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-fb-action="colorswatch-example"]');
+            if (!btn || !activeItem || activeItem.type !== 'colorswatch') return;
+            activeItem.options = '#ffffff=Weiss\n#111111=Schwarz\n#2f77bc=Blau\n#e74c3c=Rot\n#27ae60=Gruen\n.text-primary=Primaer CSS|#2f77bc\n.text-muted=Gedaempft CSS|#6c757d';
+            var optionsInput = $propsForm.querySelector('[data-fb-prop="options"]');
+            if (optionsInput) optionsInput.value = activeItem.options;
+            emitCode();
+        });
+
+        var TYPE_SEARCH_ALIASES = {
+            colorswatch: 'color swatch farbe palette css preview',
+            togglecheckbox: 'toggle switch umschalter',
+            customlink: 'url link intern extern mailto tel',
+            customlinkmultiple: 'url links mehrere intern extern mailto tel',
+            alertinfo: 'info hinweis nachricht',
+            alertwarning: 'warning warnung',
+            alertdanger: 'danger fehler',
+            alertsuccess: 'success erfolg',
+            repeater: 'repeat wiederholung liste',
+            fieldset: 'gruppe bereich',
+            tab: 'tabs reiter',
+            modal: 'dialog popup'
+        };
+
+        function paletteSearchText(li) {
+            var label = (li.textContent || '').toLowerCase();
+            var type = String(li.dataset.type || '').toLowerCase();
+            var aliases = TYPE_SEARCH_ALIASES[type] || '';
+            return label + ' ' + type + ' ' + aliases;
+        }
+
+        function applyPaletteFilter(term) {
+            var q = String(term || '').trim().toLowerCase();
+            var visibleCount = 0;
+
+            [$palette, $paletteWrap].forEach(function (listEl) {
+                if (!listEl) return;
+                listEl.querySelectorAll('.mform-fb__pal-item').forEach(function (li) {
+                    var show = q === '' || paletteSearchText(li).indexOf(q) !== -1;
+                    li.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+            });
+
+            if ($paletteEmpty) {
+                $paletteEmpty.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        }
+
+        if ($paletteSearch) {
+            $paletteSearch.addEventListener('input', function () {
+                applyPaletteFilter($paletteSearch.value);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === '/' && document.activeElement !== $paletteSearch) {
+                    e.preventDefault();
+                    $paletteSearch.focus();
+                    $paletteSearch.select();
+                }
+            });
+        }
+
+        applyPaletteFilter('');
+
         // ---- Sortable wiring ------------------------------------------------
 
         function listFor(el) {
@@ -515,11 +600,6 @@
                 }
                 // New item from palette has no children, so subtree depth is 0; depthOf check above
                 // is sufficient for palette inserts.
-                if (type === 'tab' && depthOf(evt.to) > 0) {
-                    alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
-                    setTimeout(doRender, 0);
-                    return;
-                }
                 var newItem = makeItem(type);
                 toList.splice(evt.newIndex, 0, newItem);
                 setTimeout(function () { doRender(); selectItem(newItem); }, 0);
@@ -538,12 +618,6 @@
                 setTimeout(doRender, 0);
                 return;
             }
-            if (item.type === 'tab' && depthOf(evt.to) > 0) {
-                alert('Tabs koennen nur auf der obersten Ebene platziert werden.');
-                setTimeout(doRender, 0);
-                return;
-            }
-
             removeItem(uid);
             toList.splice(evt.newIndex, 0, item);
             setTimeout(doRender, 0);
@@ -588,18 +662,9 @@
             if (!type) return;
             var newItem = makeItem(type);
 
-            // Tabs are top-level only (Fieldsets duerfen ueberall liegen).
-            if (type === 'tab') {
-                state.push(newItem);
-                renderCanvas();
-                emitCode();
-                selectItem(newItem);
-                return;
-            }
-
             // If an active repeater/tab/fieldset is selected, attempt to insert as child.
             // Otherwise append at top level.
-            var canNestInto = activeItem && (activeItem.type === 'repeater' || activeItem.type === 'tab' || activeItem.type === 'fieldset');
+            var canNestInto = activeItem && (activeItem.type === 'repeater' || activeItem.type === 'tab' || activeItem.type === 'fieldset' || activeItem.type === 'modal');
             if (canNestInto) {
                 // Determine builder-depth of the active container's children list.
                 var nestedEl = $canvas.querySelector('[data-fb-nested="' + activeItem.uid + '"]');
@@ -731,9 +796,43 @@
             });
         }
 
+        function parseColorSwatches(raw) {
+            if (!raw) return [];
+            return raw.split('\n').map(function (line) { return line.trim(); }).filter(Boolean).map(function (line, idx) {
+                var eq = line.indexOf('=');
+                if (eq === -1) {
+                    return { key: String(line), label: String(line), preview: null };
+                }
+                var key = line.slice(0, eq).trim();
+                var rest = line.slice(eq + 1).trim();
+                var pipe = rest.indexOf('|');
+                if (pipe === -1) {
+                    return { key: key || String(idx + 1), label: rest || key || String(idx + 1), preview: null };
+                }
+                var label = rest.slice(0, pipe).trim();
+                var preview = rest.slice(pipe + 1).trim();
+                return {
+                    key: key || String(idx + 1),
+                    label: label || key || String(idx + 1),
+                    preview: preview || null
+                };
+            });
+        }
+
         function optionsArray(items) {
             var pairs = items.map(function (o) {
                 var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
+                return k + ' => ' + phpStr(o.label);
+            });
+            return '[' + pairs.join(', ') + ']';
+        }
+
+        function colorSwatchArray(items) {
+            var pairs = items.map(function (o) {
+                var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
+                if (o.preview) {
+                    return k + ' => [' + phpStr('label') + ' => ' + phpStr(o.label) + ', ' + phpStr('preview') + ' => ' + phpStr(o.preview) + ']';
+                }
                 return k + ' => ' + phpStr(o.label);
             });
             return '[' + pairs.join(', ') + ']';
@@ -813,6 +912,9 @@
             if (item.type === 'html') {
                 return def.method + '(' + phpStr(item.htmlContent || '') + ')';
             }
+            if (item.type === 'alertinfo' || item.type === 'alertwarning' || item.type === 'alertdanger' || item.type === 'alertsuccess') {
+                return def.method + '(' + phpStr(item.alertText || '') + ')';
+            }
             var idLit = typeof idArg === 'number' ? String(idArg) : phpStr(idArg);
             // Select Multiple: nutzt eine andere Methode, sonst gleiche Signatur wie select.
             var method = def.method;
@@ -837,6 +939,21 @@
                     var hasDef = !!item.defaultValue;
                     if (attrPhp || hasDef) line += ', ' + (attrPhp || 'null');
                     if (hasDef) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
+                case 'togglecheckbox':
+                case 'colorswatch': {
+                    line += ', ' + colorSwatchArray(parseColorSwatches(item.options));
+                    var hasDefaultColorValue = !!item.defaultValue;
+                    if (attrPhp || hasDefaultColorValue) line += ', ' + (attrPhp || 'null');
+                    if (hasDefaultColorValue) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
+                case 'togglecheckbox': {
+                    line += ', ' + optionsArray(parseOptions(item.options));
+                    var hasDefaultValue = !!item.defaultValue;
+                    if (attrPhp || hasDefaultValue) line += ', ' + (attrPhp || 'null');
+                    if (hasDefaultValue) line += ', ' + phpStr(item.defaultValue);
                     break;
                 }
                 case 'checkboxgroup':
@@ -925,11 +1042,38 @@
             return indent + '->addFieldsetArea(' + phpStr(legend) + ', MForm::factory()\n' + inner + ')';
         }
 
+        function renderModalStmt(item, indent) {
+            var inner = renderRepeaterInner(item, indent);
+            var label = item.label || '';
+            var btnClass = item.modalBtnClass || 'btn-default';
+            var align = item.modalAlign || 'left';
+            return indent + '$mform->addModalElement(' + phpStr(label) + ', MForm::factory()\n'
+                + inner
+                + indent + '    , ' + phpStr(btnClass) + ', ' + phpStr(align) + ');';
+        }
+
+        function renderInnerModalChainLink(item, indent) {
+            var inner = renderRepeaterInner(item, indent);
+            var label = item.label || '';
+            var btnClass = item.modalBtnClass || 'btn-default';
+            var align = item.modalAlign || 'left';
+            return indent + '->addModalElement(' + phpStr(label) + ', MForm::factory()\n'
+                + inner
+                + indent + '    , ' + phpStr(btnClass) + ', ' + phpStr(align) + ')';
+        }
+
         function renderTabStmt(item, indent, isFirst) {
             var inner = renderRepeaterInner(item, indent);
             var label = item.label || '';
             var openTab = isFirst ? 'true' : 'false';
             var args = phpStr(label) + ', MForm::factory()\n' + inner;
+            var tabAttrs = tabAttrsPhp(item);
+            if (tabAttrs) {
+                if (item.tabPullRight) {
+                    return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', true, ' + tabAttrs + ');';
+                }
+                return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', false, ' + tabAttrs + ');';
+            }
             // Drop trailing args we can default; only emit pullRight if true
             if (item.tabPullRight) {
                 return indent + '$mform->addTabElement(' + args + ', ' + openTab + ', true);';
@@ -938,6 +1082,32 @@
                 return indent + '$mform->addTabElement(' + args + ', true);';
             }
             return indent + '$mform->addTabElement(' + args + ');';
+        }
+
+        function renderInnerTabChainLink(item, indent, isFirst) {
+            var inner = renderRepeaterInner(item, indent);
+            var label = item.label || '';
+            var openTab = isFirst ? 'true' : 'false';
+            var args = phpStr(label) + ', MForm::factory()\n' + inner;
+            var tabAttrs = tabAttrsPhp(item);
+            if (tabAttrs) {
+                return indent + '->addTabElement(' + args + ', ' + openTab + ', ' + (item.tabPullRight ? 'true' : 'false') + ', ' + tabAttrs + ')';
+            }
+            if (item.tabPullRight) {
+                return indent + '->addTabElement(' + args + ', ' + openTab + ', true)';
+            }
+            if (isFirst) {
+                return indent + '->addTabElement(' + args + ', true)';
+            }
+            return indent + '->addTabElement(' + args + ')';
+        }
+
+        function tabAttrsPhp(item) {
+            var attrs = {};
+            if (item.tabIcon) attrs['tab-icon'] = item.tabIcon;
+            if (item.tabStyle) attrs['tab-style'] = item.tabStyle;
+            if (item.tabLayout) attrs['tab-layout'] = item.tabLayout;
+            return attrsToPhp(attrs);
         }
 
         function renderFieldsetStmt(item, indent) {
@@ -976,17 +1146,30 @@
                 return indent + '        // Felder hier ablegen\n';
             }
             var keyPool = {};
+            var prevWasTab = false;
             var lines = children.map(function (c) {
                 if (c.type === 'fieldset') {
+                    prevWasTab = false;
                     return renderInnerFieldsetChainLink(c, indent + '        ');
+                }
+                if (c.type === 'modal') {
+                    prevWasTab = false;
+                    return renderInnerModalChainLink(c, indent + '        ');
+                }
+                if (c.type === 'tab') {
+                    var isFirstTab = !prevWasTab;
+                    prevWasTab = true;
+                    return renderInnerTabChainLink(c, indent + '        ', isFirstTab);
                 }
                 var key = slugify(c.label, 'field_' + c.id);
                 var base = key, n = 2;
                 while (keyPool[key]) { key = base + '_' + n++; }
                 keyPool[key] = true;
                 if (c.type === 'repeater') {
+                    prevWasTab = false;
                     return renderInnerRepeaterChainLink(c, key, indent + '        ');
                 }
+                prevWasTab = false;
                 return renderInnerChainLink(c, key, indent + '        ');
             });
             return lines.join('\n') + '\n';
@@ -1017,6 +1200,8 @@
                     lines.push(renderTabStmt(item, '', isFirstTab));
                 } else if (item.type === 'fieldset') {
                     lines.push(renderFieldsetStmt(item, ''));
+                } else if (item.type === 'modal') {
+                    lines.push(renderModalStmt(item, ''));
                 } else {
                     lines.push(renderField(item, item.id, '') + ';');
                 }
@@ -1089,6 +1274,7 @@
                 case 'imagelist':
                 case 'checkbox':
                 case 'checkboxgroup':
+                case 'togglecheckbox':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
                 case 'select':
@@ -1122,6 +1308,7 @@
                 case 'imagelist':
                 case 'checkbox':
                 case 'checkboxgroup':
+                case 'togglecheckbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
                 case 'select':
                     if (child.isMulti) {
@@ -1157,7 +1344,7 @@
         // Wenn select/radio/checkbox Optionen hat, zeige die moeglichen Werte
         // inkl. Labels als Kommentar (hilft beim Mapping in der Ausgabe).
         function optionValuesComment(item) {
-            if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup') {
+            if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup' && item.type !== 'togglecheckbox' && item.type !== 'colorswatch') {
                 return [];
             }
             var opts = parseOptions(item.options || '');
@@ -1182,10 +1369,12 @@
                 case 'customlink':  return 'normalisiertes Array mit customlink_url, customlink_text, customlink_target, customlink_class';
                 case 'customlinkmultiple': return 'Array normalisierter Custom-Links (je Eintrag customlink_url/_text/_target/_class)';
                 case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
+                case 'togglecheckbox': return 'Array der ausgewaehlten Werte (Toggle-Checkbox; meist ["1"] bei aktiv)';
                 case 'checkboxgroup': return item.cbgMode === 'radio' ? 'einzelner ausgewaehlter Wert (CheckboxGroup im Radio-Mode)' : 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'select':
                     return item.isMulti ? 'Array der ausgewaehlten Werte (Multi-Select, kommasepariert gespeichert)' : 'einzelner ausgewaehlter Wert';
                 case 'radio':       return 'einzelner ausgewaehlter Wert';
+                case 'colorswatch': return 'gewaehlter Farbwertausdruck (z. B. #2f77bc oder .text-primary)';
                 case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
                 case 'hidden':      return 'verstecktes Feld';
                 default:            return '';
@@ -1217,7 +1406,7 @@
             var inner = indent + '    ';
             var usedKeys = {};
             // Fieldsets innerhalb des Repeaters sind reine UI-Wrapper -> Kinder hochziehen.
-            flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+            flattenStructuralChildren(item.children || []).forEach(function (entry) {
                 if (entry.kind === 'fs-marker') {
                     lines.push(inner + entry.text);
                     return;
@@ -1232,7 +1421,7 @@
                     }
                     lines.push(sub);
                     delete c.__childKey;
-                } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
+                } else if (isStructureOnlyItem(c.type)) {
                     // ueberspringen
                 } else {
                     var clbl = c.label ? ' (' + c.label + ')' : '';
@@ -1254,13 +1443,27 @@
         // Output-Code werden sie aufgeloest. Marker-Kommentare bleiben aber als
         // visueller Trenner erhalten. Verschachtelte Fieldsets werden rekursiv
         // entpackt.
-        function flattenFieldsetChildren(children) {
+        function isAlertType(type) {
+            return type === 'alertinfo' || type === 'alertwarning' || type === 'alertdanger' || type === 'alertsuccess';
+        }
+
+        function isStructureOnlyItem(type) {
+            return type === 'headline' || type === 'description' || type === 'html' || isAlertType(type);
+        }
+
+        function flattenStructuralChildren(children) {
             var out = [];
             (children || []).forEach(function (c) {
                 if (c.type === 'fieldset') {
                     var legend = c.label ? ': ' + c.label : '';
                     out.push({ kind: 'fs-marker', text: '// ----- Fieldset' + legend + ' -----' });
-                    flattenFieldsetChildren(c.children || []).forEach(function (e) { out.push(e); });
+                    flattenStructuralChildren(c.children || []).forEach(function (e) { out.push(e); });
+                    return;
+                }
+                if (c.type === 'modal') {
+                    var modalLabel = c.label ? ': ' + c.label : '';
+                    out.push({ kind: 'fs-marker', text: '// ----- Modal' + modalLabel + ' -----' });
+                    flattenStructuralChildren(c.children || []).forEach(function (e) { out.push(e); });
                     return;
                 }
                 out.push({ kind: 'item', item: c });
@@ -1293,13 +1496,13 @@
                     } else {
                         body.push('// ----- Tab -----');
                     }
-                    flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+                    flattenStructuralChildren(item.children || []).forEach(function (entry) {
                         if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
                         var c = entry.item;
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
-                        } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
+                        } else if (isStructureOnlyItem(c.type)) {
                             // ueberspringen (sind reine Form-Strukturhinweise)
                         } else {
                             body.push(renderTopLevelVar(c));
@@ -1315,20 +1518,39 @@
                     } else {
                         body.push('// ----- Fieldset -----');
                     }
-                    flattenFieldsetChildren(item.children || []).forEach(function (entry) {
+                    flattenStructuralChildren(item.children || []).forEach(function (entry) {
                         if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
                         var c = entry.item;
                         if (c.type === 'repeater') {
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
-                        } else if (c.type === 'headline' || c.type === 'description' || c.type === 'html') {
+                        } else if (isStructureOnlyItem(c.type)) {
                             // ueberspringen
                         } else {
                             body.push(renderTopLevelVar(c));
                             body.push('');
                         }
                     });
-                } else if (item.type === 'headline' || item.type === 'description' || item.type === 'html') {
+                } else if (item.type === 'modal') {
+                    if (item.label) {
+                        body.push('// ----- Modal: ' + item.label + ' -----');
+                    } else {
+                        body.push('// ----- Modal -----');
+                    }
+                    flattenStructuralChildren(item.children || []).forEach(function (entry) {
+                        if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
+                        var c = entry.item;
+                        if (c.type === 'repeater') {
+                            body.push(renderRepeaterBlock(c, ''));
+                            body.push('');
+                        } else if (isStructureOnlyItem(c.type)) {
+                            // ueberspringen
+                        } else {
+                            body.push(renderTopLevelVar(c));
+                            body.push('');
+                        }
+                    });
+                } else if (isStructureOnlyItem(item.type)) {
                     // ueberspringen
                 } else {
                     body.push(renderTopLevelVar(item));

@@ -206,12 +206,21 @@ Inline-Layout-Container mit Label.
 addTabElement(string $label = '', mixed $form = null, bool $openTab = false, bool $pullNaviItemRight = false, array $attributes = [], bool $parse = false, bool $showWrapper = false): MForm
 ```
 Tab-Panel. Mehrere Tabs werden automatisch zu einer Tab-Leiste zusammengefasst.
+Funktioniert auch innerhalb von FlexRepeater-, Fieldset-, Collapse- und Modal-Kontexten.
 
 | Parameter | Typ | Standard | Beschreibung |
 |-----------|-----|----------|--------------|
 | `$label` | `string` | `''` | Tab-Bezeichnung |
 | `$openTab` | `bool` | `false` | Tab initial geöffnet |
 | `$pullNaviItemRight` | `bool` | `false` | Tab-Item nach rechts schieben |
+
+Optionale `$attributes` fuer Tabs:
+
+- `tab-icon` (z. B. `fa-cog`): Icon im Tab-Label.
+- `tab-style => 'modern'` oder `data-group-tab-style => 'modern'`: modernisierte Tab-Optik.
+- `tab-layout => 'vertical'` oder `data-group-tab-layout => 'vertical'`: vertikale Navigation links neben dem Tab-Content.
+
+Visual Form Builder (9.1): Fuer Tab-Elemente koennen `tab-icon`, `tab-style` und `tab-layout` direkt in den Eigenschaften gesetzt werden.
 
 ---
 

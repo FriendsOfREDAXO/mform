@@ -190,6 +190,8 @@ echo $mform->show();
 
 Stellt Tab-Elemente dar, die bei Klick den dargestellten Inhalt wechseln.
 
+Optional kann die Darstellung modernisiert oder vertikal (Navigation links) ausgegeben werden.
+
 ```php
 <?php
 use FriendsOfRedaxo\MForm;
@@ -209,6 +211,35 @@ $mform = MForm::factory()
 // parse mform
 echo $mform->show();
 ```
+
+### Optionale Tab-Varianten
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addTabElement('Inhalt', MForm::factory()
+        ->addTextField('1.0.1', ['label' => 'Titel'])
+    , true, false, [
+        'tab-icon' => 'fa-file-text-o',
+        'tab-style' => 'modern',
+        'tab-layout' => 'vertical',
+    ])
+    ->addTabElement('Einstellungen', MForm::factory()
+        ->addCheckboxField('1.0.2', [1 => 'Aktiv'], ['label' => 'Status'])
+    , false, false, [
+        'tab-icon' => 'fa-cog',
+    ]);
+
+echo $mform->show();
+```
+
+Hinweise:
+
+- `tab-style => 'modern'` ist optional und aktiviert eine modernisierte Optik.
+- `tab-layout => 'vertical'` ist optional und zeigt die Tab-Navigation links neben dem Content.
+- Alternativ koennen die Roh-Attribute `data-group-tab-style` und `data-group-tab-layout` gesetzt werden.
 
 ## Modal
 

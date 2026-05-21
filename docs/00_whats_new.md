@@ -4,6 +4,15 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Update 9.1: Tabs und Form Builder
+
+- Tabs werden ID-frei gerendert und sind dadurch stabil in verschachtelten Kontexten (inkl. FlexRepeater).
+- `addTabElement()` kann direkt in Repeater-Item-Formularen genutzt werden.
+- Optional pro Tab: `tab-icon`, `tab-style => modern`, `tab-layout => vertical`.
+- Der Visual Form Builder unterstuetzt diese drei Tab-Optionen ebenfalls in den Tab-Eigenschaften.
+
+---
+
 ## Fixes & Verbesserungen in beta4
 
 ### Flex-Repeater: Alle Link- und Media-Widgets vollständig unterstützt
