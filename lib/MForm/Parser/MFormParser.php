@@ -321,24 +321,12 @@ class MFormParser
                 }
             }
             $element->setElement(implode('', $nav));
-
-            $tabLayout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
-            if (in_array($tabLayout, ['vertical', 'left', 'nav-left'], true)) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--vertical'));
-            }
-
-            $tabStyle = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
-            if ('modern' === $tabStyle) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--modern'));
-            }
         }
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
             if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
                 $item->setClass($item->getClass() . 'active');
             }
-
-            unset($attributes['data-group-tab-layout'], $attributes['data-group-tab-style']);
         }
 
         if (count($removeAttributes) > 0) {

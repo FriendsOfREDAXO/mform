@@ -190,47 +190,14 @@ function initMFormSelectPicker(mform) {
 
 function initMFormTabs(mform) {
     mform.find('.mform-tabs').each(function () {
-        let wrapper = $(this),
-            nav = wrapper.children('ul[role=tablist]').first(),
-            panes = wrapper.children('.tab-content').first().children('.tab-pane');
-
-        if (!nav.length || !panes.length) {
-            return;
-        }
-
-        function activateTab(tabId) {
-            let links = nav.find('[data-mform-tab-toggle]'),
-                targetLink = links.filter(function () {
-                    return String($(this).data('tab-item')) === String(tabId);
-                }).first();
-
-            if (!targetLink.length) {
-                targetLink = links.first();
-                tabId = String(targetLink.data('tab-item'));
-            }
-
-            nav.find('li[role=presentation]').removeClass('active');
-            links.attr('aria-selected', 'false');
-            targetLink.closest('li[role=presentation]').addClass('active');
-            targetLink.attr('aria-selected', 'true');
-
-            panes.removeClass('active');
-            panes.filter(function () {
-                return String($(this).attr('data-tab-group-nav-tab-id')) === String(tabId);
-            }).first().addClass('active');
-        }
-
-        wrapper.off('click.mformTabs').on('click.mformTabs', '[data-mform-tab-toggle]', function (e) {
-            e.preventDefault();
-            activateTab($(this).data('tab-item'));
+        let wrapper = $(this);
+        $(this).find('ul[role=tablist] a').unbind().bind('click', function () {
+            let tab = wrapper.find('div[data-tab-group-nav-tab-id=' + $(this).data('tab-item') + ']'),
+                uid = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            tab.attr('id', uid);
+            $(this).attr('href', '#' + uid);
+            $('#' + uid).tab("show");
         });
-
-        let activeLink = nav.find('li.active [data-mform-tab-toggle]').first();
-        if (activeLink.length) {
-            activateTab(activeLink.data('tab-item'));
-        } else {
-            activateTab(nav.find('[data-mform-tab-toggle]').first().data('tab-item'));
-        }
     });
 }
 

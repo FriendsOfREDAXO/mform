@@ -42,13 +42,13 @@ switch ($this->getVar('type')) {
 
     // TAB
     case 'tabnavli':
-        echo '<li role="presentation" class="' . $this->getVar('class') . '" data-tab-nav-item="' . $this->getVar('value') . '"><a href="#" role="tab" aria-selected="false" data-mform-tab-toggle="1" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
+        echo '<li role="presentation" class="' . $this->getVar('class') . '"><a href="#' . $this->getVar('value') . '" aria-controls="' . $this->getVar('value') . '" role="tab" data-toggle="tab" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
         break;
     case 'tab':
         echo '<div role="tabpanel" class="tab-pane ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
     case 'start-group-tab':
-        echo '<div class="nav mform-tabs rex-page-nav ' . $this->getVar('class') . '" data-mform-tabs="1" ' . $this->getVar('attributes') . '><ul class="nav nav-tabs" role="tablist">' . $this->getVar('element') . '</ul><div class="tab-content">';
+        echo '<div class="nav mform-tabs rex-page-nav" ' . $this->getVar('attributes') . '><ul class="nav nav-tabs" role="tablist">' . $this->getVar('element') . '</ul><div class="tab-content">';
         break;
 
     // FIELDSET

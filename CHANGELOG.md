@@ -1,22 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
-
-## Version 9.1.0
-
-### Neu
-
-- **Tabs als ID-freie Implementierung** – `addTabElement()` funktioniert jetzt stabil in verschachtelten und dynamischen Kontexten (z. B. FlexRepeater, Fieldset, Collapse, Modal), ohne Bootstrap-ID-Verkabelung und ohne Kollisionen zwischen geklonten Instanzen.
-- **Optionale Tab-Modernisierung** – Tab-Navigation kann optional als modernisierte Variante gerendert werden über `tab-style => 'modern'` bzw. `data-group-tab-style => 'modern'`.
-- **Optionale vertikale Tab-Navigation** – Tabs können optional links neben dem Inhalt dargestellt werden über `tab-layout => 'vertical'` bzw. `data-group-tab-layout => 'vertical'` (inkl. Mobile-Fallback auf gestapelte Ansicht).
-- **Font-Awesome-Icons je Tab** – Icon-Unterstützung über `tab-icon` bleibt erhalten und funktioniert weiterhin in den neuen Tab-Varianten.
-
-### Kompatibilität
-
-- Standardverhalten bleibt unverändert: Ohne neue Attribute bleiben Tabs visuell und funktional wie bisher.
-- Bestehende Module mit `addTabElement()` bleiben kompatibel.
-
----
-
-## Version 9.0.1
+#
+# Version 9.0.1
 
 ### Behoben
 

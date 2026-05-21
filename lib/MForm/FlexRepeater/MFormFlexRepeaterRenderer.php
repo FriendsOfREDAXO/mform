@@ -203,8 +203,9 @@ class MFormFlexRepeaterRenderer
                 continue;
             }
 
-            // TAB-GROUP: ID-freie Tabs, damit verschachtelte/gekloente Kontexte
-            // (z. B. Repeater) ohne eindeutige DOM-IDs stabil funktionieren.
+            // TAB-GROUP: Bootstrap-3 nav-tabs + tab-content. IDs muessen pro Item-Klon
+            // eindeutig sein, daher Platzhalter __MFRTAB_<n>__ verwenden, die JS in
+            // _renderItem() durch eine Item-spezifische UID ersetzt.
             if ('start-group-tab' === $type) {
                 $tabsMeta = self::collectTabsForGroup($items, $i);
                 $navHtml = '';
@@ -216,28 +217,18 @@ class MFormFlexRepeaterRenderer
                         . ((isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab']) ? 'active' : ''),
                     );
                     $navHtml .= sprintf(
-                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="false" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
+                        '<li role="presentation" class="%s"><a href="#__MFRTAB_%d__" aria-controls="__MFRTAB_%d__" role="tab" data-toggle="tab" data-tab-item="__MFRTAB_%d__">%s%s</a></li>',
                         htmlspecialchars($navClass, ENT_QUOTES),
+                        $idx,
                         $idx,
                         $idx,
                         $tabIcon,
                         $meta['label'], // Label ist Entwickler-HTML
                     );
                 }
-                $groupAttributes = $item->getAttributes();
-                $layout = strtolower(trim((string) ($groupAttributes['data-group-tab-layout'] ?? '')));
-                $style = strtolower(trim((string) ($groupAttributes['data-group-tab-style'] ?? '')));
-
                 $cls = trim('nav mform-tabs rex-page-nav ' . $item->getClass());
-                if (in_array($layout, ['vertical', 'left', 'nav-left'], true)) {
-                    $cls .= ' mform-tabs--vertical';
-                }
-                if ('modern' === $style) {
-                    $cls .= ' mform-tabs--modern';
-                }
-
                 $html .= sprintf(
-                    '<div class="%s" data-mform-tabs="1"%s><ul class="nav nav-tabs" role="tablist">%s</ul><div class="tab-content">',
+                    '<div class="%s"%s><ul class="nav nav-tabs" role="tablist">%s</ul><div class="tab-content">',
                     htmlspecialchars($cls, ENT_QUOTES),
                     self::renderAttributes($item->getAttributes()),
                     $navHtml,
@@ -249,12 +240,12 @@ class MFormFlexRepeaterRenderer
                 $tabIdx = self::tabIndexInGroup($items, $i);
                 $attrs = $item->getAttributes();
                 $isActive = isset($attrs['data-group-open-tab']) && true === $attrs['data-group-open-tab'];
-                unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab'], $attrs['data-group-tab-layout'], $attrs['data-group-tab-style']);
+                unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab']);
                 $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
                 $html .= sprintf(
-                    '<div role="tabpanel" class="%s" data-tab-group-nav-tab-id="%d"%s>',
-                    htmlspecialchars($cls, ENT_QUOTES),
+                    '<div role="tabpanel" id="__MFRTAB_%d__" class="%s"%s>',
                     $tabIdx,
+                    htmlspecialchars($cls, ENT_QUOTES),
                     self::renderAttributes($attrs),
                 );
                 ++$i;
