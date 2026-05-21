@@ -137,6 +137,8 @@
         var $canvas = document.querySelector('[data-fb-canvas]');
         var $palette = document.querySelector('[data-fb-palette]');
         var $paletteWrap = document.querySelector('[data-fb-palette-wrap]');
+        var $paletteSearch = document.querySelector('[data-fb-palette-search]');
+        var $paletteEmpty = document.querySelector('[data-fb-palette-empty]');
         var $code = document.querySelector('[data-fb-code]');
         var $output = document.querySelector('[data-fb-output]');
         var $propsForm = document.querySelector('[data-fb-props-form]');
@@ -503,6 +505,62 @@
             if (optionsInput) optionsInput.value = activeItem.options;
             emitCode();
         });
+
+        var TYPE_SEARCH_ALIASES = {
+            colorswatch: 'color swatch farbe palette css preview',
+            togglecheckbox: 'toggle switch umschalter',
+            customlink: 'url link intern extern mailto tel',
+            customlinkmultiple: 'url links mehrere intern extern mailto tel',
+            alertinfo: 'info hinweis nachricht',
+            alertwarning: 'warning warnung',
+            alertdanger: 'danger fehler',
+            alertsuccess: 'success erfolg',
+            repeater: 'repeat wiederholung liste',
+            fieldset: 'gruppe bereich',
+            tab: 'tabs reiter',
+            modal: 'dialog popup'
+        };
+
+        function paletteSearchText(li) {
+            var label = (li.textContent || '').toLowerCase();
+            var type = String(li.dataset.type || '').toLowerCase();
+            var aliases = TYPE_SEARCH_ALIASES[type] || '';
+            return label + ' ' + type + ' ' + aliases;
+        }
+
+        function applyPaletteFilter(term) {
+            var q = String(term || '').trim().toLowerCase();
+            var visibleCount = 0;
+
+            [$palette, $paletteWrap].forEach(function (listEl) {
+                if (!listEl) return;
+                listEl.querySelectorAll('.mform-fb__pal-item').forEach(function (li) {
+                    var show = q === '' || paletteSearchText(li).indexOf(q) !== -1;
+                    li.style.display = show ? '' : 'none';
+                    if (show) visibleCount++;
+                });
+            });
+
+            if ($paletteEmpty) {
+                $paletteEmpty.style.display = visibleCount === 0 ? '' : 'none';
+            }
+        }
+
+        if ($paletteSearch) {
+            $paletteSearch.addEventListener('input', function () {
+                applyPaletteFilter($paletteSearch.value);
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === '/' && document.activeElement !== $paletteSearch) {
+                    e.preventDefault();
+                    $paletteSearch.focus();
+                    $paletteSearch.select();
+                }
+            });
+        }
+
+        applyPaletteFilter('');
 
         // ---- Sortable wiring ------------------------------------------------
 

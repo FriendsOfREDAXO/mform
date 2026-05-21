@@ -53,6 +53,9 @@ $body = <<<'HTML'
 <div id="mform-fb" class="mform-fb">
     <div class="mform-fb__palette">
         <h4>Felder</h4>
+        <div class="mform-fb__palette-search">
+            <input type="text" class="form-control" data-fb-palette-search placeholder="Feld suchen (z. B. color, alert, link)">
+        </div>
         <ul class="mform-fb__field-list" data-fb-palette>
             <li class="mform-fb__pal-item" data-type="text">Text</li>
             <li class="mform-fb__pal-item" data-type="textarea">Textarea</li>
@@ -85,6 +88,7 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="modal">Modal</li>
         </ul>
+        <p class="mform-fb__palette-empty" data-fb-palette-empty style="display:none">Keine Treffer in der Palette.</p>
         <div class="mform-fb__actions">
             <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#mform-fb-info"><i class="rex-icon fa-info-circle"></i> Hilfe &amp; Hinweise</button>
             <button type="button" class="btn btn-default btn-block" data-fb-action="clear" style="margin-top:6px">Alles loeschen</button>

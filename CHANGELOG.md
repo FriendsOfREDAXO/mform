@@ -13,6 +13,9 @@
 ### Verbesserungen
 
 - **ColorSwatch-UX im Form Builder** – zusätzliche Hilfe im Eigenschaften-Panel, Beispiel-Palette per Klick und erweiterte Options-Syntax für CSS-Klassen-Swatches mit optionaler Preview-Farbe (z. B. `.text-primary=Primaer CSS|#2f77bc`).
+- **Palette-Suche im Form Builder** – Live-Filter über Feld- und Wrapper-Typen inkl. Alias-Suche (z. B. `color`, `alert`, `link`) und Leerzustand-Hinweis bei keinen Treffern.
+- **Schneller Fokus auf die Suche** – `/` fokussiert direkt das Suchfeld in der Palette.
+- **Bessere Übersicht bei langen Listen** – Feld- und Wrapper-Liste haben jetzt eine maximale Höhe mit eigenem Scrollbereich in der linken Palette.
 - **Barrierefreiheit bei Tabs verbessert** – ARIA-Zustände und Verknüpfungen wurden für Standard-Tabs und Repeater-Tabs ergänzt (`aria-selected`, `aria-controls`, `aria-labelledby`).
 
 ### Behoben

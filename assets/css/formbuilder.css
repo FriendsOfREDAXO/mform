@@ -206,6 +206,35 @@ body.rex-theme-dark .mform-fb {
     padding: 0;
 }
 
+.mform-fb__field-list[data-fb-palette] {
+    max-height: 52vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.mform-fb__field-list[data-fb-palette-wrap] {
+    max-height: 24vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.mform-fb__palette-search {
+    margin: 0 0 10px;
+}
+
+.mform-fb__palette-search .form-control {
+    height: 34px;
+    font-size: 13px;
+}
+
+.mform-fb__palette-empty {
+    margin: 8px 0 0;
+    color: var(--fb-text-faint);
+    font-size: 12px;
+}
+
 .mform-fb__pal-item {
     background: var(--fb-bg-item);
     border: 1px solid var(--fb-border-strong);
