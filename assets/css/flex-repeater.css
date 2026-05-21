@@ -548,7 +548,7 @@ body.rex-theme-dark .mfr-btn-copy {
 
 .mfr-item-body.form-horizontal .mfr-field-group .control-label,
 .mfr-nested-body.form-horizontal .mfr-field-group .control-label {
-    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 /* Vertical / Inline Layout: Label oben, Feld darunter, volle Breite. */

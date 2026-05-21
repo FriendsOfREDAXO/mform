@@ -517,14 +517,12 @@ body.rex-theme-dark .mform-fb {
 
 .mform-fb__colorswatch-help {
     overflow-wrap: anywhere;
-    word-break: break-word;
 }
 
 .mform-fb__colorswatch-help code {
     display: inline;
     white-space: normal;
     overflow-wrap: anywhere;
-    word-break: break-word;
 }
 
 /* ---- Code Output --------------------------------------------------------- */
