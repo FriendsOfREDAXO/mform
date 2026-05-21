@@ -1,4 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
+#
+# Version 9.0.1
+
+### Behoben
+
+- **Bugfix:** Beim Hinzufügen eines neuen Slices (function=add) werden die Formularfelder nicht mehr mit den Werten des Vorgängers vorbefüllt. Das Verhalten entspricht jetzt wieder dem REDAXO-Standard. Danke an @abra100pro für den Hinweis!
+
 
 ## Version 9.0.0
 

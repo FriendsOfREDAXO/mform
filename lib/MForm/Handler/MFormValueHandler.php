@@ -27,6 +27,11 @@ class MFormValueHandler
      */
     public static function loadRexVars(): array
     {
+        // Fix: Im Add-Modus keine Werte laden, slice_id ist nur Insert-Position-Hint
+        if (rex_request('function', 'string') === 'add') {
+            return [];
+        }
+
         $sliceId = rex_request('slice_id', 'int', false);
         $result = [];
 
