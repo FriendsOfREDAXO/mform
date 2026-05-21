@@ -227,7 +227,7 @@ $mform = MForm::factory()
         'tab-layout' => 'vertical',
     ])
     ->addTabElement('Einstellungen', MForm::factory()
-        ->addCheckboxField('1.0.2', ['label' => 'Aktiv'])
+        ->addCheckboxField('1.0.2', [1 => 'Aktiv'], ['label' => 'Status'])
     , false, false, [
         'tab-icon' => 'fa-cog',
     ]);

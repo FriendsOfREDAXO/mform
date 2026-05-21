@@ -300,7 +300,7 @@ $itemForm = MForm::factory()
         'tab-style' => 'modern',
     ])
     ->addTabElement('Meta', MForm::factory()
-        ->addTextareaField('text', ['label' => 'Text'])
+        ->addTextAreaField('text', ['label' => 'Text'])
     , false, false, [
         'tab-icon' => 'fa-cog',
         'tab-style' => 'modern',

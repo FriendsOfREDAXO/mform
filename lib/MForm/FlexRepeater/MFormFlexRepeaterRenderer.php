@@ -214,15 +214,17 @@ class MFormFlexRepeaterRenderer
                 $navHtml = '';
                 foreach ($tabsMeta as $idx => $meta) {
                     $tabIcon = isset($meta['attrs']['tab-icon']) ? '<i class="rex-icon ' . htmlspecialchars((string) $meta['attrs']['tab-icon'], ENT_QUOTES) . '"></i> ' : '';
+                    $isActive = isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab'];
                     $navClass = trim(
                         ((isset($meta['attrs']['nav-class'])) ? (string) $meta['attrs']['nav-class'] . ' ' : '')
                         . ((isset($meta['attrs']['pull-right']) && true === $meta['attrs']['pull-right']) ? 'pull-right ' : '')
-                        . ((isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab']) ? 'active' : ''),
+                        . ($isActive ? 'active' : ''),
                     );
                     $navHtml .= sprintf(
-                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="false" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
+                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
                         htmlspecialchars($navClass, ENT_QUOTES),
                         $idx,
+                        $isActive ? 'true' : 'false',
                         $idx,
                         $tabIcon,
                         $meta['label'], // Label ist Entwickler-HTML

@@ -198,6 +198,37 @@ function initMFormTabs(mform) {
             return;
         }
 
+        function ensureAriaLinking() {
+            let baseId = 'mform-tab-' + Math.random().toString(36).slice(2, 10);
+
+            nav.find('[data-mform-tab-toggle]').each(function (idx) {
+                let link = $(this),
+                    tabId = String(link.data('tab-item')),
+                    pane = panes.filter(function () {
+                        return String($(this).attr('data-tab-group-nav-tab-id')) === tabId;
+                    }).first();
+
+                if (!pane.length) {
+                    return;
+                }
+
+                let linkId = link.attr('id');
+                if (!linkId) {
+                    linkId = baseId + '-tab-' + idx;
+                    link.attr('id', linkId);
+                }
+
+                let paneId = pane.attr('id');
+                if (!paneId) {
+                    paneId = baseId + '-panel-' + idx;
+                    pane.attr('id', paneId);
+                }
+
+                link.attr('aria-controls', paneId);
+                pane.attr('aria-labelledby', linkId);
+            });
+        }
+
         function activateTab(tabId) {
             let links = nav.find('[data-mform-tab-toggle]'),
                 targetLink = links.filter(function () {
@@ -228,6 +259,8 @@ function initMFormTabs(mform) {
             e.stopPropagation();
             activateTab($(this).data('tab-item'));
         });
+
+        ensureAriaLinking();
 
         let activeLink = nav.find('li.active [data-mform-tab-toggle]').first();
         if (activeLink.length) {

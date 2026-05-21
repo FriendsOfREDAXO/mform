@@ -335,7 +335,7 @@ class MFormParser
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
             if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
-                $item->setClass($item->getClass() . 'active');
+                $item->setClass(trim($item->getClass() . ' active'));
             }
 
             unset($attributes['data-group-tab-layout'], $attributes['data-group-tab-style']);

@@ -21,8 +21,7 @@ $infoModalBody = '<p>'
     . '<div class="alert alert-info" style="margin-top:1em;margin-bottom:0">'
     . '<strong>Hinweis:</strong> Der Form Builder bietet bewusst nur eine kuratierte Auswahl der haeufigsten MForm-Felder, '
     . 'um einen einfachen Einstieg zu ermoeglichen. Spezielle Felder wie <code>addRadioImgField</code>, '
-    . '<code>addColorSwatchField</code>, <code>addToggleCheckboxField</code>, <code>addInputField</code> mit eigenen Typen, '
-    . 'Layouts wie Column/Collapse/Modal oder Conditional Fieldsets sind weiterhin '
+    . '<code>addInputField</code> mit eigenen Typen, Layouts wie Column/Collapse oder Conditional Fieldsets sind weiterhin '
     . 'direkt im PHP-Code verfuegbar &ndash; siehe <a href="https://github.com/FriendsOfREDAXO/mform/tree/main/docs" target="_blank" rel="noopener">MForm-Doku</a>. '
     . 'Der generierte Code laesst sich beliebig erweitern.'
     . '</div>';
@@ -60,10 +59,15 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="select">Select</li>
             <li class="mform-fb__pal-item" data-type="radio">Radio</li>
             <li class="mform-fb__pal-item" data-type="checkbox">Checkbox</li>
+            <li class="mform-fb__pal-item" data-type="togglecheckbox">Toggle Checkbox</li>
             <li class="mform-fb__pal-item" data-type="checkboxgroup">Checkbox Group</li>
             <li class="mform-fb__pal-item" data-type="hidden">Hidden</li>
             <li class="mform-fb__pal-item" data-type="headline">Headline</li>
             <li class="mform-fb__pal-item" data-type="description">Description</li>
+            <li class="mform-fb__pal-item" data-type="alertinfo">Alert Info</li>
+            <li class="mform-fb__pal-item" data-type="alertwarning">Alert Warning</li>
+            <li class="mform-fb__pal-item" data-type="alertdanger">Alert Danger</li>
+            <li class="mform-fb__pal-item" data-type="alertsuccess">Alert Success</li>
             <li class="mform-fb__pal-item" data-type="html">HTML-Block</li>
             <li class="mform-fb__pal-item" data-type="media">Media</li>
             <li class="mform-fb__pal-item" data-type="medialist">Medialist</li>
@@ -72,12 +76,14 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="linklist">Linklist</li>
             <li class="mform-fb__pal-item" data-type="customlink">Custom Link</li>
             <li class="mform-fb__pal-item" data-type="customlinkmultiple">Custom Link Multiple</li>
+            <li class="mform-fb__pal-item" data-type="colorswatch">Color Swatch</li>
         </ul>
         <h4 style="margin-top:1.5em">Wrapper</h4>
         <ul class="mform-fb__field-list" data-fb-palette-wrap>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="repeater">Flex Repeater</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="tab">Tab</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="modal">Modal</li>
         </ul>
         <div class="mform-fb__actions">
             <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#mform-fb-info"><i class="rex-icon fa-info-circle"></i> Hilfe &amp; Hinweise</button>
@@ -142,6 +148,10 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="options">
                 <label>Optionen <small>(eine pro Zeile, optional <code>key=label</code>)</small></label>
                 <textarea class="form-control" rows="5" data-fb-prop="options"></textarea>
+            </div>
+            <div class="form-group" data-fb-prop-group="alertText">
+                <label>Alert-Text</label>
+                <textarea class="form-control" rows="4" data-fb-prop="alertText"></textarea>
             </div>
             <div class="form-group" data-fb-prop-group="isMulti">
                 <label class="checkbox">
@@ -292,6 +302,18 @@ $body = <<<'HTML'
                 <select class="form-control" data-fb-prop="tabLayout">
                     <option value="">Standard</option>
                     <option value="vertical">vertical (Navigation links)</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="modalBtnClass">
+                <label>Modal-Button-Klasse</label>
+                <input type="text" class="form-control" data-fb-prop="modalBtnClass" placeholder="btn-default">
+            </div>
+            <div class="form-group" data-fb-prop-group="modalAlign">
+                <label>Modal-Ausrichtung</label>
+                <select class="form-control" data-fb-prop="modalAlign">
+                    <option value="left">left</option>
+                    <option value="center">center</option>
+                    <option value="right">right</option>
                 </select>
             </div>
         </form>

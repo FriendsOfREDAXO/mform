@@ -42,7 +42,8 @@ switch ($this->getVar('type')) {
 
     // TAB
     case 'tabnavli':
-        echo '<li role="presentation" class="' . $this->getVar('class') . '" data-tab-nav-item="' . $this->getVar('value') . '"><a href="#" role="tab" aria-selected="false" data-mform-tab-toggle="1" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
+        $isActive = 1 === preg_match('/(^|\s)active(\s|$)/', (string) $this->getVar('class'));
+        echo '<li role="presentation" class="' . $this->getVar('class') . '" data-tab-nav-item="' . $this->getVar('value') . '"><a href="#" role="tab" aria-selected="' . ($isActive ? 'true' : 'false') . '" data-mform-tab-toggle="1" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
         break;
     case 'tab':
         echo '<div role="tabpanel" class="tab-pane ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
