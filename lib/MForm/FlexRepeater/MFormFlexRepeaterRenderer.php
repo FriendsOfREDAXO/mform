@@ -4,6 +4,7 @@ namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use rex_var_custom_link;
 use rex_var_custom_link_multi;
 use rex_var_custom_medialist;
@@ -23,6 +24,9 @@ class MFormFlexRepeaterRenderer
     public static function renderTemplate(MForm $form, int $level = 1): string
     {
         $items = array_values($form->getItems());
+        if (self::needsTabAutoGrouping($items)) {
+            $items = array_values(MFormGroupExtensionHelper::addTabGroupExtensionItems($items));
+        }
         $html = '';
         $i = 0;
 
@@ -276,6 +280,29 @@ class MFormFlexRepeaterRenderer
         }
 
         return $html;
+    }
+
+    /**
+     * @param array<int, MFormItem|MForm> $items
+     */
+    private static function needsTabAutoGrouping(array $items): bool
+    {
+        $hasTab = false;
+        foreach ($items as $item) {
+            if (!$item instanceof MFormItem) {
+                continue;
+            }
+
+            $type = $item->getType();
+            if ('start-group-tab' === $type) {
+                return false;
+            }
+            if ('tab' === $type) {
+                $hasTab = true;
+            }
+        }
+
+        return $hasTab;
     }
 
     /**
