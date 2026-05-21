@@ -273,11 +273,11 @@ Verfügbare Optionen im Repeater-Array:
 
 ## Wrapper im Repeater (Tabs, Collapse, Fieldset, Inline, Columns)
 
-Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerhalb eines Repeater-Items. Damit lassen sich komplexe Item-Layouts wie im klassischen MForm-Pfad aufbauen – inkl. Bootstrap-3-Tabs, Collapse-Gruppen, Fieldsets mit Legend, Form-Inline und Spalten-Grids.
+Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerhalb eines Repeater-Items. Damit lassen sich komplexe Item-Layouts wie im klassischen MForm-Pfad aufbauen – inkl. Tabs, Collapse-Gruppen, Fieldsets mit Legend, Form-Inline und Spalten-Grids.
 
 | Wrapper | Methode | Markup im Repeater-Item |
 |---------|---------|-------------------------|
-| Tabs | `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()` | Bootstrap-3 `nav-tabs` + `tab-content` |
+| Tabs | `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()` | ID-freie `nav-tabs` + `tab-content` (scoped pro Wrapper) |
 | Collapse (mit Toggle-Button) | `addCollapseElement()` | `<a data-toggle="collapse">` + `.collapse[data-group-collapse-id=…]` |
 | Collapse-Gruppe (Standalone-Toggle) | `addStartGroupCollapse()` / `addCloseGroupCollapse()` | `.collapse-group[data-group-accordion=0\|1]` |
 | Fieldset | `addFieldsetArea($legend, …)` | `<fieldset><legend>…</legend>…</fieldset>` |
@@ -287,7 +287,7 @@ Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerh
 
 ### Tabs im Repeater
 
-Tab-Panel-IDs muessen pro Item-Klon eindeutig sein. Der Renderer schreibt deshalb Platzhalter `__MFRTAB_<n>__` in die Tab-`href`s, `aria-controls` und Tab-Pane-`id`s. `flex-repeater.js _renderItem()` ersetzt die Platzhalter beim Klonen jedes Items durch eine eindeutige UID (gleiche `n` → gleiche UID, damit Nav-Link und Pane matchen). Aktive Tabs werden ueber `data-group-open-tab => true` markiert (setzt `active` auf `<li>` und `tab-pane`).
+Tabs werden ID-frei gerendert. Die Navigation wird innerhalb des naechstgelegenen `.mform-tabs`-Wrappers gescoped und per `data-tab-item`/`data-tab-group-nav-tab-id` verknuepft. Dadurch funktionieren geklonte Repeater-Items und verschachtelte Tab-Strukturen ohne ID-Kollisionen. Aktive Tabs werden weiterhin ueber `data-group-open-tab => true` markiert.
 
 ```php
 $itemForm = MForm::factory()
