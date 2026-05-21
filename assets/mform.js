@@ -221,7 +221,11 @@ function initMFormTabs(mform) {
         }
 
         wrapper.off('click.mformTabs').on('click.mformTabs', '[data-mform-tab-toggle]', function (e) {
+            if ($(this).closest('ul[role=tablist]')[0] !== nav[0]) {
+                return;
+            }
             e.preventDefault();
+            e.stopPropagation();
             activateTab($(this).data('tab-item'));
         });
 
