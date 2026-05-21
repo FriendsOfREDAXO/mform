@@ -289,6 +289,28 @@ Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerh
 
 Tabs werden ID-frei gerendert. Die Navigation wird innerhalb des naechstgelegenen `.mform-tabs`-Wrappers gescoped und per `data-tab-item`/`data-tab-group-nav-tab-id` verknuepft. Dadurch funktionieren geklonte Repeater-Items und verschachtelte Tab-Strukturen ohne ID-Kollisionen. Aktive Tabs werden weiterhin ueber `data-group-open-tab => true` markiert.
 
+Empfohlener Weg seit 9.1: `addTabElement()` direkt im Repeater-Item-Formular. Falls keine explizite Tab-Gruppe (`addStartGroupTab()` / `addCloseGroupTab()`) vorhanden ist, gruppiert der FlexRepeater-Renderer die Tabs automatisch.
+
+```php
+$itemForm = MForm::factory()
+    ->addTabElement('Inhalt', MForm::factory()
+        ->addTextField('title', ['label' => 'Titel'])
+    , true, false, [
+        'tab-icon' => 'fa-align-left',
+        'tab-style' => 'modern',
+    ])
+    ->addTabElement('Meta', MForm::factory()
+        ->addTextareaField('text', ['label' => 'Text'])
+    , false, false, [
+        'tab-icon' => 'fa-cog',
+        'tab-style' => 'modern',
+    ]);
+
+$mform->addRepeaterElement(1, $itemForm);
+```
+
+Alternative (weiterhin moeglich) ist die explizite Gruppierung mit `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()`:
+
 ```php
 $itemForm = MForm::factory()
     ->addStartGroupTab('itemTabs')
