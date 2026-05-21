@@ -5,7 +5,7 @@ use FriendsOfRedaxo\MForm;
 $tabItemForm = MForm::factory()
     ->addTabElement('Inhalt', MForm::factory()
         ->addTextField('title', ['label' => 'Block-Titel'])
-        ->addTextAreaField('text', ['label' => 'Block-Text'])
+        ->addTextAreaField('text', ['label' => 'Block-Text', 'class' => 'tiny-editor', 'data-profile' => 'full'])
     , true, false, [
         'tab-icon' => 'fa-align-left',
         'tab-style' => 'modern',
