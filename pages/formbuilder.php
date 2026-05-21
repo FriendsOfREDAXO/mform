@@ -149,6 +149,15 @@ $body = <<<'HTML'
                 <label>Optionen <small>(eine pro Zeile, optional <code>key=label</code>)</small></label>
                 <textarea class="form-control" rows="5" data-fb-prop="options"></textarea>
             </div>
+            <div class="form-group" data-fb-prop-group="colorSwatchHelp">
+                <div class="alert alert-info mform-fb__colorswatch-help" style="margin-bottom:8px">
+                    <strong>ColorSwatch Hilfe</strong><br>
+                    Pro Zeile eine Farbe. Formate:<br>
+                    <code>#2f77bc=Blau</code><br>
+                    <code>.text-primary = Primaer CSS | #2f77bc</code> <small>(mit Preview-Farbe)</small>
+                </div>
+                <button type="button" class="btn btn-default btn-xs" data-fb-action="colorswatch-example">Beispiel-Palette einfuegen</button>
+            </div>
             <div class="form-group" data-fb-prop-group="alertText">
                 <label>Alert-Text</label>
                 <textarea class="form-control" rows="4" data-fb-prop="alertText"></textarea>

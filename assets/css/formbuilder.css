@@ -486,6 +486,18 @@ body.rex-theme-dark .mform-fb {
     color: var(--fb-text-faint);
 }
 
+.mform-fb__colorswatch-help {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.mform-fb__colorswatch-help code {
+    display: inline;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 /* ---- Code Output --------------------------------------------------------- */
 .mform-fb__code-bar {
     display: flex;

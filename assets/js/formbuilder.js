@@ -91,7 +91,7 @@
             html:        { label: 'HTML-Block', method: 'addHtml',
                 props: ['htmlContent'] },
             colorswatch: { label: 'Color Swatch', method: 'addColorSwatchField',
-                props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
+                props: ['label', 'defaultValue', 'options', 'colorSwatchHelp', 'notice', 'cssClass'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
                 props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
@@ -149,7 +149,7 @@
 
         function makeItem(type) {
             var def = TYPES[type];
-            return {
+            var item = {
                 uid: 'fb-' + (Math.random().toString(36).slice(2, 8)),
                 id: nextId++,
                 type: type,
@@ -207,6 +207,7 @@
                 modalAlign: 'left',
                 children: (type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal') ? [] : null
             };
+            return item;
         }
 
         function findItem(uid, list) {
@@ -494,6 +495,15 @@
             emitCode();
         });
 
+        $propsForm.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-fb-action="colorswatch-example"]');
+            if (!btn || !activeItem || activeItem.type !== 'colorswatch') return;
+            activeItem.options = '#ffffff=Weiss\n#111111=Schwarz\n#2f77bc=Blau\n#e74c3c=Rot\n#27ae60=Gruen\n.text-primary=Primaer CSS|#2f77bc\n.text-muted=Gedaempft CSS|#6c757d';
+            var optionsInput = $propsForm.querySelector('[data-fb-prop="options"]');
+            if (optionsInput) optionsInput.value = activeItem.options;
+            emitCode();
+        });
+
         // ---- Sortable wiring ------------------------------------------------
 
         function listFor(el) {
@@ -728,9 +738,43 @@
             });
         }
 
+        function parseColorSwatches(raw) {
+            if (!raw) return [];
+            return raw.split('\n').map(function (line) { return line.trim(); }).filter(Boolean).map(function (line, idx) {
+                var eq = line.indexOf('=');
+                if (eq === -1) {
+                    return { key: String(line), label: String(line), preview: null };
+                }
+                var key = line.slice(0, eq).trim();
+                var rest = line.slice(eq + 1).trim();
+                var pipe = rest.indexOf('|');
+                if (pipe === -1) {
+                    return { key: key || String(idx + 1), label: rest || key || String(idx + 1), preview: null };
+                }
+                var label = rest.slice(0, pipe).trim();
+                var preview = rest.slice(pipe + 1).trim();
+                return {
+                    key: key || String(idx + 1),
+                    label: label || key || String(idx + 1),
+                    preview: preview || null
+                };
+            });
+        }
+
         function optionsArray(items) {
             var pairs = items.map(function (o) {
                 var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
+                return k + ' => ' + phpStr(o.label);
+            });
+            return '[' + pairs.join(', ') + ']';
+        }
+
+        function colorSwatchArray(items) {
+            var pairs = items.map(function (o) {
+                var k = /^\d+$/.test(String(o.key)) ? String(o.key) : phpStr(o.key);
+                if (o.preview) {
+                    return k + ' => [' + phpStr('label') + ' => ' + phpStr(o.label) + ', ' + phpStr('preview') + ' => ' + phpStr(o.preview) + ']';
+                }
                 return k + ' => ' + phpStr(o.label);
             });
             return '[' + pairs.join(', ') + ']';
@@ -841,6 +885,13 @@
                 }
                 case 'togglecheckbox':
                 case 'colorswatch': {
+                    line += ', ' + colorSwatchArray(parseColorSwatches(item.options));
+                    var hasDefaultColorValue = !!item.defaultValue;
+                    if (attrPhp || hasDefaultColorValue) line += ', ' + (attrPhp || 'null');
+                    if (hasDefaultColorValue) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
+                case 'togglecheckbox': {
                     line += ', ' + optionsArray(parseOptions(item.options));
                     var hasDefaultValue = !!item.defaultValue;
                     if (attrPhp || hasDefaultValue) line += ', ' + (attrPhp || 'null');
