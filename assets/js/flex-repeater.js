@@ -251,6 +251,17 @@
         return field.value !== undefined ? field.value : '';
     }
 
+    function getCheckboxGroupValue(itemEl, key) {
+        const values = [];
+        itemEl.querySelectorAll('[data-mfr-field="' + key + '"]').forEach(function (field) {
+            if (field.tagName.toLowerCase() !== 'input' || field.type !== 'checkbox') return;
+            if (field.checked) {
+                values.push(String(field.value || '1'));
+            }
+        });
+        return values.join(',');
+    }
+
     /**
      * Setzt den Wert eines Formularelements.
      */
@@ -621,8 +632,11 @@
                 field.addEventListener(evt, () => {
                     const idx = this._indexOf(itemEl);
                     if (idx !== -1) {
-                        const val = getFieldValue(field);
-                        if (val !== null) this.data[idx][field.dataset.mfrField] = val;
+                        const key = field.dataset.mfrField;
+                        const val = field.type === 'checkbox'
+                            ? getCheckboxGroupValue(itemEl, key)
+                            : getFieldValue(field);
+                        if (val !== null) this.data[idx][key] = val;
                         this._updateTitle(itemEl, this.data[idx], idx);
                     }
                     this.onChange && this.onChange();
@@ -1025,14 +1039,17 @@
                 field.addEventListener(evtType, () => {
                     // Titel aktuell halten
                     const idx = this._indexOf(itemEl);
-                    const val = getFieldValue(field);
+                    const key = field.dataset.mfrField;
+                    const val = field.type === 'checkbox'
+                        ? getCheckboxGroupValue(itemEl, key)
+                        : getFieldValue(field);
                     if (val !== null && idx !== -1) {
                         if (!this.data[idx]) this.data[idx] = {};
-                        this.data[idx][field.dataset.mfrField] = val;
+                        this.data[idx][key] = val;
                         this._setTitle(itemEl, this.data[idx], idx);
                         this._log('field change', {
                             eventType: evtType,
-                            field: field.dataset.mfrField,
+                            field: key,
                             value: val,
                             index: idx
                         });

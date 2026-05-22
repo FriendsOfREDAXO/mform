@@ -5,7 +5,7 @@
 ```php
 use FriendsOfRedaxo\MForm\Output\MFormOutput;
 
-echo MFormOutput::from('REX_VALUE[1]')
+echo MFormOutput::from(1)
     ->filter('active', '1')
     ->sort('position')
     ->limit(6)
@@ -17,7 +17,7 @@ echo MFormOutput::from('REX_VALUE[1]')
 
 | Methode | Zweck |
 |---|---|
-| `MFormOutput::from(string\|array $source)` | Aus REX_VALUE-String oder Array |
+| `MFormOutput::from(int\|string\|array $source)` | Aus Value-Slot-ID, REX_VALUE-String oder Array |
 | `MFormOutput::empty()` | Leere Instanz |
 
 ## Filtern, Sortieren, Limitieren (chainable)

@@ -18,7 +18,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
  *
  * Typical usage in module output:
  *
- *   echo MFormOutput::from('REX_VALUE[1]')
+ *   echo MFormOutput::from(1)
  *       ->filter('active', '1')
  *       ->sort('position')
  *       ->limit(6)
@@ -53,16 +53,16 @@ final class MFormOutput
     }
 
     /**
-     * Creates a new output from a REX_VALUE string or already decoded array.
+        * Creates a new output from a value slot id, REX_VALUE string or decoded array.
      *
      * Strings are passed through MFormRepeaterHelper::decode() which
      * filters disabled items and unwraps nested repeaters.
      *
-     * @param string|array<int, array<string, mixed>> $source
+     * @param int|string|array<int, array<string, mixed>> $source
      */
-    public static function from(string|array $source): self
+    public static function from(int|string|array $source): self
     {
-        if (is_string($source)) {
+        if (is_int($source) || is_string($source)) {
             return new self(MFormRepeaterHelper::decode($source));
         }
 

@@ -15,6 +15,8 @@ class MFormRepeaterHelper
 {
     private const DISABLED_KEY = '__disabled';
 
+    private static ?\rex_article_slice $cachedCurrentSlice = null;
+
     /**
      * @param array<int, MFormItem|MForm> $items
      * @return array<string, string>
@@ -302,7 +304,7 @@ class MFormRepeaterHelper
     /**
      * Decodes repeater data from the current slice by value slot id.
      *
-        * @param int $valueId ID des Value-Slots, dessen Repeater-Daten dekodiert werden sollen.
+        * @param int $valueId Value slot id to decode repeater data from.
      * @return array<int, array<string, mixed>>
      */
     public static function decodeById(int $valueId): array
@@ -326,6 +328,9 @@ class MFormRepeaterHelper
 
     private static function findCurrentSlice(): ?\rex_article_slice
     {
+        if (self::$cachedCurrentSlice instanceof \rex_article_slice) {
+            return self::$cachedCurrentSlice;
+        }
         foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
             $object = $frame['object'] ?? null;
             if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
@@ -339,6 +344,7 @@ class MFormRepeaterHelper
             }
 
             if ($slice instanceof \rex_article_slice) {
+                self::$cachedCurrentSlice = $slice;
                 return $slice;
             }
         }
