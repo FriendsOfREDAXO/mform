@@ -304,7 +304,7 @@ class MFormRepeaterHelper
     /**
      * Decodes repeater data from the current slice by value slot id.
      *
-      * @param int $valueId Value slot id to decode repeater data from.
+        * @param int $valueId Value slot id to decode repeater data from.
      * @return array<int, array<string, mixed>>
      */
     public static function decodeById(int $valueId): array
@@ -331,7 +331,6 @@ class MFormRepeaterHelper
         if (self::$cachedCurrentSlice instanceof \rex_article_slice) {
             return self::$cachedCurrentSlice;
         }
-
         foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
             $object = $frame['object'] ?? null;
             if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
