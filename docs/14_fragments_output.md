@@ -32,7 +32,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
 $headline = 'REX_VALUE[id=1]';
-$items = MFormRepeaterHelper::decode('REX_VALUE[id=2 output="html"]');
+$items = MFormRepeaterHelper::decode(2);
 
 // Link-Felder in Repeater-Items vereinheitlichen
 $items = MFormOutputHelper::normalizeRepeaterItems($items, ['link']);
@@ -105,7 +105,7 @@ use FriendsOfRedaxo\MFragment;
 use FriendsOfRedaxo\MFragment\Components\Bootstrap\Card;
 use FriendsOfRedaxo\MFragment\Components\Default\Figure;
 
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=2 output="html"]');
+$rows = MFormRepeaterHelper::decode(2);
 $rows = MFormOutputHelper::normalizeRepeaterItems($rows, ['link']);
 
 $grid = MFragment::factory()->addClass('row g-4');
@@ -188,7 +188,7 @@ Modul-Output:
 
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=3 output="html"]');
+$rows = MFormRepeaterHelper::decode(3);
 
 foreach ($rows as $row) {
     $item = new rex_fragment();

@@ -12,6 +12,10 @@
 
 ### Verbesserungen
 
+- **Repeater-Decode mit Slot-ID** – `MFormRepeaterHelper::decode()` akzeptiert jetzt neben String-Payloads auch direkt numerische Value-Slots (z. B. `decode(1)`).
+- **Klare API für Slot-basierten Zugriff** – neue Methode `MFormRepeaterHelper::decodeById(int $valueId)` für die direkte Auflösung über den REDAXO-Value-Slot.
+- **Form Builder Output aktualisiert** – generierter Repeater-Output nutzt nun bevorzugt `MFormRepeaterHelper::decode(<slot>)` statt `decode('REX_VALUE[...]')`.
+- **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
 - **ColorSwatch-UX im Form Builder** – zusätzliche Hilfe im Eigenschaften-Panel, Beispiel-Palette per Klick und erweiterte Options-Syntax für CSS-Klassen-Swatches mit optionaler Preview-Farbe (z. B. `.text-primary=Primaer CSS|#2f77bc`).
 - **Palette-Suche im Form Builder** – Live-Filter über Feld- und Wrapper-Typen inkl. Alias-Suche (z. B. `color`, `alert`, `link`) und Leerzustand-Hinweis bei keinen Treffern.
 - **Schneller Fokus auf die Suche** – `/` fokussiert direkt das Suchfeld in der Palette.

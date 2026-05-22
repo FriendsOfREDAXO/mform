@@ -53,7 +53,7 @@ $tcClass = (str_starts_with($tcCss, '.')) ? ' ' . ltrim($tcCss, '.') : '';
 
 <?php
 // Repeater: Inhaltskarten mit individuellen Farben
-$cards = MFormRepeaterHelper::decode('REX_VALUE[id=5]');
+$cards = MFormRepeaterHelper::decode(5);
 $cards = MFormRepeaterHelper::filterEnabledItems($cards);
 
 foreach ($cards as $card):

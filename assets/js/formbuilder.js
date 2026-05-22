@@ -126,6 +126,7 @@
 
         var state = [];
         var nextId = 1;
+        var STORAGE_KEY = 'mform.formbuilder.state.v1';
         // Klassische REDAXO-Module haben pro Slot-Typ ein Limit von 20 (REX_VALUE / REX_MEDIA / REX_LINK / ...).
         // Der Builder vergibt fortlaufende IDs; ueber 20 hinaus werden Werte ggf. nicht mehr persistiert.
         var MAX_FIELD_ID = 20;
@@ -254,6 +255,91 @@
                 }
             }
             return null;
+        }
+
+        function isContainerType(type) {
+            return type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal';
+        }
+
+        function sanitizeItem(raw) {
+            if (!raw || !raw.type || !TYPES[raw.type]) {
+                return null;
+            }
+
+            var item = JSON.parse(JSON.stringify(raw));
+            item.uid = (typeof item.uid === 'string' && item.uid !== '')
+                ? item.uid
+                : ('fb-' + (Math.random().toString(36).slice(2, 8)));
+
+            var parsedId = parseInt(item.id, 10);
+            item.id = Number.isFinite(parsedId) && parsedId > 0 ? parsedId : 1;
+
+            if (isContainerType(item.type)) {
+                var children = Array.isArray(item.children) ? item.children : [];
+                item.children = children
+                    .map(sanitizeItem)
+                    .filter(function (child) { return child !== null; });
+            } else {
+                item.children = null;
+            }
+
+            return item;
+        }
+
+        function collectMaxIdFromState(list) {
+            var max = 0;
+            (list || []).forEach(function (item) {
+                if (typeof item.id === 'number' && item.id > max) {
+                    max = item.id;
+                }
+                if (Array.isArray(item.children)) {
+                    var childMax = collectMaxIdFromState(item.children);
+                    if (childMax > max) {
+                        max = childMax;
+                    }
+                }
+            });
+            return max;
+        }
+
+        function persistBuilderState() {
+            try {
+                window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: state }));
+            } catch (_e) {
+                // ignore storage failures (private mode / blocked storage)
+            }
+        }
+
+        function clearPersistedBuilderState() {
+            try {
+                window.localStorage.removeItem(STORAGE_KEY);
+            } catch (_e) {
+                // ignore storage failures
+            }
+        }
+
+        function restoreBuilderState() {
+            try {
+                var raw = window.localStorage.getItem(STORAGE_KEY);
+                if (!raw) {
+                    return;
+                }
+
+                var parsed = JSON.parse(raw);
+                if (!parsed || !Array.isArray(parsed.state)) {
+                    return;
+                }
+
+                var restored = parsed.state
+                    .map(sanitizeItem)
+                    .filter(function (item) { return item !== null; });
+
+                state = restored;
+                nextId = collectMaxIdFromState(state) + 1;
+                activeItem = null;
+            } catch (_e) {
+                // ignore malformed persisted data
+            }
         }
 
         // Tree-aware: depth of the deepest nested repeater chain inside `item`.
@@ -700,6 +786,7 @@
             state = [];
             nextId = 1;
             activeItem = null;
+            clearPersistedBuilderState();
             renderProps();
             renderCanvas();
             emitCode();
@@ -1177,8 +1264,9 @@
 
         function emitCode() {
             if (state.length === 0) {
-                setCodeText($code, '// Noch keine Felder hinzugefuegt.');
-                setCodeText($output, '// Noch keine Felder hinzugefuegt.');
+                setCodeText($code, '<?php\n\n// Noch keine Felder hinzugefuegt.');
+                setCodeText($output, '<?php\n\n// Noch keine Felder hinzugefuegt.');
+                clearPersistedBuilderState();
                 var emptySlotMsg = document.querySelector('[data-fb-slot-warning]');
                 if (emptySlotMsg) {
                     emptySlotMsg.style.display = 'none';
@@ -1187,6 +1275,8 @@
                 return;
             }
             var lines = [];
+            lines.push('<?php');
+            lines.push('');
             lines.push('use FriendsOfRedaxo\\MForm;');
             lines.push('');
             lines.push('$mform = MForm::factory();');
@@ -1347,7 +1437,9 @@
             if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup' && item.type !== 'togglecheckbox' && item.type !== 'colorswatch') {
                 return [];
             }
-            var opts = parseOptions(item.options || '');
+            var opts = item.type === 'colorswatch'
+                ? parseColorSwatches(item.options || '')
+                : parseOptions(item.options || '');
             if (!opts.length) return [];
             var lines = ['moegliche Werte:'];
             opts.forEach(function (o) {
@@ -1396,7 +1488,7 @@
             if (rowVar === 'row') {
                 lines.push(indent + '// Repeater' + lbl + ' \u2013 dekodierte Items als Array von Zeilen');
                 outputUses.repeaterHelper = true;
-                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']");');
+                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode(' + item.id + ');');
                 lines.push(indent + 'foreach ($' + name + ' as $' + rowVar + ') {');
             } else {
                 lines.push(indent + '// verschachtelter Repeater' + lbl);
@@ -1473,7 +1565,7 @@
 
         function emitOutputCode() {
             if (state.length === 0) {
-                setCodeText($output, '// Noch keine Felder hinzugefuegt.');
+                setCodeText($output, '<?php\n\n// Noch keine Felder hinzugefuegt.');
                 return;
             }
             // Tracking, welche use-Statements wir brauchen.
@@ -1570,11 +1662,13 @@
                 head.push('');
             }
 
-            setCodeText($output, head.concat(body).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd());
+            setCodeText($output, ['<?php', ''].concat(head, body).join('\n').replace(/\n{3,}/g, '\n\n').trimEnd());
+            persistBuilderState();
         }
 
         // ---- Init -----------------------------------------------------------
 
+        restoreBuilderState();
         renderCanvas();
         emitCode();
         initCodeViewers();

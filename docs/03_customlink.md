@@ -271,7 +271,7 @@ Normalisiert definierte Link-Felder innerhalb einer Repeater-Liste in einem Schr
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+$items = MFormRepeaterHelper::decode(1);
 
 // fuegt pro Feld `<feldname>_normalized` hinzu
 $items = MFormOutputHelper::normalizeRepeaterItems($items, ['link', 'cta']);

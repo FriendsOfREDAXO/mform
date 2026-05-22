@@ -82,7 +82,7 @@ $seoCanonical   = 'REX_VALUE[seo_canonical]';
 
 <?php
 // --- Repeater: Teaser-Kacheln ---
-$cards = MFormRepeaterHelper::decode('REX_VALUE[id=99]');
+$cards = MFormRepeaterHelper::decode(99);
 $cards = MFormRepeaterHelper::filterEnabledItems($cards);
 
 if ([] !== $cards):

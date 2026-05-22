@@ -264,19 +264,24 @@ class MFormRepeaterHelper
     }
 
     /**
-     * Decodes a REX_VALUE JSON string and returns only enabled repeater items.
+     * Decodes repeater payload and returns only enabled items.
      *
      * Use this in module output code instead of rex_var::toArray() to automatically
      * filter out disabled (offline) items and strip the internal __disabled key.
      *
      * Example:
-     *   $rows = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+     *   $rows = MFormRepeaterHelper::decode(1);
      *
-     * @param string $rexValue The raw REX_VALUE string (already substituted by REDAXO)
+     * @param int|string $source Either a value-slot id (e.g. 1) or a raw JSON payload
      * @return array<int, array<string, mixed>> Filtered and cleaned items
      */
-    public static function decode(string $rexValue): array
+    public static function decode(int|string $source): array
     {
+        if (is_int($source)) {
+            return self::decodeById($source);
+        }
+
+        $rexValue = $source;
         if ('' === $rexValue) {
             return [];
         }
@@ -292,6 +297,53 @@ class MFormRepeaterHelper
         }
 
         return self::prepareItemsForOutput($decoded);
+    }
+
+    /**
+     * Decodes repeater data from the current slice by value slot id.
+     *
+        * @param int $valueId ID des Value-Slots, dessen Repeater-Daten dekodiert werden sollen.
+     * @return array<int, array<string, mixed>>
+     */
+    public static function decodeById(int $valueId): array
+    {
+        if ($valueId <= 0 || $valueId > 20 || !class_exists('rex_article_slice')) {
+            return [];
+        }
+
+        $slice = self::findCurrentSlice();
+        if (!$slice instanceof \rex_article_slice) {
+            return [];
+        }
+
+        $raw = $slice->getValue($valueId);
+        if (!is_string($raw) || '' === $raw) {
+            return [];
+        }
+
+        return self::decode($raw);
+    }
+
+    private static function findCurrentSlice(): ?\rex_article_slice
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+            $object = $frame['object'] ?? null;
+            if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
+                continue;
+            }
+
+            try {
+                $slice = $object->getCurrentSlice();
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if ($slice instanceof \rex_article_slice) {
+                return $slice;
+            }
+        }
+
+        return null;
     }
 
     /**

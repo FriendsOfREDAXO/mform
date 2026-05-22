@@ -756,13 +756,13 @@ Statische Hilfsmethoden für die Verarbeitung von Repeater-Daten im Modul-Output
 ### Methoden
 
 ```php
-MFormRepeaterHelper::decode(string $rexValue): array
+MFormRepeaterHelper::decode(int|string $source): array
 ```
-**Hauptmethode für die Ausgabe.** Dekodiert einen REX_VALUE-String und gibt bereinigte, aktive Items zurück. Filtert automatisch deaktivierte Items heraus.
+**Hauptmethode für die Ausgabe.** Dekodiert Repeater-Daten und gibt bereinigte, aktive Items zurück. Filtert automatisch deaktivierte Items heraus.
 
 ```php
 // Modul-Output:
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output="html"]');
+$rows = MFormRepeaterHelper::decode(1);
 foreach ($rows as $row) {
     echo $row['title'];
 }
@@ -911,7 +911,7 @@ Normalisiert Link-Felder in Repeater-Items. Fügt standardmäßig `<field>_norma
 | `$options['replace']` | `bool` | `true`: Original-Feld überschreiben (default: `false`) |
 
 ```php
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1 output="html"]');
+$rows = MFormRepeaterHelper::decode(1);
 $rows = MFormOutputHelper::normalizeRepeaterItems($rows, ['link', 'image']);
 // Jetzt: $row['link_normalized']['customlink_url']
 ```
@@ -1169,7 +1169,7 @@ $headline = 'REX_VALUE[id=1]';
 $text     = 'REX_VALUE[id=2 output="html"]';
 $image    = 'REX_VALUE[id=3]';
 $layout   = 'REX_VALUE[id=4]';
-$items    = MFormRepeaterHelper::decode('REX_VALUE[id=5 output="html"]');
+$items    = MFormRepeaterHelper::decode(5);
 
 // Items filtern, sortieren
 $items = MFormRepeaterHelper::sortByField($items, 'title');
