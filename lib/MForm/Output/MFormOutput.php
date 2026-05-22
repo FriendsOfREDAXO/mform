@@ -53,7 +53,7 @@ final class MFormOutput
     }
 
     /**
-    * Creates a new output from a value slot id, REX_VALUE string or decoded array.
+        * Creates a new output from a value slot id, REX_VALUE string or decoded array.
      *
      * Strings are passed through MFormRepeaterHelper::decode() which
      * filters disabled items and unwraps nested repeaters.
