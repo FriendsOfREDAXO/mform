@@ -302,6 +302,7 @@ class MFormRepeaterHelper
     /**
      * Decodes repeater data from the current slice by value slot id.
      *
+        * @param int $valueId ID des Value-Slots, dessen Repeater-Daten dekodiert werden sollen.
      * @return array<int, array<string, mixed>>
      */
     public static function decodeById(int $valueId): array

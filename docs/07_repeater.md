@@ -64,7 +64,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 | Methode | Verwendung |
 |---------|-----------|
-| `decode(int|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-/Entity-Dekodierung und Item-Filterung in einem Schritt. |
+| `decode(int\|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-/Entity-Dekodierung und Item-Filterung in einem Schritt. |
 | `prepareItemsForOutput(array $items)` | Wenn der Array bereits dekodiert vorliegt (z. B. aus einer DB-Abfrage). |
 
 ```php
