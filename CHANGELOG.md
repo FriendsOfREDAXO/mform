@@ -8,6 +8,13 @@
 - **Klare API für Slot-basierten Zugriff** – neue Methode `MFormRepeaterHelper::decodeById(int $valueId)` für die direkte Auflösung über den REDAXO-Value-Slot.
 - **Form Builder Output aktualisiert** – generierter Repeater-Output nutzt nun bevorzugt `MFormRepeaterHelper::decode(<slot>)` statt `decode('REX_VALUE[...]')`.
 - **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
+- **Form Builder mit PHP-Header** – generierter Input- und Output-Code startet nun immer direkt mit `<?php` (auch im Leerzustand).
+- **Form Builder Persistenz über Seitenwechsel** – Builder-Stand bleibt jetzt in `localStorage` erhalten und kann nach dem Wechsel auf andere Backend-Seiten wieder genutzt werden.
+
+### Behoben
+
+- **FlexRepeater Checkbox-Serialisierung** – Mehrfach-Checkboxen in Repeater-Items werden beim Speichern und Wiederladen wieder korrekt pro Item zugeordnet und nicht mehr gegenseitig ueberschrieben.
+- **Persistenz-Reset im Form Builder** – gespeicherter Builder-Stand wird bei `Alles loeschen` sowie bei leerem Zustand konsistent entfernt, damit keine veralteten Daten unbeabsichtigt erneut geladen werden.
 
 ## Version 9.1.0
 

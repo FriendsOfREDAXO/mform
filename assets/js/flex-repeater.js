@@ -259,16 +259,35 @@
         const tag = field.tagName.toLowerCase();
         if (tag === 'input') {
             if (field.type === 'checkbox') {
-                const normalized = typeof value === 'string' ? value.trim().toLowerCase() : value;
-                field.checked = !(
-                    normalized === '' ||
-                    normalized === false ||
-                    normalized === 0 ||
-                    normalized === '0' ||
-                    normalized === 'false' ||
-                    normalized === 'off' ||
-                    normalized === 'no'
-                );
+                if (typeof value === 'boolean') {
+                    field.checked = value;
+                    return;
+                }
+
+                // Multi-Checkbox-Werte werden kommasepariert gespeichert (z. B. "1,2").
+                let selectedValues = [];
+                if (Array.isArray(value)) {
+                    selectedValues = value.map(function (v) { return String(v); });
+                } else if (typeof value === 'string') {
+                    const normalized = value.trim().toLowerCase();
+                    if (
+                        normalized !== '' &&
+                        normalized !== '0' &&
+                        normalized !== 'false' &&
+                        normalized !== 'off' &&
+                        normalized !== 'no'
+                    ) {
+                        selectedValues = value
+                            .split(',')
+                            .map(function (v) { return v.trim(); })
+                            .filter(function (v) { return v !== ''; });
+                    }
+                } else if (value !== 0 && value !== false && value !== '') {
+                    selectedValues = [String(value)];
+                }
+
+                const currentValue = String(field.value || '1');
+                field.checked = selectedValues.includes(currentValue);
                 return;
             }
             if (field.type === 'radio') {
@@ -299,12 +318,24 @@
      */
     function collectItemData(itemEl) {
         const data = {};
+        const checkboxValues = {};
 
         itemEl.querySelectorAll('[data-mfr-field]').forEach(function (field) {
             // Felder in nested Repeatern überspringen
             if (field.closest('.mfr-nested-repeater')) return;
 
             const key = field.dataset.mfrField;
+
+            if (field.tagName.toLowerCase() === 'input' && field.type === 'checkbox') {
+                if (!Array.isArray(checkboxValues[key])) {
+                    checkboxValues[key] = [];
+                }
+                if (field.checked) {
+                    checkboxValues[key].push(String(field.value || '1'));
+                }
+                return;
+            }
+
             const val = getFieldValue(field);
 
             if (val === null) {
@@ -313,6 +344,10 @@
                 return;
             }
             data[key] = val;
+        });
+
+        Object.keys(checkboxValues).forEach(function (key) {
+            data[key] = checkboxValues[key].join(',');
         });
 
         // Nested Repeater
@@ -335,8 +370,20 @@
         if (!list) return items;
         list.querySelectorAll(':scope > .mfr-nested-item').forEach(function (nestedItem) {
             const itemData = {};
+            const checkboxValues = {};
             nestedItem.querySelectorAll('[data-mfr-field]').forEach(function (field) {
                 const key = field.dataset.mfrField;
+
+                if (field.tagName.toLowerCase() === 'input' && field.type === 'checkbox') {
+                    if (!Array.isArray(checkboxValues[key])) {
+                        checkboxValues[key] = [];
+                    }
+                    if (field.checked) {
+                        checkboxValues[key].push(String(field.value || '1'));
+                    }
+                    return;
+                }
+
                 const val = getFieldValue(field);
                 if (val === null) {
                     if (itemData[key] === undefined) itemData[key] = '';
@@ -344,6 +391,11 @@
                 }
                 itemData[key] = val;
             });
+
+            Object.keys(checkboxValues).forEach(function (key) {
+                itemData[key] = checkboxValues[key].join(',');
+            });
+
             items.push(itemData);
         });
         return items;
