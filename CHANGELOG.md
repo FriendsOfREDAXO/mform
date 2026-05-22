@@ -1,5 +1,14 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.1.1
+
+### Verbesserungen
+
+- **Repeater-Decode mit Slot-ID** – `MFormRepeaterHelper::decode()` akzeptiert jetzt neben String-Payloads auch direkt numerische Value-Slots (z. B. `decode(1)`).
+- **Klare API für Slot-basierten Zugriff** – neue Methode `MFormRepeaterHelper::decodeById(int $valueId)` für die direkte Auflösung über den REDAXO-Value-Slot.
+- **Form Builder Output aktualisiert** – generierter Repeater-Output nutzt nun bevorzugt `MFormRepeaterHelper::decode(<slot>)` statt `decode('REX_VALUE[...]')`.
+- **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
+
 ## Version 9.1.0
 
 ### Neu

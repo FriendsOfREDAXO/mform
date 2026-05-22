@@ -6,7 +6,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 // REX_VALUE[id=2] = Einfacher Flex-Repeater (JSON)
 
 // --- Flex Repeater mit Copy/Paste ---
-$items = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$items = MFormRepeaterHelper::decode(1);
 
 if (!empty($items)) {
     echo '<ul class="list-group mb-4">';
@@ -38,7 +38,7 @@ if (!empty($items)) {
 }
 
 // --- Einfacher Flex Repeater ---
-$simpleItems = MFormRepeaterHelper::decode('REX_VALUE[id=2]');
+$simpleItems = MFormRepeaterHelper::decode(2);
 
 if (!empty($simpleItems)) {
     echo '<ul class="list-unstyled">';

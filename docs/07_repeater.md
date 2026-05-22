@@ -42,7 +42,7 @@ echo $mform->show();
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
 // decode() filtert deaktivierte Items und entfernt __disabled automatisch
-$items = MFormRepeaterHelper::decode('REX_VALUE[2]');
+$items = MFormRepeaterHelper::decode(2);
 ?>
 
 <h1>REX_VALUE[1]</h1>
@@ -69,7 +69,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 ```php
 // Neu (v9): kürzeste Form im Modul-Output
-$rows = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$rows = MFormRepeaterHelper::decode(1);
 
 // Äquivalent mit prepareItemsForOutput (v8-kompatibel)
 $raw   = json_decode(html_entity_decode('REX_VALUE[id=1]', ENT_QUOTES | ENT_HTML5, 'UTF-8'), true) ?? [];
@@ -86,7 +86,7 @@ Nach dem Dekodieren stehen weitere Hilfsmethoden für typische Ausgabeszenarien 
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+$items = MFormRepeaterHelper::decode(1);
 
 // Nach Feldwert filtern
 $news = MFormRepeaterHelper::filterByField($items, 'category', 'news');
@@ -165,7 +165,7 @@ echo $mform->show();
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$sections = MFormRepeaterHelper::decode('REX_VALUE[2]');
+$sections = MFormRepeaterHelper::decode(2);
 ?>
 
 <h1><?= rex_escape('REX_VALUE[1]') ?></h1>
@@ -413,7 +413,7 @@ echo $mform->show();
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[1]');
+$items = MFormRepeaterHelper::decode(1);
 
 // Einheitliche Link-Normalisierung fuer Repeater + Nicht-Repeater-Formate
 $items = MFormOutputHelper::normalizeRepeaterItems($items, ['link']);

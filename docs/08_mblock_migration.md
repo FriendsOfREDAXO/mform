@@ -62,7 +62,7 @@ echo MForm::factory()
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$items = MFormRepeaterHelper::decode(1);
 
 foreach ($items as $item) {
     echo '<h3>' . rex_escape($item['title'] ?? '') . '</h3>';
@@ -85,7 +85,7 @@ Beim Auslesen von Custom-Link-Feldern aus Repeater-Items kann der Wert je nach K
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$items = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$items = MFormRepeaterHelper::decode(1);
 
 // Option A: Normalisierung pro Link-Feld direkt bei der Ausgabe
 foreach ($items as $item) {
@@ -519,7 +519,7 @@ echo $main->show();
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
-$cards = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$cards = MFormRepeaterHelper::decode(1);
 
 foreach ($cards as $card) {
     $title = (string) ($card['header'] ?? '');

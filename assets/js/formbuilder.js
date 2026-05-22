@@ -1396,7 +1396,7 @@
             if (rowVar === 'row') {
                 lines.push(indent + '// Repeater' + lbl + ' \u2013 dekodierte Items als Array von Zeilen');
                 outputUses.repeaterHelper = true;
-                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode("REX_VALUE[' + item.id + ']");');
+                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode(' + item.id + ');');
                 lines.push(indent + 'foreach ($' + name + ' as $' + rowVar + ') {');
             } else {
                 lines.push(indent + '// verschachtelter Repeater' + lbl);

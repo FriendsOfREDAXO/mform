@@ -220,7 +220,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
 // MFormRepeaterHelper::decode() wandelt das gespeicherte JSON in ein PHP-Array um.
 // Das Ergebnis ist eine Liste von Blöcken – jeder Block ein assoziatives Array.
-$blocks = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$blocks = MFormRepeaterHelper::decode(1);
 
 foreach ($blocks as $block) {
     $image = (string) ($block['image'] ?? '');
@@ -282,7 +282,7 @@ echo MForm::factory()
 <?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
-$blocks = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$blocks = MFormRepeaterHelper::decode(1);
 
 foreach ($blocks as $block) {
     echo '<section class="content-block">';
@@ -374,7 +374,7 @@ $title        = 'REX_VALUE[id=1]';
 $subtitle     = 'REX_VALUE[id=2]';
 // REX_MEDIALIST liefert eine kommaseparierte Liste von Dateinamen (für mehrere Bilder).
 $headerImages = array_filter(explode(',', 'REX_MEDIALIST[id=3]'));
-$blocks       = MFormRepeaterHelper::decode('REX_VALUE[id=4]');
+$blocks       = MFormRepeaterHelper::decode(4);
 $ctaValue     = 'REX_VALUE[id=5]';
 
 // ── Seitenkopf ────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
 // 1. Dekodieren – deaktivierte Items (__disabled) werden automatisch herausgefiltert,
 //    wenn filterEnabledItems() aufgerufen wird.
-$allItems = MFormRepeaterHelper::decode('REX_VALUE[id=1]');
+$allItems = MFormRepeaterHelper::decode(1);
 
 // 2. Nur aktive Items (Auge-Icon im Backend = aktiv)
 $items = MFormRepeaterHelper::filterEnabledItems($allItems);
