@@ -1,22 +1,5 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.1.1
-
-### Verbesserungen
-
-- **Repeater-Decode mit Slot-ID** – `MFormRepeaterHelper::decode()` akzeptiert jetzt neben String-Payloads auch direkt numerische Value-Slots (z. B. `decode(1)`).
-- **Klare API für Slot-basierten Zugriff** – neue Methode `MFormRepeaterHelper::decodeById(int $valueId)` für die direkte Auflösung über den REDAXO-Value-Slot.
-- **Form Builder Output aktualisiert** – generierter Repeater-Output nutzt nun bevorzugt `MFormRepeaterHelper::decode(<slot>)` statt `decode('REX_VALUE[...]')`.
-- **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
-- **Form Builder mit PHP-Header** – generierter Input- und Output-Code startet nun immer direkt mit `<?php` (auch im Leerzustand).
-- **Form Builder Persistenz über Seitenwechsel** – Builder-Stand bleibt jetzt in `localStorage` erhalten und kann nach dem Wechsel auf andere Backend-Seiten wieder genutzt werden.
-- **Kompatibilitaetshinweis (9.1.1)** – kein Breaking Change, aber geaendertes Verhalten: Entwuerfe bleiben backend-seitenuebergreifend erhalten und werden bei `Alles loeschen` (bzw. leerem Zustand) explizit entfernt.
-
-### Behoben
-
-- **FlexRepeater Checkbox-Serialisierung** – Mehrfach-Checkboxen in Repeater-Items werden beim Speichern und Wiederladen wieder korrekt pro Item zugeordnet und nicht mehr gegenseitig ueberschrieben.
-- **Persistenz-Reset im Form Builder** – gespeicherter Builder-Stand wird bei `Alles loeschen` sowie bei leerem Zustand konsistent entfernt, damit keine veralteten Daten unbeabsichtigt erneut geladen werden.
-
 ## Version 9.1.0
 
 ### Neu
@@ -29,6 +12,10 @@
 
 ### Verbesserungen
 
+- **Repeater-Decode mit Slot-ID** – `MFormRepeaterHelper::decode()` akzeptiert jetzt neben String-Payloads auch direkt numerische Value-Slots (z. B. `decode(1)`).
+- **Klare API für Slot-basierten Zugriff** – neue Methode `MFormRepeaterHelper::decodeById(int $valueId)` für die direkte Auflösung über den REDAXO-Value-Slot.
+- **Form Builder Output aktualisiert** – generierter Repeater-Output nutzt nun bevorzugt `MFormRepeaterHelper::decode(<slot>)` statt `decode('REX_VALUE[...]')`.
+- **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
 - **ColorSwatch-UX im Form Builder** – zusätzliche Hilfe im Eigenschaften-Panel, Beispiel-Palette per Klick und erweiterte Options-Syntax für CSS-Klassen-Swatches mit optionaler Preview-Farbe (z. B. `.text-primary=Primaer CSS|#2f77bc`).
 - **Palette-Suche im Form Builder** – Live-Filter über Feld- und Wrapper-Typen inkl. Alias-Suche (z. B. `color`, `alert`, `link`) und Leerzustand-Hinweis bei keinen Treffern.
 - **Schneller Fokus auf die Suche** – `/` fokussiert direkt das Suchfeld in der Palette.
