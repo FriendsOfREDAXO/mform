@@ -6,7 +6,7 @@ echo MFormOutput::tag('h2', ['class' => 'display-5 mb-2'], rex_escape('REX_VALUE
 echo MFormOutput::tag('p',  ['class' => 'lead mb-5'], rex_escape('REX_VALUE[2]'));
 
 // === Sektionen (Repeater) =================================================
-echo MFormOutput::from('REX_VALUE[3]')
+echo MFormOutput::from(3)
     ->whenEmpty('<div class="alert alert-info">Noch keine Sektionen gepflegt.</div>')
     ->renderGrid(
         cols: 2,
