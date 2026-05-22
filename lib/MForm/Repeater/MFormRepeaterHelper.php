@@ -306,16 +306,43 @@ class MFormRepeaterHelper
      */
     public static function decodeById(int $valueId): array
     {
-        if ($valueId <= 0 || !class_exists('rex_var')) {
+        if ($valueId <= 0 || $valueId > 20 || !class_exists('rex_article_slice')) {
             return [];
         }
 
-        $items = \rex_var::toArray('REX_VALUE[id=' . $valueId . ']');
-        if (!is_array($items)) {
+        $slice = self::findCurrentSlice();
+        if (!$slice instanceof \rex_article_slice) {
             return [];
         }
 
-        return self::prepareItemsForOutput($items);
+        $raw = $slice->getValue($valueId);
+        if (!is_string($raw) || '' === $raw) {
+            return [];
+        }
+
+        return self::decode($raw);
+    }
+
+    private static function findCurrentSlice(): ?\rex_article_slice
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+            $object = $frame['object'] ?? null;
+            if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
+                continue;
+            }
+
+            try {
+                $slice = $object->getCurrentSlice();
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if ($slice instanceof \rex_article_slice) {
+                return $slice;
+            }
+        }
+
+        return null;
     }
 
     /**

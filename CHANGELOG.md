@@ -10,6 +10,7 @@
 - **Doku und Demo-Beispiele vereinheitlicht** – Repeater-Beispiele wurden auf die bevorzugte Slot-ID-Variante umgestellt, die alte String-Nutzung bleibt kompatibel.
 - **Form Builder mit PHP-Header** – generierter Input- und Output-Code startet nun immer direkt mit `<?php` (auch im Leerzustand).
 - **Form Builder Persistenz über Seitenwechsel** – Builder-Stand bleibt jetzt in `localStorage` erhalten und kann nach dem Wechsel auf andere Backend-Seiten wieder genutzt werden.
+- **Kompatibilitaetshinweis (9.1.1)** – kein Breaking Change, aber geaendertes Verhalten: Entwuerfe bleiben backend-seitenuebergreifend erhalten und werden bei `Alles loeschen` (bzw. leerem Zustand) explizit entfernt.
 
 ### Behoben
 

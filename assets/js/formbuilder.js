@@ -1437,7 +1437,9 @@
             if (item.type !== 'select' && item.type !== 'radio' && item.type !== 'checkbox' && item.type !== 'checkboxgroup' && item.type !== 'togglecheckbox' && item.type !== 'colorswatch') {
                 return [];
             }
-            var opts = parseOptions(item.options || '');
+            var opts = item.type === 'colorswatch'
+                ? parseColorSwatches(item.options || '')
+                : parseOptions(item.options || '');
             if (!opts.length) return [];
             var lines = ['moegliche Werte:'];
             opts.forEach(function (o) {
