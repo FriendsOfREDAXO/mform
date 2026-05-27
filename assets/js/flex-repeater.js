@@ -80,8 +80,9 @@
 
     function setCollapseIconState(iconEl, isCollapsed) {
         if (!iconEl) return;
-        iconEl.classList.toggle('fa-square-o', !!isCollapsed);
-        iconEl.classList.toggle('fa-minus', !isCollapsed);
+        iconEl.classList.add('fa-caret-square-o-down');
+        iconEl.classList.remove('fa-square-o', 'fa-minus', 'fa-caret-square-o-up');
+        iconEl.classList.toggle('mfr-icon-open', !isCollapsed);
     }
 
     function flashAndRevealItem(itemEl, center, openBody) {
@@ -1301,8 +1302,9 @@
             this.toggleAllBtns.forEach(function (btn) {
                 const icon = btn.querySelector('i');
                 if (icon) {
-                    icon.classList.toggle('fa-square-o', hasCollapsed);
-                    icon.classList.toggle('fa-minus', !hasCollapsed);
+                    icon.classList.add('fa-caret-square-o-down');
+                    icon.classList.remove('fa-square-o', 'fa-minus', 'fa-caret-square-o-up');
+                    icon.classList.toggle('mfr-icon-open', !hasCollapsed);
                 }
             });
         }

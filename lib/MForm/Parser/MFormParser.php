@@ -192,7 +192,7 @@ class MFormParser
         ) : '';
 
         $toggleAllButton = sprintf(
-            '<button type="button" class="btn btn-default mfr-btn-toggle-all" title="%s"><i class="rex-icon fa-square-o"></i> %s</button>',
+            '<button type="button" class="btn btn-default mfr-btn-toggle-all" title="%s"><i class="rex-icon fa-caret-square-o-down"></i> %s</button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_toggle_all'), ENT_QUOTES),
         );
@@ -210,7 +210,7 @@ class MFormParser
         $this->elements[] = '<div class="mfr-items-list"></div>';
 
         $this->elements[] = sprintf(
-            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button>%s<button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-square-o"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body mform form-horizontal">%s</div></div></template>',
+            '<template class="mfr-item-template"><div class="mfr-item"><div class="mfr-item-header"><span class="mfr-item-drag" title="Verschieben"><i class="rex-icon fa-bars"></i></span><span class="mfr-item-title"></span><div class="mfr-item-actions"><button type="button" class="btn btn-xs mfr-btn-up" title="%s"><i class="rex-icon fa-chevron-up"></i></button><button type="button" class="btn btn-xs mfr-btn-down" title="%s"><i class="rex-icon fa-chevron-down"></i></button><button type="button" class="btn btn-xs mfr-btn-add-after" title="%s"><i class="rex-icon fa-plus"></i></button>%s<button type="button" class="btn btn-xs mfr-btn-visibility" title="%s"><i class="rex-icon fa-eye"></i></button><button type="button" class="btn btn-xs mfr-btn-collapse" title="%s"><i class="rex-icon fa-caret-square-o-down"></i></button><button type="button" class="btn btn-xs btn-danger mfr-btn-remove" title="%s"><i class="rex-icon fa-trash"></i></button></div></div><div class="mfr-item-body mform form-horizontal">%s</div></div></template>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_up'), ENT_QUOTES),
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_move_down'), ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),

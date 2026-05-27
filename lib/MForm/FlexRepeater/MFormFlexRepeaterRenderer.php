@@ -575,7 +575,7 @@ class MFormFlexRepeaterRenderer
             . '<button type="button" class="btn btn-xs mfr-btn-nested-up" title="Nach oben"><i class="rex-icon fa-chevron-up"></i></button>'
             . '<button type="button" class="btn btn-xs mfr-btn-nested-down" title="Nach unten"><i class="rex-icon fa-chevron-down"></i></button>'
             . '<button type="button" class="btn btn-xs mfr-btn-nested-add-after" title="Hinzufuegen nach diesem Element"><i class="rex-icon fa-plus"></i></button>'
-            . '<button type="button" class="btn btn-xs mfr-btn-nested-toggle" title="Aufklappen/Zuklappen"><i class="rex-icon fa-square-o"></i></button>'
+            . '<button type="button" class="btn btn-xs mfr-btn-nested-toggle" title="Aufklappen/Zuklappen"><i class="rex-icon fa-caret-square-o-down"></i></button>'
             . '<button type="button" class="btn btn-xs btn-danger mfr-btn-nested-remove" title="Entfernen"><i class="rex-icon fa-trash"></i></button>'
             . '</div></div>'
             . '<div class="mfr-nested-body mform form-horizontal" style="display:none">%s</div>'

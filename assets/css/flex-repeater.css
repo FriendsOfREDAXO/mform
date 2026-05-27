@@ -651,3 +651,18 @@ body.rex-theme-dark .mfr-btn-copy {
         max-width: 120px;
     }
 }
+
+/* ============================================================
+   Collapse-Icon: rotiert um 180° wenn das Item geöffnet ist
+   ============================================================ */
+.mfr-btn-collapse i,
+.mfr-btn-nested-toggle i,
+.mfr-btn-toggle-all i {
+    display: inline-block;
+    transition: transform 180ms ease;
+}
+.mfr-btn-collapse i.mfr-icon-open,
+.mfr-btn-nested-toggle i.mfr-icon-open,
+.mfr-btn-toggle-all i.mfr-icon-open {
+    transform: rotate(180deg);
+}
