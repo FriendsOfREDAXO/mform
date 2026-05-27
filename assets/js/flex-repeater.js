@@ -80,10 +80,10 @@
 
     function setCollapseIconState(iconEl, isCollapsed) {
         if (!iconEl) return;
-        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-collapse-rect');
+        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-collapse-rect', 'mfr-icon-expand-window');
         if (isCollapsed) {
             // Collapsed: show "expand" action icon.
-            iconEl.classList.add('fa-window-maximize');
+            iconEl.classList.add('mfr-icon-expand-window');
         } else {
             // Expanded: show custom "collapse" rectangle icon.
             iconEl.classList.add('mfr-icon-collapse-rect');

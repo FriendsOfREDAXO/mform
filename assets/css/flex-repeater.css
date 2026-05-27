@@ -319,6 +319,29 @@ body.rex-theme-dark {
     opacity: .95;
 }
 
+.mfr-icon-expand-window {
+    position: relative;
+    display: inline-block;
+    width: 12px;
+    height: 9px;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    box-sizing: border-box;
+    opacity: .95;
+}
+
+.mfr-icon-expand-window::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: currentColor;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+}
+
 /* --- Body --- */
 .mfr-item-body {
     padding: 1.6rem 1.9rem 1.6rem;
