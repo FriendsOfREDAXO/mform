@@ -309,6 +309,11 @@ body.rex-theme-dark {
     transition: opacity var(--mfr-transition);
 }
 
+.mfr-icon-expand-window {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
 .mfr-icon-collapse-rect {
     display: inline-block;
     width: 14px;
