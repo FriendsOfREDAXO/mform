@@ -83,9 +83,9 @@
         iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-collapse-rect', 'mfr-icon-expand-window');
         if (isCollapsed) {
             // Collapsed: show "expand" action icon.
-            iconEl.classList.add('mfr-icon-expand-window');
+            iconEl.classList.add('fa-window-maximize');
         } else {
-            // Expanded: show custom "collapse" rectangle icon.
+            // Expanded: show custom "collapse" bar icon.
             iconEl.classList.add('mfr-icon-collapse-rect');
         }
     }
