@@ -80,14 +80,15 @@
 
     function setCollapseIconState(iconEl, isCollapsed) {
         if (!iconEl) return;
-        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-expand-window');
-        iconEl.classList.add('fa-window-maximize');
+        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-regular', 'fa-window-maximize', 'fa-window-minimize', 'mfr-icon-expand-window');
+        iconEl.classList.add('fa-regular');
         if (isCollapsed) {
             // Collapsed: show "expand" action icon.
+            iconEl.classList.add('fa-window-maximize');
             return;
         } else {
-            // Expanded: use the same icon, rotated upside down.
-            iconEl.classList.add('mfr-icon-expand-window');
+            // Expanded: show dedicated minimize action icon.
+            iconEl.classList.add('fa-window-minimize');
         }
     }
 

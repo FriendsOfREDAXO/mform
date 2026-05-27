@@ -309,11 +309,6 @@ body.rex-theme-dark {
     transition: opacity var(--mfr-transition);
 }
 
-.mfr-icon-expand-window {
-    display: inline-block;
-    transform: rotate(180deg);
-}
-
 /* --- Body --- */
 .mfr-item-body {
     padding: 1.6rem 1.9rem 1.6rem;
