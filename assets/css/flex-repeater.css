@@ -315,9 +315,6 @@ body.rex-theme-dark {
     height: 10px;
     opacity: 1;
     position: relative;
-    border-top: 1.5px dashed currentColor;
-    border-left: 1.5px dashed currentColor;
-    border-right: 1.5px dashed currentColor;
     box-sizing: border-box;
 }
 
@@ -330,6 +327,23 @@ body.rex-theme-dark {
     height: 6px;
     background: currentColor;
     border-radius: 2px;
+}
+
+.mfr-icon-collapse-rect::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 6px;
+    background-image:
+        radial-gradient(circle, currentColor 1px, transparent 1.2px),
+        radial-gradient(circle, currentColor 1px, transparent 1.2px),
+        radial-gradient(circle, currentColor 1px, transparent 1.2px);
+    background-repeat: repeat-x, repeat-y, repeat-y;
+    background-size: 4px 2px, 2px 4px, 2px 4px;
+    background-position: left top, left top, right top;
+    pointer-events: none;
 }
 
 /* --- Body --- */
