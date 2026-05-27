@@ -311,13 +311,9 @@ body.rex-theme-dark {
 
 .mfr-icon-collapse-rect {
     display: inline-block;
-    width: 12px;
-    height: 9px;
-    border: 1.5px solid currentColor;
-    border-radius: 2px;
-    background: transparent;
-    box-sizing: border-box;
-    opacity: .95;
+    width: 14px;
+    height: 10px;
+    opacity: 1;
     position: relative;
 }
 
@@ -326,11 +322,11 @@ body.rex-theme-dark {
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
-    height: 2px;
+    top: 50%;
+    height: 4px;
     background: currentColor;
-    border-top-left-radius: 1px;
-    border-top-right-radius: 1px;
+    border-radius: 2px;
+    transform: translateY(-50%);
 }
 
 /* --- Body --- */
