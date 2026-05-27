@@ -309,6 +309,16 @@ body.rex-theme-dark {
     transition: opacity var(--mfr-transition);
 }
 
+.mfr-icon-collapse-rect {
+    display: inline-block;
+    width: 12px;
+    height: 9px;
+    border: 1.5px solid currentColor;
+    border-radius: 2px;
+    box-sizing: border-box;
+    opacity: .95;
+}
+
 /* --- Body --- */
 .mfr-item-body {
     padding: 1.6rem 1.9rem 1.6rem;

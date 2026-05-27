@@ -80,8 +80,14 @@
 
     function setCollapseIconState(iconEl, isCollapsed) {
         if (!iconEl) return;
-        iconEl.classList.toggle('fa-square-o', !!isCollapsed);
-        iconEl.classList.toggle('fa-minus', !isCollapsed);
+        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-collapse-rect');
+        if (isCollapsed) {
+            // Collapsed: show "expand" action icon.
+            iconEl.classList.add('fa-window-maximize');
+        } else {
+            // Expanded: show custom "collapse" rectangle icon.
+            iconEl.classList.add('mfr-icon-collapse-rect');
+        }
     }
 
     function flashAndRevealItem(itemEl, center, openBody) {
@@ -1301,8 +1307,7 @@
             this.toggleAllBtns.forEach(function (btn) {
                 const icon = btn.querySelector('i');
                 if (icon) {
-                    icon.classList.toggle('fa-square-o', hasCollapsed);
-                    icon.classList.toggle('fa-minus', !hasCollapsed);
+                    setCollapseIconState(icon, hasCollapsed);
                 }
             });
         }
