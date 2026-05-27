@@ -314,43 +314,6 @@ body.rex-theme-dark {
     transform: rotate(180deg);
 }
 
-.mfr-icon-collapse-rect {
-    display: inline-block;
-    width: 14px;
-    height: 10px;
-    opacity: 1;
-    position: relative;
-    box-sizing: border-box;
-}
-
-.mfr-icon-collapse-rect::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 6px;
-    background: currentColor;
-    border-radius: 2px;
-}
-
-.mfr-icon-collapse-rect::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 6px;
-    background-image:
-        radial-gradient(circle, currentColor 1px, transparent 1.2px),
-        radial-gradient(circle, currentColor 1px, transparent 1.2px),
-        radial-gradient(circle, currentColor 1px, transparent 1.2px);
-    background-repeat: repeat-x, repeat-y, repeat-y;
-    background-size: 4px 2px, 2px 4px, 2px 4px;
-    background-position: left top, left top, right top;
-    pointer-events: none;
-}
-
 /* --- Body --- */
 .mfr-item-body {
     padding: 1.6rem 1.9rem 1.6rem;

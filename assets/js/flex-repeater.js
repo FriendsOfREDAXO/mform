@@ -80,13 +80,14 @@
 
     function setCollapseIconState(iconEl, isCollapsed) {
         if (!iconEl) return;
-        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-collapse-rect', 'mfr-icon-expand-window');
+        iconEl.classList.remove('fa-minus', 'fa-square-o', 'fa-window-maximize', 'mfr-icon-expand-window');
+        iconEl.classList.add('fa-window-maximize');
         if (isCollapsed) {
             // Collapsed: show "expand" action icon.
-            iconEl.classList.add('fa-window-maximize', 'mfr-icon-expand-window');
+            return;
         } else {
-            // Expanded: show custom "collapse" bar icon.
-            iconEl.classList.add('mfr-icon-collapse-rect');
+            // Expanded: use the same icon, rotated upside down.
+            iconEl.classList.add('mfr-icon-expand-window');
         }
     }
 
