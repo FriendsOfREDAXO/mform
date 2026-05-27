@@ -323,7 +323,7 @@ body.rex-theme-dark {
     left: 0;
     right: 0;
     top: 50%;
-    height: 4px;
+    height: 6px;
     background: currentColor;
     border-radius: 2px;
     transform: translateY(-50%);
