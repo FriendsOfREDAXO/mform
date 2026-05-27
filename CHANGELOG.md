@@ -1,5 +1,14 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.1.1
+
+### Verbesserungen
+
+- **Flex-Repeater: konsistentere Collapse-Icons** – das Umschalten zwischen offen/geschlossen verwendet jetzt klar unterscheidbare Font-Awesome-`fa-regular`-Zustände (`fa-window-minimize` / `fa-window-maximize`) statt gemischter Darstellungen.
+- **Flex-Repeater: Icon-State-Handling vereinfacht** – alte Zwischenvarianten und Custom-Icon-Sonderfälle wurden entfernt, wodurch das Verhalten in Header und Nested-Elementen einheitlicher ist.
+
+---
+
 ## Version 9.1.0
 
 ### Neu
