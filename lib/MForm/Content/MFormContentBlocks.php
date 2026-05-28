@@ -78,7 +78,7 @@ final class MFormContentBlocks
 
         foreach (self::$blockDefinitions as $type => $definition) {
             $subForm = ($definition['form_factory'])($options);
-            $form->addConditionalFieldsetArea('block_type', '=', $type, $definition['label'], $subForm, [
+            $form->addFieldsetArea($definition['label'], $subForm, [
                 'class' => 'mform-content-block-pane',
                 'data-mform-content-block-type' => $type,
             ]);
