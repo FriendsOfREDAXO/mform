@@ -66,12 +66,16 @@ function initMFormContentBlocks(mform) {
     }
 
     function initPaneWidgets(pane) {
-        if (pane.attr('data-mform-content-block-widgets-init') === '1') {
-            return;
+        activateLazyEditors(pane);
+
+        // Trigger the classic REDAXO widget bootstrap for this pane so
+        // custom widgets (e.g. custom-link, linklist, medialist) can init.
+        if (typeof pane.trigger === 'function') {
+            pane.trigger('rex:ready', [pane]);
+        } else {
+            initMFormElements(pane);
         }
 
-        activateLazyEditors(pane);
-        initMFormElements(pane);
         pane.attr('data-mform-content-block-widgets-init', '1');
     }
 
