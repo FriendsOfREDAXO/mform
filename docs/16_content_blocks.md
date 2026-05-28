@@ -79,3 +79,47 @@ echo MFormContentBlocksOutput::from(1)->renderBulma();
 ## Hinweis zur Erweiterung
 
 Der Block-Builder ist bewusst schlank gehalten. Weitere Blocktypen koennen spaeter ueber eine erweiterte API oder ueber Projekt-Templates ergaenzt werden, ohne bestehende Inhalte zu brechen.
+
+## Eigene Blocktypen registrieren
+
+Eigene Bloecke koennen global registriert werden. Dazu wird pro Blocktyp eine Form-Factory hinterlegt.
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\Content\MFormContentBlocks;
+
+MFormContentBlocks::registerBlock('quote', 'Zitat', static function (array $options): MForm {
+    return MForm::factory()
+        ->addTextAreaField('quote', ['label' => 'Zitat'])
+        ->addTextField('author', ['label' => 'Autor']);
+});
+```
+
+Danach erscheint der neue Typ automatisch in `addContentBlocksElement()`.
+
+## Eigene Renderer registrieren
+
+Fuer eigene Blocktypen kann pro Framework ein Renderer registriert werden:
+
+```php
+<?php
+
+use FriendsOfRedaxo\MForm\Output\MFormContentBlocksOutput;
+
+MFormContentBlocksOutput::registerRenderer('bootstrap5', 'quote', static function (array $item): string {
+    $quote = isset($item['quote']) && is_string($item['quote']) ? $item['quote'] : '';
+    $author = isset($item['author']) && is_string($item['author']) ? $item['author'] : '';
+
+    if ('' === trim(strip_tags($quote))) {
+        return '';
+    }
+
+    $authorHtml = '' !== trim($author) ? '<footer class="blockquote-footer">' . rex_escape($author) . '</footer>' : '';
+
+    return '<blockquote class="blockquote mb-4"><p>' . MFormOutput::richtext($quote) . '</p>' . $authorHtml . '</blockquote>';
+});
+```
+
+Fuer UIkit und Bulma koennen analog eigene Renderer mit `uikit3` bzw. `bulma` registriert werden.

@@ -7,6 +7,8 @@
 - **Content-Blocks-Builder in mform** – neues API-Element `addContentBlocksElement()` baut einen blockbasierten Editor direkt auf dem Flex-Repeater auf.
 - **Startumfang mit drei Blocktypen** – enthalten sind `headline`, `text` (TinyMCE) und `text_image`.
 - **Framework-Output fuer drei Systeme** – neuer Renderer `MFormContentBlocksOutput` mit `renderBootstrap5()`, `renderUIKit3()` und `renderBulma()`.
+- **Erweiterbare Registry fuer eigene Bloecke** – ueber `MFormContentBlocks::registerBlock()` koennen projektseitig eigene Blocktypen inklusive Subformular registriert werden.
+- **Erweiterbare Registry fuer eigene Renderer** – ueber `MFormContentBlocksOutput::registerRenderer()` lassen sich Block-Renderer pro Framework (Bootstrap 5, UIkit 3, Bulma) registrieren oder ueberschreiben.
 - **Neue Dokumentationsseite** – `docs/16_content_blocks.md` beschreibt Input-/Output-Nutzung sowie die Felder je Blocktyp.
 
 ### Hinweise

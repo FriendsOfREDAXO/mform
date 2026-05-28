@@ -8,8 +8,38 @@ use rex_url;
 
 final class MFormContentBlocksOutput
 {
+    /** @var array<string, array<string, callable(array<string, mixed>): string>> */
+    private static array $customRenderers = [];
+
     /** @var array<int, array<string, mixed>> */
     private array $items;
+
+    /**
+     * Registriert einen Renderer fuer einen Blocktyp und ein Framework.
+     *
+     * @param callable(array<string, mixed>): string $renderer
+     */
+    public static function registerRenderer(string $framework, string $blockType, callable $renderer): void
+    {
+        $framework = strtolower(trim($framework));
+        $blockType = trim($blockType);
+
+        if ('' === $framework || '' === $blockType) {
+            throw new \InvalidArgumentException('Framework and block type must not be empty.');
+        }
+
+        if (!isset(self::$customRenderers[$framework])) {
+            self::$customRenderers[$framework] = [];
+        }
+
+        self::$customRenderers[$framework][$blockType] = $renderer;
+    }
+
+    public static function unregisterRenderer(string $framework, string $blockType): void
+    {
+        $framework = strtolower(trim($framework));
+        unset(self::$customRenderers[$framework][$blockType]);
+    }
 
     /**
      * @param array<int, array<string, mixed>> $items
@@ -53,6 +83,12 @@ final class MFormContentBlocksOutput
         foreach ($this->items as $item) {
             $type = isset($item['block_type']) && is_string($item['block_type']) ? $item['block_type'] : '';
 
+            $customHtml = $this->renderCustomBlock($framework, $type, $item);
+            if (null !== $customHtml) {
+                $html .= $customHtml;
+                continue;
+            }
+
             if (MFormContentBlocks::BLOCK_HEADLINE === $type) {
                 $html .= $this->renderHeadline($item, $framework);
                 continue;
@@ -68,6 +104,22 @@ final class MFormContentBlocksOutput
                 continue;
             }
         }
+
+        return $html;
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function renderCustomBlock(string $framework, string $type, array $item): ?string
+    {
+        $framework = strtolower($framework);
+
+        if (!isset(self::$customRenderers[$framework][$type])) {
+            return null;
+        }
+
+        $html = self::$customRenderers[$framework][$type]($item);
 
         return $html;
     }
