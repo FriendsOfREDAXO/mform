@@ -81,6 +81,11 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-repeat',
         'file'  => 'docs/07_repeater.md',
     ],
+    'content_blocks' => [
+        'title' => rex_i18n::msg('mform_docs_content_blocks'),
+        'icon'  => 'rex-icon fa-th-large',
+        'file'  => 'docs/16_content_blocks.md',
+    ],
     'mblock_migration' => [
         'title' => rex_i18n::msg('mform_docs_mblock_migration'),
         'icon'  => 'rex-icon fa-exchange',

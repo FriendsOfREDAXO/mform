@@ -14,6 +14,7 @@ Not just for modules: MForm also extends **YForm** and **rex_form** with custom 
 
 - Builds module input forms via a fluent PHP API (`MForm::factory()->addTextField(...)->...->show()`)
 - Provides a **Flex Repeater** for dynamically repeatable form rows — supporting nesting, copy/paste, and per-item enable/disable
+- Adds a **Content-Blocks Builder** (`addContentBlocksElement`) with the starter blocks Headline, Text (TinyMCE) and Text+Image
 - Ships reusable form logic via a **Template API** (`registerTemplate`, `fromTemplate`, `applyTemplate`)
 - Adds helper classes for Repeater output: `MFormRepeaterHelper::decode()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()`
 - Adds YForm value types: `custom_link`, `custom_link_multi`, `color_swatch`

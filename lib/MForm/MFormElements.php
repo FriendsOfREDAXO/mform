@@ -9,6 +9,7 @@
 namespace FriendsOfRedaxo\MForm;
 
 use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\Content\MFormContentBlocks;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormElementHandler;
@@ -291,6 +292,24 @@ abstract class MFormElements
         return $this->addElement('repeater', $id, null, $options)
             ->addForm($form, false, $debug, $showWrapper)
             ->addElement('close-repeater', $id, null, $options);
+    }
+
+    /**
+     * Content-Block-Builder auf Basis des Flex-Repeaters.
+     *
+     * Enthaltene Blocktypen:
+     * - headline (Ueberschrift)
+     * - text (TinyMCE-Textarea)
+     * - text_image (Text und Bild)
+     *
+     * @param array<string, mixed> $options
+     */
+    public function addContentBlocksElement(float|int|string $id, array $options = [], bool $debug = false, bool $showWrapper = false): static
+    {
+        $blockForm = MFormContentBlocks::createForm($options);
+        $repeaterOptions = MFormContentBlocks::normalizeRepeaterOptions($options);
+
+        return $this->addFlexRepeaterElement($id, $blockForm, $repeaterOptions, $debug, $showWrapper);
     }
 
     /** @param array<string, mixed>|null $attributes */

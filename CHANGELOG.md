@@ -1,5 +1,21 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0
+
+### Neu
+
+- **Content-Blocks-Builder in mform** – neues API-Element `addContentBlocksElement()` baut einen blockbasierten Editor direkt auf dem Flex-Repeater auf.
+- **Startumfang mit drei Blocktypen** – enthalten sind `headline`, `text` (TinyMCE) und `text_image`.
+- **Framework-Output fuer drei Systeme** – neuer Renderer `MFormContentBlocksOutput` mit `renderBootstrap5()`, `renderUIKit3()` und `renderBulma()`.
+- **Neue Dokumentationsseite** – `docs/16_content_blocks.md` beschreibt Input-/Output-Nutzung sowie die Felder je Blocktyp.
+
+### Hinweise
+
+- Der Block-Builder ist bewusst schlank und kann in Folgeversionen um weitere Blocktypen erweitert werden.
+- Die Umsetzung ist nicht als Kompatibilitaets-Layer zum isolierten yform_content_builder gedacht, sondern als eigenstaendige mform-10-Loesung.
+
+---
+
 ## Version 9.1.1
 
 ### Verbesserungen
