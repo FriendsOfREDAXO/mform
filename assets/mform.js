@@ -70,10 +70,9 @@ function initMFormContentBlocks(mform) {
 
         // Trigger the classic REDAXO widget bootstrap for this pane so
         // custom widgets (e.g. custom-link, linklist, medialist) can init.
+        $(document).trigger('rex:ready', [pane]);
         if (typeof pane.trigger === 'function') {
             pane.trigger('rex:ready', [pane]);
-        } else {
-            initMFormElements(pane);
         }
 
         pane.attr('data-mform-content-block-widgets-init', '1');
@@ -126,8 +125,8 @@ function initMFormContentBlocks(mform) {
             var isActive = paneType === selectedType;
 
             if (isActive) {
-                ensureMounted(pane);
                 pane.show();
+                ensureMounted(pane);
                 return;
             }
 
@@ -147,7 +146,9 @@ function initMFormContentBlocks(mform) {
         var selector = $(this);
         renderSelection(selector);
 
-        selector.off('change.mformContentBlocks').on('change.mformContentBlocks', function () {
+        selector
+            .off('change.mformContentBlocks changed.bs.select.mformContentBlocks input.mformContentBlocks')
+            .on('change.mformContentBlocks changed.bs.select.mformContentBlocks input.mformContentBlocks', function () {
             renderSelection(selector);
         });
     });
