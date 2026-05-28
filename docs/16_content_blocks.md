@@ -31,6 +31,11 @@ Optionen:
 - `tiny_profile` setzt das TinyMCE-Profil fuer Text-Felder.
 - Repeater-Optionen wie `min`, `max`, `copy_paste`, `collapsed`, `btn_text` koennen direkt mitgegeben werden.
 
+Verhalten:
+
+- Block-Formulare werden bedarfsbasiert gemountet. Initial ist nur der aktuell gewaehlte Block im DOM aktiv.
+- TinyMCE wird pro Block erst beim ersten Oeffnen initialisiert.
+
 ## Output: Framework-spezifisch rendern
 
 Fuer die Ausgabe gibt es `MFormContentBlocksOutput` mit drei Template-Varianten:

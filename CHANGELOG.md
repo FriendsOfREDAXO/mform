@@ -9,6 +9,7 @@
 - **Framework-Output fuer drei Systeme** – neuer Renderer `MFormContentBlocksOutput` mit `renderBootstrap5()`, `renderUIKit3()` und `renderBulma()`.
 - **Erweiterbare Registry fuer eigene Bloecke** – ueber `MFormContentBlocks::registerBlock()` koennen projektseitig eigene Blocktypen inklusive Subformular registriert werden.
 - **Erweiterbare Registry fuer eigene Renderer** – ueber `MFormContentBlocksOutput::registerRenderer()` lassen sich Block-Renderer pro Framework (Bootstrap 5, UIkit 3, Bulma) registrieren oder ueberschreiben.
+- **Bedarfsbasiertes Laden der Block-Formulare** – nicht aktive Block-Panes werden initial nicht gemountet; TinyMCE initialisiert erst beim ersten Oeffnen des jeweiligen Blocks.
 - **Neue Dokumentationsseite** – `docs/16_content_blocks.md` beschreibt Input-/Output-Nutzung sowie die Felder je Blocktyp.
 
 ### Hinweise

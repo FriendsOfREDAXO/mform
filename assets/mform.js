@@ -20,9 +20,133 @@ function initMFormElements(mform) {
         initMFormCheckboxGroups(mform);
         // init color swatches
         initMFormColorSwatches(mform);
+        // init content blocks (lazy mount)
+        initMFormContentBlocks(mform);
         // init conditional fieldsets
         initMFormConditionals(mform);
     }, 1)
+}
+
+function initMFormContentBlocks(mform) {
+    var selectors = mform.find(':input[data-mform-content-block-selector="1"]');
+    if (!selectors.length) {
+        return;
+    }
+
+    function toArray(value) {
+        if (Array.isArray(value)) return value;
+        if (value === null || value === undefined) return [];
+        return [value];
+    }
+
+    function getSelectedType(selector) {
+        var val = selector.val();
+        var values = toArray(val);
+        if (!values.length) return '';
+        return String(values[0]);
+    }
+
+    function getScope(selector) {
+        var scope = selector.closest('.mfr-item-body, .mfr-nested-body');
+        if (scope.length) {
+            return scope;
+        }
+        var mformRoot = selector.closest('.mform');
+        if (mformRoot.length) {
+            return mformRoot;
+        }
+        return mform;
+    }
+
+    function activateLazyEditors(container) {
+        container.find('textarea.mform-lazy-tiny-editor').each(function () {
+            var $el = $(this);
+            $el.removeClass('mform-lazy-tiny-editor').addClass('tiny-editor');
+        });
+    }
+
+    function initPaneWidgets(pane) {
+        if (pane.attr('data-mform-content-block-widgets-init') === '1') {
+            return;
+        }
+
+        activateLazyEditors(pane);
+        initMFormElements(pane);
+        pane.attr('data-mform-content-block-widgets-init', '1');
+    }
+
+    function ensureMounted(pane) {
+        if (pane.attr('data-mform-content-block-mounted') !== '1') {
+            var html = pane.data('mformContentBlockHtml');
+            if (typeof html === 'string') {
+                pane.html(html);
+            }
+
+            pane.attr('data-mform-content-block-mounted', '1');
+            pane.attr('data-mform-content-block-widgets-init', '0');
+        }
+
+        initPaneWidgets(pane);
+    }
+
+    function preparePane(pane) {
+        if (!pane.attr('data-mform-content-block-mounted')) {
+            pane.attr('data-mform-content-block-mounted', '1');
+        }
+
+        if (!pane.attr('data-mform-content-block-widgets-init')) {
+            pane.attr('data-mform-content-block-widgets-init', '0');
+        }
+
+        if (!pane.data('mformContentBlockHtml')) {
+            pane.data('mformContentBlockHtml', pane.html());
+        }
+    }
+
+    function renderSelection(selector) {
+        var selectedType = getSelectedType(selector);
+        var scope = getScope(selector);
+        var panes = scope.find('.mform-content-block-pane[data-mform-content-block-type]');
+
+        if (!panes.length) {
+            return;
+        }
+
+        panes.each(function () {
+            preparePane($(this));
+        });
+
+        panes.each(function () {
+            var pane = $(this);
+            var paneType = String(pane.attr('data-mform-content-block-type') || '');
+            var isActive = paneType === selectedType;
+
+            if (isActive) {
+                ensureMounted(pane);
+                pane.show();
+                return;
+            }
+
+            if (pane.attr('data-mform-content-block-initial-pruned') !== '1') {
+                pane.data('mformContentBlockHtml', pane.html());
+                pane.empty();
+                pane.attr('data-mform-content-block-mounted', '0');
+                pane.attr('data-mform-content-block-widgets-init', '0');
+                pane.attr('data-mform-content-block-initial-pruned', '1');
+            }
+
+            pane.hide();
+        });
+    }
+
+    selectors.each(function () {
+        var selector = $(this);
+        renderSelection(selector);
+
+        selector.off('change.mformContentBlocks').on('change.mformContentBlocks', function () {
+            renderSelection(selector);
+        });
+    });
 }
 
 function initMFormConditionals(mform) {

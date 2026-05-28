@@ -71,11 +71,17 @@ final class MFormContentBlocks
             $typeLabel = trim($options['type_label']);
         }
 
-        $form = MForm::factory()->addSelectField('block_type', self::getBlockTypeOptions(), ['label' => $typeLabel]);
+        $form = MForm::factory()->addSelectField('block_type', self::getBlockTypeOptions(), [
+            'label' => $typeLabel,
+            'data-mform-content-block-selector' => '1',
+        ]);
 
         foreach (self::$blockDefinitions as $type => $definition) {
             $subForm = ($definition['form_factory'])($options);
-            $form->addConditionalFieldsetArea('block_type', '=', $type, $definition['label'], $subForm);
+            $form->addConditionalFieldsetArea('block_type', '=', $type, $definition['label'], $subForm, [
+                'class' => 'mform-content-block-pane',
+                'data-mform-content-block-type' => $type,
+            ]);
         }
 
         return $form;
@@ -109,7 +115,7 @@ final class MFormContentBlocks
                     ->addTextField('title', ['label' => 'Titel'])
                     ->addTextAreaField('text', [
                         'label' => 'Text',
-                        'class' => 'tiny-editor',
+                        'class' => 'mform-lazy-tiny-editor',
                         'data-profile' => self::resolveTinyProfile($options),
                     ]);
             });
@@ -127,7 +133,7 @@ final class MFormContentBlocks
                     ], ['label' => 'Bildposition'], 1, 'left')
                     ->addTextAreaField('text', [
                         'label' => 'Text',
-                        'class' => 'tiny-editor',
+                        'class' => 'mform-lazy-tiny-editor',
                         'data-profile' => self::resolveTinyProfile($options),
                     ]);
             });
