@@ -33,6 +33,7 @@ use rex_var_custom_medialist;
 use rex_var_link;
 use rex_var_linklist;
 use rex_var_media;
+use rex_var_medialist;
 use rex_view;
 
 use function array_key_exists;
@@ -996,7 +997,11 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $value = (!is_string($item->getValue())) ? '' : $item->getValue();
                 if ('medialist' === $item->getType()) {
-                    $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                        $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    } else {
+                        $html = rex_var_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    }
                 } else {
                     $class = 'rex_var_' . $item->getType();
                     // @phpstan-ignore-next-line
