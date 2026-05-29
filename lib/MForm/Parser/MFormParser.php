@@ -31,6 +31,7 @@ use rex_var_custom_link_multi;
 use rex_var_custom_linklist;
 use rex_var_custom_medialist;
 use rex_var_link;
+use rex_var_linklist;
 use rex_var_media;
 use rex_view;
 
@@ -321,24 +322,12 @@ class MFormParser
                 }
             }
             $element->setElement(implode('', $nav));
-
-            $tabLayout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
-            if (in_array($tabLayout, ['vertical', 'left', 'nav-left'], true)) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--vertical'));
-            }
-
-            $tabStyle = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
-            if ('modern' === $tabStyle) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--modern'));
-            }
         }
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
             if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
-                $item->setClass(trim($item->getClass() . ' active'));
+                $item->setClass($item->getClass() . 'active');
             }
-
-            unset($attributes['data-group-tab-layout'], $attributes['data-group-tab-style']);
         }
 
         if (count($removeAttributes) > 0) {
@@ -1129,17 +1118,33 @@ class MFormParser
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                $value = is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? '');
 
-                $dom = new DOMDocument('1.0', 'utf-8');
-                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)
-                $selects = $dom->getElementsByTagName('select');
-                $inputs = $dom->getElementsByTagName('input');
+                if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                    $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
 
-                $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
-                $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
+                    $dom = new DOMDocument('1.0', 'utf-8');
+                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $selects = $dom->getElementsByTagName('select');
+                    $inputs = $dom->getElementsByTagName('input');
 
-                $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                    $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                    $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
+
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                } else {
+                    $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+
+                    $dom = new DOMDocument('1.0', 'utf-8');
+                    @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                    $selects = $dom->getElementsByTagName('select');
+                    $inputs = $dom->getElementsByTagName('input');
+
+                    $this->processNodeFormElements($selects, $item, 'REX_LINKLIST_SELECT_' . $id);
+                    $this->processNodeFormElements($inputs, $item, 'REX_LINKLIST_' . $id);
+
+                    $this->prepareLinkInput($dom, $inputs, $item, $attributes);
+                }
                 break;
         }
 
