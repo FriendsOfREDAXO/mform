@@ -1,5 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.1
+
+### Behoben
+
+- **`decodeById()` Slice-Kontext korrigiert** – die Aufloesung verwendet keinen global gecachten Slice mehr. Dadurch erfolgt die Ausgabe jetzt korrekt je Struktur-Slice (`ctype`), Sprache (`clang`) und aktivem Request-/Versionskontext.
+
+---
+
 ## Version 10.0.0
 
 ### Neu
