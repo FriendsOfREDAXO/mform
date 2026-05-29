@@ -31,6 +31,8 @@ use rex_var_custom_link_multi;
 use rex_var_custom_linklist;
 use rex_var_custom_medialist;
 use rex_var_link;
+use rex_var_linklist;
+use rex_var_medialist;
 use rex_var_media;
 use rex_view;
 
@@ -1007,7 +1009,11 @@ class MFormParser
                 $id = $this->getWidgetId($item);
                 $value = (!is_string($item->getValue())) ? '' : $item->getValue();
                 if ('medialist' === $item->getType()) {
-                    $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                        $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    } else {
+                        $html = rex_var_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    }
                 } else {
                     $class = 'rex_var_' . $item->getType();
                     // @phpstan-ignore-next-line
@@ -1129,7 +1135,11 @@ class MFormParser
             case 'linklist':
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
-                $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                if (MForm::isUsingCustomLinkForClassicWidgets()) {
+                    $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                } else {
+                    $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                }
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html); // utf8_decode($html)

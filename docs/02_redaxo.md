@@ -40,6 +40,10 @@ MForm stellt Widgets fuer Medien und Links in mehreren REDAXO-Kontexten bereit:
 > **Hinweis:** `addMedialistField()` und `addLinklistField()` wurden in Version 9 durch eigene MForm-Widgets ersetzt.
 > Diese bieten ein modernes Listen-UI mit Drag-and-Drop-Sortierung und sind voll repeater-kompatibel.
 > Das Speicherformat bleibt identisch zum nativen REDAXO-Format.
+>
+> **MBlock-Praxis:** Die klassischen REDAXO-Varianten von `linklist`/`medialist` waren im MBlock-Kontext historisch nie stabil.
+> Wenn du die Funktion in MBlock brauchst, sollten die MForm-Custom-Widgets verwendet werden.
+> Bonus mit MForm 9+: `MForm::useCustomLinkForClassicWidgets(true)` kann auch klassische Felder intern auf die stabileren MForm-Widgets legen.
 
 ## Modul-Eingabe
 

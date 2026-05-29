@@ -182,6 +182,8 @@ Hinweis: Die jeweilige Editor-Initialisierung erfolgt weiterhin durch das entspr
 
 MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. Für eine schrittweise Migration gibt es einen dedizierten Leitfaden.
 
+Praxis-Hinweis: Die klassischen `linklist`/`medialist`-Widgets waren im MBlock-Kontext historisch nie stabil. Wenn diese Funktion benötigt wird, sollten die MForm-Custom-Widgets genutzt werden. Bonus in MForm 9+: `MForm::useCustomLinkForClassicWidgets(true)` schaltet auch klassische Link-/Media-Felder intern auf die robusteren MForm-Widgets um (Speicherformat bleibt kompatibel).
+
 → [08_mblock_migration.md](08_mblock_migration.md)
 
 ---

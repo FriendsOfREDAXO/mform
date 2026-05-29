@@ -2,6 +2,12 @@
 
 Diese Anleitung zeigt den pragmatischen Weg, bestehende MBlock-Module auf den MForm-9-Repeater umzustellen.
 
+## Wichtiger Praxis-Hinweis zu Linklist/Medialist in MBlock
+
+- Die klassischen REDAXO-Widgets fuer `linklist` und `medialist` haben im MBlock-Kontext historisch nie zuverlaessig funktioniert (vor allem bei Reindexing/Clone-Szenarien).
+- Wenn du diese Funktion in MBlock brauchst, verwende die MForm-eigenen Custom-Widgets.
+- Bonus mit MForm 9+: Mit `MForm::useCustomLinkForClassicWidgets(true)` kannst du auch klassische Felder (`addLinkField`, `addMediaField`, `addLinklistField`, `addMedialistField`) intern auf die robusteren MForm-Widgets umstellen, ohne das REDAXO-Speicherformat zu aendern.
+
 ## Zielbild in MForm 9
 
 - Wiederholende Inhalte laufen ueber `addRepeaterElement(...)`.

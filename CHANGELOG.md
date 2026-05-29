@@ -1,5 +1,12 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.1.3
+
+### Behoben
+
+- **Schalter-Konsistenz fuer Listen-Widgets** - `addLinklistField()` und `addMedialistField()` respektieren jetzt wie `addLinkField()` den Schalter `MForm::useCustomLinkForClassicWidgets(true/false)`.
+- **MBlock-Testbeispiel ergaenzt** - neue Expert-Demo fuer `medialist`/`linklist` im MBlock-Kontext mit direkt kopierbarem Modulcode.
+
 ## Version 9.1.2
 
 ### Behoben

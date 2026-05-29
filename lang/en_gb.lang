@@ -44,6 +44,7 @@ mform_example_expert_color_swatch_demo = ColorSwatch field – hex & CSS classes
 mform_example_expert_repeater_helper_api = RepeaterHelper API – filter, sort, group, limit
 mform_example_expert_custom_link_multi = Custom link multi field [addCustomLinkMultipleField]
 mform_example_expert_template_api = Template API – registerTemplate / fromTemplate / applyTemplate
+mform_example_expert_mblock_medialist_linklist = MBlock test: medialist + linklist (core/custom toggle)
 mform_example_extended_read_only_fields = Read-only fields & hidden fields [addHiddenField]
 mform_example_expert_placeholder = Placeholder
 mform_example_extended_default_value = DefaultValue
