@@ -15,8 +15,6 @@ class MFormRepeaterHelper
 {
     private const DISABLED_KEY = '__disabled';
 
-    private static ?\rex_article_slice $cachedCurrentSlice = null;
-
     /**
      * @param array<int, MFormItem|MForm> $items
      * @return array<string, string>
@@ -328,9 +326,6 @@ class MFormRepeaterHelper
 
     private static function findCurrentSlice(): ?\rex_article_slice
     {
-        if (self::$cachedCurrentSlice instanceof \rex_article_slice) {
-            return self::$cachedCurrentSlice;
-        }
         foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
             $object = $frame['object'] ?? null;
             if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
@@ -344,7 +339,6 @@ class MFormRepeaterHelper
             }
 
             if ($slice instanceof \rex_article_slice) {
-                self::$cachedCurrentSlice = $slice;
                 return $slice;
             }
         }
