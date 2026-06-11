@@ -2,6 +2,37 @@
 
 Diese Anleitung zeigt den pragmatischen Weg, bestehende MBlock-Module auf den MForm-9-Repeater umzustellen.
 
+## Konverter-Workflow im Backend
+
+Im Backend unter `MForm -> MBlock zu Repeater` steht ein gefuehrter Workflow zur Verfuegung:
+
+1. Modul laden und Eingabe-/Ausgabe-Code konvertieren
+2. Optional ein neues Modul mit Prefix `mfr_` + Timestamp erzeugen
+3. Datenmigration als Dry-Run pruefen
+4. Legacy-Key-Mapping setzen (z. B. `1 -> link`)
+5. Daten anwenden und Slices auf das neue Modul umhaengen
+6. Bei Bedarf letzte Umhaengung ueber Reassign-Revert zuruecksetzen
+
+### Mapping im Tool
+
+- Feld `Legacy-Key "1" auf Feldname mappen` fuer den haeufigsten Altfall
+- Optionales JSON-Mapping fuer mehrere Keys, z. B.:
+
+```json
+{"1":"link","REX_LINK_1":"link"}
+```
+
+### Wichtig zu den Grenzen des Konverters
+
+Der Konverter ist bewusst deterministisch und textbasiert. Er kann viele Standardmuster automatisieren, aber nicht jede Speziallogik:
+
+- projektindividuelle PHP-Logik
+- externe Includes/Dateien
+- stark verschachtelte Sonderstrukturen
+- proprietaere Feldkonventionen ohne eindeutiges Mapping
+
+> Empfehlung: Immer erst Dry-Run, dann Staging-Test, dann produktive Uebernahme.
+
 ## Wichtiger Praxis-Hinweis zu Linklist/Medialist in MBlock
 
 - Die klassischen REDAXO-Widgets fuer `linklist` und `medialist` haben im MBlock-Kontext historisch nie zuverlaessig funktioniert (vor allem bei Reindexing/Clone-Szenarien).

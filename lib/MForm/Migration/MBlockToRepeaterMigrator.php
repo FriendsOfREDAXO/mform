@@ -79,11 +79,14 @@ final class MBlockToRepeaterMigrator
      * Dry-Run: konvertiert alle Slices eines Moduls in den Speicher und
      * liefert eine Vorschau, ohne etwas zu schreiben.
      *
+        * @param array<int|string, string> $legacyKeyMap
+        *
      * @return array{
      *     column: string,
      *     rows: list<array{
      *         slice_id: int,
      *         article_id: int,
+    *         article_name: string,
      *         clang_id: int,
      *         count: int,
      *         changed: bool,
@@ -105,10 +108,13 @@ final class MBlockToRepeaterMigrator
 
         $sql = rex_sql::factory();
         $slices = $sql->getArray(
-            'SELECT id, article_id, clang_id, ' . $column . ' AS slot_value
-             FROM ' . rex::getTable('article_slice') . '
-             WHERE module_id = :mid
-             ORDER BY id ASC',
+                        'SELECT s.id, s.article_id, s.clang_id, s.' . $column . ' AS slot_value,
+                                        COALESCE(a.name, \'\') AS article_name
+                         FROM ' . rex::getTable('article_slice') . ' s
+                         LEFT JOIN ' . rex::getTable('article') . ' a
+                             ON a.id = s.article_id AND a.clang_id = s.clang_id
+                         WHERE s.module_id = :mid
+                         ORDER BY s.id ASC',
             ['mid' => $moduleId],
         );
 
@@ -135,6 +141,7 @@ final class MBlockToRepeaterMigrator
             $rows[] = [
                 'slice_id' => (int) $slice['id'],
                 'article_id' => (int) $slice['article_id'],
+                'article_name' => is_string($slice['article_name'] ?? null) ? (string) $slice['article_name'] : '',
                 'clang_id' => (int) $slice['clang_id'],
                 'count' => (int) $result['count'],
                 'changed' => $changed,
@@ -157,6 +164,7 @@ final class MBlockToRepeaterMigrator
      * Wendet die Migration auf die ausgewaehlten Slices an.
      *
      * @param list<int> $sliceIds
+        * @param array<int|string, string> $legacyKeyMap
      *
      * @return array{updated: int, skipped: int, errors: list<string>}
      */

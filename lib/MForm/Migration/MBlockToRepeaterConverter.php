@@ -153,7 +153,7 @@ final class MBlockToRepeaterConverter
      * - alle uebrigen (sprechenden) Keys bleiben unveraendert erhalten
      *
     * @param string|null $repeaterId Repeater-Slot-Id (Standard "1").
-    * @param array<string, string> $legacyKeyMap Optionales Mapping alter Keys auf neue Repeater-Feldnamen,
+    * @param array<int|string, string> $legacyKeyMap Optionales Mapping alter Keys auf neue Repeater-Feldnamen,
     *                                            z. B. ['1' => 'link'].
      *
      * @return array{json: string, count: int, notes: list<string>, warnings: list<string>}
@@ -205,6 +205,23 @@ final class MBlockToRepeaterConverter
                 $item['media'] = $item['REX_MEDIA_1'];
                 unset($item['REX_MEDIA_1']);
                 $this->notes[] = 'Legacy-Key `REX_MEDIA_1` auf `media` gemappt.';
+            }
+
+            // Legacy-Link-Key aus klassischen Widgets auf sprechenden Key mappen.
+            if (array_key_exists('REX_LINK_1', $item) && !array_key_exists('link', $item)) {
+                $item['link'] = $item['REX_LINK_1'];
+                unset($item['REX_LINK_1']);
+                $this->notes[] = 'Legacy-Key `REX_LINK_1` auf `link` gemappt.';
+            }
+
+            // Plausibler Default: numerischer Key `1` ist bei Legacy-Repeatern meist das Link-Feld.
+            if (array_key_exists('1', $item) && !array_key_exists('link', $item)) {
+                $legacyLink = trim((string) $item['1']);
+                if ('' !== $legacyLink) {
+                    $item['link'] = $item['1'];
+                    unset($item['1']);
+                    $this->notes[] = 'Plausibilitaetskorrektur: numerischen Legacy-Key `1` auf `link` gemappt.';
+                }
             }
 
             // Leeren numerischen Legacy-Key entfernen (haeufig aus alten Widgets).
@@ -637,6 +654,10 @@ final class MBlockToRepeaterConverter
     private function addOutputKeyFallbacks(string $code): string
     {
         $mediaFallbacks = 0;
+        $linkFallbacks = 0;
+        $numericLinkFallbacks = 0;
+
+        // Legacy REX_MEDIA_1 -> bevorzugt neuer Key `media`.
         $code = (string) preg_replace_callback(
             '/(\$\w+)\[\s*([\'\"])REX_MEDIA_1\2\s*\]/',
             static function (array $m) use (&$mediaFallbacks): string {
@@ -650,6 +671,41 @@ final class MBlockToRepeaterConverter
 
         if ($mediaFallbacks > 0) {
             $this->notes[] = sprintf('%d Output-Zugriff(e) auf `REX_MEDIA_1` mit Fallback `media`/`REX_MEDIA_1` versehen.', $mediaFallbacks);
+        }
+
+        // Legacy REX_LINK_1 -> bevorzugt neuer Key `link`.
+        $code = (string) preg_replace_callback(
+            '/(\$\w+)\[\s*([\'\"])REX_LINK_1\2\s*\]/',
+            static function (array $m) use (&$linkFallbacks): string {
+                ++$linkFallbacks;
+                $var = $m[1];
+
+                return '(' . $var . '[\'link\'] ?? (' . $var . '[\'REX_LINK_1\'] ?? \'\'))';
+            },
+            $code,
+        );
+
+        if ($linkFallbacks > 0) {
+            $this->notes[] = sprintf('%d Output-Zugriff(e) auf `REX_LINK_1` mit Fallback `link`/`REX_LINK_1` versehen.', $linkFallbacks);
+        }
+
+        // Numerischer Legacy-Link-Key (z. B. $item[1]) -> sprechender Key `link`.
+        $itemVars = [];
+        if (preg_match_all('/foreach\s*\(\s*[^)]*?\sas\s+(?:\$\w+\s*=>\s*)?(\$\w+)\s*\)/', $code, $foreachMatches)) {
+            foreach ($foreachMatches[1] as $itemVar) {
+                $itemVars[$itemVar] = true;
+            }
+        }
+
+        foreach (array_keys($itemVars) as $itemVar) {
+            $pattern = '/' . preg_quote($itemVar, '/') . '\[\s*1\s*\]/';
+            $replacement = '(' . $itemVar . '[\'link\'] ?? (' . $itemVar . '[\'1\'] ?? \'\'))';
+            $code = (string) preg_replace($pattern, $replacement, $code, -1, $count);
+            $numericLinkFallbacks += (int) $count;
+        }
+
+        if ($numericLinkFallbacks > 0) {
+            $this->notes[] = sprintf('%d numerische Output-Zugriff(e) auf `[1]` mit Fallback `link`/`1` versehen.', $numericLinkFallbacks);
         }
 
         return $code;

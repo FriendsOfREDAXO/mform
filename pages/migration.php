@@ -15,8 +15,6 @@
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterMigrator;
 
-echo rex_view::title(rex_i18n::msg('mform_title') . ' &ndash; ' . rex_i18n::msg('mform_migration'));
-
 $converter = new MBlockToRepeaterConverter();
 $migrator = new MBlockToRepeaterMigrator($converter);
 
@@ -47,12 +45,13 @@ $convertMessage = '';
 $pageMessages = '';
 $reassignHistoryTable = rex::getTable('mform_migration_reassign_history');
 
+/** @var array<string, string> $legacyKeyMap */
 $legacyKeyMap = [];
 if ('' !== trim($legacyKeyMapJson)) {
     $decodedMap = json_decode($legacyKeyMapJson, true);
     if (is_array($decodedMap)) {
         foreach ($decodedMap as $oldKey => $newKey) {
-            if (is_scalar($oldKey) && is_scalar($newKey)) {
+            if (is_scalar($newKey)) {
                 $old = trim((string) $oldKey);
                 $new = trim((string) $newKey);
                 if ('' !== $old && '' !== $new) {
@@ -91,10 +90,21 @@ rex_sql::factory()->setQuery(
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
 );
 
-// Alle Module fuer Auswahl laden.
+// Fuer die Migration nur Module mit MBlock-Bezug laden (Input/Output).
 $allModules = rex_sql::factory()->getArray(
-    'SELECT id, name FROM ' . rex::getTable('module') . ' ORDER BY name ASC, id ASC'
+    'SELECT id, name FROM ' . rex::getTable('module') . '
+     WHERE input LIKE :mblock OR output LIKE :mblock
+     ORDER BY name ASC, id ASC',
+    ['mblock' => '%MBlock%'],
 );
+
+if ([] === $allModules) {
+    // Fallback: Wenn keine Treffer gefunden werden, alle Module anzeigen.
+    $allModules = rex_sql::factory()->getArray(
+        'SELECT id, name FROM ' . rex::getTable('module') . ' ORDER BY name ASC, id ASC'
+    );
+    $pageMessages .= rex_view::info(rex_i18n::msg('mform_migration_select_module_fallback_all'));
+}
 
 // Modul aus DB laden.
 $loadModuleId = rex_request('load_module_id', 'int', 0);
@@ -632,7 +642,9 @@ if (null !== $batchResult && [] !== $batchResult['rows']) {
         $rowsHtml .= '<tr>'
             . '<td>' . $checkbox . '</td>'
             . '<td>' . $row['slice_id'] . '</td>'
-            . '<td>' . $row['article_id'] . '</td>'
+            . '<td>' . $row['article_id']
+            . ('' !== trim($row['article_name']) ? ' &ndash; ' . rex_escape($row['article_name']) : '')
+            . '</td>'
             . '<td>' . $row['clang_id'] . '</td>'
             . '<td>' . $row['count'] . '</td>'
             . '<td>' . $stateBadge . $warnHtml . '</td>'
@@ -686,7 +698,9 @@ if (null !== $batchResult && [] !== $batchResult['rows']) {
         $reassignRowsHtml .= '<tr>'
             . '<td><input type="checkbox" name="reassign_slice_ids[]" value="' . $row['slice_id'] . '" checked></td>'
             . '<td>' . $row['slice_id'] . '</td>'
-            . '<td>' . $row['article_id'] . '</td>'
+            . '<td>' . $row['article_id']
+            . ('' !== trim($row['article_name']) ? ' &ndash; ' . rex_escape($row['article_name']) : '')
+            . '</td>'
             . '<td>' . $row['clang_id'] . '</td>'
             . '</tr>';
     }

@@ -13,6 +13,23 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Update 9.1.4: Neuer MBlock-Konverter-Workflow
+
+Das Migrationswerkzeug (`Backend -> MForm -> MBlock zu Repeater`) wurde fuer reale Bestandsmodule deutlich erweitert.
+
+- Erzeugt auf Wunsch ein **neues konvertiertes Modul** mit Prefix `mfr_` und Timestamp
+- Bietet eine **Slice-Umhaengung** auf ein Zielmodul direkt im Tool
+- Enthält eine **Revert-Funktion** (letzte Umhaengung rueckgaengig)
+- Unterstuetzt **Legacy-Key-Mapping** in der Datenmigration
+    - z. B. `1 -> link`
+    - optional per JSON fuer mehrere Keys
+- Liefert klare Rueckmeldungen nach Konvertierung, Dry-Run, Speichern/Umhaengen
+- Springt nach Aktionen automatisch zum passenden Abschnitt (Anker-Navigation)
+
+Wichtig: Der Konverter deckt viele Standardfaelle ab, aber nicht alle Sonderfaelle. Spezielle Konfigurationen, externe Dateien oder projektindividuelle Logik muessen ggf. manuell nachgezogen werden.
+
+---
+
 ## Fixes & Verbesserungen in beta4
 
 ### Flex-Repeater: Alle Link- und Media-Widgets vollständig unterstützt

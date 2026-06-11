@@ -1,5 +1,28 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.1.4
+
+### Neu
+
+- **MBlock-Konverter deutlich erweitert** - Das Migrationswerkzeug (`mform/migration`) bietet jetzt einen robusteren End-to-End-Workflow fuer MBlock -> Repeater, inklusive:
+  - Erzeugen eines neuen konvertierten Moduls mit Prefix `mfr_` und Timestamp
+  - Direktes Umhaengen ausgewaehlter Slices auf ein Zielmodul
+  - **Revert-Funktion** fuer die letzte protokollierte Umhaengung (Rollback per Reassign-Token)
+- **Legacy-Key-Mapping im Datenlauf** - Fuer problematische Alt-Keys (z. B. numerischer Key `1`) kann jetzt ein explizites Mapping auf sprechende Repeater-Feldnamen gesetzt werden (Einzelfeld + JSON-Mapping).
+
+### Verbesserungen
+
+- **Media-Migration robuster** - `REX_MEDIA_1` wird in der Datenmigration auf `media` gemappt; leere Legacy-Keys werden bereinigt.
+- **Output-Fallback fuer Alt-/Neu-Keys** - Konvertierter Output kann auf neue und alte Keys reagieren (`media` / `REX_MEDIA_1`), um Uebergangsphasen abzufangen.
+- **UX im Migrationswerkzeug verbessert**
+  - klare Erfolgsrueckmeldungen nach Laden, Konvertierung, Dry-Run, Umhaengen und Revert
+  - Form-Aktionen springen nach Submit wieder zum passenden Abschnitt (Anker-Navigation)
+  - sichtbarer Hinweis auf Konverter-Grenzen (nicht alle Spezialfaelle sind vollautomatisch konvertierbar)
+
+### Qualitaet
+
+- **RexStan-Check durchgefuehrt und bereinigt** - Das Addon `mform` ist nach den Anpassungen erneut statisch geprueft, Ergebnis: **0 Fehler**.
+
 ## Version 9.1.3
 
 ### Neu
