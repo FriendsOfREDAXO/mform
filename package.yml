@@ -27,6 +27,10 @@ page:
             title: 'translate:formbuilder'
             icon: rex-icon fa-grip
 
+        migration:
+            title: 'translate:migration'
+            icon: rex-icon fa-rotate
+
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md

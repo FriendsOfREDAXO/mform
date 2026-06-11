@@ -613,18 +613,28 @@ class MFormFlexRepeaterRenderer
         if ('' !== $notice) {
             $noticeHtml = sprintf('<p class="help-block">%s</p>', htmlspecialchars($notice, ENT_QUOTES));
         }
+        // Optionale Zusatzklasse (z. B. mform-inline-color-radios / mform-inline-radios)
+        // aus den Item-Attributen uebernehmen – analog zum klassischen MFormParser-Pfad.
+        // Diese Klasse steuert per CSS u. a. die Darstellung der Farb-Swatch-Radios.
+        $attrs = $item->getAttributes();
+        $extraClass = '';
+        if (isset($attrs['form-group-class']) && is_string($attrs['form-group-class']) && '' !== $attrs['form-group-class']) {
+            $extraClass = ' ' . htmlspecialchars($attrs['form-group-class'], ENT_QUOTES);
+        }
         // Bootstrap-3 form-horizontal Markup (col-sm-3 / col-sm-9). Die Layout-Variante
         // (vertical/inline) wird per CSS via [data-mfr-layout] auf dem .mfr-container
         // ueberschrieben.
         if ('' === $label) {
             return sprintf(
-                '<div class="form-group mfr-field-group"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                '<div class="form-group mfr-field-group%s"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                $extraClass,
                 $field,
                 $noticeHtml,
             );
         }
         return sprintf(
-            '<div class="form-group mfr-field-group"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            '<div class="form-group mfr-field-group%s"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            $extraClass,
             $label,
             $field,
             $noticeHtml,
@@ -678,7 +688,8 @@ class MFormFlexRepeaterRenderer
     {
         $html = '<div class="mfr-radio-group">';
         foreach ($item->getOptions() as $key => $value) {
-            $html .= sprintf('<div class="radio"><label><input type="radio" data-mfr-field="%s" value="%s"> %s</label></div>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), htmlspecialchars((string) $value, ENT_QUOTES));
+            // Option-Label ist Entwickler-HTML (z. B. Farb-Swatch-Spans, Icons) und wird nicht escaped.
+            $html .= sprintf('<div class="radio"><label><input type="radio" data-mfr-field="%s" value="%s"> %s</label></div>', htmlspecialchars($fieldKey, ENT_QUOTES), htmlspecialchars((string) $key, ENT_QUOTES), (string) $value);
         }
         $html .= '</div>';
         return $html;

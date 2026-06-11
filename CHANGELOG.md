@@ -2,6 +2,10 @@
 
 ## Version 9.1.3
 
+### Neu
+
+- **Migrationswerkzeug MBlock → Repeater** – neue Backend-Seite (`mform/migration`), die MBlock-basierten Modul-Code halbautomatisch auf den MForm-9-Repeater umstellt. Eingabe: entfernt Feldnamen-Präfixe (`1.0.header` → `header`) und ersetzt `MBlock::show(...)` durch `addRepeaterElement(...)`. Ausgabe: stellt `rex_var::toArray("REX_VALUE[n]")` der Repeater-Slot-ID auf `MFormRepeaterHelper::decode(n)` um. Gruppierte Einzel-Einstellungsfelder (andere Slot-IDs) bleiben unangetastet; Hinweise markieren manuell zu prüfende Konstrukte (z. B. numerische Media-/Link-Felder). Das Werkzeug erzeugt nur Vorschlags-Code und verändert keine Module oder Daten. Zugrunde liegende Logik in `FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter` (auch programmatisch nutzbar).
+
 ### Behoben
 
 - **Schalter-Konsistenz fuer Listen-Widgets** - `addLinklistField()` und `addMedialistField()` respektieren jetzt wie `addLinkField()` den Schalter `MForm::useCustomLinkForClassicWidgets(true/false)`.
