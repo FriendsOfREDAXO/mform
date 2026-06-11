@@ -1,6 +1,6 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.1.4
+## Version 9.2.0
 
 ### Neu
 
@@ -9,6 +9,7 @@
   - Direktes Umhaengen ausgewaehlter Slices auf ein Zielmodul
   - **Revert-Funktion** fuer die letzte protokollierte Umhaengung (Rollback per Reassign-Token)
 - **Legacy-Key-Mapping im Datenlauf** - Fuer problematische Alt-Keys (z. B. numerischer Key `1`) kann jetzt ein explizites Mapping auf sprechende Repeater-Feldnamen gesetzt werden (Einzelfeld + JSON-Mapping).
+- **Migrationswerkzeug MBlock → Repeater** – neue Backend-Seite (`mform/migration`), die MBlock-basierten Modul-Code halbautomatisch auf den MForm-9-Repeater umstellt. Eingabe: entfernt Feldnamen-Präfixe (`1.0.header` → `header`) und ersetzt `MBlock::show(...)` durch `addRepeaterElement(...)`. Ausgabe: stellt `rex_var::toArray("REX_VALUE[n]")` der Repeater-Slot-ID auf `MFormRepeaterHelper::decode(n)` um. Gruppierte Einzel-Einstellungsfelder (andere Slot-IDs) bleiben unangetastet; Hinweise markieren manuell zu prüfende Konstrukte (z. B. numerische Media-/Link-Felder). Das Werkzeug erzeugt nur Vorschlags-Code und verändert keine Module oder Daten. Zugrunde liegende Logik in `FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter` (auch programmatisch nutzbar).
 
 ### Verbesserungen
 
@@ -19,20 +20,14 @@
   - Form-Aktionen springen nach Submit wieder zum passenden Abschnitt (Anker-Navigation)
   - sichtbarer Hinweis auf Konverter-Grenzen (nicht alle Spezialfaelle sind vollautomatisch konvertierbar)
 
-### Qualitaet
-
-- **RexStan-Check durchgefuehrt und bereinigt** - Das Addon `mform` ist nach den Anpassungen erneut statisch geprueft, Ergebnis: **0 Fehler**.
-
-## Version 9.1.3
-
-### Neu
-
-- **Migrationswerkzeug MBlock → Repeater** – neue Backend-Seite (`mform/migration`), die MBlock-basierten Modul-Code halbautomatisch auf den MForm-9-Repeater umstellt. Eingabe: entfernt Feldnamen-Präfixe (`1.0.header` → `header`) und ersetzt `MBlock::show(...)` durch `addRepeaterElement(...)`. Ausgabe: stellt `rex_var::toArray("REX_VALUE[n]")` der Repeater-Slot-ID auf `MFormRepeaterHelper::decode(n)` um. Gruppierte Einzel-Einstellungsfelder (andere Slot-IDs) bleiben unangetastet; Hinweise markieren manuell zu prüfende Konstrukte (z. B. numerische Media-/Link-Felder). Das Werkzeug erzeugt nur Vorschlags-Code und verändert keine Module oder Daten. Zugrunde liegende Logik in `FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter` (auch programmatisch nutzbar).
-
 ### Behoben
 
 - **Schalter-Konsistenz fuer Listen-Widgets** - `addLinklistField()` und `addMedialistField()` respektieren jetzt wie `addLinkField()` den Schalter `MForm::useCustomLinkForClassicWidgets(true/false)`.
 - **MBlock-Testbeispiel ergaenzt** - neue Expert-Demo fuer `medialist`/`linklist` im MBlock-Kontext mit direkt kopierbarem Modulcode.
+
+### Qualitaet
+
+- **RexStan-Check durchgefuehrt und bereinigt** - Das Addon `mform` ist nach den Anpassungen erneut statisch geprueft, Ergebnis: **0 Fehler**.
 
 ## Version 9.1.2
 
