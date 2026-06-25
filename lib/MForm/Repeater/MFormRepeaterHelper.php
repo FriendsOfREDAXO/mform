@@ -287,10 +287,14 @@ class MFormRepeaterHelper
         }
 
         $normalizedValue = html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        // Default-Rex-Output kann JSON durch nl2br() mit <br>-Tags anreichern.
-        $normalizedValue = preg_replace('/<br\s*\/?>/i', "\n", $normalizedValue) ?? $normalizedValue;
-
         $decoded = json_decode($normalizedValue, true);
+
+        // Fallback fuer Default-Rex-Output: nl2br() kann JSON ausserhalb von Strings mit <br>-Tags anreichern.
+        // Wichtig: Erst nach einem fehlgeschlagenen Decode ersetzen, damit legitime <br>-Tags im Feldinhalt erhalten bleiben.
+        if (!is_array($decoded)) {
+            $fallbackValue = preg_replace('/<br\s*\/?>/i', "\n", $normalizedValue) ?? $normalizedValue;
+            $decoded = json_decode($fallbackValue, true);
+        }
 
         if (!is_array($decoded)) {
             return [];

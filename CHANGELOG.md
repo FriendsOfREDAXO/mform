@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.2.2
+
+### Behoben
+
+- **FlexRepeater-Decode mit Richtext stabilisiert** - `MFormRepeaterHelper::decode()` behandelt Inhalte mit `<br>` (z. B. aus TinyMCE/CKE5) jetzt korrekt. Das JSON wird zuerst unverändert decodiert; die `<br>`-Normalisierung greift nur noch als Fallback für durch `nl2br()` veränderten REX-Output. Dadurch liefern Repeater mit mehrzeiligem Richtext nicht mehr fälschlich ein leeres Array.
+
 ## Version 9.1.4
 
 ### Neu
