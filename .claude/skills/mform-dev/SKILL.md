@@ -101,6 +101,8 @@ Nach relevanten Änderungen immer statische Analyse ausführen:
 docker exec -it coreweb bash -c "cd /var/www/html/public && php redaxo/bin/console rexstan:analyze redaxo/src/addons/mform/"
 ```
 
+Wenn RexStan im `coreweb`-Container wegen fehlender optionaler Scan-Pfade aus der globalen `redaxo/data/addons/rexstan/user-config.neon` abbricht, die betroffenen Verzeichnisse im Container kurz anlegen und den MForm-Check danach erneut starten. Das ist ein Umgebungsproblem, kein MForm-Fehler.
+
 ### Manuelle/verhaltensnahe Checks
 
 Wenn betroffen, mindestens gedanklich oder praktisch prüfen:
