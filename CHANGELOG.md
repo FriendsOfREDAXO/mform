@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.2.4
+
+### Entfernt
+
+- **Legacy-Alpine-Assets bereinigt** - Die alten, nicht mehr eingebundenen Alpine-Repeater-Dateien wurden entfernt. Der Flex-Repeater ist jetzt der einzige aktive Repeater-Pfad im AddOn.
+
+## Version 9.2.3
+
+### Behoben
+
+- **Repeater + Custom-Link stabilisiert** - Bestehende String-Werte in `addCustomLinkField()`-Repeatern werden beim Initialisieren jetzt in das erwartete Objektformat normalisiert. Dadurch verschwinden die `[object Object]`-Fehler im Label-Feld, und das Speichern überschreibt nicht mehr unberührt gelassene Links mit kaputten Werten.
+- **Bootstrap-Wrapper im Flex-Repeater korrigiert** - Die gemeldeten `form-group`-Container erhalten jetzt konsistent die fehlende `row`-Klasse, damit `col-*`-Spalten wieder mit den erwarteten Abständen gerendert werden.
+
 ## Version 9.2.2
 
 ### Behoben

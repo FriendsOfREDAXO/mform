@@ -530,7 +530,7 @@ class MFormFlexRepeaterRenderer
             default => 'text-left',
         };
         // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
-        return '<div class="form-group mfr-modal-wrapper">' .
+        return '<div class="row form-group mfr-modal-wrapper">' .
             '<div class="col-sm-12 ' . $alignClass . '">' .
             '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"' .
             ' data-toggle="modal" data-target="#__MFRID__">' .
@@ -626,14 +626,14 @@ class MFormFlexRepeaterRenderer
         // ueberschrieben.
         if ('' === $label) {
             return sprintf(
-                '<div class="form-group mfr-field-group%s"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                '<div class="row form-group mfr-field-group%s"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
                 $extraClass,
                 $field,
                 $noticeHtml,
             );
         }
         return sprintf(
-            '<div class="form-group mfr-field-group%s"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            '<div class="row form-group mfr-field-group%s"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
             $extraClass,
             $label,
             $field,

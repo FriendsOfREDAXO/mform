@@ -45,7 +45,6 @@ Bei Änderungen gilt:
 ### Assets
 
 - `assets/mform.js` – allgemeines JS
-- `assets/repeater.js` – historischer Repeater-Kontext
 - `assets/js/flex-repeater.js` – aktueller Flex-Repeater
 - `assets/js/customlink.js` – Custom-Link-Widget
 - `assets/js/list-widget.js` / `imglist.js` – Listen-/Bild-Widgets

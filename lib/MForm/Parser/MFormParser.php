@@ -1175,11 +1175,6 @@ class MFormParser
             switch ($input->getAttribute('type')) {
                 case 'text':
                     if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
-                        if ('media' == $item->getType()) {
-                            $item->addAttribute('x-model', $attributes['x-model']);
-                        } else {
-                            $item->addAttribute('x-model', $attributes['x-model'] . '.name');
-                        }
                         $this->processNodeFormElement($input, $item);
                         $input->setAttribute(':id', "'" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . 'Index' . ((isset($attributes['parent_id'])) ? "+'-'+" . $attributes['parent_id'] . 'Index' : '') . "+'_NAME'");
                     } else {
@@ -1188,7 +1183,6 @@ class MFormParser
                     break;
                 case 'hidden':
                     if (isset($attributes['repeater_link']) && true === $attributes['repeater_link']) {
-                        $item->addAttribute('x-model', $attributes['x-model'] . '.id');
                         $this->processNodeFormElement($input, $item);
                         $input->setAttribute(':id', "'" . $attributes['item_name_key'] . "-'+" . $attributes['repeaterId'] . 'Index' . ((isset($attributes['parent_id'])) ? "+'-'+" . $attributes['parent_id'] . 'Index' : ''));
                     } else {
