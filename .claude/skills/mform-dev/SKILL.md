@@ -1,5 +1,6 @@
 ---
-name: mformdescription: MForm addon development skill. Use when working on FriendsOfREDAXO mform, especially fields, wrappers, flex repeater, custom link widgets, YForm value types, rex_form integration, docs, changelog, README synchronization, compatibility, or code-quality checks.
+name: mform
+description: MForm addon development skill. Use when working on FriendsOfREDAXO mform, especially fields, wrappers, flex repeater, custom link widgets, YForm value types, rex_form integration, docs, changelog, README synchronization, compatibility, or code-quality checks.
 ---
 
 # MForm Development Skill
@@ -101,7 +102,7 @@ Nach relevanten Änderungen immer statische Analyse ausführen:
 docker exec -it coreweb bash -c "cd /var/www/html/public && php redaxo/bin/console rexstan:analyze redaxo/src/addons/mform/"
 ```
 
-Wenn RexStan im `coreweb`-Container wegen fehlender optionaler Scan-Pfade aus der globalen `redaxo/data/addons/rexstan/user-config.neon` abbricht, die betroffenen Verzeichnisse im Container kurz anlegen und den MForm-Check danach erneut starten. Das ist ein Umgebungsproblem, kein MForm-Fehler.
+Wenn RexStan wegen fehlender optionaler Scan-Pfade aus der globalen `redaxo/data/addons/rexstan/user-config.neon` abbricht, die betroffenen Verzeichnisse in der Zielumgebung kurz anlegen und den MForm-Check danach erneut starten. Ist die Zielumgebung unbekannt, vorher den Namen der Umgebung beim Nutzer erfragen. Das ist ein Umgebungsproblem, kein MForm-Fehler.
 
 ### Manuelle/verhaltensnahe Checks
 
