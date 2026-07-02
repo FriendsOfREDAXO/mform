@@ -1,4 +1,5 @@
 <?php
+
 /** @var rex_fragment $this */
 
 switch ($this->getVar('type')) {
@@ -10,7 +11,7 @@ switch ($this->getVar('type')) {
         echo '<div class="hidden" style="display:none">' . $this->getVar('label') . $this->getVar('element') . '</div>';
         break;
 
-    // COLUM
+        // COLUM
     case 'start-group-column':
         echo '<div class="row ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
@@ -18,7 +19,7 @@ switch ($this->getVar('type')) {
         echo '<div class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
 
-    // INLINE
+        // INLINE
     case 'inline':
         $options = $this->vars;
         $options['notClosedFormGroup'] = true;
@@ -29,7 +30,7 @@ switch ($this->getVar('type')) {
         echo '</div></div>';
         break;
 
-    // COLLAPSE
+        // COLLAPSE
     case 'collapse-button':
         echo '<a class="btn btn-white btn-block ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</a>';
         break;
@@ -40,7 +41,7 @@ switch ($this->getVar('type')) {
         echo $this->getVar('label') . '<div class="collapse ' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>';
         break;
 
-    // TAB
+        // TAB
     case 'tabnavli':
         $isActive = 1 === preg_match('/(^|\s)active(\s|$)/', (string) $this->getVar('class'));
         echo '<li role="presentation" class="' . $this->getVar('class') . '" data-tab-nav-item="' . $this->getVar('value') . '"><a href="#" role="tab" aria-selected="' . ($isActive ? 'true' : 'false') . '" data-mform-tab-toggle="1" data-tab-item="' . $this->getVar('value') . '">' . $this->getVar('label') . '</a></li>';
@@ -52,7 +53,7 @@ switch ($this->getVar('type')) {
         echo '<div class="nav mform-tabs rex-page-nav ' . $this->getVar('class') . '" data-mform-tabs="1" ' . $this->getVar('attributes') . '><ul class="nav nav-tabs" role="tablist">' . $this->getVar('element') . '</ul><div class="tab-content">';
         break;
 
-    // FIELDSET
+        // FIELDSET
     case 'fieldset':
         echo '<fieldset class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('legend');
         break;
@@ -63,7 +64,7 @@ switch ($this->getVar('type')) {
         echo '<legend>' . $this->getVar('legend') . '</legend>';
         break;
 
-    // DIV CLOSE STUFF
+        // DIV CLOSE STUFF
     case 'close-tab':
     case 'close-collapse':
     case 'close-column':
@@ -75,7 +76,7 @@ switch ($this->getVar('type')) {
         echo '</div></div>';
         break;
 
-    // MODAL
+        // MODAL
     case 'modal':
         $modalId = $this->getVar('id');
         $label = $this->getVar('label');

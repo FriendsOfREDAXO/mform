@@ -185,7 +185,7 @@ if ('convert' === $func) {
                         $createdKey = array_key_exists('key', $source) ? $newKey : '-';
 
                         $loadModuleId = $newModuleId;
-                            $lastCreatedModuleId = $newModuleId;
+                        $lastCreatedModuleId = $newModuleId;
                         $moduleCreateMessage .= rex_view::success(rex_i18n::msg('mform_migration_create_success', $newModuleId, $createdKey));
                     }
                 }

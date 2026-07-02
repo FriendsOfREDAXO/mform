@@ -1,4 +1,5 @@
 <?php
+
 /** @var rex_fragment $this */
 
 $wrapperOpen = '';
@@ -29,7 +30,7 @@ switch ($this->getVar('type')) {
 
 if ($this->getVar('type') == 'datalist') {
     echo '<datalist id="' . $this->getVar('id') . '">' . $this->getVar('options') . '</datalist>';
-} else if ($this->getVar('type') == 'datalist-option') {
+} elseif ($this->getVar('type') == 'datalist-option') {
     echo '<option ' . $this->getVar('attributes') . '>' . $this->getVar('value') . '</option>';
 } else {
     echo $wrapperOpen . '<input id="' . $this->getVar('id') . '" type="' . $this->getVar('type') . '" name="REX_INPUT_VALUE' . $this->getVar('varId') . '" value="' . $this->getVar('value') . '" class="' . $this->getVar('class') . '" ' . $this->getVar('attributes') . '>' . $this->getVar('datalist') . $wrapperClose;

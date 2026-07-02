@@ -20,8 +20,9 @@ $types = trim((string) $this->getElement('types'));
 if ('*' == $types) {
     $types = '';
 }
-if ($types)
+if ($types) {
     $widget_params['types'] = $types;
+}
 
 $widget = rex_var_imglist::getWidget($buttonId, $name, $value, $widget_params);
 

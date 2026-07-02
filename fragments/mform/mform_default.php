@@ -1,4 +1,5 @@
 <?php
+
 /** @var rex_fragment $this */
 
 switch ($this->getVar('type')) {

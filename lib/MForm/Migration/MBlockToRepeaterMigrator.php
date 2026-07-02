@@ -108,7 +108,7 @@ final class MBlockToRepeaterMigrator
 
         $sql = rex_sql::factory();
         $slices = $sql->getArray(
-                        'SELECT s.id, s.article_id, s.clang_id, s.' . $column . ' AS slot_value,
+            'SELECT s.id, s.article_id, s.clang_id, s.' . $column . ' AS slot_value,
                                         COALESCE(a.name, \'\') AS article_name
                          FROM ' . rex::getTable('article_slice') . ' s
                          LEFT JOIN ' . rex::getTable('article') . ' a

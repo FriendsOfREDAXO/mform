@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author Joachim Doerr
  * @package redaxo5
@@ -11,7 +12,7 @@ $addon = rex_addon::get('mform');
 
 if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
     rex_yform::addTemplatePath(rex_path::addon('mform', 'ytemplates'));
-    
+
     $yform = rex_addon::get('yform');
     if (version_compare($yform->getVersion(), '5.0.0-beta1', '<')) {
         if (rex_plugin::get('yform', 'manager')->isAvailable()) {
