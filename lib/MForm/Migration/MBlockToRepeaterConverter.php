@@ -721,7 +721,8 @@ final class MBlockToRepeaterConverter
             return; // bereits vorhanden
         }
         // Nach dem letzten use-Statement einfuegen; falls keins da ist: nach <?php.
-        if (preg_match_all('/^\s*use\s+[^;]+;\s*$/m', $code, $matches, PREG_OFFSET_CAPTURE) && [] !== $matches[0]) {
+        $useMatchCount = preg_match_all('/^\s*use\s+[^;]+;\s*$/m', $code, $matches, PREG_OFFSET_CAPTURE);
+        if ($useMatchCount > 0) {
             $last = $matches[0][count($matches[0]) - 1];
             $insertPos = $last[1] + strlen($last[0]);
             $code = substr($code, 0, $insertPos) . "\n" . $useStatement . substr($code, $insertPos);
