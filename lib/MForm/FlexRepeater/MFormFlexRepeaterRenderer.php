@@ -80,11 +80,17 @@ class MFormFlexRepeaterRenderer
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
                 $align = $attrs['data-modal-align'] ?? 'left';
                 $rowClass = '';
-                if (isset($attrs['data-modal-row-class']) && is_string($attrs['data-modal-row-class'])) {
-                    $rowClass = trim($attrs['data-modal-row-class']);
+                if (isset($attrs['data-modal-row-class'])) {
+                    if (is_string($attrs['data-modal-row-class'])) {
+                        $rowClass = trim($attrs['data-modal-row-class']);
+                    }
+                    unset($attrs['data-modal-row-class']);
                 }
-                if (isset($attrs['data-group-row-class']) && is_string($attrs['data-group-row-class'])) {
-                    $rowClass = trim($rowClass . ' ' . $attrs['data-group-row-class']);
+                if (isset($attrs['data-group-row-class'])) {
+                    if (is_string($attrs['data-group-row-class'])) {
+                        $rowClass = trim($rowClass . ' ' . $attrs['data-group-row-class']);
+                    }
+                    unset($attrs['data-group-row-class']);
                 }
                 $innerHtml = '';
                 ++$i;
@@ -184,12 +190,16 @@ class MFormFlexRepeaterRenderer
             if ('start-group-column' === $type) {
                 $attrs = $item->getAttributes();
                 $rowExtraClass = '';
-                if (isset($attrs['data-group-column-row-class']) && is_string($attrs['data-group-column-row-class'])) {
-                    $rowExtraClass = trim($attrs['data-group-column-row-class']);
+                if (isset($attrs['data-group-column-row-class'])) {
+                    if (is_string($attrs['data-group-column-row-class'])) {
+                        $rowExtraClass = trim($attrs['data-group-column-row-class']);
+                    }
                     unset($attrs['data-group-column-row-class']);
                 }
-                if (isset($attrs['data-group-row-class']) && is_string($attrs['data-group-row-class'])) {
-                    $rowExtraClass = trim($rowExtraClass . ' ' . $attrs['data-group-row-class']);
+                if (isset($attrs['data-group-row-class'])) {
+                    if (is_string($attrs['data-group-row-class'])) {
+                        $rowExtraClass = trim($rowExtraClass . ' ' . $attrs['data-group-row-class']);
+                    }
                     unset($attrs['data-group-row-class']);
                 }
 
