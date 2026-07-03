@@ -24,6 +24,10 @@ class MFormFlexRepeaterRenderer
     public static function renderTemplate(MForm $form, int $level = 1): string
     {
         $items = array_values($form->getItems());
+
+        // Keep the same auto-group behavior as the classic parser path.
+        // This ensures addColumnElement() also creates a row wrapper in Flex-Repeater templates.
+        $items = array_values(MFormGroupExtensionHelper::addColumnGroupExtensionItems($items));
         if (self::needsTabAutoGrouping($items)) {
             $items = array_values(MFormGroupExtensionHelper::addTabGroupExtensionItems($items));
         }
@@ -75,6 +79,13 @@ class MFormFlexRepeaterRenderer
                 $attrs = $item->getAttributes();
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
                 $align = $attrs['data-modal-align'] ?? 'left';
+                $rowClass = '';
+                if (isset($attrs['data-modal-row-class']) && is_string($attrs['data-modal-row-class'])) {
+                    $rowClass = trim($attrs['data-modal-row-class']);
+                }
+                if (isset($attrs['data-group-row-class']) && is_string($attrs['data-group-row-class'])) {
+                    $rowClass = trim($rowClass . ' ' . $attrs['data-group-row-class']);
+                }
                 $innerHtml = '';
                 ++$i;
                 while ($i < count($items)) {
@@ -90,7 +101,7 @@ class MFormFlexRepeaterRenderer
                     }
                     ++$i;
                 }
-                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml);
+                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml, $rowClass);
                 continue;
             }
 
@@ -171,8 +182,19 @@ class MFormFlexRepeaterRenderer
 
             // COLUMN-GROUP: Bootstrap-3 row + col-* divs
             if ('start-group-column' === $type) {
-                $cls = trim('row ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                $attrs = $item->getAttributes();
+                $rowExtraClass = '';
+                if (isset($attrs['data-group-column-row-class']) && is_string($attrs['data-group-column-row-class'])) {
+                    $rowExtraClass = trim($attrs['data-group-column-row-class']);
+                    unset($attrs['data-group-column-row-class']);
+                }
+                if (isset($attrs['data-group-row-class']) && is_string($attrs['data-group-row-class'])) {
+                    $rowExtraClass = trim($rowExtraClass . ' ' . $attrs['data-group-row-class']);
+                    unset($attrs['data-group-row-class']);
+                }
+
+                $cls = trim('row ' . $rowExtraClass . ' ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
                 ++$i;
                 continue;
             }
@@ -522,7 +544,7 @@ class MFormFlexRepeaterRenderer
         }
     }
 
-    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml): string
+    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml, string $rowClass = ''): string
     {
         $alignClass = match ($align) {
             'center' => 'text-center',
@@ -530,7 +552,7 @@ class MFormFlexRepeaterRenderer
             default => 'text-left',
         };
         // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
-        return '<div class="row form-group mfr-modal-wrapper">' .
+        return '<div class="row form-group mfr-modal-wrapper ' . htmlspecialchars($rowClass, ENT_QUOTES) . '">' .
             '<div class="col-sm-12 ' . $alignClass . '">' .
             '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"' .
             ' data-toggle="modal" data-target="#__MFRID__">' .

@@ -1,5 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.2.5
+
+### Behoben
+
+- **Row/Column-Grundverhalten vereinheitlicht (klassischer Parser + Flex-Repeater)** - `addColumnElement()` wird jetzt in allen relevanten Renderpfaden konsistent in `row`-Gruppen geführt. Damit ist kein manueller HTML-Workaround mit `addHtml('<div class="row">')` mehr nötig.
+- **Modal-Wrapper auf Bootstrap-Row ausgerichtet** - Der Modal-Button-Wrapper rendert jetzt konsistent als `row form-group` (klassischer Parser und Flex-Repeater), damit `col-*`-Spalten erwartungsgemäß funktionieren.
+
+### Neu
+
+- **Optionale Row-Klassen für Auto-Column-Gruppen** - Für automatisch erzeugte Column-Row-Wrapper können jetzt zusätzliche Klassen per `data-group-column-row-class` (Alias: `data-group-row-class`) gesetzt werden.
+- **Optionale Row-Klassen für Modal-Wrapper** - Zusätzliche Klassen für den Modal-Row-Wrapper sind jetzt per `data-modal-row-class` (Alias: `data-group-row-class`) möglich.
+
 ## Version 9.2.4
 
 ### Entfernt

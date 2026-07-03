@@ -304,6 +304,18 @@ class MFormParser
             $removeAttributes = ['data-group-collapse-id'];
         }
 
+        // COLUMN GROUP MANIPULATIONS
+        if ('start-group-column' == $item->getType()) {
+            if (isset($attributes['data-group-column-row-class']) && is_string($attributes['data-group-column-row-class'])) {
+                $item->setClass(trim($item->getClass() . ' ' . $attributes['data-group-column-row-class']));
+                unset($attributes['data-group-column-row-class']);
+            }
+            if (isset($attributes['data-group-row-class']) && is_string($attributes['data-group-row-class'])) {
+                $item->setClass(trim($item->getClass() . ' ' . $attributes['data-group-row-class']));
+                unset($attributes['data-group-row-class']);
+            }
+        }
+
         // TAB MANIPULATIONS
         if ('start-group-tab' == $item->getType()) {
             $nav = [];
