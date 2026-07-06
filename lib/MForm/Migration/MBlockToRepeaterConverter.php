@@ -589,11 +589,14 @@ final class MBlockToRepeaterConverter
     private function collectInputWarnings(string $code): void
     {
         // Numerische Media-/Link-Felder (REX_MEDIA[n] / REX_LINK[n]) im Repeater.
-        if (preg_match('/addMediaField\(\s*(\$\w+|\d+)\s*,/', $code)) {
+        if (preg_match('/addMediaField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code)) {
             $this->warnings[] = 'Numerisches `addMediaField(n, ...)` gefunden: Im Repeater muss das Feld einen sprechenden Namen erhalten (z. B. `addMediaField(\'media\', ...)`), da `REX_MEDIA[n]`-Slots dort nicht funktionieren.';
         }
-        if (preg_match('/addLinkField\(\s*(\$\w+|\d+)\s*,/', $code) || preg_match('/addLinkField\(\s*(\$\w+|\d+)\s*\)/', $code)) {
+        if (preg_match('/addLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code) || preg_match('/addLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*\)/', $code)) {
             $this->warnings[] = 'Numerisches `addLinkField(n, ...)` gefunden: Im Repeater einen sprechenden Namen vergeben (z. B. `addLinkField(\'link\', ...)`).';
+        }
+        if (preg_match('/addCustomLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code) || preg_match('/addCustomLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*\)/', $code)) {
+            $this->warnings[] = 'Numerisches `addCustomLinkField(n, ...)` gefunden: Im Repeater einen sprechenden Namen vergeben (z. B. `addCustomLinkField(\'link\', ...)`), sonst drohen Schluesselkollisionen.';
         }
 
         if (str_contains($code, 'useCustomLinkForClassicWidgets')) {
@@ -615,7 +618,10 @@ final class MBlockToRepeaterConverter
     private function normalizeNumericRepeaterWidgetKeys(string $code): string
     {
         $countMedia = 0;
+        $countMFormMedia = 0;
         $countLink = 0;
+        $countMFormLink = 0;
+        $countCustomLink = 0;
 
         // Repeater-Form-Variable aus MBlock::show($id, $formVar->show(), ...) ermitteln.
         if (!preg_match('/MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)->show\(\)/', $code, $m)) {
@@ -627,10 +633,17 @@ final class MBlockToRepeaterConverter
 
         $code = (string) preg_replace_callback(
             $pattern,
-            static function (array $mm) use (&$countMedia, &$countLink): string {
+            static function (array $mm) use (&$countMedia, &$countMFormMedia, &$countLink, &$countMFormLink, &$countCustomLink): string {
                 $block = $mm[0];
-                $block = (string) preg_replace('/->addMediaField\(\s*1\s*,/m', '->addMediaField(\'media\',', $block, -1, $countMedia);
-                $block = (string) preg_replace('/->addLinkField\(\s*1\s*(,|\))/m', '->addLinkField(\'link\'$1', $block, -1, $countLink);
+
+                // Media-Widgets: numerische/quoted 1 auf sprechenden Key mappen.
+                $block = (string) preg_replace('/->addMediaField\(\s*(?:1|[\'"]1[\'"])\s*,/m', '->addMediaField(\'media\',', $block, -1, $countMedia);
+                $block = (string) preg_replace('/->addMFormMediaField\(\s*(?:1|[\'"]1[\'"])\s*,/m', '->addMFormMediaField(\'media\',', $block, -1, $countMFormMedia);
+
+                // Link-Widgets: numerische/quoted 1 auf sprechenden Key mappen.
+                $block = (string) preg_replace('/->addLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addLinkField(\'link\'$1', $block, -1, $countLink);
+                $block = (string) preg_replace('/->addMFormLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addMFormLinkField(\'link\'$1', $block, -1, $countMFormLink);
+                $block = (string) preg_replace('/->addCustomLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addCustomLinkField(\'link\'$1', $block, -1, $countCustomLink);
 
                 return $block;
             },
@@ -641,8 +654,17 @@ final class MBlockToRepeaterConverter
         if ($countMedia > 0) {
             $this->notes[] = sprintf('%d numerische(s) `addMediaField(1, ...)` auf `addMediaField(\'media\', ...)` umgestellt.', $countMedia);
         }
+        if ($countMFormMedia > 0) {
+            $this->notes[] = sprintf('%d numerische(s) `addMFormMediaField(1, ...)` auf `addMFormMediaField(\'media\', ...)` umgestellt.', $countMFormMedia);
+        }
         if ($countLink > 0) {
             $this->notes[] = sprintf('%d numerische(s) `addLinkField(1, ...)` auf `addLinkField(\'link\', ...)` umgestellt.', $countLink);
+        }
+        if ($countMFormLink > 0) {
+            $this->notes[] = sprintf('%d numerische(s) `addMFormLinkField(1, ...)` auf `addMFormLinkField(\'link\', ...)` umgestellt.', $countMFormLink);
+        }
+        if ($countCustomLink > 0) {
+            $this->notes[] = sprintf('%d numerische(s) `addCustomLinkField(1, ...)` auf `addCustomLinkField(\'link\', ...)` umgestellt.', $countCustomLink);
         }
 
         return $code;
