@@ -65,6 +65,62 @@ class MFormLayoutCore
 
     /**
      * @param array<string, mixed> $attributes
+     */
+    public static function isTabActive(array $attributes): bool
+    {
+        return isset($attributes['data-group-open-tab']) && self::isTruthyFlag($attributes['data-group-open-tab']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    public static function isTabPullRight(array $attributes): bool
+    {
+        return isset($attributes['pull-right']) && self::isTruthyFlag($attributes['pull-right']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    public static function buildTabNavClass(array $attributes): string
+    {
+        $class = '';
+
+        if (array_key_exists('nav-class', $attributes) && is_string($attributes['nav-class']) && '' !== trim($attributes['nav-class'])) {
+            $class = trim($class . ' ' . $attributes['nav-class']);
+        }
+
+        if (self::isTabPullRight($attributes)) {
+            $class = trim($class . ' pull-right');
+        }
+
+        if (self::isTabActive($attributes)) {
+            $class = trim($class . ' active');
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    public static function isTabLayoutVertical(array $attributes): bool
+    {
+        $layout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
+        return in_array($layout, ['vertical', 'left', 'nav-left'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    public static function isTabStyleModern(array $attributes): bool
+    {
+        $style = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
+        return 'modern' === $style;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
      * @param array<int, string> $keys
      */
     private static function consumeClassAttributes(array &$attributes, array $keys): string
@@ -85,5 +141,19 @@ class MFormLayoutCore
         }
 
         return $class;
+    }
+
+    private static function isTruthyFlag(mixed $value): bool
+    {
+        if (true === $value) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+            return '1' === $normalized || 'true' === $normalized;
+        }
+
+        return 1 === (int) $value;
     }
 }

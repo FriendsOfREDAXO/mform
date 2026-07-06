@@ -616,7 +616,6 @@ section.repeater .repeater-group {
     padding: 0.5rem 1.25rem 1.25rem 1.25rem;
     margin-bottom: 0.5rem;
     transition: box-shadow 0.3s ease-in-out;
-
     border: 1px solid var(--mform-repeater-group-border);
     background: var(--mform-repeater-group-bg);
     box-shadow: var(--mform-repeater-group-shadow);

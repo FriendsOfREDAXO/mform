@@ -37,11 +37,13 @@ class MFormLabelRenderer
         }
 
         $icon = '' !== $item->getInfoTooltipIcon() ? $item->getInfoTooltipIcon() : 'fa-info-circle';
+        $iconEsc = htmlspecialchars($icon, ENT_QUOTES);
+        $tooltipEsc = htmlspecialchars($item->getInfoTooltip(), ENT_QUOTES);
 
         return '<a href="#" class="mblock-info-tooltip" data-toggle="tooltip" title="'
-            . $item->getInfoTooltip()
+            . $tooltipEsc
             . '"><i class="fa '
-            . $icon
+            . $iconEsc
             . '"></i></a>';
     }
 
