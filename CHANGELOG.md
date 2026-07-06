@@ -12,6 +12,7 @@
 - **Label-Auflösung für Wrapper/Navigation vereinheitlicht** - Repeater-, Modal-, Collapse- und Tab-Labels verwenden jetzt in beiden Renderpfaden dieselbe locale-fähige Auflösung (statt „erstes Array-Element“). Das reduziert Drift bei mehrsprachigen Label-Arrays.
 - **Gemeinsame Collapse-Kernlogik** - Entscheidungen zu `open`/`accordion`/`hide-toggle-links` und die Bereinigung der Collapse-Wrapper-Attribute laufen jetzt über einen gemeinsamen Layout-Core und werden in Parser sowie Flex-Repeater gleich genutzt.
 - **Tabs in beiden Pfaden generell angeglichen** - Active-/Pull-Right-Auswertung, Nav-Klassenbildung, Layout-/Style-Flags (`vertical`/`modern`) sowie die Bereinigung tab-spezifischer Meta-Attribute sind jetzt in Parser und Flex-Repeater konsistent umgesetzt (inkl. robuster Truthy-Auswertung für `true`/`1`).
+- **Selectpicker in Repeatern stabilisiert** - Wenn bei `.selectpicker` kein explizites `data-container` gesetzt ist, wird beim Initialisieren standardmäßig `body` verwendet. Das verhindert falsch angedockte Dropdowns in verschachtelten Wrappern/Reapeatern.
 
 ### Neu
 
