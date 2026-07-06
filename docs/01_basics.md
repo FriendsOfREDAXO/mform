@@ -195,6 +195,26 @@ $mform = MForm::factory()
 echo $mform->show();
 ```
 
+### Tooltip-Icon: Default und Override
+
+Wenn bei `setTooltipInfo()` kein Icon gesetzt wird, nutzt MForm standardmäßig `fa-info-circle`.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addTextField(1.0, ['label' => 'Titel'])
+        // Default-Icon: fa-info-circle
+        ->setTooltipInfo('Standard-Hinweis ohne Icon-Override')
+
+    ->addTextField(1.1, ['label' => 'Untertitel'])
+        // Eigenes Icon explizit gesetzt
+        ->setTooltipInfo('Hinweis mit Fragezeichen-Icon', 'fa-question-circle');
+
+echo $mform->show();
+```
+
 ## Select- und Multiselect-Elemente
 
 Rendert `<select>`- und `<select multiple>`-Elemente.

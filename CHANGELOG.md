@@ -1,14 +1,21 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.2.5
+## Version 9.3.0
 
 ### Behoben
 
 - **Row/Column-Grundverhalten vereinheitlicht (klassischer Parser + Flex-Repeater)** - `addColumnElement()` wird jetzt in allen relevanten Renderpfaden konsistent in `row`-Gruppen geführt. Damit ist kein manueller HTML-Workaround mit `addHtml('<div class="row">')` mehr nötig.
 - **Modal-Wrapper auf Bootstrap-Row ausgerichtet** - Der Modal-Button-Wrapper rendert jetzt konsistent als `row form-group` (klassischer Parser und Flex-Repeater), damit `col-*`-Spalten erwartungsgemäß funktionieren.
+- **`setTooltipInfo()` im Flex-Repeater funktionsgleich zum Parser** - Label- und Tooltip-Rendering laufen jetzt über einen gemeinsamen internen Renderer. Dadurch wird der Tooltip im Repeater nicht mehr ignoriert und die Label-Aufbereitung (inkl. Sprach-Array-Fallback) bleibt über beide Pfade konsistent.
+- **Default-Tooltip-Icon angepasst** - Wenn bei `setTooltipInfo()` kein eigenes Icon übergeben wird, verwendet MForm jetzt standardmäßig `fa-info-circle` statt `fa-exclamation`.
+- **Gemeinsamer Layout-Core für Wrapper-Row-Klassen** - Die Verarbeitung von `data-group-column-row-class` / `data-group-row-class` (Columns) sowie `data-modal-row-class` / `data-group-row-class` (Modal) wurde in einen gemeinsamen internen Core ausgelagert und wird jetzt von Parser und Flex-Repeater genutzt.
+- **Label-Auflösung für Wrapper/Navigation vereinheitlicht** - Repeater-, Modal-, Collapse- und Tab-Labels verwenden jetzt in beiden Renderpfaden dieselbe locale-fähige Auflösung (statt „erstes Array-Element“). Das reduziert Drift bei mehrsprachigen Label-Arrays.
+- **Gemeinsame Collapse-Kernlogik** - Entscheidungen zu `open`/`accordion`/`hide-toggle-links` und die Bereinigung der Collapse-Wrapper-Attribute laufen jetzt über einen gemeinsamen Layout-Core und werden in Parser sowie Flex-Repeater gleich genutzt.
+- **Tabs in beiden Pfaden generell angeglichen** - Active-/Pull-Right-Auswertung, Nav-Klassenbildung, Layout-/Style-Flags (`vertical`/`modern`) sowie die Bereinigung tab-spezifischer Meta-Attribute sind jetzt in Parser und Flex-Repeater konsistent umgesetzt (inkl. robuster Truthy-Auswertung für `true`/`1`).
 
 ### Neu
 
+- **Renderer-Parität Demo/Smoke-Checks** - Neue Demo-Seite `demo_renderer_parity` zur Gegenprobe von Parser-HTML und Flex-Repeater-Template-HTML inkl. Marker-Checks für Tooltip, Row-/Modal-Klassen und Full-Layout.
 - **Optionale Row-Klassen für Auto-Column-Gruppen** - Für automatisch erzeugte Column-Row-Wrapper können jetzt zusätzliche Klassen per `data-group-column-row-class` (Alias: `data-group-row-class`) gesetzt werden.
 - **Optionale Row-Klassen für Modal-Wrapper** - Zusätzliche Klassen für den Modal-Row-Wrapper sind jetzt per `data-modal-row-class` (Alias: `data-group-row-class`) möglich.
 

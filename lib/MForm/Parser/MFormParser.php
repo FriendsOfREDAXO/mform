@@ -17,6 +17,8 @@ use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
+use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
 use rex_addon;
@@ -116,13 +118,7 @@ class MFormParser
         $copyPaste = !isset($attrs['copy_paste']) || $attrs['copy_paste'];
         $label = '';
         if ('' !== $item->getLabel() && [] !== $item->getLabel()) {
-            $itemLabel = $item->getLabel();
-            if (is_array($itemLabel)) {
-                $firstLabel = reset($itemLabel);
-                $labelStr = (string) ($firstLabel ?? '');
-            } else {
-                $labelStr = (string) $itemLabel;
-            }
+            $labelStr = self::resolveAnyLabel($item->getLabel());
             // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons).
             $label = '<label class="control-label mfr-label">' . $labelStr . '</label>';
         }
@@ -258,7 +254,7 @@ class MFormParser
         if ('modal' == $item->getType()) {
             $labelRaw = $item->getLabel();
             if ('' !== $labelRaw && [] !== $labelRaw) {
-                $labelStr = is_array($labelRaw) ? (string) (array_values($labelRaw)[0] ?? '') : (string) $labelRaw;
+                $labelStr = self::resolveAnyLabel($labelRaw);
                 $element->setLabel($labelStr);
             }
             $removeAttributes = ['data-modal-btn-class'];
@@ -281,12 +277,16 @@ class MFormParser
         // COLLAPSE MANIPULATIONS
         if ('collapse' == $item->getType()) {
             $removeAttributes = ['data-group-hide-toggle-links', 'data-group-accordion', 'data-group-open-collapse'];
+            $openCollapse = MFormLayoutCore::isCollapseOpen($attributes);
+            $isAccordion = MFormLayoutCore::isCollapseAccordion($attributes);
+            $hideToggle = MFormLayoutCore::shouldHideCollapseToggle($attributes, '' !== (string) self::resolveAnyLabel($item->getLabel()));
+
             $buttonAttributes = [
                 'data-toggle' => 'collapse',
-                'data-collapse-open' => (int) $attributes['data-group-open-collapse'],
-                'aria-expanded' => ((1 == (int) $attributes['data-group-open-collapse']) ? 'true' : 'false'),
+                'data-collapse-open' => $openCollapse ? 1 : 0,
+                'aria-expanded' => $openCollapse ? 'true' : 'false',
             ];
-            if (isset($attributes['data-group-accordion']) && 1 == (int) $attributes['data-group-accordion']) {
+            if ($isAccordion) {
                 unset($buttonAttributes['data-collapse-open']);
             }
             if ('true' == $buttonAttributes['aria-expanded']) {
@@ -294,9 +294,9 @@ class MFormParser
             }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
-                ->setClass((('' === $item->getLabel() || [] === $item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
+                ->setClass($hideToggle ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
-                ->setValue(is_array($item->getLabel()) ? (string) (array_values($item->getLabel())[0] ?? '') : (string) $item->getLabel());
+                ->setValue(self::resolveAnyLabel($item->getLabel()));
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
         }
 
@@ -306,17 +306,9 @@ class MFormParser
 
         // COLUMN GROUP MANIPULATIONS
         if ('start-group-column' == $item->getType()) {
-            if (isset($attributes['data-group-column-row-class'])) {
-                if (is_string($attributes['data-group-column-row-class'])) {
-                    $item->setClass(trim($item->getClass() . ' ' . $attributes['data-group-column-row-class']));
-                }
-                unset($attributes['data-group-column-row-class']);
-            }
-            if (isset($attributes['data-group-row-class'])) {
-                if (is_string($attributes['data-group-row-class'])) {
-                    $item->setClass(trim($item->getClass() . ' ' . $attributes['data-group-row-class']));
-                }
-                unset($attributes['data-group-row-class']);
+            $rowClass = MFormLayoutCore::consumeColumnGroupRowClass($attributes);
+            if ('' !== $rowClass) {
+                $item->setClass(trim($item->getClass() . ' ' . $rowClass));
             }
         }
 
@@ -329,34 +321,35 @@ class MFormParser
                     $element = new MFormElement();
                     $element->setType('tabnavli')
                         ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . (string) $item->getGroupKey())
-                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . (is_array($itm->getLabel()) ? (string) (array_values($itm->getLabel())[0] ?? '') : (string) $itm->getLabel()))
-                        ->setClass(
-                            ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
-                            ((array_key_exists('pull-right', $itm->getAttributes()) && true === $itm->getAttributes()['pull-right']) ? ' pull-right' : '') .
-                            ((array_key_exists('data-group-open-tab', $itm->getAttributes()) && true === $itm->getAttributes()['data-group-open-tab']) ? ' active' : ''),
-                        );
+                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . self::resolveAnyLabel($itm->getLabel()))
+                        ->setClass(self::buildTabNavClass($itm->getAttributes()));
                     $nav[] = $this->parseElement($element, 'wrapper');
                 }
             }
             $element->setElement(implode('', $nav));
 
-            $tabLayout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
-            if (in_array($tabLayout, ['vertical', 'left', 'nav-left'], true)) {
+            if (self::isTabLayoutVertical($attributes)) {
                 $item->setClass(trim($item->getClass() . ' mform-tabs--vertical'));
             }
 
-            $tabStyle = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
-            if ('modern' === $tabStyle) {
+            if (self::isTabStyleModern($attributes)) {
                 $item->setClass(trim($item->getClass() . ' mform-tabs--modern'));
             }
         }
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
-            if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
+            if (self::isTabActive($attributes)) {
                 $item->setClass(trim($item->getClass() . ' active'));
             }
 
-            unset($attributes['data-group-tab-layout'], $attributes['data-group-tab-style']);
+            unset(
+                $attributes['tab-icon'],
+                $attributes['nav-class'],
+                $attributes['pull-right'],
+                $attributes['data-group-open-tab'],
+                $attributes['data-group-tab-layout'],
+                $attributes['data-group-tab-style'],
+            );
         }
 
         if (count($removeAttributes) > 0) {
@@ -1611,20 +1604,6 @@ class MFormParser
 
     private function createLabelElement(MFormItem $item): MFormElement
     {
-        $this->createTooltipElement($item);
-
-        $labelString = $item->getLabel();
-        if (is_array($item->getLabel())) {
-            foreach ($item->getLabel() as $key => $itemLabel) {
-                if (str_contains(rex_i18n::getLocale(), $key)) {
-                    $labelString = $itemLabel;
-                }
-            }
-            if (is_array($labelString)) {
-                $labelString = array_values($labelString)[0];
-            }
-        }
-
         $label = new MFormElement();
         $label->setId($item->getId());
 
@@ -1632,29 +1611,10 @@ class MFormParser
             $label->setId($item->getId() . '" :for="' . $item->getAttributes()[':id']);
         }
 
-        $label->setValue($labelString)
+        $label->setValue(MFormLabelRenderer::renderLabelHtml($item))
             ->setType('label');
 
         return $label;
-    }
-
-    private function createTooltipElement(MFormItem $item): void
-    {
-        // set tooltip
-        if ($item->getInfoTooltip()) {
-            // parse tooltip
-            if ('' === (string) $item->getInfoTooltipIcon()) {
-                $item->setInfoTooltipIcon('fa-exclamation');
-            }
-
-            $tooltip = new MFormElement();
-            $tooltip->setValue($item->getInfoTooltip())
-                ->setInfoTooltipIcon($item->getInfoTooltipIcon())
-                ->setType('tooltip-info');
-
-            $currentLabel = $item->getLabel();
-            $item->setLabel((is_array($currentLabel) ? '' : (string) $currentLabel) . $this->parseElement($tooltip, 'base'));
-        }
     }
 
     /**
@@ -1746,5 +1706,93 @@ class MFormParser
             }
         }
         return $inlineAttributes;
+    }
+
+    private static function resolveAnyLabel(mixed $label): string
+    {
+        if (!is_array($label)) {
+            return (string) ($label ?? '');
+        }
+
+        foreach ($label as $key => $itemLabel) {
+            if (is_string($key) && str_contains(rex_i18n::getLocale(), $key)) {
+                return is_array($itemLabel)
+                    ? (string) (array_values($itemLabel)[0] ?? '')
+                    : (string) $itemLabel;
+            }
+        }
+
+        $first = array_values($label)[0] ?? '';
+        return is_array($first) ? (string) (array_values($first)[0] ?? '') : (string) $first;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabActive(array $attributes): bool
+    {
+        return isset($attributes['data-group-open-tab']) && self::isTruthyFlag($attributes['data-group-open-tab']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabPullRight(array $attributes): bool
+    {
+        return isset($attributes['pull-right']) && self::isTruthyFlag($attributes['pull-right']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function buildTabNavClass(array $attributes): string
+    {
+        $class = '';
+
+        if (array_key_exists('nav-class', $attributes) && is_string($attributes['nav-class']) && '' !== trim($attributes['nav-class'])) {
+            $class = trim($class . ' ' . $attributes['nav-class']);
+        }
+
+        if (self::isTabPullRight($attributes)) {
+            $class = trim($class . ' pull-right');
+        }
+
+        if (self::isTabActive($attributes)) {
+            $class = trim($class . ' active');
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabLayoutVertical(array $attributes): bool
+    {
+        $layout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
+        return in_array($layout, ['vertical', 'left', 'nav-left'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabStyleModern(array $attributes): bool
+    {
+        $style = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
+        return 'modern' === $style;
+    }
+
+    private static function isTruthyFlag(mixed $value): bool
+    {
+        if (true === $value) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+            return '1' === $normalized || 'true' === $normalized;
+        }
+
+        return 1 === (int) $value;
     }
 }

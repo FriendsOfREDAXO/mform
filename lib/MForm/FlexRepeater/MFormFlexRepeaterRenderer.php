@@ -4,7 +4,10 @@ namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
+use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
+use rex_i18n;
 use rex_var_custom_link;
 use rex_var_custom_link_multi;
 use rex_var_custom_medialist;
@@ -79,19 +82,7 @@ class MFormFlexRepeaterRenderer
                 $attrs = $item->getAttributes();
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
                 $align = $attrs['data-modal-align'] ?? 'left';
-                $rowClass = '';
-                if (isset($attrs['data-modal-row-class'])) {
-                    if (is_string($attrs['data-modal-row-class'])) {
-                        $rowClass = trim($attrs['data-modal-row-class']);
-                    }
-                    unset($attrs['data-modal-row-class']);
-                }
-                if (isset($attrs['data-group-row-class'])) {
-                    if (is_string($attrs['data-group-row-class'])) {
-                        $rowClass = trim($rowClass . ' ' . $attrs['data-group-row-class']);
-                    }
-                    unset($attrs['data-group-row-class']);
-                }
+                $rowClass = MFormLayoutCore::consumeModalRowClass($attrs);
                 $innerHtml = '';
                 ++$i;
                 while ($i < count($items)) {
@@ -141,20 +132,20 @@ class MFormFlexRepeaterRenderer
             if ('collapse' === $type) {
                 $attrs = $item->getAttributes();
                 $labelStr = self::getLabelString($item->getLabel()); // Entwickler-HTML, nicht escapen
-                $hideToggleLinks = isset($attrs['data-group-hide-toggle-links']) && 'true' === (string) $attrs['data-group-hide-toggle-links'];
-                $openCollapse = isset($attrs['data-group-open-collapse']) && (1 === (int) $attrs['data-group-open-collapse'] || true === $attrs['data-group-open-collapse']);
-                $isAccordion = isset($attrs['data-group-accordion']) && 1 === (int) $attrs['data-group-accordion'];
+                $hideToggleLinks = MFormLayoutCore::shouldHideCollapseToggle($attrs, '' !== $labelStr);
+                $openCollapse = MFormLayoutCore::isCollapseOpen($attrs);
+                $isAccordion = MFormLayoutCore::isCollapseAccordion($attrs);
                 $btnAttrs = ' data-toggle="collapse"';
                 if (!$isAccordion) {
                     $btnAttrs .= ' data-collapse-open="' . ($openCollapse ? 1 : 0) . '"';
                 }
                 $btnAttrs .= ' aria-expanded="' . ($openCollapse ? 'true' : 'false') . '"';
-                $btnHidden = ('' === $labelStr || $hideToggleLinks) ? ' hidden' : '';
+                $btnHidden = $hideToggleLinks ? ' hidden' : '';
                 $btnHtml = sprintf('<a class="btn btn-white btn-block%s"%s>%s</a>', $btnHidden, $btnAttrs, $labelStr);
 
                 // Wrapper-Attribute bereinigen wie im Fragment
                 $wrapperAttrs = $attrs;
-                unset($wrapperAttrs['data-group-hide-toggle-links'], $wrapperAttrs['data-group-accordion'], $wrapperAttrs['data-group-open-collapse']);
+                MFormLayoutCore::consumeCollapseWrapperAttributes($wrapperAttrs);
                 $cls = trim('collapse ' . $item->getClass() . ($openCollapse ? ' in' : ''));
                 $wrapperAttrHtml = self::renderAttributes($wrapperAttrs);
                 $html .= $btnHtml . sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), $wrapperAttrHtml);
@@ -189,19 +180,7 @@ class MFormFlexRepeaterRenderer
             // COLUMN-GROUP: Bootstrap-3 row + col-* divs
             if ('start-group-column' === $type) {
                 $attrs = $item->getAttributes();
-                $rowExtraClass = '';
-                if (isset($attrs['data-group-column-row-class'])) {
-                    if (is_string($attrs['data-group-column-row-class'])) {
-                        $rowExtraClass = trim($attrs['data-group-column-row-class']);
-                    }
-                    unset($attrs['data-group-column-row-class']);
-                }
-                if (isset($attrs['data-group-row-class'])) {
-                    if (is_string($attrs['data-group-row-class'])) {
-                        $rowExtraClass = trim($rowExtraClass . ' ' . $attrs['data-group-row-class']);
-                    }
-                    unset($attrs['data-group-row-class']);
-                }
+                $rowExtraClass = MFormLayoutCore::consumeColumnGroupRowClass($attrs);
 
                 $cls = trim('row ' . $rowExtraClass . ' ' . $item->getClass());
                 $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
@@ -246,12 +225,8 @@ class MFormFlexRepeaterRenderer
                 $navHtml = '';
                 foreach ($tabsMeta as $idx => $meta) {
                     $tabIcon = isset($meta['attrs']['tab-icon']) ? '<i class="rex-icon ' . htmlspecialchars((string) $meta['attrs']['tab-icon'], ENT_QUOTES) . '"></i> ' : '';
-                    $isActive = isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab'];
-                    $navClass = trim(
-                        ((isset($meta['attrs']['nav-class'])) ? (string) $meta['attrs']['nav-class'] . ' ' : '')
-                        . ((isset($meta['attrs']['pull-right']) && true === $meta['attrs']['pull-right']) ? 'pull-right ' : '')
-                        . ($isActive ? 'active' : ''),
-                    );
+                    $isActive = self::isTabActive($meta['attrs']);
+                    $navClass = self::buildTabNavClass($meta['attrs']);
                     $navHtml .= sprintf(
                         '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
                         htmlspecialchars($navClass, ENT_QUOTES),
@@ -263,14 +238,12 @@ class MFormFlexRepeaterRenderer
                     );
                 }
                 $groupAttributes = $item->getAttributes();
-                $layout = strtolower(trim((string) ($groupAttributes['data-group-tab-layout'] ?? '')));
-                $style = strtolower(trim((string) ($groupAttributes['data-group-tab-style'] ?? '')));
 
                 $cls = trim('nav mform-tabs rex-page-nav ' . $item->getClass());
-                if (in_array($layout, ['vertical', 'left', 'nav-left'], true)) {
+                if (self::isTabLayoutVertical($groupAttributes)) {
                     $cls .= ' mform-tabs--vertical';
                 }
-                if ('modern' === $style) {
+                if (self::isTabStyleModern($groupAttributes)) {
                     $cls .= ' mform-tabs--modern';
                 }
 
@@ -286,7 +259,7 @@ class MFormFlexRepeaterRenderer
             if ('tab' === $type) {
                 $tabIdx = self::tabIndexInGroup($items, $i);
                 $attrs = $item->getAttributes();
-                $isActive = isset($attrs['data-group-open-tab']) && true === $attrs['data-group-open-tab'];
+                $isActive = self::isTabActive($attrs);
                 unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab'], $attrs['data-group-tab-layout'], $attrs['data-group-tab-style']);
                 $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
                 $html .= sprintf(
@@ -621,21 +594,106 @@ class MFormFlexRepeaterRenderer
 
     private static function getLabelString(mixed $label): string
     {
-        if (is_array($label)) {
-            return (string) (reset($label) ?: '');
+        return self::resolveAnyLabel($label);
+    }
+
+    private static function resolveAnyLabel(mixed $label): string
+    {
+        if (!is_array($label)) {
+            return (string) ($label ?? '');
         }
-        return (string) ($label ?? '');
+
+        foreach ($label as $key => $itemLabel) {
+            if (is_string($key) && str_contains(rex_i18n::getLocale(), $key)) {
+                return is_array($itemLabel)
+                    ? (string) (array_values($itemLabel)[0] ?? '')
+                    : (string) $itemLabel;
+            }
+        }
+
+        $first = array_values($label)[0] ?? '';
+        return is_array($first) ? (string) (array_values($first)[0] ?? '') : (string) $first;
     }
 
     private static function renderLabel(MFormItem $item): string
     {
-        $label = self::getLabelString($item->getLabel());
+        $label = MFormLabelRenderer::renderLabelHtml($item);
         if ('' === $label) {
             return '';
         }
         // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons),
         // wie auch im klassischen MFormParser-Pfad ausserhalb des Repeaters.
         return $label;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabActive(array $attributes): bool
+    {
+        return isset($attributes['data-group-open-tab']) && self::isTruthyFlag($attributes['data-group-open-tab']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabPullRight(array $attributes): bool
+    {
+        return isset($attributes['pull-right']) && self::isTruthyFlag($attributes['pull-right']);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function buildTabNavClass(array $attributes): string
+    {
+        $class = '';
+
+        if (isset($attributes['nav-class']) && is_string($attributes['nav-class']) && '' !== trim($attributes['nav-class'])) {
+            $class = trim($class . ' ' . $attributes['nav-class']);
+        }
+
+        if (self::isTabPullRight($attributes)) {
+            $class = trim($class . ' pull-right');
+        }
+
+        if (self::isTabActive($attributes)) {
+            $class = trim($class . ' active');
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabLayoutVertical(array $attributes): bool
+    {
+        $layout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
+        return in_array($layout, ['vertical', 'left', 'nav-left'], true);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private static function isTabStyleModern(array $attributes): bool
+    {
+        $style = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
+        return 'modern' === $style;
+    }
+
+    private static function isTruthyFlag(mixed $value): bool
+    {
+        if (true === $value) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower(trim($value));
+            return '1' === $normalized || 'true' === $normalized;
+        }
+
+        return 1 === (int) $value;
     }
 
     private static function wrapFormGroup(string $label, string $field, MFormItem $item): string
@@ -653,21 +711,43 @@ class MFormFlexRepeaterRenderer
         if (isset($attrs['form-group-class']) && is_string($attrs['form-group-class']) && '' !== $attrs['form-group-class']) {
             $extraClass = ' ' . htmlspecialchars($attrs['form-group-class'], ENT_QUOTES);
         }
+
+        $labelColClass = 'control-label col-sm-3 mfr-field-label';
+        $fieldColClass = 'col-sm-9 mfr-field-col';
+
+        if ('' !== $item->getLabelColClass() && '' !== $item->getFormItemColClass()) {
+            $labelColClass = trim($item->getLabelColClass() . ' mfr-field-label');
+            $fieldColClass = trim($item->getFormItemColClass() . ' mfr-field-col');
+        }
+
+        // Keep behavior aligned with the default parser templates:
+        // setFull() forces both label and field columns to full width.
+        if ($item->isFull()) {
+            $labelColClass = 'control-label col-sm-12 mfr-field-label';
+            $fieldColClass = 'col-sm-12 mfr-field-col';
+        }
+
+        $labelColClassEsc = htmlspecialchars($labelColClass, ENT_QUOTES);
+        $fieldColClassEsc = htmlspecialchars($fieldColClass, ENT_QUOTES);
+
         // Bootstrap-3 form-horizontal Markup (col-sm-3 / col-sm-9). Die Layout-Variante
         // (vertical/inline) wird per CSS via [data-mfr-layout] auf dem .mfr-container
         // ueberschrieben.
         if ('' === $label) {
             return sprintf(
-                '<div class="row form-group mfr-field-group%s"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                '<div class="row form-group mfr-field-group%s"><div class="%s">%s%s</div></div>',
                 $extraClass,
+                $fieldColClassEsc,
                 $field,
                 $noticeHtml,
             );
         }
         return sprintf(
-            '<div class="row form-group mfr-field-group%s"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            '<div class="row form-group mfr-field-group%s"><label class="%s">%s</label><div class="%s">%s%s</div></div>',
             $extraClass,
+            $labelColClassEsc,
             $label,
+            $fieldColClassEsc,
             $field,
             $noticeHtml,
         );
