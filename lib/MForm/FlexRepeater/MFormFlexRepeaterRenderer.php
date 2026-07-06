@@ -4,6 +4,7 @@ namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
@@ -415,33 +416,39 @@ class MFormFlexRepeaterRenderer
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
 
+        $normalizedInputType = MFormFieldTypeCore::normalizeSimpleInputType($type);
+        if (null !== $normalizedInputType) {
+            return self::wrapFormGroup(
+                $label,
+                self::renderInputWithOptionalDatalist(
+                    $normalizedInputType,
+                    $class,
+                    $key,
+                    $attrs,
+                    $item->getOptions(),
+                    MFormFieldTypeCore::isReadonlySimpleInputType($type),
+                ),
+                $item,
+            );
+        }
+
+        if (MFormFieldTypeCore::isTextareaLikeType($type)) {
+            $readonlyAttr = MFormFieldTypeCore::isReadonlyTextareaType($type) ? ' readonly' : '';
+
+            return self::wrapFormGroup(
+                $label,
+                sprintf(
+                    '<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s%s></textarea>',
+                    $class,
+                    $key,
+                    $attrs,
+                    $readonlyAttr,
+                ),
+                $item,
+            );
+        }
+
         switch ($type) {
-            case 'text':
-            case 'email':
-            case 'url':
-            case 'tel':
-            case 'number':
-            case 'color':
-            case 'date':
-            case 'time':
-            case 'datetime-local':
-            case 'month':
-            case 'week':
-            case 'search':
-            case 'range':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<input type="%s" class="form-control %s" data-mfr-field="%s" value=""%s>', htmlspecialchars($type, ENT_QUOTES), $class, $key, $attrs),
-                    $item,
-                );
-
-            case 'textarea':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s></textarea>', $class, $key, $attrs),
-                    $item,
-                );
-
             case 'hidden':
                 return sprintf('<input type="hidden" data-mfr-field="%s" value="">', $key);
 
@@ -492,20 +499,6 @@ class MFormFlexRepeaterRenderer
             case 'linklist':
                 return self::wrapFormGroup($label, self::renderListWidget('linklist', $key, $item), $item);
 
-            case 'text-readonly':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s readonly>', $class, $key, $attrs),
-                    $item,
-                );
-
-            case 'textarea-readonly':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s readonly></textarea>', $class, $key, $attrs),
-                    $item,
-                );
-
             case 'headline':
                 $val = is_string($item->getValue()) ? $item->getValue() : '';
                 return sprintf('<div class="mfr-template-headline"><h4>%s</h4></div>', htmlspecialchars($val, ENT_QUOTES));
@@ -525,6 +518,51 @@ class MFormFlexRepeaterRenderer
             default:
                 return '';
         }
+    }
+
+    /**
+     * @param array<mixed> $options
+     */
+    private static function renderInputWithOptionalDatalist(string $type, string $class, string $fieldKeyEsc, string $attrs, array $options, bool $readonly = false): string
+    {
+        $datalistId = '';
+        $datalistHtml = '';
+        if (count($options) > 0) {
+            $datalistId = '__MFRID__-datalist-' . preg_replace('/[^a-z0-9\-_]/i', '-', html_entity_decode($fieldKeyEsc, ENT_QUOTES));
+            $datalistHtml = sprintf('<datalist id="%s">%s</datalist>', htmlspecialchars($datalistId, ENT_QUOTES), self::renderDatalistOptions($options));
+        }
+
+        $listAttr = '' !== $datalistId ? ' list="' . htmlspecialchars($datalistId, ENT_QUOTES) . '"' : '';
+        $readonlyAttr = $readonly ? ' readonly' : '';
+
+        return sprintf(
+            '<input type="%s" class="form-control %s" data-mfr-field="%s" value=""%s%s%s>%s',
+            htmlspecialchars($type, ENT_QUOTES),
+            $class,
+            $fieldKeyEsc,
+            $attrs,
+            $listAttr,
+            $readonlyAttr,
+            $datalistHtml,
+        );
+    }
+
+    /**
+     * @param array<mixed> $options
+     */
+    private static function renderDatalistOptions(array $options): string
+    {
+        $html = '';
+        foreach ($options as $key => $value) {
+            if (is_array($value)) {
+                continue;
+            }
+
+            $labelAttr = is_int($key) ? '' : ' label="' . htmlspecialchars((string) $key, ENT_QUOTES) . '"';
+            $html .= '<option value="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"' . $labelAttr . '></option>';
+        }
+
+        return $html;
     }
 
     private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml, string $rowClass = ''): string

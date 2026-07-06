@@ -13,6 +13,9 @@
 - **Gemeinsame Collapse-Kernlogik** - Entscheidungen zu `open`/`accordion`/`hide-toggle-links` und die Bereinigung der Collapse-Wrapper-Attribute laufen jetzt über einen gemeinsamen Layout-Core und werden in Parser sowie Flex-Repeater gleich genutzt.
 - **Tabs in beiden Pfaden generell angeglichen** - Active-/Pull-Right-Auswertung, Nav-Klassenbildung, Layout-/Style-Flags (`vertical`/`modern`) sowie die Bereinigung tab-spezifischer Meta-Attribute sind jetzt in Parser und Flex-Repeater konsistent umgesetzt (inkl. robuster Truthy-Auswertung für `true`/`1`).
 - **Selectpicker in Repeatern stabilisiert** - Wenn bei `.selectpicker` kein explizites `data-container` gesetzt ist, wird beim Initialisieren standardmäßig `body` verwendet. Das verhindert falsch angedockte Dropdowns in verschachtelten Wrappern/Reapeatern.
+- **Einfache Feldparität im Flex-Repeater erweitert** - `datetime` wird im Repeater-Template jetzt direkt gerendert, Textfelder unterstützen Datalist-Optionen analog zum Parser, und `markitup` wird bewusst als normale `textarea`-Fallback-Ausgabe behandelt.
+- **Password-Input in beiden Renderpfaden angeglichen** - `password` wird jetzt wie andere einfache Input-Typen sowohl im klassischen Parser als auch im Flex-Repeater konsistent als Eingabefeld gerendert.
+- **Gemeinsamer Feldtyp-Core für einfache Felder** - Die Typ-Klassifikation und Normalisierung für einfache Inputs (`text`, `datetime`, `password`, `text-readonly`, …) sowie Textarea-Typen (`textarea`, `markitup`, `textarea-readonly`) ist jetzt zentralisiert und wird von Parser und Flex-Repeater gemeinsam genutzt.
 
 ### Neu
 

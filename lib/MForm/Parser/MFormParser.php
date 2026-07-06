@@ -17,6 +17,7 @@ use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
@@ -420,7 +421,7 @@ class MFormParser
     {
         $datalist = '';
 
-        if ('text-readonly' == $item->getType()) { // is readonly
+        if (MFormFieldTypeCore::isReadonlySimpleInputType($item->getType())) { // is readonly
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
@@ -444,11 +445,12 @@ class MFormParser
 
         // create element
         $element = new MFormElement();
+        $normalizedType = MFormFieldTypeCore::normalizeSimpleInputType($item->getType()) ?? $item->getType();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
-            ->setType($item->getType())
+            ->setType($normalizedType)
             ->setClass($item->getClass())
             ->setDatalist($datalist)
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
@@ -469,9 +471,8 @@ class MFormParser
      */
     private function generateAreaElement(MFormItem $item): void
     {
-        // set typ specific vars
-        if ('textarea-readonly' == $item->getType()) {
-            $item->setType('textarea'); // type is textarea
+        // set type specific vars
+        if (MFormFieldTypeCore::isReadonlyTextareaType($item->getType())) {
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
@@ -480,11 +481,12 @@ class MFormParser
 
         // create element
         $element = new MFormElement();
+        $normalizedType = MFormFieldTypeCore::normalizeTextareaType($item->getType()) ?? $item->getType();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
-            ->setType($item->getType())
+            ->setType($normalizedType)
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes()));
 
@@ -1491,7 +1493,19 @@ class MFormParser
                         $item = $mformItem;
                     }
 
-                    switch ($item->getType()) {
+                    $itemType = $item->getType();
+
+                    if (MFormFieldTypeCore::isSimpleInputType($itemType)) {
+                        $this->generateInputElement($item);
+                        continue;
+                    }
+
+                    if (MFormFieldTypeCore::isTextareaLikeType($itemType)) {
+                        $this->generateAreaElement($item);
+                        continue;
+                    }
+
+                    switch ($itemType) {
                         // OPEN REPEATER
                         case 'repeater':
                             $this->openRepeaterElement($item, $key, $items, $skipKeys);
@@ -1535,30 +1549,8 @@ class MFormParser
                         case 'alert':
                             $this->generateLineElement($item);
                             break;
-                        case 'color':
-                        case 'email':
-                        case 'url':
-                        case 'tel':
-                        case 'search':
-                        case 'number':
-                        case 'range':
-                        case 'date':
-                        case 'time':
-                        case 'datetime':
-                        case 'datetime-local':
-                        case 'month':
-                        case 'week':
-                        case 'text':
-                        case 'text-readonly':
-                            $this->generateInputElement($item);
-                            break;
                         case 'hidden':
                             $this->generateHiddenInputElement($item);
-                            break;
-                        case 'markitup':
-                        case 'textarea':
-                        case 'textarea-readonly':
-                            $this->generateAreaElement($item);
                             break;
                         case 'select':
                         case 'multiselect':

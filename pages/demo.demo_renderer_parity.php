@@ -42,6 +42,14 @@ $buildForm = static function (): MForm {
         )
         ->addTextField(1.5, ['label' => 'Volle Breite'])
             ->setFull()
+        ->addInputField('datetime', 1.8, ['label' => 'Datum/Zeit'])
+        ->addInputField('password', 1.11, ['label' => 'Passwort'])
+        ->addTextField(1.9, ['label' => 'Text mit Datalist'])
+            ->setOptions([
+                'Alpha',
+                'Beta',
+            ])
+        ->addInputField('markitup', 1.10, ['label' => 'Markitup Fallback'])
         ->addTabElement(
             'Tab Inhalt',
             MForm::factory()->addTextField(1.6, ['label' => 'Tab Feld A']),
@@ -119,6 +127,22 @@ $checks = [
     [
         'label' => 'Tab Active-Markierung vorhanden',
         'needle' => ' active',
+    ],
+    [
+        'label' => 'Datetime-Feld gerendert',
+        'needle' => 'type="datetime"',
+    ],
+    [
+        'label' => 'Password-Feld gerendert',
+        'needle' => 'type="password"',
+    ],
+    [
+        'label' => 'Datalist am Input vorhanden',
+        'needle' => '<datalist id=',
+    ],
+    [
+        'label' => 'Markitup-Feld vorhanden',
+        'needle' => 'Markitup Fallback',
     ],
 ];
 
