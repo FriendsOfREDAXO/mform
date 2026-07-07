@@ -83,15 +83,22 @@ switch ($this->getVar('type')) {
         $btnClass = 'btn ' . ($this->getVar('class') ?: 'btn-default');
         // extract alignment from rendered attributes string (data-modal-align="left|center|right")
         $modalAlignRaw = '';
+        $modalRowClass = '';
         if (preg_match('/data-modal-align="([^"]*?)"/', (string) $this->getVar('attributes'), $_alignM)) {
             $modalAlignRaw = $_alignM[1];
+        }
+        if (preg_match('/data-modal-row-class="([^"]*?)"/', (string) $this->getVar('attributes'), $_rowM)) {
+            $modalRowClass = trim((string) $_rowM[1]);
+        }
+        if (preg_match('/data-group-row-class="([^"]*?)"/', (string) $this->getVar('attributes'), $_groupRowM)) {
+            $modalRowClass = trim($modalRowClass . ' ' . (string) $_groupRowM[1]);
         }
         $modalAlignClass = match ($modalAlignRaw) {
             'center' => 'text-center',
             'right'  => 'text-right',
             default  => 'text-left',
         };
-        echo '<div class="form-group mfr-modal-wrapper"><div class="col-sm-12 ' . $modalAlignClass . '">';
+        echo '<div class="row form-group mfr-modal-wrapper ' . rex_escape($modalRowClass) . '"><div class="col-sm-12 ' . $modalAlignClass . '">';
         echo '<button type="button" class="' . rex_escape($btnClass) . '" data-toggle="modal" data-target="#' . rex_escape($modalId) . '">';
         echo '<i class="fa fa-cog"></i> ' . rex_escape($label);
         echo '</button>';

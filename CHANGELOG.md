@@ -1,5 +1,33 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.3.0
+
+### Behoben
+
+- **Row/Column-Grundverhalten vereinheitlicht (klassischer Parser + Flex-Repeater)** - `addColumnElement()` wird jetzt in allen relevanten Renderpfaden konsistent in `row`-Gruppen geführt. Damit ist kein manueller HTML-Workaround mit `addHtml('<div class="row">')` mehr nötig.
+- **Modal-Wrapper auf Bootstrap-Row ausgerichtet** - Der Modal-Button-Wrapper rendert jetzt konsistent als `row form-group` (klassischer Parser und Flex-Repeater), damit `col-*`-Spalten erwartungsgemäß funktionieren.
+- **`setTooltipInfo()` im Flex-Repeater funktionsgleich zum Parser** - Label- und Tooltip-Rendering laufen jetzt über einen gemeinsamen internen Renderer. Dadurch wird der Tooltip im Repeater nicht mehr ignoriert und die Label-Aufbereitung (inkl. Sprach-Array-Fallback) bleibt über beide Pfade konsistent.
+- **Default-Tooltip-Icon angepasst** - Wenn bei `setTooltipInfo()` kein eigenes Icon übergeben wird, verwendet MForm jetzt standardmäßig `fa-info-circle` statt `fa-exclamation`.
+- **Gemeinsamer Layout-Core für Wrapper-Row-Klassen** - Die Verarbeitung von `data-group-column-row-class` / `data-group-row-class` (Columns) sowie `data-modal-row-class` / `data-group-row-class` (Modal) wurde in einen gemeinsamen internen Core ausgelagert und wird jetzt von Parser und Flex-Repeater genutzt.
+- **Label-Auflösung für Wrapper/Navigation vereinheitlicht** - Repeater-, Modal-, Collapse- und Tab-Labels verwenden jetzt in beiden Renderpfaden dieselbe locale-fähige Auflösung (statt „erstes Array-Element“). Das reduziert Drift bei mehrsprachigen Label-Arrays.
+- **Gemeinsame Collapse-Kernlogik** - Entscheidungen zu `open`/`accordion`/`hide-toggle-links` und die Bereinigung der Collapse-Wrapper-Attribute laufen jetzt über einen gemeinsamen Layout-Core und werden in Parser sowie Flex-Repeater gleich genutzt.
+- **Tabs in beiden Pfaden generell angeglichen** - Active-/Pull-Right-Auswertung, Nav-Klassenbildung, Layout-/Style-Flags (`vertical`/`modern`) sowie die Bereinigung tab-spezifischer Meta-Attribute sind jetzt in Parser und Flex-Repeater konsistent umgesetzt (inkl. robuster Truthy-Auswertung für `true`/`1`).
+- **Selectpicker in Repeatern stabilisiert** - Wenn bei `.selectpicker` kein explizites `data-container` gesetzt ist, wird beim Initialisieren standardmäßig `body` verwendet. Das verhindert falsch angedockte Dropdowns in verschachtelten Wrappern/Reapeatern.
+- **Copy/Paste-UX im Repeater entkoppelt und bereinigt** - Das Kopieren ist jetzt eine klare Aktion ohne klebrigen Toggle-Zustand. Die Einfügen-Buttons folgen konsequent dem Clipboard-Status und bleiben nicht mehr unbeabsichtigt sichtbar.
+- **Clipboard auf Modultyp + Repeater begrenzt** - Ein kopiertes Item kann jetzt nur noch in Blöcken desselben Modultyps und im selben Repeater eingefügt werden. Dadurch erscheinen Einfügen-Aktionen nicht mehr in fachfremden Bereichen.
+- **Toolbar-Einfügen semantisch aufgeteilt** - Oben wird jetzt am Anfang eingefügt, unten am Ende. Beide Buttons bleiben kompakt mit dem Label „Einfügen“, die genaue Position wird über den Title vermittelt.
+- **Kopieren beenden kompakt und eindeutig** - Für den aktiven Clipboard-Zustand gibt es ein eigenes Symbol (Copy mit X-Overlay) inklusive Tooltip-Titel „Kopieren beenden“, damit der Exit aus dem Copy-Modus sofort erkennbar ist.
+- **Style-Fixes für Repeater-Aktionsbuttons** - Die Buttonflächen und Hover-Zustände im Flex-Repeater wurden für Light- und Dark-Mode vereinheitlicht. Der Plus-Button bleibt grün, der Delete-Button wieder klar als weißer Danger-Button mit rotem Icon erkennbar, und die Icon-Kontraste bleiben in beiden Dark-Modi sauber lesbar.
+- **Einfache Feldparität im Flex-Repeater erweitert** - `datetime` wird im Repeater-Template jetzt direkt gerendert, Textfelder unterstützen Datalist-Optionen analog zum Parser, und `markitup` wird bewusst als normale `textarea`-Fallback-Ausgabe behandelt.
+- **Password-Input in beiden Renderpfaden angeglichen** - `password` wird jetzt wie andere einfache Input-Typen sowohl im klassischen Parser als auch im Flex-Repeater konsistent als Eingabefeld gerendert.
+- **Gemeinsamer Feldtyp-Core für einfache Felder** - Die Typ-Klassifikation und Normalisierung für einfache Inputs (`text`, `datetime`, `password`, `text-readonly`, …) sowie Textarea-Typen (`textarea`, `markitup`, `textarea-readonly`) ist jetzt zentralisiert und wird von Parser und Flex-Repeater gemeinsam genutzt.
+
+### Neu
+
+- **Renderer-Parität Demo/Smoke-Checks** - Neue Demo-Seite `demo_renderer_parity` zur Gegenprobe von Parser-HTML und Flex-Repeater-Template-HTML inkl. Marker-Checks für Tooltip, Row-/Modal-Klassen und Full-Layout.
+- **Optionale Row-Klassen für Auto-Column-Gruppen** - Für automatisch erzeugte Column-Row-Wrapper können jetzt zusätzliche Klassen per `data-group-column-row-class` (Alias: `data-group-row-class`) gesetzt werden.
+- **Optionale Row-Klassen für Modal-Wrapper** - Zusätzliche Klassen für den Modal-Row-Wrapper sind jetzt per `data-modal-row-class` (Alias: `data-group-row-class`) möglich.
+
 ## Version 9.2.4
 
 ### Entfernt

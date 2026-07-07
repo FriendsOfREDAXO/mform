@@ -17,6 +17,8 @@
 
     const MFR_LOG_PREFIX = '[MFR]';
     const MFR_ITEM_DISABLED_KEY = '__disabled';
+    const _clipboardUiInstances = new Set();
+    let _clipboardUiListenerRegistered = false;
 
     function isGlobalDebugEnabled() {
         return window.MFR_DEBUG === true;
@@ -32,6 +34,23 @@
         if (!debugEnabled) return;
         const args = Array.prototype.slice.call(arguments, 2);
         console.log.apply(console, [MFR_LOG_PREFIX + ' ' + label].concat(args));
+    }
+
+    function registerClipboardUiInstance(instance) {
+        if (!instance) return;
+        _clipboardUiInstances.add(instance);
+
+        if (_clipboardUiListenerRegistered) {
+            return;
+        }
+
+        document.addEventListener('mfr:clipboard-updated', function () {
+            _clipboardUiInstances.forEach(function (registeredInstance) {
+                registeredInstance._updateClipboardUi();
+            });
+        });
+
+        _clipboardUiListenerRegistered = true;
     }
 
     // -------------------------------------------------------------------------
@@ -502,8 +521,10 @@
             const insertedEl = this._renderItem(d, insertIndex);
             if (insertedEl) {
                 const children = Array.from(this.itemsList.children);
-                const ref = children[insertIndex + 1];
-                if (ref) ref.before(insertedEl);
+                const ref = children[insertIndex];
+                if (ref && ref !== insertedEl) {
+                    ref.before(insertedEl);
+                }
                 this._focusNewItem(insertedEl, true);
             }
 
@@ -711,6 +732,7 @@
             this.data = [];
             this._suppressSync = false;
             this._isBootstrapping = false;
+            registerClipboardUiInstance(this);
 
             this._log('constructor', {
                 fieldName: this.fieldName,
@@ -791,6 +813,15 @@
                     e.preventDefault();
                     this._log('toggle all clicked (delegated)');
                     this._toggleAll();
+                    return;
+                }
+
+                // Paste button in top toolbar → insert at start
+                const pasteStartBtn = e.target.closest('.mfr-btn-paste-start');
+                if (pasteStartBtn && pasteStartBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    this._pasteItemAtStart();
+                    return;
                 }
 
                 // Paste button in toolbar → append at end
@@ -798,6 +829,15 @@
                 if (pasteBtn && pasteBtn.closest('.mfr-container') === this.container) {
                     e.preventDefault();
                     this._pasteItem();
+                    return;
+                }
+
+                // Clear clipboard button in toolbar
+                const clearClipboardBtn = e.target.closest('.mfr-btn-clipboard-clear');
+                if (clearClipboardBtn && clearClipboardBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    this._clearClipboard();
+                    return;
                 }
 
                 // Paste button on item → insert after that item
@@ -807,6 +847,7 @@
                     const itemEl = pasteAfterBtn.closest('.mfr-item');
                     const idx = itemEl ? Array.from(this.itemsList.children).indexOf(itemEl) : -1;
                     this._pasteItemAfter(idx);
+                    return;
                 }
             });
 
@@ -816,16 +857,7 @@
             this._sortableInitialized = false;
             this._initSortable();
 
-            // Show paste buttons if clipboard is already filled
-            if (this.copyPaste) {
-                try {
-                    if (sessionStorage.getItem('mfr_clipboard')) {
-                        this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after, .mfr-btn-paste-after').forEach(function (btn) {
-                            btn.style.display = '';
-                        });
-                    }
-                } catch (e) { /* ignore */ }
-            }
+            this._updateClipboardUi();
 
             // Formular-Submit wird über den globalen Handler in initRepeaters abgewickelt
         }
@@ -854,14 +886,15 @@
 
             const d = data || this._emptyData();
             const insertIndex = index + 1;
+            const nextSibling = this.itemsList ? (this.itemsList.children[insertIndex] || null) : null;
             this.data.splice(insertIndex, 0, d);
             this._log('insertItemAfter', { index: index, insertIndex: insertIndex, data: d });
 
             const insertedEl = this._renderItem(d, insertIndex);
             if (insertedEl) {
-                const children = Array.from(this.itemsList.children);
-                const ref = children[insertIndex + 1];
-                if (ref) ref.before(insertedEl);
+                if (nextSibling && nextSibling !== insertedEl) {
+                    nextSibling.before(insertedEl);
+                }
                 this._focusNewItem(insertedEl, true);
             }
 
@@ -997,6 +1030,8 @@
             });
             setTimeout(() => initWidgets(itemEl), 20);
 
+            this._updateClipboardUi();
+
             return itemEl;
         }
 
@@ -1114,18 +1149,12 @@
                     const snapshot = JSON.parse(JSON.stringify(this.data[idx] || {}));
                     // Remove disabled marker so paste produces an enabled item
                     delete snapshot[MFR_ITEM_DISABLED_KEY];
-                    try {
-                        sessionStorage.setItem('mfr_clipboard', JSON.stringify(snapshot));
-                    } catch (e2) {
-                        window._mfrClipboard = snapshot;
-                    }
-                    // Show all paste buttons in this container
-                    this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after').forEach(function (btn) {
-                        btn.style.display = '';
-                    });
-                    // Visual feedback
+                    this._setClipboardSnapshot(snapshot);
+                    this._updateClipboardUi();
+                    copyBtn.classList.remove('mfr-btn-copy-active');
+                    void copyBtn.offsetWidth;
                     copyBtn.classList.add('mfr-btn-copy-active');
-                    window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 800);
+                    window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 650);
                     this._log('copyItem', { idx: idx, snapshot: snapshot });
                 });
             }
@@ -1179,29 +1208,39 @@
         }
 
         _pasteItem() {
-            let snapshot = null;
-            try {
-                const raw = sessionStorage.getItem('mfr_clipboard');
-                if (raw) snapshot = JSON.parse(raw);
-            } catch (e) { /* ignore */ }
-            if (!snapshot && window._mfrClipboard) {
-                snapshot = window._mfrClipboard;
-            }
+            const snapshot = this._getClipboardSnapshot();
             if (!snapshot) return;
             const data = JSON.parse(JSON.stringify(snapshot));
             this._log('pasteItem', { data: data });
             this.addItem(data);
+            this._updateClipboardUi();
+        }
+
+        _pasteItemAtStart() {
+            const snapshot = this._getClipboardSnapshot();
+            if (!snapshot) return;
+            const data = JSON.parse(JSON.stringify(snapshot));
+            this._log('pasteItemAtStart', { data: data });
+
+            if (this.max > 0 && this.data.length >= this.max) return;
+
+            const firstSibling = this.itemsList ? this.itemsList.firstElementChild : null;
+            this.data.unshift(data);
+            const insertedEl = this._renderItem(data, 0);
+            if (insertedEl && firstSibling && firstSibling !== insertedEl) {
+                firstSibling.before(insertedEl);
+            }
+
+            this._reindex();
+            this._updateAddBtn();
+            this._updateToggleAllButton();
+            this.syncValue();
+            this._focusNewItem(insertedEl, true);
+            this._updateClipboardUi();
         }
 
         _pasteItemAfter(idx) {
-            let snapshot = null;
-            try {
-                const raw = sessionStorage.getItem('mfr_clipboard');
-                if (raw) snapshot = JSON.parse(raw);
-            } catch (e) { /* ignore */ }
-            if (!snapshot && window._mfrClipboard) {
-                snapshot = window._mfrClipboard;
-            }
+            const snapshot = this._getClipboardSnapshot();
             if (!snapshot) return;
             const data = JSON.parse(JSON.stringify(snapshot));
             this._log('pasteItemAfter', { idx: idx, data: data });
@@ -1210,6 +1249,116 @@
             } else {
                 this.addItem(data);
             }
+            this._updateClipboardUi();
+        }
+
+        _setClipboardSnapshot(snapshot) {
+            if (!snapshot || typeof snapshot !== 'object') return;
+            const payload = {
+                mfrClipboardVersion: 2,
+                scopeKey: this._getClipboardScopeKey(),
+                data: snapshot
+            };
+            try {
+                sessionStorage.setItem('mfr_clipboard', JSON.stringify(payload));
+            } catch (e) { /* ignore */ }
+            window._mfrClipboard = payload;
+            document.dispatchEvent(new CustomEvent('mfr:clipboard-updated'));
+        }
+
+        _getClipboardScopeKey() {
+            const form = this.container.closest('form');
+            let moduleId = '';
+
+            if (form) {
+                const field = form.querySelector('[name="module_id"]');
+                if (field && field.value !== undefined && String(field.value) !== '') {
+                    moduleId = String(field.value);
+                }
+
+                if (!moduleId) {
+                    try {
+                        const action = form.getAttribute('action') || window.location.href;
+                        const url = new URL(action, window.location.origin);
+                        moduleId = url.searchParams.get('module_id') || '';
+                    } catch (e) { /* ignore */ }
+                }
+            }
+
+            if (!moduleId) {
+                try {
+                    moduleId = new URL(window.location.href).searchParams.get('module_id') || '';
+                } catch (e) { /* ignore */ }
+            }
+
+            const moduleScope = moduleId ? ('module_id=' + moduleId) : ('path=' + window.location.pathname);
+            return moduleScope + '::' + String(this.fieldName || 'unknown-repeater');
+        }
+
+        _readClipboardPayload() {
+            let payload = null;
+            try {
+                const raw = sessionStorage.getItem('mfr_clipboard');
+                if (raw) payload = JSON.parse(raw);
+            } catch (e) { /* ignore */ }
+
+            if (!payload && window._mfrClipboard) {
+                payload = window._mfrClipboard;
+            }
+
+            return payload;
+        }
+
+        _getClipboardSnapshot() {
+            const payload = this._readClipboardPayload();
+            if (!payload || typeof payload !== 'object') {
+                return null;
+            }
+
+            if (payload.mfrClipboardVersion !== 2 || !payload.scopeKey || !payload.data || typeof payload.data !== 'object') {
+                // Legacy/invalid payload is ignored to prevent cross-repeater leakage.
+                return null;
+            }
+
+            if (payload.scopeKey !== this._getClipboardScopeKey()) {
+                return null;
+            }
+
+            return payload.data;
+        }
+
+        _clearClipboard() {
+            try {
+                sessionStorage.removeItem('mfr_clipboard');
+            } catch (e) { /* ignore */ }
+            window._mfrClipboard = null;
+            document.dispatchEvent(new CustomEvent('mfr:clipboard-updated'));
+        }
+
+        _updateClipboardUi() {
+            if (!this.copyPaste) return;
+            const hasClipboard = !!this._getClipboardSnapshot();
+
+            this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-start, .mfr-btn-paste-after').forEach(function (btn) {
+                btn.style.display = hasClipboard ? '' : 'none';
+            });
+
+            this.container.querySelectorAll('.mfr-btn-clipboard-clear').forEach(function (btn) {
+                btn.style.display = hasClipboard ? '' : 'none';
+                const title = btn.getAttribute('title') || 'Kopieren beenden';
+                if (!btn.getAttribute('title')) {
+                    btn.setAttribute('title', title);
+                }
+                if (!btn.getAttribute('aria-label')) {
+                    btn.setAttribute('aria-label', title);
+                }
+                if (!btn.getAttribute('data-toggle')) {
+                    btn.setAttribute('data-toggle', 'tooltip');
+                }
+                if (!btn.getAttribute('data-placement')) {
+                    btn.setAttribute('data-placement', 'top');
+                }
+            });
         }
 
         _moveItem(fromIdx, toIdx) {

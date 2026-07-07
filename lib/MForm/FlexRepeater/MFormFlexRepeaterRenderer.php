@@ -4,6 +4,9 @@ namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
+use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
+use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use rex_var_custom_link;
 use rex_var_custom_link_multi;
@@ -24,6 +27,10 @@ class MFormFlexRepeaterRenderer
     public static function renderTemplate(MForm $form, int $level = 1): string
     {
         $items = array_values($form->getItems());
+
+        // Keep the same auto-group behavior as the classic parser path.
+        // This ensures addColumnElement() also creates a row wrapper in Flex-Repeater templates.
+        $items = array_values(MFormGroupExtensionHelper::addColumnGroupExtensionItems($items));
         if (self::needsTabAutoGrouping($items)) {
             $items = array_values(MFormGroupExtensionHelper::addTabGroupExtensionItems($items));
         }
@@ -75,6 +82,7 @@ class MFormFlexRepeaterRenderer
                 $attrs = $item->getAttributes();
                 $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
                 $align = $attrs['data-modal-align'] ?? 'left';
+                $rowClass = MFormLayoutCore::consumeModalRowClass($attrs);
                 $innerHtml = '';
                 ++$i;
                 while ($i < count($items)) {
@@ -90,7 +98,7 @@ class MFormFlexRepeaterRenderer
                     }
                     ++$i;
                 }
-                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml);
+                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml, $rowClass);
                 continue;
             }
 
@@ -124,20 +132,20 @@ class MFormFlexRepeaterRenderer
             if ('collapse' === $type) {
                 $attrs = $item->getAttributes();
                 $labelStr = self::getLabelString($item->getLabel()); // Entwickler-HTML, nicht escapen
-                $hideToggleLinks = isset($attrs['data-group-hide-toggle-links']) && 'true' === (string) $attrs['data-group-hide-toggle-links'];
-                $openCollapse = isset($attrs['data-group-open-collapse']) && (1 === (int) $attrs['data-group-open-collapse'] || true === $attrs['data-group-open-collapse']);
-                $isAccordion = isset($attrs['data-group-accordion']) && 1 === (int) $attrs['data-group-accordion'];
+                $hideToggleLinks = MFormLayoutCore::shouldHideCollapseToggle($attrs, '' !== $labelStr);
+                $openCollapse = MFormLayoutCore::isCollapseOpen($attrs);
+                $isAccordion = MFormLayoutCore::isCollapseAccordion($attrs);
                 $btnAttrs = ' data-toggle="collapse"';
                 if (!$isAccordion) {
                     $btnAttrs .= ' data-collapse-open="' . ($openCollapse ? 1 : 0) . '"';
                 }
                 $btnAttrs .= ' aria-expanded="' . ($openCollapse ? 'true' : 'false') . '"';
-                $btnHidden = ('' === $labelStr || $hideToggleLinks) ? ' hidden' : '';
+                $btnHidden = $hideToggleLinks ? ' hidden' : '';
                 $btnHtml = sprintf('<a class="btn btn-white btn-block%s"%s>%s</a>', $btnHidden, $btnAttrs, $labelStr);
 
                 // Wrapper-Attribute bereinigen wie im Fragment
                 $wrapperAttrs = $attrs;
-                unset($wrapperAttrs['data-group-hide-toggle-links'], $wrapperAttrs['data-group-accordion'], $wrapperAttrs['data-group-open-collapse']);
+                MFormLayoutCore::consumeCollapseWrapperAttributes($wrapperAttrs);
                 $cls = trim('collapse ' . $item->getClass() . ($openCollapse ? ' in' : ''));
                 $wrapperAttrHtml = self::renderAttributes($wrapperAttrs);
                 $html .= $btnHtml . sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), $wrapperAttrHtml);
@@ -171,8 +179,11 @@ class MFormFlexRepeaterRenderer
 
             // COLUMN-GROUP: Bootstrap-3 row + col-* divs
             if ('start-group-column' === $type) {
-                $cls = trim('row ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                $attrs = $item->getAttributes();
+                $rowExtraClass = MFormLayoutCore::consumeColumnGroupRowClass($attrs);
+
+                $cls = trim('row ' . $rowExtraClass . ' ' . $item->getClass());
+                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
                 ++$i;
                 continue;
             }
@@ -214,12 +225,8 @@ class MFormFlexRepeaterRenderer
                 $navHtml = '';
                 foreach ($tabsMeta as $idx => $meta) {
                     $tabIcon = isset($meta['attrs']['tab-icon']) ? '<i class="rex-icon ' . htmlspecialchars((string) $meta['attrs']['tab-icon'], ENT_QUOTES) . '"></i> ' : '';
-                    $isActive = isset($meta['attrs']['data-group-open-tab']) && true === $meta['attrs']['data-group-open-tab'];
-                    $navClass = trim(
-                        ((isset($meta['attrs']['nav-class'])) ? (string) $meta['attrs']['nav-class'] . ' ' : '')
-                        . ((isset($meta['attrs']['pull-right']) && true === $meta['attrs']['pull-right']) ? 'pull-right ' : '')
-                        . ($isActive ? 'active' : ''),
-                    );
+                    $isActive = MFormLayoutCore::isTabActive($meta['attrs']);
+                    $navClass = MFormLayoutCore::buildTabNavClass($meta['attrs']);
                     $navHtml .= sprintf(
                         '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
                         htmlspecialchars($navClass, ENT_QUOTES),
@@ -231,14 +238,12 @@ class MFormFlexRepeaterRenderer
                     );
                 }
                 $groupAttributes = $item->getAttributes();
-                $layout = strtolower(trim((string) ($groupAttributes['data-group-tab-layout'] ?? '')));
-                $style = strtolower(trim((string) ($groupAttributes['data-group-tab-style'] ?? '')));
 
                 $cls = trim('nav mform-tabs rex-page-nav ' . $item->getClass());
-                if (in_array($layout, ['vertical', 'left', 'nav-left'], true)) {
+                if (MFormLayoutCore::isTabLayoutVertical($groupAttributes)) {
                     $cls .= ' mform-tabs--vertical';
                 }
-                if ('modern' === $style) {
+                if (MFormLayoutCore::isTabStyleModern($groupAttributes)) {
                     $cls .= ' mform-tabs--modern';
                 }
 
@@ -254,7 +259,7 @@ class MFormFlexRepeaterRenderer
             if ('tab' === $type) {
                 $tabIdx = self::tabIndexInGroup($items, $i);
                 $attrs = $item->getAttributes();
-                $isActive = isset($attrs['data-group-open-tab']) && true === $attrs['data-group-open-tab'];
+                $isActive = MFormLayoutCore::isTabActive($attrs);
                 unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab'], $attrs['data-group-tab-layout'], $attrs['data-group-tab-style']);
                 $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
                 $html .= sprintf(
@@ -406,37 +411,44 @@ class MFormFlexRepeaterRenderer
         if (count($toggleOptions) > 0 && in_array($type, ['select', 'multiselect'], true) && !isset($itemAttributes['data-toggle'])) {
             $itemAttributes = array_merge(['data-toggle' => 'collapse'], $itemAttributes);
         }
+        MFormLayoutCore::ensureSelectpickerContainer($itemAttributes, $item->getClass());
         $attrs = self::renderAttributes($itemAttributes);
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
 
+        $normalizedInputType = MFormFieldTypeCore::normalizeSimpleInputType($type);
+        if (null !== $normalizedInputType) {
+            return self::wrapFormGroup(
+                $label,
+                self::renderInputWithOptionalDatalist(
+                    $normalizedInputType,
+                    $class,
+                    $key,
+                    $attrs,
+                    $item->getOptions(),
+                    MFormFieldTypeCore::isReadonlySimpleInputType($type),
+                ),
+                $item,
+            );
+        }
+
+        if (MFormFieldTypeCore::isTextareaLikeType($type)) {
+            $readonlyAttr = MFormFieldTypeCore::isReadonlyTextareaType($type) ? ' readonly' : '';
+
+            return self::wrapFormGroup(
+                $label,
+                sprintf(
+                    '<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s%s></textarea>',
+                    $class,
+                    $key,
+                    $attrs,
+                    $readonlyAttr,
+                ),
+                $item,
+            );
+        }
+
         switch ($type) {
-            case 'text':
-            case 'email':
-            case 'url':
-            case 'tel':
-            case 'number':
-            case 'color':
-            case 'date':
-            case 'time':
-            case 'datetime-local':
-            case 'month':
-            case 'week':
-            case 'search':
-            case 'range':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<input type="%s" class="form-control %s" data-mfr-field="%s" value=""%s>', htmlspecialchars($type, ENT_QUOTES), $class, $key, $attrs),
-                    $item,
-                );
-
-            case 'textarea':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s></textarea>', $class, $key, $attrs),
-                    $item,
-                );
-
             case 'hidden':
                 return sprintf('<input type="hidden" data-mfr-field="%s" value="">', $key);
 
@@ -487,20 +499,6 @@ class MFormFlexRepeaterRenderer
             case 'linklist':
                 return self::wrapFormGroup($label, self::renderListWidget('linklist', $key, $item), $item);
 
-            case 'text-readonly':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<input type="text" class="form-control %s" data-mfr-field="%s" value=""%s readonly>', $class, $key, $attrs),
-                    $item,
-                );
-
-            case 'textarea-readonly':
-                return self::wrapFormGroup(
-                    $label,
-                    sprintf('<textarea class="form-control %s" data-mfr-field="%s" rows="3"%s readonly></textarea>', $class, $key, $attrs),
-                    $item,
-                );
-
             case 'headline':
                 $val = is_string($item->getValue()) ? $item->getValue() : '';
                 return sprintf('<div class="mfr-template-headline"><h4>%s</h4></div>', htmlspecialchars($val, ENT_QUOTES));
@@ -522,7 +520,52 @@ class MFormFlexRepeaterRenderer
         }
     }
 
-    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml): string
+    /**
+     * @param array<mixed> $options
+     */
+    private static function renderInputWithOptionalDatalist(string $type, string $class, string $fieldKeyEsc, string $attrs, array $options, bool $readonly = false): string
+    {
+        $datalistId = '';
+        $datalistHtml = '';
+        if (count($options) > 0) {
+            $datalistId = '__MFRID__-datalist-' . preg_replace('/[^a-z0-9\-_]/i', '-', html_entity_decode($fieldKeyEsc, ENT_QUOTES));
+            $datalistHtml = sprintf('<datalist id="%s">%s</datalist>', htmlspecialchars($datalistId, ENT_QUOTES), self::renderDatalistOptions($options));
+        }
+
+        $listAttr = '' !== $datalistId ? ' list="' . htmlspecialchars($datalistId, ENT_QUOTES) . '"' : '';
+        $readonlyAttr = $readonly ? ' readonly' : '';
+
+        return sprintf(
+            '<input type="%s" class="form-control %s" data-mfr-field="%s" value=""%s%s%s>%s',
+            htmlspecialchars($type, ENT_QUOTES),
+            $class,
+            $fieldKeyEsc,
+            $attrs,
+            $listAttr,
+            $readonlyAttr,
+            $datalistHtml,
+        );
+    }
+
+    /**
+     * @param array<mixed> $options
+     */
+    private static function renderDatalistOptions(array $options): string
+    {
+        $html = '';
+        foreach ($options as $key => $value) {
+            if (is_array($value)) {
+                continue;
+            }
+
+            $labelAttr = is_int($key) ? '' : ' label="' . htmlspecialchars((string) $key, ENT_QUOTES) . '"';
+            $html .= '<option value="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"' . $labelAttr . '></option>';
+        }
+
+        return $html;
+    }
+
+    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml, string $rowClass = ''): string
     {
         $alignClass = match ($align) {
             'center' => 'text-center',
@@ -530,7 +573,7 @@ class MFormFlexRepeaterRenderer
             default => 'text-left',
         };
         // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
-        return '<div class="row form-group mfr-modal-wrapper">' .
+        return '<div class="row form-group mfr-modal-wrapper ' . htmlspecialchars($rowClass, ENT_QUOTES) . '">' .
             '<div class="col-sm-12 ' . $alignClass . '">' .
             '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"' .
             ' data-toggle="modal" data-target="#__MFRID__">' .
@@ -589,15 +632,12 @@ class MFormFlexRepeaterRenderer
 
     private static function getLabelString(mixed $label): string
     {
-        if (is_array($label)) {
-            return (string) (reset($label) ?: '');
-        }
-        return (string) ($label ?? '');
+        return MFormLabelRenderer::resolveLabelValue($label);
     }
 
     private static function renderLabel(MFormItem $item): string
     {
-        $label = self::getLabelString($item->getLabel());
+        $label = MFormLabelRenderer::renderLabelHtml($item);
         if ('' === $label) {
             return '';
         }
@@ -621,21 +661,50 @@ class MFormFlexRepeaterRenderer
         if (isset($attrs['form-group-class']) && is_string($attrs['form-group-class']) && '' !== $attrs['form-group-class']) {
             $extraClass = ' ' . htmlspecialchars($attrs['form-group-class'], ENT_QUOTES);
         }
+
+        $labelColClass = 'control-label col-sm-3 mfr-field-label';
+        $fieldColClass = 'col-sm-9 mfr-field-col';
+        $hasCustomGridClasses = false;
+
+        if ('' !== $item->getLabelColClass() && '' !== $item->getFormItemColClass()) {
+            $labelColClass = trim($item->getLabelColClass() . ' mfr-field-label');
+            $fieldColClass = trim($item->getFormItemColClass() . ' mfr-field-col');
+            $hasCustomGridClasses = true;
+        }
+
+        // Keep behavior aligned with the default parser templates:
+        // setFull() forces both label and field columns to full width.
+        if ($item->isFull()) {
+            $labelColClass = 'control-label col-sm-12 mfr-field-label';
+            $fieldColClass = 'col-sm-12 mfr-field-col';
+        }
+
+        $labelColClassEsc = htmlspecialchars($labelColClass, ENT_QUOTES);
+        $fieldColClassEsc = htmlspecialchars($fieldColClass, ENT_QUOTES);
+
         // Bootstrap-3 form-horizontal Markup (col-sm-3 / col-sm-9). Die Layout-Variante
         // (vertical/inline) wird per CSS via [data-mfr-layout] auf dem .mfr-container
         // ueberschrieben.
         if ('' === $label) {
+            $fieldNoLabelClass = $fieldColClass;
+            if (!$item->isFull() && !$hasCustomGridClasses) {
+                $fieldNoLabelClass = 'col-sm-9 col-sm-offset-3 mfr-field-col';
+            }
+
             return sprintf(
-                '<div class="row form-group mfr-field-group%s"><div class="col-sm-12 mfr-field-col">%s%s</div></div>',
+                '<div class="row form-group mfr-field-group%s"><div class="%s">%s%s</div></div>',
                 $extraClass,
+                htmlspecialchars($fieldNoLabelClass, ENT_QUOTES),
                 $field,
                 $noticeHtml,
             );
         }
         return sprintf(
-            '<div class="row form-group mfr-field-group%s"><label class="control-label col-sm-3 mfr-field-label">%s</label><div class="col-sm-9 mfr-field-col">%s%s</div></div>',
+            '<div class="row form-group mfr-field-group%s"><label class="%s">%s</label><div class="%s">%s%s</div></div>',
             $extraClass,
+            $labelColClassEsc,
             $label,
+            $fieldColClassEsc,
             $field,
             $noticeHtml,
         );

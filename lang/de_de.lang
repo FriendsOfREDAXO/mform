@@ -8,6 +8,7 @@ mform_demo_base = Basis Beispiele
 mform_demo_extended = Erweiterte Beispiele
 mform_demo_expert = Experten Beispiele
 mform_demo_layout_preview = Layout & SVG Vorschau
+mform_demo_renderer_parity = Renderer-Parität
 mform_formbuilder = Form Builder
 mform_demo_community = FOS Beispiele
 mform_demo_wrapper = Wrapper Beispiele
@@ -159,6 +160,9 @@ mform_example_description_community = Later
 mform_example_description_wrapper = Die "Wrapper Beispiele" zeigen auf, wie man mittels der MForm Wrapper-Elemente Input-Formulare sinnvoll layouten und interaktiv aufbereiten kann.
 mform_example_description_repeater = Durch die "Repeater Beispiele" wird demonstiert, wie einfach ein Repeater Element funktioniert, prinzipiell lässt es sich wie die anderen Wrapper Elemente anlegen. Das gewrappte Formular kann durch den Repeater beliebig oft oder mit einem min. oder max. Blocklimit (genauso wie bisher mit MBlock) repliziert werden.
 mform_example_description_layout_preview = Diese Seite zeigt die beiden Utility-Klassen <code>HtmlToSvgConverter</code> und <code>LayoutPreviewBuilder</code> aus dem MForm-Namespace <code>FriendsOfRedaxo\MForm\Utils</code>. <code>LayoutPreviewBuilder</code> erzeugt programmatisch SVG-Layout-Vorschauen aus Sections, Spalten und Platzhalterelementen – ideal als Modul-Vorschaubild im Backend. <code>HtmlToSvgConverter</code> verpackt SVG-Fragmente (rect, circle, line, path, text, g, image) zu einem vollständigen, eigenständigen SVG. Der "HTML"-Anteil bezieht sich dabei auf die unterstützten <em>HTML-Style-Attribute</em> (<code>style="background:…; color:…; border: 1px solid red"</code>) auf diesen SVG-Tags – sie werden zu <code>fill</code> / <code>stroke</code> / <code>stroke-width</code> umgesetzt.
+mform_demo_renderer_parity_description = Smoke-Checks für Parser und Flex-Repeater. Diese Seite vergleicht typische Wrapper-/Label-Szenarien und zeigt, ob beide Renderpfade die gleichen Kernmerkmale enthalten.
+mform_demo_renderer_parity_checks = Renderer-Parität: Smoke-Checks
+mform_demo_renderer_parity_html = Renderer-Parität: HTML-Vergleich
 
 mform_github = MForm bei FOR - go to github
 
@@ -180,8 +184,11 @@ mform_flex_repeater_visibility = Aktiv / Inaktiv (Ausgabe)
 mform_flex_repeater_remove = Entfernen
 mform_flex_repeater_toggle = Aufklappen / Zuklappen
 mform_flex_repeater_copy = Kopieren
+mform_flex_repeater_paste_label = Einfügen
+mform_flex_repeater_paste_start = Einfügen (am Anfang)
 mform_flex_repeater_paste = Einfügen (am Ende)
 mform_flex_repeater_paste_after = Danach einfügen
+mform_flex_repeater_clipboard_clear = Kopieren beenden
 
 mform_install = Install
 mform_update = Update

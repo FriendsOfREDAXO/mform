@@ -8,6 +8,7 @@ mform_demo_base = Basic examples
 mform_demo_extended = Extended examples
 mform_demo_expert = Expert examples
 mform_demo_layout_preview = Layout & SVG preview
+mform_demo_renderer_parity = Renderer parity
 mform_formbuilder = Form Builder
 mform_demo_community = FOS examples
 mform_demo_wrapper = Wrapper examples
@@ -160,6 +161,9 @@ mform_example_description_community = Later
 mform_example_description_wrapper = The "Wrapper Examples" demonstrate how to effectively layout and enhance input forms using MForm wrapper elements.
 mform_example_description_repeater = The "Repeater Examples" illustrate how simple it is to use a repeater element. Essentially, it can be created like the other wrapper elements. The wrapped form can be replicated using the repeater as many times as needed, with minimum or maximum block limits (similar to MBlock as before).
 mform_example_description_layout_preview = This page demonstrates the two utility classes <code>HtmlToSvgConverter</code> and <code>LayoutPreviewBuilder</code> from the MForm namespace <code>FriendsOfRedaxo\MForm\Utils</code>. <code>LayoutPreviewBuilder</code> programmatically generates SVG layout previews from sections, columns and placeholder elements – ideal as a module preview image in the backend. <code>HtmlToSvgConverter</code> wraps SVG fragments (rect, circle, line, path, text, g, image) into a complete, standalone SVG. The "HTML" part refers to the supported <em>HTML-style attributes</em> (<code>style="background:…; color:…; border: 1px solid red"</code>) on those SVG tags – they are translated to <code>fill</code> / <code>stroke</code> / <code>stroke-width</code>.
+mform_demo_renderer_parity_description = Smoke checks for parser and flex repeater. This page compares common wrapper/label scenarios and shows whether both render paths contain the same core markers.
+mform_demo_renderer_parity_checks = Renderer parity: Smoke checks
+mform_demo_renderer_parity_html = Renderer parity: HTML comparison
 
 mform_github = MForm FOR – go to github
 
@@ -178,8 +182,11 @@ mform_cl_multi_remove = Remove
 mform_cl_multi_move = Move
 mform_flex_repeater_toggle = Expand / Collapse
 mform_flex_repeater_copy = Copy
+mform_flex_repeater_paste_label = Paste
+mform_flex_repeater_paste_start = Paste (at start)
 mform_flex_repeater_paste = Paste (at end)
 mform_flex_repeater_paste_after = Paste after
+mform_flex_repeater_clipboard_clear = End copy mode
 mform_repeater_remove_field_confirm_msg = Remove field?
 mform_list_widget_view_grid = Grid view
 mform_list_widget_view_list = List view

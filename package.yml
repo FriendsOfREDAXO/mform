@@ -1,5 +1,5 @@
 package: mform
-version: '9.2.4'
+version: '9.3.0'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -22,6 +22,7 @@ page:
                 demo_rexform: { title: 'translate:demo_rexform' }
                 demo_expert: { title: 'translate:demo_expert' }
                 demo_layout_preview: { title: 'translate:demo_layout_preview' }
+                demo_renderer_parity: { title: 'translate:demo_renderer_parity' }
 
         formbuilder:
             title: 'translate:formbuilder'

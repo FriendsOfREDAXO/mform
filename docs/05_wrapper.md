@@ -165,6 +165,17 @@ $mform = MForm::factory()
 echo $mform->show();
 ```
 
+Hinweis zur Kompatibilität:
+
+- `addColumnElement()` wird auch im Flex-Repeater-Kontext automatisch zu einer `row`-Gruppe zusammengefasst. Ein zusätzlicher manueller HTML-Workaround mit `addHtml('<div class="row">')` ist nicht nötig.
+- Optional kann die Row-Klasse für die automatisch erzeugte Spaltengruppe pro Column-Element erweitert werden:
+
+```php
+->addColumnElement(6, $field, ['data-group-column-row-class' => 'g-5'])
+```
+
+Alias (gleiches Verhalten): `data-group-row-class`.
+
 ## Inline-Elemente
 
 Stellt Inline-Elemente dar, die sich in einer Zeile nebeneinander anordnen.
@@ -255,6 +266,11 @@ Hinweise:
 | `$align` | `string` | `'left'` | Button-Ausrichtung: `'left'`, `'center'` oder `'right'` |
 | `$attributes` | `array` | `[]` | Zusätzliche HTML-Attribute für den Button-Wrapper |
 
+Zusätzliche optionale Attribute für den Modal-Button-Wrapper:
+
+- `data-modal-row-class`: Zusätzliche Klassen für den äußeren `row form-group`-Wrapper.
+- `data-group-row-class`: Alias zu `data-modal-row-class`.
+
 ```php
 <?php
 use FriendsOfRedaxo\MForm;
@@ -274,7 +290,7 @@ $mform = MForm::factory()
             'py-2' => 'Klein',
             'py-4' => 'Mittel',
         ], ['label' => 'Abstand'])
-    , 'btn-default', 'center')
+    , 'btn-default', 'center', ['data-modal-row-class' => 'g-5'])
 
     // Hilfe-Dialog rechts, btn-info
     ->addModalElement('Hilfe', MForm::factory()

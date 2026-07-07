@@ -177,9 +177,10 @@ function initMFormSelectPicker(mform) {
     mform.find('.selectpicker').each(function () {
         // Stellen Sie sicher, dass der Wert '0' korrekt behandelt wird
         var selectedValue = $(this).attr('data-selected');
+        var options = {};
         
         $(this).selectpicker('destroy');
-        $(this).selectpicker();
+        $(this).selectpicker(options);
         
         // Wenn selectedValue '0' ist, manuell den ausgewählten Wert setzen
         if (selectedValue === '0' || selectedValue === 0) {

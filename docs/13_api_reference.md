@@ -702,6 +702,9 @@ setTooltipInfo(?string $value = null, string $icon = ''): MForm
 ```
 Zeigt ein Info-Tooltip-Icon neben dem Label.
 
+- Default ohne Icon-Parameter: `fa-info-circle`
+- Eigenes Icon weiterhin möglich, z. B. `fa-question-circle`
+
 ---
 
 ```php

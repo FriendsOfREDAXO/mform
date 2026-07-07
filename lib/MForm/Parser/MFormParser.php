@@ -17,6 +17,9 @@ use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
+use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
+use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
 use rex_addon;
@@ -116,13 +119,7 @@ class MFormParser
         $copyPaste = !isset($attrs['copy_paste']) || $attrs['copy_paste'];
         $label = '';
         if ('' !== $item->getLabel() && [] !== $item->getLabel()) {
-            $itemLabel = $item->getLabel();
-            if (is_array($itemLabel)) {
-                $firstLabel = reset($itemLabel);
-                $labelStr = (string) ($firstLabel ?? '');
-            } else {
-                $labelStr = (string) $itemLabel;
-            }
+            $labelStr = MFormLabelRenderer::resolveLabelValue($item->getLabel());
             // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons).
             $label = '<label class="control-label mfr-label">' . $labelStr . '</label>';
         }
@@ -187,10 +184,21 @@ class MFormParser
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_after'), ENT_QUOTES),
         ) : '';
 
-        $pasteButton = $copyPaste ? sprintf(
+        $pasteButtonTop = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-paste-start" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_start'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_label'), ENT_QUOTES),
+        ) : '';
+
+        $pasteButtonBottom = $copyPaste ? sprintf(
             '<button type="button" class="btn btn-default mfr-btn-paste" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
-            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_label'), ENT_QUOTES),
+        ) : '';
+
+        $clearClipboardButton = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-clipboard-clear" title="%1$s" aria-label="%1$s" data-toggle="tooltip" data-placement="top" style="display:none"><span class="mfr-copy-off-icon"><i class="rex-icon fa-copy"></i><i class="rex-icon fa-times mfr-copy-off-x"></i></span></button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_clipboard_clear'), ENT_QUOTES),
         ) : '';
 
         $toggleAllButton = sprintf(
@@ -205,9 +213,10 @@ class MFormParser
             htmlspecialchars($btnClass, ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),
         );
-        $toolbarGroup = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButton . '</div>';
+        $toolbarGroupTop = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonTop . $clearClipboardButton . '</div>';
+        $toolbarGroupBottom = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonBottom . $clearClipboardButton . '</div>';
 
-        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroup . '</div>';
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroupTop . '</div>';
 
         $this->elements[] = '<div class="mfr-items-list"></div>';
 
@@ -223,7 +232,7 @@ class MFormParser
             $templateHtml,
         );
 
-        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroup . '</div>';
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroupBottom . '</div>';
 
         if ($this->debug) {
             $this->elements[] = sprintf(
@@ -258,7 +267,7 @@ class MFormParser
         if ('modal' == $item->getType()) {
             $labelRaw = $item->getLabel();
             if ('' !== $labelRaw && [] !== $labelRaw) {
-                $labelStr = is_array($labelRaw) ? (string) (array_values($labelRaw)[0] ?? '') : (string) $labelRaw;
+                $labelStr = MFormLabelRenderer::resolveLabelValue($labelRaw);
                 $element->setLabel($labelStr);
             }
             $removeAttributes = ['data-modal-btn-class'];
@@ -281,12 +290,16 @@ class MFormParser
         // COLLAPSE MANIPULATIONS
         if ('collapse' == $item->getType()) {
             $removeAttributes = ['data-group-hide-toggle-links', 'data-group-accordion', 'data-group-open-collapse'];
+            $openCollapse = MFormLayoutCore::isCollapseOpen($attributes);
+            $isAccordion = MFormLayoutCore::isCollapseAccordion($attributes);
+            $hideToggle = MFormLayoutCore::shouldHideCollapseToggle($attributes, '' !== MFormLabelRenderer::resolveLabelValue($item->getLabel()));
+
             $buttonAttributes = [
                 'data-toggle' => 'collapse',
-                'data-collapse-open' => (int) $attributes['data-group-open-collapse'],
-                'aria-expanded' => ((1 == (int) $attributes['data-group-open-collapse']) ? 'true' : 'false'),
+                'data-collapse-open' => $openCollapse ? 1 : 0,
+                'aria-expanded' => $openCollapse ? 'true' : 'false',
             ];
-            if (isset($attributes['data-group-accordion']) && 1 == (int) $attributes['data-group-accordion']) {
+            if ($isAccordion) {
                 unset($buttonAttributes['data-collapse-open']);
             }
             if ('true' == $buttonAttributes['aria-expanded']) {
@@ -294,14 +307,22 @@ class MFormParser
             }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
-                ->setClass((('' === $item->getLabel() || [] === $item->getLabel()) || (array_key_exists('data-group-hide-toggle-links', $attributes) && 'true' == $attributes['data-group-hide-toggle-links'])) ? ' hidden' : '')
+                ->setClass($hideToggle ? ' hidden' : '')
                 ->setAttributes($this->parseAttributes($buttonAttributes))
-                ->setValue(is_array($item->getLabel()) ? (string) (array_values($item->getLabel())[0] ?? '') : (string) $item->getLabel());
+                ->setValue(MFormLabelRenderer::resolveLabelValue($item->getLabel()));
             $element->setLabel($this->parseElement($collapseButton, 'wrapper')); // add parsed legend to collapse element
         }
 
         if ('start-group-collapse' == $item->getType()) {
             $removeAttributes = ['data-group-collapse-id'];
+        }
+
+        // COLUMN GROUP MANIPULATIONS
+        if ('start-group-column' == $item->getType()) {
+            $rowClass = MFormLayoutCore::consumeColumnGroupRowClass($attributes);
+            if ('' !== $rowClass) {
+                $item->setClass(trim($item->getClass() . ' ' . $rowClass));
+            }
         }
 
         // TAB MANIPULATIONS
@@ -313,34 +334,35 @@ class MFormParser
                     $element = new MFormElement();
                     $element->setType('tabnavli')
                         ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . (string) $item->getGroupKey())
-                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . (is_array($itm->getLabel()) ? (string) (array_values($itm->getLabel())[0] ?? '') : (string) $itm->getLabel()))
-                        ->setClass(
-                            ((array_key_exists('nav-class', $itm->getAttributes())) ? $itm->getAttributes()['nav-class'] . ' ' : '') .
-                            ((array_key_exists('pull-right', $itm->getAttributes()) && true === $itm->getAttributes()['pull-right']) ? ' pull-right' : '') .
-                            ((array_key_exists('data-group-open-tab', $itm->getAttributes()) && true === $itm->getAttributes()['data-group-open-tab']) ? ' active' : ''),
-                        );
+                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . MFormLabelRenderer::resolveLabelValue($itm->getLabel()))
+                        ->setClass(MFormLayoutCore::buildTabNavClass($itm->getAttributes()));
                     $nav[] = $this->parseElement($element, 'wrapper');
                 }
             }
             $element->setElement(implode('', $nav));
 
-            $tabLayout = strtolower(trim((string) ($attributes['data-group-tab-layout'] ?? '')));
-            if (in_array($tabLayout, ['vertical', 'left', 'nav-left'], true)) {
+            if (MFormLayoutCore::isTabLayoutVertical($attributes)) {
                 $item->setClass(trim($item->getClass() . ' mform-tabs--vertical'));
             }
 
-            $tabStyle = strtolower(trim((string) ($attributes['data-group-tab-style'] ?? '')));
-            if ('modern' === $tabStyle) {
+            if (MFormLayoutCore::isTabStyleModern($attributes)) {
                 $item->setClass(trim($item->getClass() . ' mform-tabs--modern'));
             }
         }
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
-            if (isset($attributes['data-group-open-tab']) && true === $attributes['data-group-open-tab']) {
+            if (MFormLayoutCore::isTabActive($attributes)) {
                 $item->setClass(trim($item->getClass() . ' active'));
             }
 
-            unset($attributes['data-group-tab-layout'], $attributes['data-group-tab-style']);
+            unset(
+                $attributes['tab-icon'],
+                $attributes['nav-class'],
+                $attributes['pull-right'],
+                $attributes['data-group-open-tab'],
+                $attributes['data-group-tab-layout'],
+                $attributes['data-group-tab-style'],
+            );
         }
 
         if (count($removeAttributes) > 0) {
@@ -411,7 +433,7 @@ class MFormParser
     {
         $datalist = '';
 
-        if ('text-readonly' == $item->getType()) { // is readonly
+        if (MFormFieldTypeCore::isReadonlySimpleInputType($item->getType())) { // is readonly
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
@@ -435,11 +457,12 @@ class MFormParser
 
         // create element
         $element = new MFormElement();
+        $normalizedType = MFormFieldTypeCore::normalizeSimpleInputType($item->getType()) ?? $item->getType();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
-            ->setType($item->getType())
+            ->setType($normalizedType)
             ->setClass($item->getClass())
             ->setDatalist($datalist)
             ->setAttributes($this->parseAttributes($item->getAttributes())); // parse attributes for use in templates
@@ -460,9 +483,8 @@ class MFormParser
      */
     private function generateAreaElement(MFormItem $item): void
     {
-        // set typ specific vars
-        if ('textarea-readonly' == $item->getType()) {
-            $item->setType('textarea'); // type is textarea
+        // set type specific vars
+        if (MFormFieldTypeCore::isReadonlyTextareaType($item->getType())) {
             MFormAttributeHandler::addAttribute($item, 'readonly', 'readonly'); // add attribute readonly
         }
 
@@ -471,11 +493,12 @@ class MFormParser
 
         // create element
         $element = new MFormElement();
+        $normalizedType = MFormFieldTypeCore::normalizeTextareaType($item->getType()) ?? $item->getType();
         // add all replacement elements for template parsing
         $element->setId($item->getId())
             ->setVarId($this->varIdStr($item))
             ->setValue((string) ((is_array($item->getValue())) ? implode('', $item->getValue()) : $item->getValue()))
-            ->setType($item->getType())
+            ->setType($normalizedType)
             ->setClass($item->getClass())
             ->setAttributes($this->parseAttributes($item->getAttributes()));
 
@@ -501,6 +524,7 @@ class MFormParser
         // init option element string
         $optionElements = '';
         $attributes = $item->getAttributes();
+        MFormLayoutCore::ensureSelectpickerContainer($attributes, $item->getClass());
         if (count($item->getToggleOptions()) > 0) {
             $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
         }
@@ -1482,7 +1506,19 @@ class MFormParser
                         $item = $mformItem;
                     }
 
-                    switch ($item->getType()) {
+                    $itemType = $item->getType();
+
+                    if (MFormFieldTypeCore::isSimpleInputType($itemType)) {
+                        $this->generateInputElement($item);
+                        continue;
+                    }
+
+                    if (MFormFieldTypeCore::isTextareaLikeType($itemType)) {
+                        $this->generateAreaElement($item);
+                        continue;
+                    }
+
+                    switch ($itemType) {
                         // OPEN REPEATER
                         case 'repeater':
                             $this->openRepeaterElement($item, $key, $items, $skipKeys);
@@ -1526,30 +1562,8 @@ class MFormParser
                         case 'alert':
                             $this->generateLineElement($item);
                             break;
-                        case 'color':
-                        case 'email':
-                        case 'url':
-                        case 'tel':
-                        case 'search':
-                        case 'number':
-                        case 'range':
-                        case 'date':
-                        case 'time':
-                        case 'datetime':
-                        case 'datetime-local':
-                        case 'month':
-                        case 'week':
-                        case 'text':
-                        case 'text-readonly':
-                            $this->generateInputElement($item);
-                            break;
                         case 'hidden':
                             $this->generateHiddenInputElement($item);
-                            break;
-                        case 'markitup':
-                        case 'textarea':
-                        case 'textarea-readonly':
-                            $this->generateAreaElement($item);
                             break;
                         case 'select':
                         case 'multiselect':
@@ -1595,20 +1609,6 @@ class MFormParser
 
     private function createLabelElement(MFormItem $item): MFormElement
     {
-        $this->createTooltipElement($item);
-
-        $labelString = $item->getLabel();
-        if (is_array($item->getLabel())) {
-            foreach ($item->getLabel() as $key => $itemLabel) {
-                if (str_contains(rex_i18n::getLocale(), $key)) {
-                    $labelString = $itemLabel;
-                }
-            }
-            if (is_array($labelString)) {
-                $labelString = array_values($labelString)[0];
-            }
-        }
-
         $label = new MFormElement();
         $label->setId($item->getId());
 
@@ -1616,29 +1616,10 @@ class MFormParser
             $label->setId($item->getId() . '" :for="' . $item->getAttributes()[':id']);
         }
 
-        $label->setValue($labelString)
+        $label->setValue(MFormLabelRenderer::renderLabelHtml($item))
             ->setType('label');
 
         return $label;
-    }
-
-    private function createTooltipElement(MFormItem $item): void
-    {
-        // set tooltip
-        if ($item->getInfoTooltip()) {
-            // parse tooltip
-            if ('' === (string) $item->getInfoTooltipIcon()) {
-                $item->setInfoTooltipIcon('fa-exclamation');
-            }
-
-            $tooltip = new MFormElement();
-            $tooltip->setValue($item->getInfoTooltip())
-                ->setInfoTooltipIcon($item->getInfoTooltipIcon())
-                ->setType('tooltip-info');
-
-            $currentLabel = $item->getLabel();
-            $item->setLabel((is_array($currentLabel) ? '' : (string) $currentLabel) . $this->parseElement($tooltip, 'base'));
-        }
     }
 
     /**
@@ -1731,4 +1712,5 @@ class MFormParser
         }
         return $inlineAttributes;
     }
+
 }
