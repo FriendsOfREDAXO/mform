@@ -68,9 +68,17 @@ class MFormLayoutCore
      *
      * @param array<string, mixed> $attributes
      */
-    public static function ensureSelectpickerContainer(array &$attributes): void
+    public static function ensureSelectpickerContainer(array &$attributes, string $itemClass = ''): void
     {
-        $classAttr = isset($attributes['class']) ? trim((string) $attributes['class']) : '';
+        $classParts = [];
+        if (isset($attributes['class'])) {
+            $classParts[] = trim((string) $attributes['class']);
+        }
+        if ('' !== trim($itemClass)) {
+            $classParts[] = trim($itemClass);
+        }
+
+        $classAttr = trim(implode(' ', $classParts));
         if ('' === $classAttr) {
             return;
         }

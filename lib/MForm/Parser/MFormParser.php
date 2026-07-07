@@ -512,7 +512,7 @@ class MFormParser
         // init option element string
         $optionElements = '';
         $attributes = $item->getAttributes();
-        MFormLayoutCore::ensureSelectpickerContainer($attributes);
+        MFormLayoutCore::ensureSelectpickerContainer($attributes, $item->getClass());
         if (count($item->getToggleOptions()) > 0) {
             $attributes = array_merge(['data-toggle' => 'collapse'], $attributes);
         }
