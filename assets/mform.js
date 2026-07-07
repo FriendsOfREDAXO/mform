@@ -177,16 +177,7 @@ function initMFormSelectPicker(mform) {
     mform.find('.selectpicker').each(function () {
         // Stellen Sie sicher, dass der Wert '0' korrekt behandelt wird
         var selectedValue = $(this).attr('data-selected');
-        var containerAttr = $(this).attr('data-container');
-        var hasExplicitContainer = typeof containerAttr !== 'undefined' && String(containerAttr).trim() !== '';
         var options = {};
-
-        // Ohne expliziten Container landet das Dropdown in Repeatern/verschachtelten
-        // Wrappers haeufig am falschen DOM-Anker. Standard ist daher body.
-        if (!hasExplicitContainer) {
-            $(this).attr('data-container', 'body');
-            options.container = 'body';
-        }
         
         $(this).selectpicker('destroy');
         $(this).selectpicker(options);
