@@ -78,10 +78,19 @@ Besonders sensibel sind:
 - `__disabled`-Handling für Online/Offline im Repeater
 - Nested Repeater
 - Modal-IDs innerhalb von Repeatern
+- Clipboard- und Event-Lifecycle im Flex-Repeater (keine per-Instanz `document`-Listener ohne sauberen Lifecycle)
+- Paste-at-start-Pfad im Flex-Repeater: Fokus nur setzen, wenn `_renderItem()` wirklich ein Element liefert
 - TinyMCE-, MarkdownEditor- und klassische Widget-Kompatibilität
 - MBlock-Migration und `useCustomLinkForClassicWidgets(true)`
 - YForm-Value-Types und Listenansicht im Manager
 - Nutzung außerhalb klassischer Module, z. B. rex_form oder YForm
+
+### Aktuelle Projektregeln (Session-Update)
+
+- `demo_renderer_parity` nur im Debug-Modus anzeigen. Die Sichtbarkeit wird über Backend-Pages gesteuert (z. B. in `boot.php` via `PAGES_PREPARED`), nicht nur über Doku-Hinweise.
+- Wenn neue Feldtypen eingeführt oder stärker genutzt werden, immer die Default-Class-Matrix prüfen (`MFormDefault::$classes`).
+- Für Default-Class-Zugriffe in Manipulatoren defensiv arbeiten (Fallback statt direkter Array-Index), um `Undefined array key`-Warnings zu vermeiden.
+- Bei Flex-Repeater-Clipboard-Updates zentralen Listener-Ansatz bevorzugen (eine Registrierung + Instanz-Registry), damit PJAX-/Reload-Szenarien keine alten Instanzen halten.
 
 ## Arbeitsweise
 
@@ -89,6 +98,10 @@ Besonders sensibel sind:
 2. Ändere nur diesen Bereich.
 3. Prüfe sofort danach den engsten sinnvollen Check.
 4. Aktualisiere anschließend Doku, README und Changelog, wenn Nutzerverhalten betroffen ist.
+
+5. Bei neuen Input-Typen zusätzlich prüfen:
+	- `MFormDefault::$classes`
+	- betroffene Manipulatoren/Renderer auf direkte Typ-Indexzugriffe
 
 ## Qualitätschecks
 
@@ -124,6 +137,8 @@ Bei geänderten Features, APIs, Kompatibilitätsregeln oder Nutzungshinweisen im
 - `README.de.md`
 - passende Dateien unter `docs/`
 
+Bei reinen Stabilitätsfixes im Repeater (z. B. Clipboard-Lifecycle, Focus-Guards, Typ-Fallbacks) mindestens `CHANGELOG.md` aktualisieren.
+
 ### Zuordnung
 
 - Neue Nutzerfeatures: `docs/00_whats_new.md`
@@ -139,3 +154,5 @@ Halte die deutsche und englische README inhaltlich synchron, soweit es um Featur
 ## Entscheidungsregel bei Unsicherheit
 
 Wenn eine Änderung zwischen Modernisierung und Kompatibilität abwägen muss, entscheide standardmäßig für Kompatibilität.
+
+Wo möglich, getrennte Rendering-Pfade vermeiden und stattdessen gemeinsame Renderer-/Helper-Pfade nutzen, damit Parser und Flex-Repeater nicht auseinanderdriften.
