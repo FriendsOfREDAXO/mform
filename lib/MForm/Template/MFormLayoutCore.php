@@ -64,6 +64,29 @@ class MFormLayoutCore
     }
 
     /**
+     * Ensures selectpicker fields have a stable default container.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function ensureSelectpickerContainer(array &$attributes): void
+    {
+        $classAttr = isset($attributes['class']) ? trim((string) $attributes['class']) : '';
+        if ('' === $classAttr) {
+            return;
+        }
+
+        $classes = preg_split('/\s+/', $classAttr) ?: [];
+        if (!in_array('selectpicker', $classes, true)) {
+            return;
+        }
+
+        $containerAttr = isset($attributes['data-container']) ? trim((string) $attributes['data-container']) : '';
+        if ('' === $containerAttr) {
+            $attributes['data-container'] = 'body';
+        }
+    }
+
+    /**
      * @param array<string, mixed> $attributes
      */
     public static function isTabActive(array $attributes): bool

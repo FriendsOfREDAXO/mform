@@ -411,6 +411,7 @@ class MFormFlexRepeaterRenderer
         if (count($toggleOptions) > 0 && in_array($type, ['select', 'multiselect'], true) && !isset($itemAttributes['data-toggle'])) {
             $itemAttributes = array_merge(['data-toggle' => 'collapse'], $itemAttributes);
         }
+        MFormLayoutCore::ensureSelectpickerContainer($itemAttributes);
         $attrs = self::renderAttributes($itemAttributes);
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
