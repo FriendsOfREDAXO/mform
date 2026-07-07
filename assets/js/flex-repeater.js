@@ -711,6 +711,8 @@
             this.data = [];
             this._suppressSync = false;
             this._isBootstrapping = false;
+            this._onClipboardUpdated = () => this._updateClipboardUi();
+            document.addEventListener('mfr:clipboard-updated', this._onClipboardUpdated);
 
             this._log('constructor', {
                 fieldName: this.fieldName,
@@ -791,6 +793,15 @@
                     e.preventDefault();
                     this._log('toggle all clicked (delegated)');
                     this._toggleAll();
+                    return;
+                }
+
+                // Paste button in top toolbar → insert at start
+                const pasteStartBtn = e.target.closest('.mfr-btn-paste-start');
+                if (pasteStartBtn && pasteStartBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    this._pasteItemAtStart();
+                    return;
                 }
 
                 // Paste button in toolbar → append at end
@@ -798,6 +809,15 @@
                 if (pasteBtn && pasteBtn.closest('.mfr-container') === this.container) {
                     e.preventDefault();
                     this._pasteItem();
+                    return;
+                }
+
+                // Clear clipboard button in toolbar
+                const clearClipboardBtn = e.target.closest('.mfr-btn-clipboard-clear');
+                if (clearClipboardBtn && clearClipboardBtn.closest('.mfr-container') === this.container) {
+                    e.preventDefault();
+                    this._clearClipboard();
+                    return;
                 }
 
                 // Paste button on item → insert after that item
@@ -807,6 +827,7 @@
                     const itemEl = pasteAfterBtn.closest('.mfr-item');
                     const idx = itemEl ? Array.from(this.itemsList.children).indexOf(itemEl) : -1;
                     this._pasteItemAfter(idx);
+                    return;
                 }
             });
 
@@ -816,16 +837,7 @@
             this._sortableInitialized = false;
             this._initSortable();
 
-            // Show paste buttons if clipboard is already filled
-            if (this.copyPaste) {
-                try {
-                    if (sessionStorage.getItem('mfr_clipboard')) {
-                        this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after, .mfr-btn-paste-after').forEach(function (btn) {
-                            btn.style.display = '';
-                        });
-                    }
-                } catch (e) { /* ignore */ }
-            }
+            this._updateClipboardUi();
 
             // Formular-Submit wird über den globalen Handler in initRepeaters abgewickelt
         }
@@ -997,6 +1009,8 @@
             });
             setTimeout(() => initWidgets(itemEl), 20);
 
+            this._updateClipboardUi();
+
             return itemEl;
         }
 
@@ -1114,15 +1128,8 @@
                     const snapshot = JSON.parse(JSON.stringify(this.data[idx] || {}));
                     // Remove disabled marker so paste produces an enabled item
                     delete snapshot[MFR_ITEM_DISABLED_KEY];
-                    try {
-                        sessionStorage.setItem('mfr_clipboard', JSON.stringify(snapshot));
-                    } catch (e2) {
-                        window._mfrClipboard = snapshot;
-                    }
-                    // Show all paste buttons in this container
-                    this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-after').forEach(function (btn) {
-                        btn.style.display = '';
-                    });
+                    this._setClipboardSnapshot(snapshot);
+                    this._updateClipboardUi();
                     // Visual feedback
                     copyBtn.classList.add('mfr-btn-copy-active');
                     window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 800);
@@ -1179,29 +1186,38 @@
         }
 
         _pasteItem() {
-            let snapshot = null;
-            try {
-                const raw = sessionStorage.getItem('mfr_clipboard');
-                if (raw) snapshot = JSON.parse(raw);
-            } catch (e) { /* ignore */ }
-            if (!snapshot && window._mfrClipboard) {
-                snapshot = window._mfrClipboard;
-            }
+            const snapshot = this._getClipboardSnapshot();
             if (!snapshot) return;
             const data = JSON.parse(JSON.stringify(snapshot));
             this._log('pasteItem', { data: data });
             this.addItem(data);
+            this._updateClipboardUi();
+        }
+
+        _pasteItemAtStart() {
+            const snapshot = this._getClipboardSnapshot();
+            if (!snapshot) return;
+            const data = JSON.parse(JSON.stringify(snapshot));
+            this._log('pasteItemAtStart', { data: data });
+
+            if (this.max > 0 && this.data.length >= this.max) return;
+
+            this.data.unshift(data);
+            const insertedEl = this._renderItem(data, 0);
+            if (insertedEl && this.itemsList && this.itemsList.firstElementChild && this.itemsList.firstElementChild !== insertedEl) {
+                this.itemsList.firstElementChild.before(insertedEl);
+            }
+
+            this._reindex();
+            this._updateAddBtn();
+            this._updateToggleAllButton();
+            this.syncValue();
+            this._focusNewItem(insertedEl, true);
+            this._updateClipboardUi();
         }
 
         _pasteItemAfter(idx) {
-            let snapshot = null;
-            try {
-                const raw = sessionStorage.getItem('mfr_clipboard');
-                if (raw) snapshot = JSON.parse(raw);
-            } catch (e) { /* ignore */ }
-            if (!snapshot && window._mfrClipboard) {
-                snapshot = window._mfrClipboard;
-            }
+            const snapshot = this._getClipboardSnapshot();
             if (!snapshot) return;
             const data = JSON.parse(JSON.stringify(snapshot));
             this._log('pasteItemAfter', { idx: idx, data: data });
@@ -1210,6 +1226,62 @@
             } else {
                 this.addItem(data);
             }
+            this._updateClipboardUi();
+        }
+
+        _setClipboardSnapshot(snapshot) {
+            if (!snapshot || typeof snapshot !== 'object') return;
+            try {
+                sessionStorage.setItem('mfr_clipboard', JSON.stringify(snapshot));
+            } catch (e) { /* ignore */ }
+            window._mfrClipboard = snapshot;
+            document.dispatchEvent(new CustomEvent('mfr:clipboard-updated'));
+        }
+
+        _getClipboardSnapshot() {
+            let snapshot = null;
+            try {
+                const raw = sessionStorage.getItem('mfr_clipboard');
+                if (raw) snapshot = JSON.parse(raw);
+            } catch (e) { /* ignore */ }
+            if (!snapshot && window._mfrClipboard) {
+                snapshot = window._mfrClipboard;
+            }
+            return snapshot;
+        }
+
+        _clearClipboard() {
+            try {
+                sessionStorage.removeItem('mfr_clipboard');
+            } catch (e) { /* ignore */ }
+            window._mfrClipboard = null;
+            document.dispatchEvent(new CustomEvent('mfr:clipboard-updated'));
+        }
+
+        _updateClipboardUi() {
+            if (!this.copyPaste) return;
+            const hasClipboard = !!this._getClipboardSnapshot();
+
+            this.container.querySelectorAll('.mfr-btn-paste, .mfr-btn-paste-start, .mfr-btn-paste-after').forEach(function (btn) {
+                btn.style.display = hasClipboard ? '' : 'none';
+            });
+
+            this.container.querySelectorAll('.mfr-btn-clipboard-clear').forEach(function (btn) {
+                btn.style.display = hasClipboard ? '' : 'none';
+                const title = btn.getAttribute('title') || 'Kopieren beenden';
+                if (!btn.getAttribute('title')) {
+                    btn.setAttribute('title', title);
+                }
+                if (!btn.getAttribute('aria-label')) {
+                    btn.setAttribute('aria-label', title);
+                }
+                if (!btn.getAttribute('data-toggle')) {
+                    btn.setAttribute('data-toggle', 'tooltip');
+                }
+                if (!btn.getAttribute('data-placement')) {
+                    btn.setAttribute('data-placement', 'top');
+                }
+            });
         }
 
         _moveItem(fromIdx, toIdx) {

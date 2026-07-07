@@ -184,8 +184,11 @@ mform_flex_repeater_visibility = Aktiv / Inaktiv (Ausgabe)
 mform_flex_repeater_remove = Entfernen
 mform_flex_repeater_toggle = Aufklappen / Zuklappen
 mform_flex_repeater_copy = Kopieren
+mform_flex_repeater_paste_label = Einfügen
+mform_flex_repeater_paste_start = Einfügen (am Anfang)
 mform_flex_repeater_paste = Einfügen (am Ende)
 mform_flex_repeater_paste_after = Danach einfügen
+mform_flex_repeater_clipboard_clear = Kopieren beenden
 
 mform_install = Install
 mform_update = Update

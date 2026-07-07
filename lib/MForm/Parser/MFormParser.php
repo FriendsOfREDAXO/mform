@@ -184,10 +184,21 @@ class MFormParser
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_after'), ENT_QUOTES),
         ) : '';
 
-        $pasteButton = $copyPaste ? sprintf(
+        $pasteButtonTop = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-paste-start" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_start'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_label'), ENT_QUOTES),
+        ) : '';
+
+        $pasteButtonBottom = $copyPaste ? sprintf(
             '<button type="button" class="btn btn-default mfr-btn-paste" title="%s" style="display:none"><i class="rex-icon fa-paste"></i> %s</button>',
             htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
-            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste'), ENT_QUOTES),
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_paste_label'), ENT_QUOTES),
+        ) : '';
+
+        $clearClipboardButton = $copyPaste ? sprintf(
+            '<button type="button" class="btn btn-default mfr-btn-clipboard-clear" title="%1$s" aria-label="%1$s" data-toggle="tooltip" data-placement="top" style="display:none"><span class="mfr-copy-off-icon"><i class="rex-icon fa-copy"></i><i class="rex-icon fa-times mfr-copy-off-x"></i></span></button>',
+            htmlspecialchars(rex_i18n::msg('mform_flex_repeater_clipboard_clear'), ENT_QUOTES),
         ) : '';
 
         $toggleAllButton = sprintf(
@@ -202,9 +213,10 @@ class MFormParser
             htmlspecialchars($btnClass, ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),
         );
-        $toolbarGroup = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButton . '</div>';
+        $toolbarGroupTop = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonTop . $clearClipboardButton . '</div>';
+        $toolbarGroupBottom = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonBottom . $clearClipboardButton . '</div>';
 
-        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroup . '</div>';
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroupTop . '</div>';
 
         $this->elements[] = '<div class="mfr-items-list"></div>';
 
@@ -220,7 +232,7 @@ class MFormParser
             $templateHtml,
         );
 
-        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroup . '</div>';
+        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-bottom">' . $toolbarGroupBottom . '</div>';
 
         if ($this->debug) {
             $this->elements[] = sprintf(

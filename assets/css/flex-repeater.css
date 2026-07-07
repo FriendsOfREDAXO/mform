@@ -455,6 +455,27 @@ body.rex-theme-dark {
     border-color: #3a6ea8 !important;
 }
 
+.mfr-btn-clipboard-clear {
+    color: #a94442;
+}
+
+.mfr-copy-off-icon {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+}
+
+.mfr-copy-off-icon .mfr-copy-off-x {
+    position: absolute;
+    right: -4px;
+    top: -4px;
+    font-size: 10px;
+}
+
+.mfr-btn-clipboard-clear:hover {
+    color: #843534;
+}
+
 /* Paste button in toolbar – margin handled by btn-group */
 
 /* Dark mode copy button */
@@ -465,6 +486,16 @@ body.rex-theme-dark .mfr-btn-copy {
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .mfr-btn-copy {
         color: #7fb3e8;
+    }
+}
+
+body.rex-theme-dark .mfr-btn-clipboard-clear {
+    color: #f08a8a;
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) .mfr-btn-clipboard-clear {
+        color: #f08a8a;
     }
 }
 
