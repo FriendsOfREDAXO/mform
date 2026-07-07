@@ -502,8 +502,10 @@
             const insertedEl = this._renderItem(d, insertIndex);
             if (insertedEl) {
                 const children = Array.from(this.itemsList.children);
-                const ref = children[insertIndex + 1];
-                if (ref) ref.before(insertedEl);
+                const ref = children[insertIndex];
+                if (ref && ref !== insertedEl) {
+                    ref.before(insertedEl);
+                }
                 this._focusNewItem(insertedEl, true);
             }
 
@@ -866,14 +868,15 @@
 
             const d = data || this._emptyData();
             const insertIndex = index + 1;
+            const nextSibling = this.itemsList ? (this.itemsList.children[insertIndex] || null) : null;
             this.data.splice(insertIndex, 0, d);
             this._log('insertItemAfter', { index: index, insertIndex: insertIndex, data: d });
 
             const insertedEl = this._renderItem(d, insertIndex);
             if (insertedEl) {
-                const children = Array.from(this.itemsList.children);
-                const ref = children[insertIndex + 1];
-                if (ref) ref.before(insertedEl);
+                if (nextSibling && nextSibling !== insertedEl) {
+                    nextSibling.before(insertedEl);
+                }
                 this._focusNewItem(insertedEl, true);
             }
 
@@ -1130,9 +1133,10 @@
                     delete snapshot[MFR_ITEM_DISABLED_KEY];
                     this._setClipboardSnapshot(snapshot);
                     this._updateClipboardUi();
-                    // Visual feedback
+                    copyBtn.classList.remove('mfr-btn-copy-active');
+                    void copyBtn.offsetWidth;
                     copyBtn.classList.add('mfr-btn-copy-active');
-                    window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 800);
+                    window.setTimeout(function () { copyBtn.classList.remove('mfr-btn-copy-active'); }, 650);
                     this._log('copyItem', { idx: idx, snapshot: snapshot });
                 });
             }
@@ -1202,10 +1206,11 @@
 
             if (this.max > 0 && this.data.length >= this.max) return;
 
+            const firstSibling = this.itemsList ? this.itemsList.firstElementChild : null;
             this.data.unshift(data);
             const insertedEl = this._renderItem(data, 0);
-            if (insertedEl && this.itemsList && this.itemsList.firstElementChild && this.itemsList.firstElementChild !== insertedEl) {
-                this.itemsList.firstElementChild.before(insertedEl);
+            if (insertedEl && firstSibling && firstSibling !== insertedEl) {
+                firstSibling.before(insertedEl);
             }
 
             this._reindex();
