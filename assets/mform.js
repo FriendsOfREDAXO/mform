@@ -177,7 +177,8 @@ function initMFormSelectPicker(mform) {
     mform.find('.selectpicker').each(function () {
         // Stellen Sie sicher, dass der Wert '0' korrekt behandelt wird
         var selectedValue = $(this).attr('data-selected');
-        var hasExplicitContainer = typeof $(this).attr('data-container') !== 'undefined' && $(this).attr('data-container') !== '';
+        var containerAttr = $(this).attr('data-container');
+        var hasExplicitContainer = typeof containerAttr !== 'undefined' && String(containerAttr).trim() !== '';
         var options = {};
 
         // Ohne expliziten Container landet das Dropdown in Repeatern/verschachtelten
