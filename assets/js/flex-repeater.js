@@ -1235,7 +1235,9 @@
             this._updateAddBtn();
             this._updateToggleAllButton();
             this.syncValue();
-            this._focusNewItem(insertedEl, true);
+            if (insertedEl) {
+                this._focusNewItem(insertedEl, true);
+            }
             this._updateClipboardUi();
         }
 

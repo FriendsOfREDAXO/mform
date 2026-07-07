@@ -24,6 +24,25 @@ if (rex_addon::exists('yform') && rex_addon::get('yform')->isAvailable()) {
 }
 
 if (rex::isBackend()) {
+    rex_extension::register('PAGES_PREPARED', static function (): void {
+        if (rex::isDebugMode()) {
+            return;
+        }
+
+        $demoPage = rex_be_controller::getPageObject('mform/demo');
+        if (!$demoPage) {
+            return;
+        }
+
+        $subpages = $demoPage->getSubpages();
+        if (!isset($subpages['demo_renderer_parity'])) {
+            return;
+        }
+
+        unset($subpages['demo_renderer_parity']);
+        $demoPage->setSubpages($subpages);
+    });
+
     // add toggle files
     rex_view::addCssFile($addon->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($addon->getAssetsUrl('toggle/toggle.js'));

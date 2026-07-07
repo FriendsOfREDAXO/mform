@@ -72,7 +72,8 @@ class MFormItemManipulator
         // is default class flag set
         if ($item->isDefaultClass()) {
             // set class by mform default dto
-            $item->setClass(MFormDefault::$classes[$item->getType()] . ' ' . $item->getClass()); // add default class as first class
+            $defaultClass = MFormDefault::$classes[$item->getType()] ?? '';
+            $item->setClass(trim($defaultClass . ' ' . $item->getClass())); // add default class as first class
         }
     }
 }
