@@ -17,6 +17,8 @@
 
     const MFR_LOG_PREFIX = '[MFR]';
     const MFR_ITEM_DISABLED_KEY = '__disabled';
+    const _clipboardUiInstances = new Set();
+    let _clipboardUiListenerRegistered = false;
 
     function isGlobalDebugEnabled() {
         return window.MFR_DEBUG === true;
@@ -32,6 +34,23 @@
         if (!debugEnabled) return;
         const args = Array.prototype.slice.call(arguments, 2);
         console.log.apply(console, [MFR_LOG_PREFIX + ' ' + label].concat(args));
+    }
+
+    function registerClipboardUiInstance(instance) {
+        if (!instance) return;
+        _clipboardUiInstances.add(instance);
+
+        if (_clipboardUiListenerRegistered) {
+            return;
+        }
+
+        document.addEventListener('mfr:clipboard-updated', function () {
+            _clipboardUiInstances.forEach(function (registeredInstance) {
+                registeredInstance._updateClipboardUi();
+            });
+        });
+
+        _clipboardUiListenerRegistered = true;
     }
 
     // -------------------------------------------------------------------------
@@ -713,8 +732,7 @@
             this.data = [];
             this._suppressSync = false;
             this._isBootstrapping = false;
-            this._onClipboardUpdated = () => this._updateClipboardUi();
-            document.addEventListener('mfr:clipboard-updated', this._onClipboardUpdated);
+            registerClipboardUiInstance(this);
 
             this._log('constructor', {
                 fieldName: this.fieldName,

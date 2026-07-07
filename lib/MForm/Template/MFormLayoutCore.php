@@ -29,8 +29,7 @@ class MFormLayoutCore
      */
     public static function isCollapseOpen(array $attributes): bool
     {
-        return isset($attributes['data-group-open-collapse'])
-            && (1 === (int) $attributes['data-group-open-collapse'] || true === $attributes['data-group-open-collapse']);
+        return isset($attributes['data-group-open-collapse']) && self::isTruthyFlag($attributes['data-group-open-collapse']);
     }
 
     /**
@@ -38,7 +37,7 @@ class MFormLayoutCore
      */
     public static function isCollapseAccordion(array $attributes): bool
     {
-        return isset($attributes['data-group-accordion']) && 1 === (int) $attributes['data-group-accordion'];
+        return isset($attributes['data-group-accordion']) && self::isTruthyFlag($attributes['data-group-accordion']);
     }
 
     /**
@@ -48,7 +47,7 @@ class MFormLayoutCore
     {
         return !$hasLabel
             || (array_key_exists('data-group-hide-toggle-links', $attributes)
-                && 'true' === (string) $attributes['data-group-hide-toggle-links']);
+                && self::isTruthyFlag($attributes['data-group-hide-toggle-links']));
     }
 
     /**
@@ -67,6 +66,7 @@ class MFormLayoutCore
      * Ensures selectpicker fields have a stable default container.
      *
      * @param array<string, mixed> $attributes
+      * @param string $itemClass
      */
     public static function ensureSelectpickerContainer(array &$attributes, string $itemClass = ''): void
     {
@@ -102,17 +102,11 @@ class MFormLayoutCore
         return isset($attributes['data-group-open-tab']) && self::isTruthyFlag($attributes['data-group-open-tab']);
     }
 
-    /**
-     * @param array<string, mixed> $attributes
-     */
     public static function isTabPullRight(array $attributes): bool
     {
         return isset($attributes['pull-right']) && self::isTruthyFlag($attributes['pull-right']);
     }
 
-    /**
-     * @param array<string, mixed> $attributes
-     */
     public static function buildTabNavClass(array $attributes): string
     {
         $class = '';
@@ -174,6 +168,9 @@ class MFormLayoutCore
         return $class;
     }
 
+    /**
+     * Returns true for boolean true, numeric 1 and string values like "1" or "true".
+     */
     private static function isTruthyFlag(mixed $value): bool
     {
         if (true === $value) {
