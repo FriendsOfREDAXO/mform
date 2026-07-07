@@ -1231,23 +1231,77 @@
 
         _setClipboardSnapshot(snapshot) {
             if (!snapshot || typeof snapshot !== 'object') return;
+            const payload = {
+                mfrClipboardVersion: 2,
+                scopeKey: this._getClipboardScopeKey(),
+                data: snapshot
+            };
             try {
-                sessionStorage.setItem('mfr_clipboard', JSON.stringify(snapshot));
+                sessionStorage.setItem('mfr_clipboard', JSON.stringify(payload));
             } catch (e) { /* ignore */ }
-            window._mfrClipboard = snapshot;
+            window._mfrClipboard = payload;
             document.dispatchEvent(new CustomEvent('mfr:clipboard-updated'));
         }
 
-        _getClipboardSnapshot() {
-            let snapshot = null;
+        _getClipboardScopeKey() {
+            const form = this.container.closest('form');
+            let moduleId = '';
+
+            if (form) {
+                const field = form.querySelector('[name="module_id"]');
+                if (field && field.value !== undefined && String(field.value) !== '') {
+                    moduleId = String(field.value);
+                }
+
+                if (!moduleId) {
+                    try {
+                        const action = form.getAttribute('action') || window.location.href;
+                        const url = new URL(action, window.location.origin);
+                        moduleId = url.searchParams.get('module_id') || '';
+                    } catch (e) { /* ignore */ }
+                }
+            }
+
+            if (!moduleId) {
+                try {
+                    moduleId = new URL(window.location.href).searchParams.get('module_id') || '';
+                } catch (e) { /* ignore */ }
+            }
+
+            const moduleScope = moduleId ? ('module_id=' + moduleId) : ('path=' + window.location.pathname);
+            return moduleScope + '::' + String(this.fieldName || 'unknown-repeater');
+        }
+
+        _readClipboardPayload() {
+            let payload = null;
             try {
                 const raw = sessionStorage.getItem('mfr_clipboard');
-                if (raw) snapshot = JSON.parse(raw);
+                if (raw) payload = JSON.parse(raw);
             } catch (e) { /* ignore */ }
-            if (!snapshot && window._mfrClipboard) {
-                snapshot = window._mfrClipboard;
+
+            if (!payload && window._mfrClipboard) {
+                payload = window._mfrClipboard;
             }
-            return snapshot;
+
+            return payload;
+        }
+
+        _getClipboardSnapshot() {
+            const payload = this._readClipboardPayload();
+            if (!payload || typeof payload !== 'object') {
+                return null;
+            }
+
+            if (payload.mfrClipboardVersion !== 2 || !payload.scopeKey || !payload.data || typeof payload.data !== 'object') {
+                // Legacy/invalid payload is ignored to prevent cross-repeater leakage.
+                return null;
+            }
+
+            if (payload.scopeKey !== this._getClipboardScopeKey()) {
+                return null;
+            }
+
+            return payload.data;
         }
 
         _clearClipboard() {
