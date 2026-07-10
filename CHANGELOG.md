@@ -1,5 +1,20 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.3.1
+
+### Neu
+
+- **Einfaches `visible_if` für Einzelfelder** - Über `setVisibleIf($sourceField, $operator, $compareValue)` lassen sich einzelne Felder direkt ein- und ausblenden, ohne zusätzliches Wrapper-Fieldset.
+- **Builder-Optionen für beide Sichtbarkeitsmodi** - Der Form Builder unterstützt jetzt sowohl feldbasiertes `visible_if` (Einzelfelder) als auch `addConditionalFieldsetArea()` für komplette Fieldset-Bereiche.
+- **Neue Extended-Demo `visible_if`** - Beispielmodul ergänzt, das beide Varianten kombiniert (Einzelfeld + Conditional-Fieldset + Repeater).
+
+### Behoben
+
+- **Conditional Fieldset im Builder korrekt generiert** - Für bedingte Fieldsets wird kein doppeltes verschachteltes Fieldset mehr erzeugt.
+- **`setVisibleIf()` im Top-Level-Codegenerator repariert** - Die Builder-Ausgabe erzeugt jetzt gültiges Method-Chaining und zerschießt keine nachfolgenden Feldaufrufe mehr.
+- **`visible_if` im Flex-Repeater funktionsfähig** - Die Condition-Quellfeldsuche erkennt jetzt auch Repeater-Felder zuverlässig (inkl. Toggle/Checkbox-Fälle), sodass `setVisibleIf('toggle_checkbox', '=', '1')` korrekt reagiert.
+- **Gemeinsame Form-Group-Dekoration ohne Doppelcode** - Parser und Flex-Repeater nutzen denselben internen Helper für `form-group`-Klassen und -Attribute.
+
 ## Version 9.3.0
 
 ### Behoben

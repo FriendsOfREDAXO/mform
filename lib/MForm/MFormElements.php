@@ -260,6 +260,18 @@ abstract class MFormElements
         $attributes['data-mform-conditional-value'] = $compareValue;
         $attributes['data-mform-conditional-action'] = $action;
 
+        $conditionJson = json_encode([
+            [
+                'field' => (string) $sourceField,
+                'op' => $operator,
+                'value' => $compareValue,
+                'action' => $action,
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (false !== $conditionJson) {
+            $attributes['data-mform-condition'] = $conditionJson;
+        }
+
         return $this->addFieldsetArea($legend, $form, $attributes, $parse, $showWrapper);
     }
 
@@ -694,6 +706,17 @@ abstract class MFormElements
     public function setAttributes(array $attributes): static
     {
         MFormAttributeHandler::setAttributes($this->item, $attributes);
+        return $this;
+    }
+
+    public function setVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): static
+    {
+        MFormAttributeHandler::addAttribute($this->item, 'visible_if', [
+            'field' => (string) $sourceField,
+            'op' => $operator,
+            'value' => $compareValue,
+        ]);
+
         return $this;
     }
 

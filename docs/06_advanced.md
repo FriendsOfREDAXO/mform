@@ -303,6 +303,36 @@ Optionale Aktion:
 - Standard ist `show` (Bereich zeigen, wenn Bedingung erfüllt ist)
 - Mit dem letzten Parameter `action = 'hide'` wird das Verhalten invertiert
 
+## Beispiel: visible_if (ohne Wrapper)
+
+Mit `setVisibleIf()` kannst du einzelne Felder direkt an ein Quellfeld koppeln.
+Das ist die einfache Variante, wenn kein kompletter Bereich ein- und ausgeblendet werden muss.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$mform = MForm::factory()
+    ->addSelectField(1, [
+        'text' => 'Text',
+        'image' => 'Bild',
+    ], ['label' => 'Typ'])
+
+    ->addTextField(2, ['label' => 'Headline'])
+        ->setVisibleIf(1, '=', 'text')
+
+    ->addMediaField(3, null, null, ['label' => 'Bild'])
+        ->setVisibleIf(1, '=', 'image');
+
+echo $mform->show();
+```
+
+Hinweise:
+
+- `setVisibleIf()` arbeitet auf Feldebene (kein zusätzliches Wrapper-Fieldset).
+- Für mehrere Felder mit derselben Regel ist `addConditionalFieldsetArea()` weiterhin die bessere Wahl.
+- Beide Varianten funktionieren im klassischen Parser-Pfad und im Flex-Repeater.
+
 ## Beispiel: LayoutPreviewBuilder mit addRadioImgField
 
 `LayoutPreviewBuilder` ist in mform vor allem fuer grafische Auswahlfelder gedacht. Der typische Einsatz ist `addRadioImgField()`, bei dem jede Option eine automatisch erzeugte Layoutvorschau bekommt.

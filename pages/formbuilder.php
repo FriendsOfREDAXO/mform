@@ -21,7 +21,7 @@ $infoModalBody = '<p>'
     . '<div class="alert alert-info" style="margin-top:1em;margin-bottom:0">'
     . '<strong>Hinweis:</strong> Der Form Builder bietet bewusst nur eine kuratierte Auswahl der haeufigsten MForm-Felder, '
     . 'um einen einfachen Einstieg zu ermoeglichen. Spezielle Felder wie <code>addRadioImgField</code>, '
-    . '<code>addInputField</code> mit eigenen Typen, Layouts wie Column/Collapse oder Conditional Fieldsets sind weiterhin '
+    . '<code>addInputField</code> mit eigenen Typen und Layouts wie Column/Collapse sind weiterhin '
     . 'direkt im PHP-Code verfuegbar &ndash; siehe <a href="https://github.com/FriendsOfREDAXO/mform/tree/main/docs" target="_blank" rel="noopener">MForm-Doku</a>. '
     . 'Der generierte Code laesst sich beliebig erweitern.'
     . '</div>';
@@ -207,6 +207,38 @@ $body = <<<'HTML'
                 <label class="checkbox">
                     <input type="checkbox" data-fb-prop="full"> setFull()
                 </label>
+            </div>
+
+            <hr data-fb-prop-group="visibilityEnabled">
+            <div class="form-group" data-fb-prop-group="visibilityEnabled">
+                <label class="checkbox">
+                    <input type="checkbox" data-fb-prop="visibilityEnabled"> Sichtbarkeit an Bedingung koppeln
+                </label>
+                <p class="help-block" style="margin-top:4px"><small>Das Feld wird nur angezeigt, wenn das gewaehlte Quellfeld die Bedingung erfuellt.</small></p>
+            </div>
+            <div class="form-group" data-fb-prop-group="visibilitySourceUid">
+                <label>Quellfeld</label>
+                <select class="form-control" data-fb-prop="visibilitySourceUid">
+                    <option value="">Bitte waehlen</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="visibilityOperator">
+                <label>Operator</label>
+                <select class="form-control" data-fb-prop="visibilityOperator">
+                    <option value="eq">ist gleich</option>
+                    <option value="neq">ist ungleich</option>
+                    <option value="contains">enthaelt</option>
+                    <option value="in">ist in Liste</option>
+                    <option value="gt">ist groesser als</option>
+                    <option value="lt">ist kleiner als</option>
+                    <option value="empty">ist leer</option>
+                    <option value="not_empty">ist nicht leer</option>
+                </select>
+            </div>
+            <div class="form-group" data-fb-prop-group="visibilityValue">
+                <label>Vergleichswert</label>
+                <input type="text" class="form-control" data-fb-prop="visibilityValue" placeholder="z. B. 1 oder image">
+                <p class="help-block" style="margin-top:4px"><small>Bei "ist in Liste" mehrere Werte kommasepariert angeben.</small></p>
             </div>
 
             <!-- CustomLink: Linktypen -->

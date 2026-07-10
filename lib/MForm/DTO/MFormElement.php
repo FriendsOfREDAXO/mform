@@ -32,6 +32,7 @@ class MFormElement
     public string $infoCollapseButton = "";
     public string $infoCollapse = "";
     public string $notice = "";
+    public string $formGroupAttributes = "";
     public bool $full = false;
 
     public function setId(string $id): static
@@ -169,6 +170,12 @@ class MFormElement
     public function setNotice(string $notice): static
     {
         $this->notice = $notice;
+        return $this;
+    }
+
+    public function setFormGroupAttributes(string $formGroupAttributes): static
+    {
+        $this->formGroupAttributes = $formGroupAttributes;
         return $this;
     }
 

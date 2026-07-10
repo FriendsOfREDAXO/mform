@@ -26,7 +26,7 @@ function initMFormElements(mform) {
 }
 
 function initMFormConditionals(mform) {
-    var targets = mform.find('.mform-conditional-target[data-mform-conditional-source]');
+    var targets = mform.find('.mform-conditional-target[data-mform-conditional-source], .mform-conditional-target[data-mform-condition]');
     if (!targets.length) {
         return;
     }
@@ -38,7 +38,7 @@ function initMFormConditionals(mform) {
         return op;
     }
 
-    function findSourceFields(source) {
+    function findSourceFields(target, source) {
         var sourceStr = (source || '').toString().trim();
         if (!sourceStr.length) return $();
 
@@ -48,20 +48,36 @@ function initMFormConditionals(mform) {
             'REX_INPUT_VALUE[' + sourceStr + '][]'
         ];
 
-        return mform.find(':input').filter(function () {
-            var name = this.name || '';
-            var id = this.id || '';
+        var localItem = target.closest('.mfr-item, .mfr-nested-item');
+        var scopes = localItem.length ? [localItem, mform] : [mform];
 
-            if (sourceStr.charAt(0) === '#') {
-                return ('#' + id) === sourceStr;
+        function collectMatchingFields(scope) {
+            return scope.find(':input').filter(function () {
+                var name = this.name || '';
+                var id = this.id || '';
+                var fieldKey = $(this).attr('data-mfr-field') || '';
+
+                if (sourceStr.charAt(0) === '#') {
+                    return ('#' + id) === sourceStr;
+                }
+
+                if (id === sourceStr) return true;
+                if (fieldKey === sourceStr) return true;
+                if (candidates.indexOf(name) !== -1) return true;
+                if (name.endsWith('[' + sourceStr + ']')) return true;
+                if (name.endsWith('[' + sourceStr + '][]')) return true;
+                return false;
+            });
+        }
+
+        for (var i = 0; i < scopes.length; i++) {
+            var matches = collectMatchingFields(scopes[i]);
+            if (matches.length) {
+                return matches;
             }
+        }
 
-            if (id === sourceStr) return true;
-            if (candidates.indexOf(name) !== -1) return true;
-            if (name.endsWith('[' + sourceStr + ']')) return true;
-            if (name.endsWith('[' + sourceStr + '][]')) return true;
-            return false;
-        });
+        return $();
     }
 
     function getFieldValue(fields) {
@@ -137,40 +153,102 @@ function initMFormConditionals(mform) {
         return sourceText === compareText;
     }
 
-    function applyConditional(target) {
-        var source = target.data('mform-conditional-source');
-        var operator = target.data('mform-conditional-operator') || '=';
-        var compare = target.data('mform-conditional-value') || '';
-        var action = (target.data('mform-conditional-action') || 'show').toString().toLowerCase();
-        var fields = findSourceFields(source);
+    function getConditions(target) {
+        var raw = target.attr('data-mform-condition');
+        if (raw) {
+            try {
+                var parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    return parsed.filter(function (condition) {
+                        return condition && typeof condition === 'object' && String(condition.field || '').trim() !== '';
+                    });
+                }
+            } catch (_error) {
+                // ignore malformed JSON and fall back to legacy attributes
+            }
+        }
 
-        if (!fields.length) {
-            target.show();
+        var legacySource = target.data('mform-conditional-source');
+        if (legacySource === undefined || legacySource === null || String(legacySource).trim() === '') {
+            return [];
+        }
+
+        return [{
+            field: legacySource,
+            op: target.data('mform-conditional-operator') || '=',
+            value: target.data('mform-conditional-value') || '',
+            action: target.data('mform-conditional-action') || 'show'
+        }];
+    }
+
+    function setConditionalVisibility(target, shouldShow, animate) {
+        var wasVisible = target.data('mformConditionalVisible');
+        if (typeof wasVisible === 'undefined') {
+            wasVisible = !target.hasClass('mform-conditional-hidden') && target.is(':visible');
+        }
+
+        if (wasVisible === shouldShow) {
             return;
         }
 
-        var matched = compareValue(getFieldValue(fields), compare, operator);
-        var shouldShow = action === 'hide' ? !matched : matched;
-
+        target.data('mformConditionalVisible', shouldShow);
         target.toggleClass('mform-conditional-hidden', !shouldShow);
+
+        if (!animate) {
+            if (shouldShow) {
+                target.show();
+            } else {
+                target.hide();
+            }
+            return;
+        }
+
+        target.stop(true, true);
+        target.addClass('mform-conditional-animating');
+
         if (shouldShow) {
-            target.show();
+            target.hide().slideDown(160, function () {
+                target.removeClass('mform-conditional-animating');
+            });
         } else {
-            target.hide();
+            target.slideUp(160, function () {
+                target.removeClass('mform-conditional-animating');
+            });
         }
     }
 
-    function evaluateAllConditionals() {
+    function applyConditional(target, animate) {
+        var conditions = getConditions(target);
+        if (!conditions.length) {
+            setConditionalVisibility(target, true, animate);
+            return;
+        }
+
+        var action = (target.data('mform-conditional-action') || conditions[0].action || 'show').toString().toLowerCase();
+        var matched = conditions.every(function (condition) {
+            var fields = findSourceFields(target, condition.field);
+            if (!fields.length) {
+                return false;
+            }
+
+            return compareValue(getFieldValue(fields), condition.value || '', condition.op || '=');
+        });
+        var shouldShow = action === 'hide' ? !matched : matched;
+
+        setConditionalVisibility(target, shouldShow, animate);
+    }
+
+    function evaluateAllConditionals(animate) {
         targets.each(function () {
-            applyConditional($(this));
+            applyConditional($(this), animate);
         });
     }
 
     mform.off('.mformConditional').on('change.mformConditional input.mformConditional', ':input', function () {
-        evaluateAllConditionals();
+        evaluateAllConditionals(true);
     });
 
-    evaluateAllConditionals();
+    evaluateAllConditionals(false);
 }
 
 function initMFormSelectPicker(mform) {

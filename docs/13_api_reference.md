@@ -698,6 +698,19 @@ Setzt einen einzelnen Parameter.
 ---
 
 ```php
+setVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): MForm
+```
+Koppelt die Sichtbarkeit eines einzelnen Feldes an ein Quellfeld (ohne Wrapper).
+
+| Parameter | Typ | Beschreibung |
+|-----------|-----|--------------|
+| `$sourceField` | `float\|int\|string` | Feld-ID oder Feld-Key des steuernden Feldes |
+| `$operator` | `string` | Vergleichsoperator (`=`, `!=`, `>`, `<`, `contains`, `in`, `empty`, `!empty`) |
+| `$compareValue` | `string` | Vergleichswert |
+
+---
+
+```php
 setTooltipInfo(?string $value = null, string $icon = ''): MForm
 ```
 Zeigt ein Info-Tooltip-Icon neben dem Label.

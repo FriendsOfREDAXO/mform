@@ -124,6 +124,8 @@
                 props: ['label', 'modalBtnClass', 'modalAlign'] }
         };
 
+        var VISIBILITY_PROPS = ['visibilityEnabled', 'visibilitySourceUid', 'visibilityOperator', 'visibilityValue'];
+
         var state = [];
         var nextId = 1;
         var STORAGE_KEY = 'mform.formbuilder.state.v1';
@@ -208,6 +210,10 @@
                 // Modal
                 modalBtnClass: 'btn-default',
                 modalAlign: 'left',
+                visibilityEnabled: false,
+                visibilitySourceUid: '',
+                visibilityOperator: 'eq',
+                visibilityValue: '',
                 children: (type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal') ? [] : null
             };
             return item;
@@ -259,6 +265,14 @@
 
         function isContainerType(type) {
             return type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal';
+        }
+
+        function isConditionSourceType(type) {
+            return !isContainerType(type) && !isStructureOnlyItem(type);
+        }
+
+        function supportsVisibility(type) {
+            return type === 'fieldset' || isConditionSourceType(type);
         }
 
         function sanitizeItem(raw) {
@@ -546,7 +560,10 @@
             $propsForm.style.display = '';
 
             var def = TYPES[activeItem.type];
-            var available = def.props || [];
+            var available = (def.props || []).slice();
+            if (supportsVisibility(activeItem.type)) {
+                Array.prototype.push.apply(available, VISIBILITY_PROPS);
+            }
 
             $propsForm.querySelectorAll('[data-fb-prop-group]').forEach(function (g) {
                 g.style.display = available.indexOf(g.dataset.fbPropGroup) !== -1 ? '' : 'none';
@@ -558,12 +575,88 @@
                 profileGroup.style.display = 'none';
             }
 
+            updateVisibilitySourceOptions();
+            updateVisibilityPropUI();
+
             $propsForm.querySelectorAll('[data-fb-prop]').forEach(function (input) {
                 var key = input.dataset.fbProp;
                 var val = activeItem[key];
                 if (input.type === 'checkbox') input.checked = !!val;
                 else input.value = val == null ? '' : val;
             });
+
+            updateVisibilitySourceOptions();
+            updateVisibilityPropUI();
+        }
+
+        function collectConditionSourceOptions(list, nested, options, excludeUid) {
+            var keyPool = {};
+
+            (list || []).forEach(function (item) {
+                var generatedKey = null;
+
+                if (nested && item.type !== 'fieldset' && item.type !== 'modal' && item.type !== 'tab') {
+                    var baseKey = slugify(item.label, 'field_' + item.id);
+                    generatedKey = baseKey;
+                    var suffix = 2;
+                    while (keyPool[generatedKey]) {
+                        generatedKey = baseKey + '_' + suffix++;
+                    }
+                    keyPool[generatedKey] = true;
+                }
+
+                if (item.uid !== excludeUid && isConditionSourceType(item.type)) {
+                    options.push({
+                        uid: item.uid,
+                        label: item.label || item.type,
+                        type: item.type,
+                        ref: nested ? generatedKey : String(item.id)
+                    });
+                }
+
+                if (Array.isArray(item.children) && item.children.length) {
+                    collectConditionSourceOptions(item.children, true, options, excludeUid);
+                }
+            });
+        }
+
+        function updateVisibilitySourceOptions() {
+            var select = $propsForm.querySelector('[data-fb-prop="visibilitySourceUid"]');
+            if (!select || !activeItem) return;
+
+            var previous = activeItem.visibilitySourceUid || '';
+            var options = [];
+            collectConditionSourceOptions(state, false, options, activeItem.uid);
+
+            select.innerHTML = '<option value="">Bitte waehlen</option>';
+            options.forEach(function (option) {
+                var opt = document.createElement('option');
+                opt.value = option.uid;
+                opt.textContent = option.label + ' [' + option.type + ': ' + option.ref + ']';
+                select.appendChild(opt);
+            });
+
+            select.value = previous;
+            if (select.value !== previous) {
+                activeItem.visibilitySourceUid = '';
+            }
+        }
+
+        function updateVisibilityPropUI() {
+            if (!activeItem) return;
+
+            var enabled = !!activeItem.visibilityEnabled;
+            ['visibilitySourceUid', 'visibilityOperator', 'visibilityValue'].forEach(function (name) {
+                var group = $propsForm.querySelector('[data-fb-prop-group="' + name + '"]');
+                if (!group) return;
+                group.style.display = enabled ? '' : 'none';
+            });
+
+            var valueGroup = $propsForm.querySelector('[data-fb-prop-group="visibilityValue"]');
+            if (valueGroup && enabled) {
+                var operator = String(activeItem.visibilityOperator || 'eq');
+                valueGroup.style.display = (operator === 'empty' || operator === 'not_empty') ? 'none' : '';
+            }
         }
 
         $propsForm.addEventListener('input', function (e) {
@@ -575,10 +668,14 @@
             if (key === 'tinymce') {
                 renderProps();
             }
+            if (key === 'visibilityEnabled' || key === 'visibilityOperator') {
+                renderProps();
+            }
             if (key === 'label') {
                 $canvas.querySelectorAll('[data-uid="' + activeItem.uid + '"] > .mform-fb__item-head .mform-fb__item-label').forEach(function (lbl) {
                     lbl.textContent = activeItem.label || activeItem.type;
                 });
+                renderProps();
             }
             emitCode();
         });
@@ -985,6 +1082,59 @@
             return '[' + keys.map(function (k) { return phpStr(k) + ' => ' + phpStr(attrs[k]); }).join(', ') + ']';
         }
 
+        function hasVisibilityCondition(item) {
+            return !!(item && item.visibilityEnabled && item.visibilitySourceUid);
+        }
+
+        function normalizeVisibilityOperator(operator) {
+            switch (String(operator || 'eq')) {
+                case 'eq': return '=';
+                case 'neq': return '!=';
+                case 'not_empty': return '!empty';
+                default: return String(operator || '=');
+            }
+        }
+
+        function conditionalWrapperAttrsPhp() {
+            return '[' + phpStr('class') + ' => ' + phpStr('mform-conditional-wrapper') + ']';
+        }
+
+        function resolveGeneratedConditionSource(uid, list, nested) {
+            var keyPool = {};
+
+            for (var index = 0; index < (list || []).length; index++) {
+                var item = list[index];
+                var generatedKey = null;
+
+                if (nested && item.type !== 'fieldset' && item.type !== 'modal' && item.type !== 'tab') {
+                    var baseKey = slugify(item.label, 'field_' + item.id);
+                    generatedKey = baseKey;
+                    var suffix = 2;
+                    while (keyPool[generatedKey]) {
+                        generatedKey = baseKey + '_' + suffix++;
+                    }
+                    keyPool[generatedKey] = true;
+                }
+
+                if (item.uid === uid && isConditionSourceType(item.type)) {
+                    return nested ? generatedKey : String(item.id);
+                }
+
+                if (Array.isArray(item.children) && item.children.length) {
+                    var nestedHit = resolveGeneratedConditionSource(uid, item.children, true);
+                    if (nestedHit) {
+                        return nestedHit;
+                    }
+                }
+            }
+
+            return '';
+        }
+
+        function conditionSourceLiteral(sourceRef) {
+            return /^\d+$/.test(String(sourceRef)) ? String(parseInt(sourceRef, 10)) : phpStr(sourceRef);
+        }
+
         // Builds the call expression WITHOUT a leading `$mform` / `->`, so the
         // caller can choose: top-level uses `$mform->...`, inner items use `->...`.
         function renderCall(item, idArg) {
@@ -1129,6 +1279,102 @@
             return indent + '->addFieldsetArea(' + phpStr(legend) + ', MForm::factory()\n' + inner + ')';
         }
 
+        function renderInnerItemChainLink(item, indent, meta) {
+            meta = meta || {};
+
+            if (item.type === 'fieldset') {
+                return renderInnerFieldsetChainLink(item, indent);
+            }
+            if (item.type === 'modal') {
+                return renderInnerModalChainLink(item, indent);
+            }
+            if (item.type === 'tab') {
+                return renderInnerTabChainLink(item, indent, !!meta.isFirstTab);
+            }
+            if (item.type === 'repeater') {
+                return renderInnerRepeaterChainLink(item, meta.idArg, indent);
+            }
+
+            return renderInnerChainLink(item, meta.idArg, indent);
+        }
+
+        function visibleIfChain(item, indent) {
+            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
+            if (!sourceRef) {
+                return '';
+            }
+
+            return '\n' + indent + '->setVisibleIf('
+                + conditionSourceLiteral(sourceRef)
+                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
+                + ', ' + phpStr(item.visibilityValue || '')
+                + ')';
+        }
+
+        function renderTopLevelItemStmt(item, idx, indent) {
+            if (item.type === 'repeater') {
+                return renderRepeaterStmt(item, item.id, indent);
+            }
+            if (item.type === 'tab') {
+                var isFirstTab = idx === 0 || state[idx - 1].type !== 'tab';
+                return renderTabStmt(item, indent, isFirstTab);
+            }
+            if (item.type === 'fieldset') {
+                return renderFieldsetStmt(item, indent);
+            }
+            if (item.type === 'modal') {
+                return renderModalStmt(item, indent);
+            }
+
+            return renderField(item, item.id, indent) + ';';
+        }
+
+        function renderConditionalFieldsetStmt(item, idx, indent) {
+            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
+            if (!sourceRef) {
+                return renderTopLevelItemStmt(item, idx, indent);
+            }
+
+            var inner = renderRepeaterInner(item, indent);
+
+            return indent + '$mform->addConditionalFieldsetArea('
+                + conditionSourceLiteral(sourceRef)
+                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
+                + ', ' + phpStr(item.visibilityValue || '')
+                + ', ' + phpStr(item.label || '')
+                + ', MForm::factory()\n'
+                + inner
+                + ', ' + conditionalWrapperAttrsPhp()
+                + ');';
+        }
+
+        function renderTopLevelVisibleFieldStmt(item, indent) {
+            var line = indent + '$mform->' + renderCall(item, item.id);
+            if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
+                line += '\n' + indent + '    ->setFull()';
+            }
+            line += visibleIfChain(item, indent + '    ');
+            return line + ';';
+        }
+
+        function renderConditionalInnerFieldsetChainLink(item, indent) {
+            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
+            if (!sourceRef) {
+                return renderInnerFieldsetChainLink(item, indent);
+            }
+
+            var inner = renderRepeaterInner(item, indent);
+            return indent + '->addConditionalFieldsetArea('
+                + conditionSourceLiteral(sourceRef)
+                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
+                + ', ' + phpStr(item.visibilityValue || '')
+                + ', ' + phpStr(item.label || '')
+                + ', MForm::factory()\n'
+                + inner
+                + ', ' + conditionalWrapperAttrsPhp()
+                + ')';
+        }
+
         function renderModalStmt(item, indent) {
             var inner = renderRepeaterInner(item, indent);
             var label = item.label || '';
@@ -1235,29 +1481,32 @@
             var keyPool = {};
             var prevWasTab = false;
             var lines = children.map(function (c) {
-                if (c.type === 'fieldset') {
-                    prevWasTab = false;
-                    return renderInnerFieldsetChainLink(c, indent + '        ');
-                }
-                if (c.type === 'modal') {
-                    prevWasTab = false;
-                    return renderInnerModalChainLink(c, indent + '        ');
-                }
+                var itemIndent = indent + '        ';
+                var meta = {};
+
                 if (c.type === 'tab') {
                     var isFirstTab = !prevWasTab;
                     prevWasTab = true;
-                    return renderInnerTabChainLink(c, indent + '        ', isFirstTab);
+                    meta.isFirstTab = isFirstTab;
+                    return renderInnerItemChainLink(c, itemIndent, meta);
+                }
+                if (c.type === 'fieldset') {
+                    prevWasTab = false;
+                    return hasVisibilityCondition(c)
+                        ? renderConditionalInnerFieldsetChainLink(c, itemIndent)
+                        : renderInnerFieldsetChainLink(c, itemIndent);
+                }
+                if (c.type === 'modal') {
+                    prevWasTab = false;
+                    return renderInnerModalChainLink(c, itemIndent);
                 }
                 var key = slugify(c.label, 'field_' + c.id);
                 var base = key, n = 2;
                 while (keyPool[key]) { key = base + '_' + n++; }
                 keyPool[key] = true;
-                if (c.type === 'repeater') {
-                    prevWasTab = false;
-                    return renderInnerRepeaterChainLink(c, key, indent + '        ');
-                }
                 prevWasTab = false;
-                return renderInnerChainLink(c, key, indent + '        ');
+                meta.idArg = key;
+                return renderInnerItemChainLink(c, itemIndent, meta) + (hasVisibilityCondition(c) ? visibleIfChain(c, itemIndent) : '');
             });
             return lines.join('\n') + '\n';
         }
@@ -1282,18 +1531,14 @@
             lines.push('$mform = MForm::factory();');
             lines.push('');
             state.forEach(function (item, idx) {
-                if (item.type === 'repeater') {
-                    lines.push(renderRepeaterStmt(item, item.id, ''));
-                } else if (item.type === 'tab') {
-                    // First tab in a contiguous run is opened by default.
-                    var isFirstTab = idx === 0 || state[idx - 1].type !== 'tab';
-                    lines.push(renderTabStmt(item, '', isFirstTab));
-                } else if (item.type === 'fieldset') {
-                    lines.push(renderFieldsetStmt(item, ''));
-                } else if (item.type === 'modal') {
-                    lines.push(renderModalStmt(item, ''));
+                if (item.type === 'fieldset' && hasVisibilityCondition(item)) {
+                    lines.push(renderConditionalFieldsetStmt(item, idx, ''));
                 } else {
-                    lines.push(renderField(item, item.id, '') + ';');
+                    var line = renderTopLevelItemStmt(item, idx, '');
+                    if (item.type !== 'fieldset' && hasVisibilityCondition(item) && !isContainerType(item.type)) {
+                        line = renderTopLevelVisibleFieldStmt(item, '');
+                    }
+                    lines.push(line);
                 }
             });
             lines.push('');

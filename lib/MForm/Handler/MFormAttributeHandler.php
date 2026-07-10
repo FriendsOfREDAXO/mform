@@ -13,6 +13,48 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 class MFormAttributeHandler
 {
     /**
+     * @param array<string, mixed> $condition
+     */
+    private static function applyVisibleIf(MFormItem $item, array $condition, string $action = 'show'): void
+    {
+        $sourceField = isset($condition['field']) ? trim((string) $condition['field']) : '';
+        if ('' === $sourceField) {
+            return;
+        }
+
+        $operator = isset($condition['op']) ? trim((string) $condition['op']) : '=';
+        $compareValue = isset($condition['value']) ? (string) $condition['value'] : '';
+
+        $formGroupClass = trim((string) ($item->getAttributes()['form-group-class'] ?? ''));
+        $formGroupClass = trim($formGroupClass . ' mform-conditional-target');
+        $item->addAttribute('form-group-class', $formGroupClass);
+
+        $formGroupAttributes = $item->getAttributes()['form-group-attributes'] ?? [];
+        if (!is_array($formGroupAttributes)) {
+            $formGroupAttributes = [];
+        }
+
+        $conditionJson = json_encode([
+            [
+                'field' => $sourceField,
+                'op' => $operator,
+                'value' => $compareValue,
+                'action' => $action,
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $formGroupAttributes['data-mform-conditional-source'] = $sourceField;
+        $formGroupAttributes['data-mform-conditional-operator'] = $operator;
+        $formGroupAttributes['data-mform-conditional-value'] = $compareValue;
+        $formGroupAttributes['data-mform-conditional-action'] = $action;
+        if (false !== $conditionJson) {
+            $formGroupAttributes['data-mform-condition'] = $conditionJson;
+        }
+
+        $item->addAttribute('form-group-attributes', $formGroupAttributes);
+    }
+
+    /**
      * @description set attributes to the item
      */
     public static function addAttribute(MFormItem $item, mixed $name, mixed $value): void
@@ -81,6 +123,16 @@ class MFormAttributeHandler
                 break;
             case 'default-class': // i like set the r5 default classes
                 $item->setDefaultClass($value);
+                break;
+            case 'visible_if':
+                if (is_array($value)) {
+                    self::applyVisibleIf($item, $value);
+                }
+                break;
+            case 'hidden_if':
+                if (is_array($value)) {
+                    self::applyVisibleIf($item, $value, 'hide');
+                }
                 break;
             default: // set any attributes
                 $item->attributes[$name] = $value;

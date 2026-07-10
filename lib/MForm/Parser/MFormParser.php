@@ -20,6 +20,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Utils\MFormFormGroupHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormItemManipulator;
 use rex_addon;
@@ -474,6 +475,8 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
+        $this->applyFormGroupDecoration($item, $templateElement);
+
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -508,6 +511,8 @@ class MFormParser
             ->setElement($this->parseElement($element, 'textarea'))
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
@@ -607,6 +612,8 @@ class MFormParser
             ->setElement($this->parseElement($element, 'select'))
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
@@ -713,6 +720,8 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
+        $this->applyFormGroupDecoration($item, $templateElement);
+
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -816,9 +825,7 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
-        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
-            $templateElement->setClass($item->getAttributes()['form-group-class']);
-        }
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -890,9 +897,7 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
-        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
-            $templateElement->setClass($item->getAttributes()['form-group-class']);
-        }
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -921,10 +926,8 @@ class MFormParser
             ->setElement($radioElements)
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
-        if ('' !== (string) ($item->getAttributes()['form-group-class'] ?? '')) {
-            $templateElement->setClass($item->getAttributes()['form-group-class']);
-            unset($item->getAttributes()['form-group-class']);
-        }
+
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
@@ -1064,6 +1067,8 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
+        $this->applyFormGroupDecoration($item, $templateElement);
+
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -1184,6 +1189,8 @@ class MFormParser
         $templateElement->setElement($body)
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         // add to output element array
         $this->elements[] = $this->parseElement($templateElement, 'default');
@@ -1397,6 +1404,8 @@ class MFormParser
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
 
+        $this->applyFormGroupDecoration($item, $templateElement);
+
         $templateElement = rex_extension::registerPoint(
             new rex_extension_point('mform/mformParser.generateCustomLinkElement', $templateElement, [
                 'item' => $item,
@@ -1482,6 +1491,8 @@ class MFormParser
         $templateElement->setElement($html)
             ->setNotice($item->getNotice())
             ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
 
         $this->elements[] = $this->parseElement($templateElement, 'default');
     }
@@ -1705,12 +1716,25 @@ class MFormParser
         $inlineAttributes = '';
         if (count($attributes) > 0) {
             foreach ($attributes as $key => $value) {
-                if (!in_array($key, ['id', 'name', 'type', 'value', 'checked', 'selected'])) {
+                if (!in_array($key, ['id', 'name', 'type', 'value', 'checked', 'selected', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if'], true)) {
                     $inlineAttributes .= ' ' . $key . '="' . $value . '"';
                 }
             }
         }
         return $inlineAttributes;
+    }
+
+    private function applyFormGroupDecoration(MFormItem $item, MFormElement $templateElement): void
+    {
+        $formGroupClass = MFormFormGroupHelper::getExtraClass($item);
+        if ('' !== $formGroupClass) {
+            $templateElement->setClass(trim($templateElement->class . ' ' . $formGroupClass));
+        }
+
+        $formGroupAttributes = MFormFormGroupHelper::getAttributes($item);
+        if ([] !== $formGroupAttributes) {
+            $templateElement->setFormGroupAttributes($this->parseAttributes($formGroupAttributes));
+        }
     }
 
 }

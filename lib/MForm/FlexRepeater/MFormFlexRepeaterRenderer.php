@@ -7,6 +7,7 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Utils\MFormFormGroupHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use rex_var_custom_link;
 use rex_var_custom_link_multi;
@@ -658,9 +659,11 @@ class MFormFlexRepeaterRenderer
         // Diese Klasse steuert per CSS u. a. die Darstellung der Farb-Swatch-Radios.
         $attrs = $item->getAttributes();
         $extraClass = '';
-        if (isset($attrs['form-group-class']) && is_string($attrs['form-group-class']) && '' !== $attrs['form-group-class']) {
-            $extraClass = ' ' . htmlspecialchars($attrs['form-group-class'], ENT_QUOTES);
+        $formGroupClass = MFormFormGroupHelper::getExtraClass($item);
+        if ('' !== $formGroupClass) {
+            $extraClass = ' ' . htmlspecialchars($formGroupClass, ENT_QUOTES);
         }
+        $formGroupAttributeHtml = self::renderAttributes(MFormFormGroupHelper::getAttributes($item));
 
         $labelColClass = 'control-label col-sm-3 mfr-field-label';
         $fieldColClass = 'col-sm-9 mfr-field-col';
@@ -692,16 +695,18 @@ class MFormFlexRepeaterRenderer
             }
 
             return sprintf(
-                '<div class="row form-group mfr-field-group%s"><div class="%s">%s%s</div></div>',
+                '<div class="row form-group mfr-field-group%s"%s><div class="%s">%s%s</div></div>',
                 $extraClass,
+                $formGroupAttributeHtml,
                 htmlspecialchars($fieldNoLabelClass, ENT_QUOTES),
                 $field,
                 $noticeHtml,
             );
         }
         return sprintf(
-            '<div class="row form-group mfr-field-group%s"><label class="%s">%s</label><div class="%s">%s%s</div></div>',
+            '<div class="row form-group mfr-field-group%s"%s><label class="%s">%s</label><div class="%s">%s%s</div></div>',
             $extraClass,
+            $formGroupAttributeHtml,
             $labelColClassEsc,
             $label,
             $fieldColClassEsc,

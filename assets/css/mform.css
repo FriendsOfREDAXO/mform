@@ -242,6 +242,10 @@ body.rex-theme-dark .mfr-container {
     color: var(--mform-field-placeholder);
 }
 
+.mform-conditional-target.mform-conditional-animating {
+    overflow: hidden;
+}
+
 .mform select.form-control {
     height: 34px;
 }
@@ -385,6 +389,17 @@ body.rex-theme-dark .mfr-container {
 
 .mform .form-horizontal fieldset {
     width: 100%;
+}
+
+.mform .form-horizontal fieldset.mform-conditional-wrapper {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-inline-size: 0;
+}
+
+.mform .form-horizontal fieldset.mform-conditional-wrapper > legend {
+    display: none;
 }
 
 .mform .mform-headline.grey-legend-background h3,
