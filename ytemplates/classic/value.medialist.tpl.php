@@ -38,10 +38,6 @@ if ($toolbar !== '') {
     $widgetParams['toolbar'] = $toolbar;
 }
 
-if ((string) $this->getElement('hide_label') !== '') {
-    $widgetParams['hide_label'] = 1 == $this->getElement('hide_label');
-}
-
 $widget = rex_var_custom_medialist::getWidget($buttonId, $name, $value, $widgetParams);
 
 $classGroup = trim('form-group ' . $this->getHTMLClass() . ' ' . $this->getWarningClass());

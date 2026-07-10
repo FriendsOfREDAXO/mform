@@ -38,7 +38,6 @@ class rex_yform_value_medialist extends rex_yform_value_abstract
                 'views' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_medialist_views')],
                 'view_switch' => ['type' => 'checkbox', 'label' => rex_i18n::msg('yform_values_medialist_view_switch')],
                 'toolbar' => ['type' => 'select', 'label' => rex_i18n::msg('yform_values_medialist_toolbar'), 'options' => 'horizontal=horizontal,vertical=vertical'],
-                'hide_label' => ['type' => 'checkbox', 'label' => rex_i18n::msg('yform_values_medialist_hide_label')],
                 'notice' => ['type' => 'text', 'label' => rex_i18n::msg('yform_values_defaults_notice')],
             ],
             'description' => rex_i18n::msg('yform_values_medialist_description'),
