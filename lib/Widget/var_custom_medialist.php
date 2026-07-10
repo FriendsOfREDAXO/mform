@@ -71,6 +71,7 @@ class rex_var_custom_medialist extends rex_var
         $options = '';
         foreach ($values as $file) {
             $escaped = rex_escape($file);
+            $optionLabel = self::getOptionLabel($file);
             $ext = strtolower((string) rex_file::extension($file));
             $isRasterImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif'], true);
             $isModernImage = in_array($ext, ['webp', 'avif'], true);
@@ -101,7 +102,7 @@ class rex_var_custom_medialist extends rex_var
                 );
             }
 
-            $options .= '<option value="' . $escaped . '" data-preview="' . rex_escape($previewUrl) . '" data-ext="' . rex_escape($ext) . '" data-media-kind="' . rex_escape($mediaKind) . '" data-is-image="' . ($isImage ? '1' : '0') . '">' . $escaped . '</option>';
+            $options .= '<option value="' . $escaped . '" data-preview="' . rex_escape($previewUrl) . '" data-ext="' . rex_escape($ext) . '" data-media-kind="' . rex_escape($mediaKind) . '" data-is-image="' . ($isImage ? '1' : '0') . '" title="' . $escaped . '">' . rex_escape($optionLabel) . '</option>';
         }
 
         $disabled = '';
@@ -178,5 +179,20 @@ class rex_var_custom_medialist extends rex_var
             . '<button type="button" class="btn btn-popup mform-list-btn" data-action="delete" title="' . rex_i18n::msg('var_media_remove') . '"' . $disabled . '><i class="rex-icon rex-icon-delete-media"></i></button>'
             . '</div>'
             . '</div>';
+    }
+
+    private static function getOptionLabel(string $filename): string
+    {
+        $media = rex_media::get($filename);
+        if (null === $media) {
+            return $filename;
+        }
+
+        $title = trim((string) $media->getTitle());
+        if ('' !== $title) {
+            return $title;
+        }
+
+        return $filename;
     }
 }

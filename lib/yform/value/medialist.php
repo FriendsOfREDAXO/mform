@@ -59,14 +59,29 @@ class rex_yform_value_medialist extends rex_yform_value_abstract
 
         $return = [];
         foreach ($files as $file) {
-            $filename = $file;
-            if (mb_strlen($file) > 24) {
-                $filename = mb_substr($file, 0, 10) . ' ... ' . mb_substr($file, -10);
+            $label = self::getMediaLabel($file);
+            if (mb_strlen($label) > 24) {
+                $label = mb_substr($label, 0, 10) . ' ... ' . mb_substr($label, -10);
             }
-            $return[] = '<span style="white-space:nowrap;" title="' . rex_escape($file) . '">' . rex_escape($filename) . '</span>';
+            $return[] = '<span style="white-space:nowrap;" title="' . rex_escape($file) . '">' . rex_escape($label) . '</span>';
         }
 
         return implode('<br />', $return);
+    }
+
+    private static function getMediaLabel(string $filename): string
+    {
+        $media = rex_media::get($filename);
+        if (null === $media) {
+            return $filename;
+        }
+
+        $title = trim((string) $media->getTitle());
+        if ('' !== $title) {
+            return $title;
+        }
+
+        return $filename;
     }
 
     /**
