@@ -10,7 +10,7 @@ jobs:
   redaxo_publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - if: hashFiles('composer.json') != ''
         uses: shivammathur/setup-php@v2
         with:
