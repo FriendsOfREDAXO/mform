@@ -1,5 +1,21 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.3.1
+
+### Neu
+
+- **YLink-Labelspalten konfigurierbar** - Für `ylink`-Quellen können die Spalten zur sichtbaren Datensatz-Beschriftung jetzt explizit angegeben werden, z. B. per `label_columns` im Array oder per vierter String-Komponente mit `|`-getrennter Spaltenliste.
+
+### Behoben
+
+- **Dropdowns im Flex-Repeater werden nicht mehr abgeschnitten** - Offene Bootstrap-Dropdowns dürfen in Repeater- und Nested-Repeater-Items jetzt über den Item-Rahmen hinausragen, statt durch `overflow: hidden` gekappt zu werden.
+- **Custom-Link erkennt `rex-<table>://<id>` im Widget klarer** - Gespeicherte YForm-/Datensatz-Links zeigen im sichtbaren Label jetzt nach Möglichkeit einen lesbaren Datensatznamen statt nur des Rohwerts.
+
+### Verbesserungen
+
+- **Datensatz-Label mit sinnvollen Fallbacks** - Für `rex-<table>://<id>` werden bevorzugt `name` + `surname`, alternativ `title`, `label`, `headline` oder `bezeichnung` als Widget-Beschriftung verwendet.
+- **Custom-Link-Datensatzauflösung flexibler** - Bei gespeicherten `rex-<table>://<id>`-Werten nutzt das Widget bevorzugt die je Linkquelle konfigurierten Label-Spalten und fällt erst danach auf die bisherigen Standard-Fallbacks zurück.
+
 ## Version 9.3.0
 
 ### Behoben

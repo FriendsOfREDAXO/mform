@@ -225,7 +225,7 @@ yform_values_medialist_toolbar = Toolbar-Ausrichtung
 yform_values_medialist_hide_label = Label in der Liste ausblenden
 yform_values_linklist_description = 🧩 Linklist-Widget aus MForm. Sortierbare Liste interner REDAXO-Links.
 yform_values_linklist_toolbar = Toolbar-Ausrichtung
-yform_values_custom_link_ylink = 🧩 YForm-Link-Widget aus MForm. (label_text::yform_tabelle::anzeige_column,label_text2::yform_tabelle_2::anzeige_column_2)
+yform_values_custom_link_ylink = 🧩 YForm-Link-Widget aus MForm. (label_text::yform_tabelle::anzeige_column::label_spalte1|label_spalte2)
 
 # Docs
 

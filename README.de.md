@@ -14,9 +14,11 @@ Nicht nur für Module: MForm erweitert auch **YForm** und **rex_form** um zusät
 
 - Modul-Eingabeformulare per fluentem PHP-API (`MForm::factory()->addTextField(...)->...->show()`)
 - **Flex-Repeater** für dynamisch wiederholbare Formularzeilen — mit Verschachtelung, Copy/Paste und Aktiv/Inaktiv pro Item
+- Hält Dropdown-basierte Bedienelemente im **Flex-Repeater** benutzbar, indem geöffnete Menüs bei Bedarf über den Item-Rahmen hinausragen dürfen
 - Wiederverwendbare Formularlogik via **Template-API** (`registerTemplate`, `fromTemplate`, `applyTemplate`)
 - Hilfsklassen für die Repeater-Ausgabe: `MFormRepeaterHelper::decode()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()`
 - YForm Value-Types: `custom_link`, `custom_link_multi`, `color_swatch`
+- Löst im Custom-Link-Widget gespeicherte Datensatz-Links wie `rex-<table>://<id>` nach Möglichkeit zu lesbaren Bezeichnungen auf
 - Wachsende Bibliothek **installierbarer Demo-Module** direkt aus dem REDAXO-Backend
 
 ## Schnellbeispiel

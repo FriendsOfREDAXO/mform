@@ -186,6 +186,12 @@ $yform->setValueField('custom_link_multi', [
 REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=1 mailto=1 phone=1 media=1 anchor=1 ylink="Countries::rex_ycountries::de_de"]
 ```
 
+Mit expliziten Label-Spalten für gespeicherte Datensatz-Links:
+
+```html
+REX_CUSTOM_LINK[id=5 widget=1 external=1 intern=1 media=1 ylink="Team::rex_team_members::name::name|surname"]
+```
+
 ### `custom_link_multi`
 
 ```html
@@ -196,6 +202,11 @@ REX_CUSTOM_LINK_MULTI[id=6 widget=1 external=1 intern=1 mailto=1 phone=0 media=1
 
 - `custom_link` speichert einen einzelnen String, z. B. `redaxo://1` oder `mailto:test@example.org`.
 - `custom_link_multi` speichert ein JSON-Array, z. B. `["redaxo://1","mailto:test@example.org"]`.
+- Bei Werten im Format `rex-<table>://<id>` versucht das Widget den Datensatznamen automatisch aufzulösen, z. B. über `name` + `surname` oder Fallback-Spalten wie `title`, `label`, `headline` und `bezeichnung`.
+- Für `ylink` kann die sichtbare Datensatz-Beschriftung explizit konfiguriert werden:
+    - Array-Syntax: `label_columns => ['name', 'surname']`
+    - String-Syntax: vierte `ylink`-Komponente mit `|`-getrennter Liste, z. B. `Team::rex_team_members::name::name|surname`
+- `column` bleibt die Spalte für die Dropdown-Liste. `label_columns` betrifft die Auflösung bereits gespeicherter Werte im Widget.
 - Im MBlock-Kontext sollte `addCustomLinkField()` **immer mit einem String-Pfad** als ID verwendet werden (z. B. `"$id.0.link"`). Damit landet der Wert unter dem lesbaren Schlüssel `$item['link']` im JSON. Eine numerische ID funktioniert zwar technisch, ergibt aber den wenig hilfreichen Schlüssel `$item['6']`.
 
 ---

@@ -15,6 +15,10 @@ In der Funktionalität deckt der Flex-Repeater inzwischen alle bekannten MBlock-
 | `addRepeaterElement` | ja | – | – |
 | `addFlexRepeaterElement` | ja | – | – |
 
+## Verhalten offener Dropdowns
+
+Wenn innerhalb eines Repeater-Items ein Bootstrap-Dropdown geöffnet wird, darf das Menü über den Kartenrahmen hinausragen. Das gilt auch für verschachtelte Repeater und verhindert abgeschnittene Selectpicker-, Widget- oder Aktions-Menüs.
+
 ## Beispiele
 
 ### Eingabe-Modul

@@ -226,7 +226,7 @@ yform_values_medialist_toolbar = Toolbar orientation
 yform_values_medialist_hide_label = Hide label in list
 yform_values_linklist_description = Linklist widget from mform. Sortable list of internal REDAXO links.
 yform_values_linklist_toolbar = Toolbar orientation
-yform_values_custom_link_ylink = YFORM link widget (label_text::yform_table_name::column_to_display,label_text2::yform_table_name_2::column_to_display_2)
+yform_values_custom_link_ylink = YFORM link widget (label_text::yform_table_name::column_to_display::label_column1|label_column2)
 
 # Docs
 

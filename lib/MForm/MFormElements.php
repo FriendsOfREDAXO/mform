@@ -580,7 +580,8 @@ abstract class MFormElements
     /**
      * @internal attributes ['data-intern'=>'enable','data-extern'=>'enable','data-media'=>'enable','data-mailto'=>'enable','data-tel'=>'disable', 'data-extern-link-prefix' => 'https://www.', 'data-link-category' => 14, 'data-media-category' => 1, 'data-media-type' => 'jpg,png', 'data-types' => 'jpg,png', 'types' => 'jpg,png'];
      *
-     * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
+    * $ylink = [['name' => 'Countries', 'table'=>'rex_ycountries', 'column' => 'de_de']]
+    * $ylinkWithCustomLabel = [['name' => 'Team', 'table'=>'rex_team_members', 'column' => 'name', 'label_columns' => ['name', 'surname']]]
      * ->addCustomLinkField(1, ['label' => 'custom', 'data-intern'=>'disable', 'data-extern'=>'enable', 'ylink' => $ylink])
      * @param array<string, mixed>|null $attributes
      */

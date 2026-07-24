@@ -483,7 +483,7 @@ Unterstützte `$attributes` (data-Attribute):
 | `data-link-category` | `int` | Start-Kategorie für interne Links |
 | `data-media-category` | `int` | Start-Kategorie für Medien |
 | `data-media-type` | `string` | Erlaubte Dateiendungen (kommasepariert) |
-| `ylink` | `array` | YForm-Tabellen-Links |
+| `ylink` | `array` | YForm-Tabellen-Links; optional mit `label_columns` für die sichtbare Datensatz-Beschriftung |
 
 ---
 

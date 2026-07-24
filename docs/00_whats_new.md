@@ -4,6 +4,15 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Update 9.3.1: Dropdown-Overflow und Datensatz-Link-Labels
+
+- Offene Dropdown-Menüs in Flex-Repeater-Items werden nicht mehr am Item-Rahmen abgeschnitten.
+- Das Custom-Link-Widget zeigt bei Werten wie `rex-team-members://15` nach Möglichkeit einen lesbaren Datensatznamen statt nur des Rohwerts.
+- `ylink`-Quellen können jetzt optional definieren, aus welchen Spalten ein gespeicherter Datensatz im Widget beschriftet wird.
+- Unterstützt werden sowohl Array-Konfigurationen mit `label_columns` als auch die String-Syntax `Label::tabelle::dropdown_spalte::spalte1|spalte2`.
+
+---
+
 ## Update 9.1: Tabs und Form Builder
 
 - Tabs werden ID-frei gerendert und sind dadurch stabil in verschachtelten Kontexten (inkl. FlexRepeater).

@@ -209,6 +209,26 @@ $ylink = [['name' => 'Länder', 'table' => 'rex_ycountries', 'column' => 'de_de'
 ->addCustomLinkField(1, ['label' => 'Custom', 'data-intern' => 'disable', 'data-extern' => 'enable', 'ylink' => $ylink])
 ```
 
+Mit eigener Label-Auflösung für gespeicherte Datensätze:
+
+```php
+$ylink = [[
+    'name' => 'Team',
+    'table' => 'rex_team_members',
+    'column' => 'name',
+    'label_columns' => ['name', 'surname'],
+]];
+
+->addCustomLinkField(1, [
+    'label' => 'Custom',
+    'data-intern' => 'disable',
+    'data-extern' => 'enable',
+    'ylink' => $ylink,
+])
+```
+
+`column` steuert weiterhin die Anzeige im Dropdown. `label_columns` steuert dagegen die sichtbare Bezeichnung bereits gespeicherter Werte wie `rex-team-members://15`.
+
 ### `addMFormMediaField` – Unified Media-Wrapper (MForm v9+)
 
 Basiert intern auf `custom_link` und speichert den Dateinamen in `REX_VALUE[n]`.

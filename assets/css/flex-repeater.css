@@ -237,6 +237,13 @@ body.rex-theme-dark {
     margin-top: .15rem;
 }
 
+.mfr-item:has(.open),
+.mfr-nested-item:has(.open),
+.mfr-item:has(.dropdown-menu.show),
+.mfr-nested-item:has(.dropdown-menu.show) {
+    overflow: visible;
+}
+
 /* --- Header --- */
 .mfr-item-header {
     display: flex;

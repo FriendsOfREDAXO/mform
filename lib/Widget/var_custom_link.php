@@ -32,6 +32,8 @@ class rex_var_custom_link extends rex_var
             if ($art instanceof rex_article) {
                 $valueName = trim(sprintf('%s [%s]', $art->getName(), $art->getId()));
             }
+        } elseif (1 === preg_match('/^(rex-[a-z0-9-]+):\/\/(\d+)$/i', $valueString, $m)) {
+            $valueName = self::getCustomLinkYFormDatasetText($valueString, $m[1], (int) $m[2]);
         }
         $valueName = (string) rex_extension::registerPoint(
             new rex_extension_point('mform/varCustomLink.getCustomLinkText', $valueName, [
@@ -65,6 +67,105 @@ class rex_var_custom_link extends rex_var
         }
 
         return $valueName;
+    }
+
+    /**
+     * @param array<int, string>|string|null $labelColumns
+     * @return array<int, string>
+     */
+    public static function normalizeLabelColumns(array|string|null $labelColumns): array
+    {
+        if (is_string($labelColumns)) {
+            $labelColumns = array_map('trim', explode('|', $labelColumns));
+        }
+
+        if (!is_array($labelColumns)) {
+            return [];
+        }
+
+        $normalizedColumns = [];
+        foreach ($labelColumns as $column) {
+            $column = trim($column);
+            if ('' !== $column) {
+                $normalizedColumns[] = $column;
+            }
+        }
+
+        return array_values(array_unique($normalizedColumns));
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @param array<int, string> $labelColumns
+     */
+    public static function resolveCustomLinkLabelFromRow(array $row, array $labelColumns): string
+    {
+        $parts = [];
+        foreach ($labelColumns as $column) {
+            if (!isset($row[$column])) {
+                continue;
+            }
+
+            $value = trim((string) $row[$column]);
+            if ('' !== $value) {
+                $parts[] = $value;
+            }
+        }
+
+        return trim(implode(' ', $parts));
+    }
+
+    public static function getCustomLinkYFormDatasetText(string $fallbackValue, string $tableScheme, int $id): string
+    {
+        return self::getCustomLinkYFormDatasetTextByColumns($fallbackValue, $tableScheme, $id, []);
+    }
+
+    /**
+     * @param array<int, string>|string|null $labelColumns
+     */
+    public static function getCustomLinkYFormDatasetTextByColumns(string $fallbackValue, string $tableScheme, int $id, array|string|null $labelColumns = null): string
+    {
+        $table = str_replace('-', '_', strtolower($tableScheme));
+        $normalizedLabelColumns = self::normalizeLabelColumns($labelColumns);
+
+        try {
+            $sql = rex_sql::factory();
+            $rows = $sql->getArray(
+                'SELECT * FROM ' . $sql->escapeIdentifier($table) . ' WHERE id = :id LIMIT 1',
+                ['id' => $id],
+            );
+        } catch (rex_sql_exception) {
+            return $fallbackValue;
+        }
+
+        if (!isset($rows[0])) {
+            return $fallbackValue;
+        }
+
+        $row = $rows[0];
+        $label = self::resolveCustomLinkLabelFromRow($row, $normalizedLabelColumns);
+
+        if ('' === $label) {
+            $label = trim(implode(' ', array_filter([
+                trim((string) ($row['name'] ?? '')),
+                trim((string) ($row['surname'] ?? '')),
+            ])));
+        }
+
+        if ('' === $label) {
+            foreach (['title', 'label', 'headline', 'bezeichnung'] as $column) {
+                if (isset($row[$column]) && is_string($row[$column]) && '' !== trim($row[$column])) {
+                    $label = trim($row[$column]);
+                    break;
+                }
+            }
+        }
+
+        if ('' === $label) {
+            return $fallbackValue;
+        }
+
+        return sprintf('%s [id=%d]', $label, $id);
     }
 
     /**
@@ -124,7 +225,16 @@ class rex_var_custom_link extends rex_var
                     'name' => $link[0],
                     'table' => $link[1],
                     'column' => $link[2],
+                    'label_columns' => self::normalizeLabelColumns($link[3] ?? null),
                 ];
+            }
+        } elseif (isset($args['ylink']) && is_array($args['ylink'])) {
+            foreach ($args['ylink'] as $index => $ylink) {
+                if (!is_array($ylink)) {
+                    continue;
+                }
+
+                $args['ylink'][$index]['label_columns'] = self::normalizeLabelColumns($ylink['label_columns'] ?? null);
             }
         }
         return $args;
@@ -208,7 +318,11 @@ class rex_var_custom_link extends rex_var
                     $ylinks .= '<li><a href="#" class="ylink" data-table="' . $link['table'] . '" data-column="' . $link['column'] . '" data-name="' . $link['name'] . '">' . $link['name'] . '</a></li>';
 
                     if ('' !== $valueString && str_contains($valueString, str_replace('_', '-', $link['table']))) {
-                        $valueName = self::getCustomLinkYFormLinkText($valueString, $link['table'], $link['column']);
+                        if (isset($link['label_columns']) && is_array($link['label_columns']) && count($link['label_columns']) > 0) {
+                            $valueName = self::getCustomLinkYFormDatasetTextByColumns($valueString, str_replace('_', '-', $link['table']), (int) preg_replace('/^.*:\/\//', '', $valueString), $link['label_columns']);
+                        } else {
+                            $valueName = self::getCustomLinkYFormLinkText($valueString, $link['table'], $link['column']);
+                        }
                     }
                 }
             }
