@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.4.0
+
+### Neu
+
+- **MediaPlace-Unterstützung für alle Medien-Picker-Widgets** - Custom-Link (Einzelmedium + Vorschau), Medialisten-Widget (`REX_MEDIALIST`/`REX_CUSTOM_MEDIALIST`, "Öffnen"/"Hinzufügen"/"Ansehen") und das ältere Bilderlisten-Widget öffnen jetzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Overlay statt des klassischen Medienpool-Popups, sofern das AddOn installiert und aktiv ist - ohne MediaPlace ändert sich nichts. Die Erkennung läuft über die neue, zentrale `assets/js/mediaplace-bridge.js` (`window.rex5MediaplaceBridge`, gleiches Prinzip wie bei tinymce/cke5), auf die alle drei Widget-Skripte zurückgreifen, statt die Weiche mehrfach zu duplizieren.
+
 ## Version 9.3.1
 
 ### Neu

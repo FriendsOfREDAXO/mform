@@ -178,6 +178,32 @@ function mformListWidgetInit(widget) {
             return false;
         }
 
+        if (type === 'medialist' && window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+            if (action === 'open' || action === 'add') {
+                const filter = mformMediaplaceFilterFromParams(params);
+                const pickOptions = { multiple: true };
+                if (filter) pickOptions.filter = filter;
+                const previewBase = String(widget.attr('data-preview-base') || '');
+
+                window.rex5MediaplaceBridge.pick(function (filenames) {
+                    const picked = Array.isArray(filenames) ? filenames : (filenames ? [filenames] : []);
+                    if (!picked.length) return;
+                    picked.forEach(function (file) {
+                        select.append(mformListBuildMediaOption(file, previewBase));
+                    });
+                    mformListRender(widget, type);
+                    mformListWriteHidden(widget);
+                }, pickOptions);
+                return false;
+            }
+
+            if (action === 'view') {
+                const filename = String(select.find('option:selected').first().val() || '');
+                if (filename) window.rex5MediaplaceBridge.show(filename);
+                return false;
+            }
+        }
+
         let popup = null;
 
         if (type === 'medialist') {
@@ -332,6 +358,27 @@ function mformListEnsureIds(widget, type) {
     return { baseId: baseId };
 }
 
+function mformListBuildMediaOption(value, previewBase) {
+    const option = $('<option/>').attr('value', value).text(value);
+    const dotPos = value.lastIndexOf('.');
+    const ext = dotPos > -1 ? value.substring(dotPos + 1).toLowerCase() : 'file';
+    const isRasterImage = ['jpg', 'jpeg', 'png', 'gif'].indexOf(ext) !== -1;
+    const isModernImage = ['webp', 'avif'].indexOf(ext) !== -1;
+    const isSvg = ext === 'svg';
+    const isVideo = ['mp4', 'webm', 'ogg'].indexOf(ext) !== -1;
+    const isImage = isRasterImage || isModernImage || isSvg;
+    option.attr('data-ext', ext);
+    option.attr('data-is-image', isImage ? '1' : '0');
+    option.attr('data-media-kind', isVideo ? 'video' : (isImage ? 'image' : 'file'));
+    // Use direct /media/ for svg, avif, webp, video – media manager may not support them
+    if (isVideo || isSvg || isModernImage) {
+        option.attr('data-preview', '/media/' + value);
+    } else if (isRasterImage && previewBase) {
+        option.attr('data-preview', previewBase + encodeURIComponent(value));
+    }
+    return option;
+}
+
 function mformListBuildOptionsFromHidden(widget, type) {
     const hidden = widget.find('input.mform-list-value');
     const select = widget.find('select.mform-list-select');
@@ -349,27 +396,11 @@ function mformListBuildOptionsFromHidden(widget, type) {
     const options = [];
     const previewBase = String(widget.attr('data-preview-base') || '');
     parts.forEach(function (value) {
-        const text = type === 'linklist' ? ('Artikel ' + value) : value;
-        const option = $('<option/>').attr('value', value).text(text);
         if (type === 'medialist') {
-            const dotPos = value.lastIndexOf('.');
-            const ext = dotPos > -1 ? value.substring(dotPos + 1).toLowerCase() : 'file';
-            const isRasterImage = ['jpg', 'jpeg', 'png', 'gif'].indexOf(ext) !== -1;
-            const isModernImage = ['webp', 'avif'].indexOf(ext) !== -1;
-            const isSvg = ext === 'svg';
-            const isVideo = ['mp4', 'webm', 'ogg'].indexOf(ext) !== -1;
-            const isImage = isRasterImage || isModernImage || isSvg;
-            option.attr('data-ext', ext);
-            option.attr('data-is-image', isImage ? '1' : '0');
-            option.attr('data-media-kind', isVideo ? 'video' : (isImage ? 'image' : 'file'));
-            // Use direct /media/ for svg, avif, webp, video – media manager may not support them
-            if (isVideo || isSvg || isModernImage) {
-                option.attr('data-preview', '/media/' + value);
-            } else if (isRasterImage && previewBase) {
-                option.attr('data-preview', previewBase + encodeURIComponent(value));
-            }
+            options.push(mformListBuildMediaOption(value, previewBase));
+            return;
         }
-        options.push(option);
+        options.push($('<option/>').attr('value', value).text('Artikel ' + value));
     });
 
     select.empty();

@@ -4,6 +4,14 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Update 9.4.0: MediaPlace-Unterstützung für Medien-Widgets
+
+- Custom-Link (Einzelmedium + Vorschau-Button), das Medialisten-Widget (`REX_MEDIALIST`/`REX_CUSTOM_MEDIALIST`) und das ältere Bilderlisten-Widget öffnen jetzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Overlay statt des klassischen Medienpool-Popups, sofern MediaPlace installiert und aktiv ist.
+- Ohne MediaPlace ändert sich nichts – die klassischen Popups bleiben der Fallback.
+- Die Erkennung läuft zentral über `assets/js/mediaplace-bridge.js`, auf die alle Widget-Skripte zurückgreifen.
+
+---
+
 ## Update 9.3.1: Dropdown-Overflow und Datensatz-Link-Labels
 
 - Offene Dropdown-Menüs in Flex-Repeater-Items werden nicht mehr am Item-Rahmen abgeschnitten.
