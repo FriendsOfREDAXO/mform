@@ -4,7 +4,7 @@
 
 ### Neu
 
-- **MediaPlace-Unterstützung für alle Medien-Picker-Widgets** - Custom-Link (Einzelmedium + Vorschau), Medialisten-Widget (`REX_MEDIALIST`/`REX_CUSTOM_MEDIALIST`, "Öffnen"/"Hinzufügen"/"Ansehen") und das ältere Bilderlisten-Widget öffnen jetzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Overlay statt des klassischen Medienpool-Popups, sofern das AddOn installiert und aktiv ist - ohne MediaPlace ändert sich nichts. Die Erkennung läuft über die neue, zentrale `assets/js/mediaplace-bridge.js` (`window.rex5MediaplaceBridge`, gleiches Prinzip wie bei tinymce/cke5), auf die alle drei Widget-Skripte zurückgreifen, statt die Weiche mehrfach zu duplizieren.
+- **MediaPlace-Unterstützung für alle Medien-Picker-Widgets** - Custom-Link (Einzelmedium + Vorschau), Medialisten-Widget (`REX_MEDIALIST`/`REX_CUSTOM_MEDIALIST`, "Öffnen"/"Hinzufügen"/"Ansehen") und das ältere Bilderlisten-Widget öffnen jetzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Overlay statt des klassischen Medienpool-Popups, sofern das AddOn installiert und aktiv ist - ohne MediaPlace ändert sich nichts. Die Erkennung läuft über die neue, zentrale `assets/js/mediaplace-bridge.js` (`window.rex5MediaplaceBridge`, gleiches Prinzip wie bei tinymce/cke5), auf die alle drei Widget-Skripte zurückgreifen, statt die Weiche mehrfach zu duplizieren. Eine konfigurierte `types="jpg,png"`-Beschränkung bleibt dabei hart durchgesetzt (MediaPlace ≥1.3.6 vorausgesetzt, über `MP3.open()`s neue `allowedExtensions`-Option) - ohne diese MediaPlace-Version filtert sie nur den Start-Tab, ohne die Auswahl zu blockieren.
 
 ## Version 9.3.1
 

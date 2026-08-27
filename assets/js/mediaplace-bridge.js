@@ -64,13 +64,25 @@ function mformMediaplaceFilterForTypes(rawTypes) {
 }
 
 /**
- * Extrahiert args[types] aus dem serverseitig vorgebauten Popup-Query-String
- * (z.B. "&args[types]=jpg%2Cpng&rex_file_category=5", siehe var_custom_medialist.php)
- * und leitet daraus per mformMediaplaceFilterForTypes() einen Start-Tab ab.
+ * Extrahiert args[types] als rohe Endungsliste aus dem serverseitig
+ * vorgebauten Popup-Query-String (z.B. "&args[types]=jpg%2Cpng&rex_file_category=5",
+ * siehe var_custom_medialist.php). Leere Liste, wenn kein types-Parameter da ist.
+ */
+function mformMediaplaceExtensionsFromParams(paramsStr) {
+    var match = /[?&]args\[types\]=([^&]*)/.exec(String(paramsStr || ''));
+    if (!match) return [];
+    var raw = decodeURIComponent(match[1].replace(/\+/g, ' '));
+    return raw.split(',').map(function (t) {
+        return String(t || '').trim().toLowerCase();
+    }).filter(Boolean);
+}
+
+/**
+ * Leitet per mformMediaplaceFilterForTypes() einen Start-Tab (options.filter)
+ * aus demselben args[types]-Parameter ab -- nur ein Komfort-Hinweis fuer den
+ * initial aktiven Tab, die eigentliche Durchsetzung uebernimmt options.allowedExtensions.
  */
 function mformMediaplaceFilterFromParams(paramsStr) {
-    var match = /[?&]args\[types\]=([^&]*)/.exec(String(paramsStr || ''));
-    if (!match) return null;
-    var raw = decodeURIComponent(match[1].replace(/\+/g, ' '));
-    return mformMediaplaceFilterForTypes(raw.split(','));
+    var types = mformMediaplaceExtensionsFromParams(paramsStr);
+    return types.length ? mformMediaplaceFilterForTypes(types) : null;
 }

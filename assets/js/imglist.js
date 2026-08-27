@@ -140,8 +140,10 @@ function imglist_widget_actions(element) {
 
 function imglist_pick_via_mediaplace(element, param) {
     const filter = mformMediaplaceFilterFromParams(param);
+    const extensions = mformMediaplaceExtensionsFromParams(param);
     const pickOptions = { multiple: true };
     if (filter) pickOptions.filter = filter;
+    if (extensions.length) pickOptions.allowedExtensions = extensions;
 
     window.rex5MediaplaceBridge.pick(function (filenames) {
         const picked = Array.isArray(filenames) ? filenames : (filenames ? [filenames] : []);

@@ -214,6 +214,7 @@ function customlink_init_widget(element) {
             if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
                 const filter = mformMediaplaceFilterForTypes(mediaTypesList);
                 const pickOptions = filter ? { filter: filter } : {};
+                if (mediaTypesList.length) pickOptions.allowedExtensions = mediaTypesList;
                 window.rex5MediaplaceBridge.pick(function (filename) {
                     setLinkValue(filename, filename);
                 }, pickOptions);

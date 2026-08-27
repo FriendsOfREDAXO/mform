@@ -181,8 +181,10 @@ function mformListWidgetInit(widget) {
         if (type === 'medialist' && window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
             if (action === 'open' || action === 'add') {
                 const filter = mformMediaplaceFilterFromParams(params);
+                const extensions = mformMediaplaceExtensionsFromParams(params);
                 const pickOptions = { multiple: true };
                 if (filter) pickOptions.filter = filter;
+                if (extensions.length) pickOptions.allowedExtensions = extensions;
                 const previewBase = String(widget.attr('data-preview-base') || '');
 
                 window.rex5MediaplaceBridge.pick(function (filenames) {
