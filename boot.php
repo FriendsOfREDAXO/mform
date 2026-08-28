@@ -30,6 +30,7 @@ if (rex::isBackend()) {
     // widgets
     rex_view::addCssFile($addon->getAssetsUrl('css/imglist.css'));
     rex_view::addCssFile($addon->getAssetsUrl('css/list-widget.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/mediaplace-bridge.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/imglist.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/sortable.min.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/list-widget.js'));

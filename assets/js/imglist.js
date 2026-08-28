@@ -106,16 +106,29 @@ function imglist_widget_actions(element) {
     });
 
     element.find('.btn-popup.open').off('click.mformImglist').on('click.mformImglist', function () {
+        if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+            imglist_pick_via_mediaplace(element, param);
+            return false;
+        }
         openREXMedialist(widget_id, param);
         return false;
     });
 
     element.find('.btn-popup.add').off('click.mformImglist').on('click.mformImglist', function () {
+        if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+            imglist_pick_via_mediaplace(element, param);
+            return false;
+        }
         addREXMedialist(widget_id, param);
         return false;
     });
 
     element.find('.btn-popup.view').off('click.mformImglist').on('click.mformImglist', function () {
+        if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+            const filename = String(element.find('select option:selected').first().val() || '');
+            if (filename) window.rex5MediaplaceBridge.show(filename);
+            return false;
+        }
         viewREXMedialist(widget_id, param);
         return false;
     });
@@ -124,6 +137,24 @@ function imglist_widget_actions(element) {
 // function deleteREXImagelist(widget_id, param) {
 //     alert('delete');
 // }
+
+function imglist_pick_via_mediaplace(element, param) {
+    const filter = mformMediaplaceFilterFromParams(param);
+    const extensions = mformMediaplaceExtensionsFromParams(param);
+    const pickOptions = { multiple: true };
+    if (filter) pickOptions.filter = filter;
+    if (extensions.length) pickOptions.allowedExtensions = extensions;
+
+    window.rex5MediaplaceBridge.pick(function (filenames) {
+        const picked = Array.isArray(filenames) ? filenames : (filenames ? [filenames] : []);
+        if (!picked.length) return;
+        const select = element.find('select');
+        picked.forEach(function (file) {
+            select.append($('<option/>').attr('value', file).text(file));
+        });
+        imglist_add_img_by_last_list_item(element);
+    }, pickOptions);
+}
 
 function imglist_add_img_by_last_list_item(element) {
     let go_go_go = false;

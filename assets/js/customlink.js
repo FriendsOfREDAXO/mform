@@ -210,6 +210,17 @@ function customlink_init_widget(element) {
             closeDropDown(id);
 
             const mediaTypesList = normalizeMediaTypes(media_types);
+
+            if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+                const filter = mformMediaplaceFilterForTypes(mediaTypesList);
+                const pickOptions = filter ? { filter: filter } : {};
+                if (mediaTypesList.length) pickOptions.allowedExtensions = mediaTypesList;
+                window.rex5MediaplaceBridge.pick(function (filename) {
+                    setLinkValue(filename, filename);
+                }, pickOptions);
+                return false;
+            }
+
             if (mediaTypesList.length) {
                 args = '&args[types]=' + encodeURIComponent(mediaTypesList.join(','));
             }
@@ -247,6 +258,11 @@ function customlink_init_widget(element) {
 
             if (!isPreviewableMediaValue(mediaValue)) {
                 syncMediaPreviewButton(mediaValue);
+                return false;
+            }
+
+            if (window.rex5MediaplaceBridge && window.rex5MediaplaceBridge.isActive()) {
+                window.rex5MediaplaceBridge.show(mediaValue);
                 return false;
             }
 
