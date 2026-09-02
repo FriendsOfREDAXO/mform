@@ -11,18 +11,18 @@
  */
 window.rex5MediaplaceBridge = window.rex5MediaplaceBridge || {
     isActive: function () {
-        return typeof MP3 !== 'undefined' && typeof MP3.open === 'function';
+        return typeof MP !== 'undefined' && typeof MP.open === 'function';
     },
     // onSelect(filename) wie beim klassischen Popup (Single-Select).
     // onSelect(filenames[]) bei options.multiple (Array von Dateinamen).
     // options.filter waehlt optional den Start-Typ-Tab vor (z.B. 'images').
     pick: function (onSelect, options) {
-        MP3.open(onSelect, options || {});
+        MP.open(onSelect, options || {});
     },
     // Oeffnet den Overlay direkt im Detail-Panel einer Datei (Browse-only).
     show: function (filename) {
-        if (typeof MP3.openFile === 'function') {
-            MP3.openFile(filename);
+        if (typeof MP.openFile === 'function') {
+            MP.openFile(filename);
         }
     }
 };

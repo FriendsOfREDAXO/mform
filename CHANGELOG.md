@@ -1,5 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.4.1
+
+> **Voraussetzung: [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace) ≥ 2.0.0.** Wer MediaPlace einsetzt, sollte vor diesem Update auf Version 2.0.0 oder neuer aktualisieren (siehe "Behoben" unten) – mit einer älteren MediaPlace-Version wird das Overlay sonst nicht mehr erkannt und es öffnet sich wieder der klassische Medienpool-Popup.
+
+### Behoben
+
+- **MediaPlace-Erkennung nutzte noch das alte globale JS-Objekt `MP3`:** `window.rex5MediaplaceBridge` in `assets/js/mediaplace-bridge.js` prüfte auf `MP3.open()`/`MP3.openFile()`, MediaPlace hat sein globales Overlay-Objekt seit Version 2.0.0 aber in `MP` umbenannt. Dadurch öffnete sich bei aktuellem MediaPlace wieder der klassische Medienpool-Popup statt des Overlays. Auf `MP` aktualisiert.
+
 ## Version 9.4.0
 
 ### Neu
