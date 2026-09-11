@@ -7,6 +7,7 @@
  */
 
 rex_api_function::register('mform_resolve_link', \FriendsOfREDAXO\MForm\Api\ResolveLinkApi::class);
+rex_api_function::register('mform_a11y_check', \FriendsOfREDAXO\MForm\Api\A11yCheckApi::class);
 
 $addon = rex_addon::get('mform');
 
@@ -37,6 +38,14 @@ if (rex::isBackend()) {
     rex_view::addJsFile($addon->getAssetsUrl('js/sortable.min.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/list-widget.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/customlink.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/a11y-check.js'));
+    rex_view::setJsProperty('mform_a11y', [
+        'api' => rex_url::backendController(['rex-api-call' => 'mform_a11y_check'], false),
+        'edit' => rex_i18n::msg('mform_a11y_edit'),
+        'ok' => rex_i18n::msg('mform_a11y_ok'),
+        'blocked' => rex_i18n::msg('mform_a11y_strict_blocked'),
+        'checking' => rex_i18n::msg('mform_a11y_checking'),
+    ]);
     // add mform js / css
     rex_view::addJsFile($addon->getAssetsUrl('mform.js'));
     rex_view::addCssFile($addon->getAssetsUrl('css/mform.css'));

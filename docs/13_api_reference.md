@@ -493,6 +493,8 @@ addMediaField(float|int|string $id, ?array $parameter = null, mixed $catId = nul
 ```
 Medienpool-Datei-Picker (einzelne Datei).
 
+Option `a11y` (ab 10.0, auch für Medialist, MForm-Media/-Medialist, Bildliste und Custom Link): Laufzeit-Prüfung der Medienpool-Metadaten, z. B. `['a11y' => ['med_alt']]` oder `['a11y' => ['required_media_meta' => [['field' => 'med_alt', 'message' => '…']], 'strict' => true]]`. Siehe [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
+
 ---
 
 ```php

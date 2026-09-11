@@ -4,6 +4,14 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 
 ---
 
+## Update 10.0: Barrierefreiheits-Prüfung für Medien-Felder
+
+- Medien-Felder bekommen mit der Option `a11y` eine Laufzeit-Prüfung gegen den Medienpool: `['a11y' => ['med_alt']]` meldet direkt unter dem Widget, wenn der ALT-Text fehlt, mit Link zum Bearbeiten. Jedes `med_*`-Metainfo-Feld ist prüfbar, eigene Meldung je Feld, `strict` blockiert das Speichern.
+- Berücksichtigt „dekorativ, kein ALT nötig“ (MediaPlace oder `med_alt_decorative`), mehrsprachige Felder aus metainfo_lang_fields je Online-Sprache und eigene MediaPlace-Metadaten (`mediaplace:<key>`).
+- Keine Änderung an gespeicherten Daten. Details: [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
+
+---
+
 ## Update 9.4.0: MediaPlace-Unterstützung für Medien-Widgets
 
 - Custom-Link (Einzelmedium + Vorschau-Button), das Medialisten-Widget (`REX_MEDIALIST`/`REX_CUSTOM_MEDIALIST`) und das ältere Bilderlisten-Widget öffnen jetzt automatisch das [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace)-Overlay statt des klassischen Medienpool-Popups, sofern MediaPlace installiert und aktiv ist.

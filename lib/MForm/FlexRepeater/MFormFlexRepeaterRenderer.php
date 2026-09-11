@@ -5,6 +5,7 @@ namespace FriendsOfRedaxo\MForm\FlexRepeater;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
 use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
+use FriendsOfRedaxo\MForm\A11y\MediaMetaChecker;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
@@ -363,6 +364,9 @@ class MFormFlexRepeaterRenderer
 
     private static function renderField(MFormItem $item): string
     {
+        // Opt-in A11y-Prüfung: a11y-Option in form-group-Attribute umsetzen (#397).
+        MediaMetaChecker::applyToItem($item);
+
         $type = $item->getType();
         $fieldKey = self::extractFieldKey($item->getVarId());
         $label = self::renderLabel($item);

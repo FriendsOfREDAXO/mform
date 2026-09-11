@@ -13,6 +13,7 @@ use Dom\HTMLCollection;
 use Dom\HTMLDocument;
 use Exception;
 use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\A11y\MediaMetaChecker;
 use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
@@ -1292,6 +1293,10 @@ class MFormParser
     {
         if (count($item->getAttributes()) > 0) {
             foreach ($item->getAttributes() as $key => $value) {
+                // Steuerwerte fuer die form-group gehoeren nicht ans Eingabeelement.
+                if (in_array($key, ['form-group-class', 'form-group-attributes', 'a11y'], true)) {
+                    continue;
+                }
                 if (is_array($value)) {
                     foreach ($value as $vKey => $vValue) {
                         if (!is_array($vValue)) {
@@ -1537,6 +1542,9 @@ class MFormParser
                     }
 
                     $itemType = $item->getType();
+
+                    // Opt-in A11y-Prüfung: a11y-Option in form-group-Attribute umsetzen (#397).
+                    MediaMetaChecker::applyToItem($item);
 
                     if (MFormFieldTypeCore::isSimpleInputType($itemType)) {
                         $this->generateInputElement($item);
@@ -1805,7 +1813,8 @@ class MFormParser
 
         $formGroupAttributes = MFormFormGroupHelper::getAttributes($item);
         if ([] !== $formGroupAttributes) {
-            $templateElement->setFormGroupAttributes($this->parseAttributes($formGroupAttributes));
+            // Werte HTML-escaped (JSON in data-Attributen), gleiche Serialisierung wie im Flex-Repeater.
+            $templateElement->setFormGroupAttributes(MFormWrapperRenderer::attributes($formGroupAttributes, []));
         }
     }
 

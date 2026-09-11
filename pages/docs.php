@@ -106,6 +106,11 @@ $mform_doc_pages = [
         'icon'  => 'rex-icon fa-share-alt',
         'file'  => 'docs/15_mform_output.md',
     ],
+    'a11y' => [
+        'title' => rex_i18n::msg('mform_docs_a11y'),
+        'icon'  => 'rex-icon fa-universal-access',
+        'file'  => 'docs/16_a11y.md',
+    ],
     'readme' => [
         'title' => rex_i18n::msg('mform_docs_readme'),
         'icon'  => 'rex-icon fa-book',

@@ -1227,3 +1227,44 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     border-color: var(--mform-focus);
     box-shadow: 0 0 0 3px var(--mform-focus-ring);
 }
+
+/* A11y-Metadaten-Prüfung (#397): Hinweisliste unter Medien-Widgets */
+.mform .mform-a11y-feedback,
+.mfr-container .mform-a11y-feedback {
+    margin-top: 6px;
+    font-size: 12px;
+}
+.mform .mform-a11y-list,
+.mfr-container .mform-a11y-list {
+    list-style: none;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--mform-warning);
+    border-left-width: 4px;
+    background: var(--mform-surface-alt);
+    color: var(--mform-text);
+}
+.mform .mform-a11y-list li + li,
+.mfr-container .mform-a11y-list li + li {
+    margin-top: 3px;
+}
+.mform .mform-a11y-head,
+.mfr-container .mform-a11y-head {
+    float: left;
+    margin-right: 6px;
+    color: var(--mform-warning);
+}
+.mform .mform-a11y-edit,
+.mfr-container .mform-a11y-edit {
+    margin-left: .4em;
+    color: var(--mform-link);
+    white-space: nowrap;
+}
+.mform .mform-a11y-ok,
+.mfr-container .mform-a11y-ok {
+    color: var(--mform-success-strong);
+}
+.mform .mform-a11y-has-issues.has-error .mform-a11y-list,
+.mfr-container .mform-a11y-has-issues.has-error .mform-a11y-list {
+    border-color: var(--mform-danger);
+}
