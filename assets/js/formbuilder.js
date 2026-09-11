@@ -113,7 +113,7 @@
                         'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
             repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
                 props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
-                        'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll',
+                        'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll', 'repeaterShowAddButton',
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
                         'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
             tab:         { label: 'Tab', method: 'addTabElement',
@@ -196,6 +196,7 @@
                 repeaterCollapsed: false,
                 repeaterFirstOpen: false,
                 repeaterShowToggleAll: type === 'repeater' ? true : false,
+                repeaterShowAddButton: type === 'repeater' ? true : false,
                 repeaterCopyPaste: type === 'repeater' ? true : false,
                 repeaterConfirmDelete: type === 'repeater' ? true : false,
                 repeaterOpen: type === 'repeater' ? true : false,
@@ -1459,11 +1460,12 @@
             if (defCnt !== null && !isNaN(defCnt)) parts.push("'default_count' => " + defCnt);
             if (item.label) parts.push("'label' => " + phpStr(item.label));
             // Flags only emit when DIFFERENT from MForm core default.
-            // Core defaults: collapsed=false, first_open=false, show_toggle_all=true,
+            // Core defaults: collapsed=false, first_open=false, show_toggle_all=true, show_add_button=true,
             //                open=true, copy_paste=true, confirm_delete=true.
             if (item.repeaterCollapsed === true) parts.push("'collapsed' => true");
             if (item.repeaterFirstOpen === true) parts.push("'first_open' => true");
             if (item.repeaterShowToggleAll === false) parts.push("'show_toggle_all' => false");
+            if (item.repeaterShowAddButton === false) parts.push("'show_add_button' => false");
             if (item.repeaterOpen === false) parts.push("'open' => false");
             if (item.repeaterCopyPaste === false) parts.push("'copy_paste' => false");
             if (item.repeaterConfirmDelete === false) parts.push("'confirm_delete' => false");

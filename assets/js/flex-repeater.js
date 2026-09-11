@@ -469,6 +469,7 @@
             this.itemsList = container.querySelector('.mfr-nested-items');
             this.template = container.querySelector('.mfr-nested-template');
             this.addBtn = container.querySelector('.mfr-btn-add-nested');
+            this.showAddButton = container.dataset.mfrShowAddButton !== 'false';
 
             this._init();
         }
@@ -481,6 +482,13 @@
                     e.preventDefault();
                     this.addItem();
                 });
+            }
+
+            // show_add_button=false: Button nur solange sichtbar, wie keine Items da sind.
+            // Ueber MutationObserver, damit alle Wege (add, insert, remove, paste) erfasst sind.
+            this._updateAddBtn();
+            if (this.itemsList && typeof MutationObserver !== 'undefined') {
+                new MutationObserver(() => this._updateAddBtn()).observe(this.itemsList, { childList: true });
             }
 
             this._sortableInitialized = false;
@@ -701,6 +709,12 @@
         _focusNewItem(itemEl, insertedInMiddle) {
             flashAndRevealItem(itemEl, !!insertedInMiddle, true);
         }
+
+        _updateAddBtn() {
+            if (!this.addBtn) return;
+            const hide = !this.showAddButton && this.itemsList && this.itemsList.children.length > 0;
+            this.addBtn.style.display = hide ? 'none' : '';
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -716,6 +730,8 @@
             this.collapsed = container.dataset.mfrCollapsed === 'true';
             this.firstOpen = container.dataset.mfrFirstOpen !== 'false';
             this.showToggleAll = container.dataset.mfrShowToggleAll !== 'false';
+            // show_add_button=false: Toolbar-"Hinzufuegen" nur, solange keine Items da sind
+            this.showAddButton = container.dataset.mfrShowAddButton !== 'false';
             this.defaultCount = parseInt(container.dataset.mfrDefaultCount, 10) || 0;
             this.confirmDelete = container.dataset.mfrConfirmDelete === '1';
             this.confirmDeleteMsg = container.dataset.mfrConfirmDeleteMsg || 'Wirklich löschen?';
@@ -1517,9 +1533,19 @@
 
         _updateAddBtn() {
             if (!this.addBtns || this.addBtns.length === 0) return;
-            const hide = this.max > 0 && this.data.length >= this.max;
-            this.addBtns.forEach(function (btn) {
+            const maxReached = this.max > 0 && this.data.length >= this.max;
+            const empty = this.data.length === 0;
+            this.addBtns.forEach((btn, i) => {
+                let hide = maxReached;
+                // show_add_button=false: leer -> nur der erste (obere) Button,
+                // mit Items -> gar keiner (das "+" am Item reicht)
+                if (!this.showAddButton) hide = hide || !empty || i > 0;
                 btn.style.display = hide ? 'none' : '';
+            });
+            // Toolbar ohne sichtbare Buttons komplett ausblenden (kein leerer Rahmen)
+            Array.from(this.container.querySelectorAll(':scope > .mfr-toolbar')).forEach((toolbar) => {
+                const anyVisible = Array.from(toolbar.querySelectorAll('button')).some((b) => b.style.display !== 'none');
+                toolbar.style.display = anyVisible ? '' : 'none';
             });
         }
 

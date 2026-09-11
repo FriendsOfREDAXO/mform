@@ -208,6 +208,7 @@ echo MForm::factory()
         'collapsed'       => true,   // Einträge standardmäßig zugeklappt – spart Platz
         'first_open'      => true,   // erster Eintrag direkt aufgeklappt
         'show_toggle_all' => true,   // "Alle auf-/zuklappen"-Button
+        'show_add_button' => false,  // "Hinzufügen" nur solange leer, danach reicht das "+" am Eintrag
     ])
     ->show();
 ```

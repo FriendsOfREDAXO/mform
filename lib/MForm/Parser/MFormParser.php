@@ -130,6 +130,11 @@ class MFormParser
         $collapsed = isset($attrs['collapsed']) && $attrs['collapsed'] ? 'true' : 'false';
         $firstOpen = isset($attrs['first_open']) && $attrs['first_open'] ? 'true' : 'false';
         $showToggleAll = !isset($attrs['show_toggle_all']) || $attrs['show_toggle_all'] ? 'true' : 'false';
+        // show_add_button => false: Toolbar-Buttons "Hinzufuegen" nur zeigen, solange
+        // der Repeater leer ist -- danach reicht das "+" am Item (Issue #442).
+        // "show_add_buttons" (Plural, wie im Issue vorgeschlagen) wird als Alias akzeptiert.
+        $showAddButtonAttr = $attrs['show_add_button'] ?? $attrs['show_add_buttons'] ?? true;
+        $showAddButton = $showAddButtonAttr ? 'true' : 'false';
         $open = !isset($attrs['open']) || $attrs['open'] ? 'true' : 'false';
         $defaultCount = isset($attrs['default_count']) ? (int) $attrs['default_count'] : 0;
         $confirmDelete = !isset($attrs['confirm_delete']) || $attrs['confirm_delete'] ? 1 : 0;
@@ -161,7 +166,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s">%s',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s">%s',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -169,6 +174,7 @@ class MFormParser
             $collapsed,
             $firstOpen,
             $showToggleAll,
+            $showAddButton,
             $open,
             $defaultCount,
             $confirmDelete,

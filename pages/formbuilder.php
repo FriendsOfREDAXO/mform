@@ -307,6 +307,9 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="repeaterShowToggleAll">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterShowToggleAll"> "Alle ein-/ausklappen"-Button <small>(show_toggle_all)</small></label>
             </div>
+            <div class="form-group" data-fb-prop-group="repeaterShowAddButton">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterShowAddButton"> "Hinzufuegen"-Buttons in der Toolbar auch bei vorhandenen Items <small>(show_add_button; aus = nur solange der Repeater leer ist)</small></label>
+            </div>
             <div class="form-group" data-fb-prop-group="repeaterOpen">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="repeaterOpen"> Neu hinzugefuegtes Item geoeffnet <small>(open)</small></label>
             </div>

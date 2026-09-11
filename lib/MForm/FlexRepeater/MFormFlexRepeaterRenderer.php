@@ -55,8 +55,9 @@ class MFormFlexRepeaterRenderer
                 $attrs = $item->getAttributes();
                 $btnText = (string) ($attrs['btn_text'] ?? 'Hinzufügen');
                 $label = self::getLabelString($item->getLabel());
+                $showAddButton = (bool) ($attrs['show_add_button'] ?? $attrs['show_add_buttons'] ?? true);
 
-                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm);
+                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm, $showAddButton);
 
                 $skip = $i + 1;
                 while ($skip < count($items)) {
@@ -593,7 +594,7 @@ class MFormFlexRepeaterRenderer
             '</div></div></div>';
     }
 
-    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm): string
+    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true): string
     {
         $innerTemplate = '';
         if (null !== $innerForm) {
@@ -607,7 +608,7 @@ class MFormFlexRepeaterRenderer
         }
 
         return sprintf(
-            '<div class="mfr-nested-repeater" data-mfr-field="%s" data-mfr-level="2">%s'
+            '<div class="mfr-nested-repeater" data-mfr-field="%s" data-mfr-level="2" data-mfr-show-add-button="%s">%s'
             . '<div class="mfr-nested-items"></div>'
             . '<button type="button" class="btn btn-default btn-sm mfr-btn-add-nested"><i class="rex-icon fa-plus-circle"></i> %s</button>'
             . '<template class="mfr-nested-template">'
@@ -625,6 +626,7 @@ class MFormFlexRepeaterRenderer
             . '<div class="mfr-nested-body mform form-horizontal" style="display:none">%s</div>'
             . '</div></template></div>',
             htmlspecialchars($fieldKey, ENT_QUOTES),
+            $showAddButton ? 'true' : 'false',
             $labelHtml,
             htmlspecialchars($btnText, ENT_QUOTES),
             $innerTemplate,
