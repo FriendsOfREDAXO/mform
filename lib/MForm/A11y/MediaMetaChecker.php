@@ -246,17 +246,12 @@ final class MediaMetaChecker
             return ['ok' => true, 'languages' => [], 'code' => ''];
         }
 
-        // MediaPlace mit eigenem ALT-Feld: je Online-Sprache pruefen ("dekorativ" gilt fuer alle Sprachen).
-        // Ist das eigene Feld unvollstaendig, zaehlt ein gefuelltes klassisches med_alt trotzdem
-        // (Projekte pflegen oft nur eines von beiden).
-        $ownState = null;
+        // MediaPlace mit eigenem ALT-Feld: wie MediaPlace selbst (AltTextStatus) zaehlt dann nur dieses Feld,
+        // je Online-Sprache, "dekorativ" gilt fuer alle Sprachen. Das klassische med_alt bleibt aussen vor.
         if (self::mediaplaceAvailable() && class_exists(\FriendsOfRedaxo\Mediaplace\AltTextStatus::class)) {
             $ownField = \FriendsOfRedaxo\Mediaplace\AltTextStatus::resolveOwnAltField();
             if (null !== $ownField) {
-                $ownState = $this->mediaplaceFieldState($media, $ownField->getKey());
-                if ($ownState['ok']) {
-                    return $ownState;
-                }
+                return $this->mediaplaceFieldState($media, $ownField->getKey());
             } else {
                 $ownData = class_exists(\FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::class) ? \FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::loadFromMedia($media) : [];
                 if (!\FriendsOfRedaxo\Mediaplace\AltTextStatus::isMissing($media, $ownData)) {
@@ -270,7 +265,7 @@ final class MediaMetaChecker
             return ['ok' => true, 'languages' => [], 'code' => ''];
         }
         if (!array_key_exists(self::FIELD_ALT, $types)) {
-            return $ownState ?? ['ok' => false, 'languages' => [], 'code' => self::mediaplaceAvailable() ? 'missing_alt' : 'unknown_field'];
+            return ['ok' => false, 'languages' => [], 'code' => self::mediaplaceAvailable() ? 'missing_alt' : 'unknown_field'];
         }
 
         $value = $media->getValue(self::FIELD_ALT);
@@ -278,14 +273,10 @@ final class MediaMetaChecker
             $state = $this->languageState($value);
             $state['code'] = 'missing_alt';
 
-            return $state['ok'] ? $state : ($ownState ?? $state);
-        }
-        if ('' !== trim((string) $value)) {
-            return ['ok' => true, 'languages' => [], 'code' => ''];
+            return $state;
         }
 
-        // Klassisch leer: Befund des eigenen MediaPlace-Feldes (mit fehlenden Sprachen) hat mehr Aussagekraft.
-        return $ownState ?? ['ok' => false, 'languages' => [], 'code' => 'missing_alt'];
+        return ['ok' => '' !== trim((string) $value), 'languages' => [], 'code' => 'missing_alt'];
     }
 
     /**
