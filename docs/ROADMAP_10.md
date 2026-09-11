@@ -96,13 +96,13 @@ Palette-Parität (#425), JSON-Export/Import (#406), Live-Preview über `rex_api_
 
 ### 5.7 Test-Suite
 
-Stand Beta 1: PHPUnit-Grundstock vorhanden (`tests/Unit`, `tests/Redaxo`, CI-Jobs). Offen: Golden-Snapshots für Wrapper-Kombinationen, Playwright-Smoke im Workflow.
+Stand Beta 1: erledigt (`tests/Unit`, `tests/Redaxo` mit Golden-Snapshot, Playwright-Smoke, alle drei in CI). Weitere Tests kommen mit den jeweiligen Features.
 
 PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML-Snapshots für Wrapper-Kombinationen in beiden Renderpfaden (#437). Ein Playwright-Smoke-Test für Repeater, Builder und Migrationsseite im GitHub-Workflow. Die Regressionen aus 9.4.x bis 9.5.0 (Widget-IDs, doppeltes Escaping) werden als erste Tests festgehalten.
 
 ### 5.8 Kleinere Punkte
-- Modul-Linter als Console-Command: findet `MBlock::show()`, veraltete Aufrufe und numerische Media-Keys in Repeatern (Warnung aus dem Konverter).
-- Dark-Mode-Audit der Eingabefelder (Kommentar in #437: Schatten, Linien, Radius uneinheitlich).
+- Modul-Linter `mform:lint` (#454): erledigt in Beta 1.
+- Dark-Mode-Audit / Design-Tokens (#455): erledigt in Beta 1.
 - Englische Doku für die Kernkapitel, Doku-Seite „Was ist neu in 10“.
 - Deprecation-Policy: Was in 10 als veraltet markiert wird, fliegt frühestens in 11.
 
