@@ -48,7 +48,9 @@ final class RenderParityTest extends TestCase
             ->addTabElement('Tab Meta', MForm::factory()->addTextField('1.0.t2', ['label' => 'Tab Feld B']), false, true, [
                 'tab-icon' => 'fa-cog',
             ])
-            ->addCollapseElement('Zugeklappt', MForm::factory()->addTextField('1.0.c', ['label' => 'Im Collapse']), false);
+            ->addCollapseElement('Zugeklappt', MForm::factory()->addTextField('1.0.c', ['label' => 'Im Collapse']), false)
+            ->addFieldsetArea('Legende', MForm::factory()->addTextField('1.0.f', ['label' => 'Im Fieldset']))
+            ->addInlineElement('Inline', MForm::factory()->addTextField('1.0.i1', ['label' => 'I1'])->addTextField('1.0.i2', ['label' => 'I2']));
     }
 
     /**
@@ -83,6 +85,9 @@ final class RenderParityTest extends TestCase
             'rex-icon fa-cog',
             'tab-pane',
             'Im Collapse',
+            'class="collapse-group',
+            '<legend>Legende</legend>',
+            'Inline</label>',
         ];
     }
 

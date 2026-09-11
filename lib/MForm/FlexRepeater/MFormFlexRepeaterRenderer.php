@@ -38,6 +38,9 @@ class MFormFlexRepeaterRenderer
         if (self::needsTabAutoGrouping($items)) {
             $items = array_values(MFormGroupExtensionHelper::addTabGroupExtensionItems($items));
         }
+        // Collapse-/Accordion-Gruppen wie im Parser: mform.js initialisiert Toggles nur innerhalb von .collapse-group.
+        $items = array_values(MFormGroupExtensionHelper::addCollapseGroupExtensionItems($items));
+        $items = array_values(MFormGroupExtensionHelper::addAccordionGroupExtensionItems($items));
         $html = '';
         $i = 0;
 
@@ -187,21 +190,23 @@ class MFormFlexRepeaterRenderer
                 continue;
             }
 
-            // INLINE-GROUP: form-inline Wrapper
-            if ('start-group-inline' === $type) {
-                $cls = trim('form-inline ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
-                ++$i;
-                continue;
-            }
+            // INLINE: wie im Parser eine offene form-group mit Label, die Kinder folgen im Feld-Wrapper.
             if ('inline' === $type) {
-                $cls = trim('form-inline mfr-inline ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                $labelHtml = self::renderLabel($item);
+                $html .= MFormWrapperRenderer::open('inline', $item->getClass(), $item->getAttributes(), [
+                    'label' => '' !== $labelHtml ? '<label>' . $labelHtml . '</label>' : '',
+                    'element' => '',
+                    'formGroupAttributes' => '',
+                    'infoTooltip' => '',
+                    'infoCollapseButton' => '',
+                    'infoCollapse' => '',
+                    'notice' => '',
+                ]);
                 ++$i;
                 continue;
             }
-            if ('close-inline' === $type || 'close-group-inline' === $type) {
-                $html .= '</div>';
+            if ('start-group-inline' === $type || 'close-inline' === $type || 'close-group-inline' === $type) {
+                $html .= MFormWrapperRenderer::close($type);
                 ++$i;
                 continue;
             }
