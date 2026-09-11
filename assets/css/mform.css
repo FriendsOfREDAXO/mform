@@ -4,190 +4,190 @@
 
 .mform,
 .mfr-container {
-    --mform-field-bg: #ffffff;
-    --mform-field-text: #1f2d3d;
-    --mform-field-border: #c7d0dc;
-    --mform-field-border-hover: #9aa8ba;
-    --mform-field-focus: #4f8ec5;
-    --mform-field-placeholder: #7b8795;
+    --mform-field-bg: var(--mform-input-bg);
+    --mform-field-text: var(--mform-text);
+    --mform-field-border: var(--mform-input-border);
+    --mform-field-border-hover: var(--mform-border-strong);
+    --mform-field-focus: var(--mform-focus);
+    --mform-field-placeholder: var(--mform-muted);
     --mform-field-bg-disabled: #eef1f5;
     --mform-field-border-disabled: #c1cad7;
-    --mform-field-radius: 6px;
+    --mform-field-radius: var(--mform-radius);
     --mform-field-shadow: inset 0 1px 1px rgba(0, 0, 0, .04);
-    --mform-field-shadow-focus: 0 0 0 2px rgba(79, 142, 197, .22);
+    --mform-field-shadow-focus: 0 0 0 2px var(--mform-focus-ring);
 
-    --mform-btn-white-bg: #ffffff;
-    --mform-btn-white-text: #333333;
-    --mform-btn-white-border: #e8e8e8;
-    --mform-btn-white-hover-bg: #4b9ad9;
-    --mform-btn-white-active-bg: #2a81c7;
+    --mform-btn-white-bg: var(--mform-surface);
+    --mform-btn-white-text: var(--mform-text);
+    --mform-btn-white-border: var(--mform-border);
+    --mform-btn-white-hover-bg: var(--mform-link);
+    --mform-btn-white-active-bg: var(--mform-link);
     --mform-btn-white-active-text: #ffffff;
-    --mform-btn-white-icon: #4b9ad9;
+    --mform-btn-white-icon: var(--mform-link);
     --mform-btn-white-icon-active: #ffffff;
-    --mform-btn-white-tabs-bg: #fafafa;
+    --mform-btn-white-tabs-bg: var(--mform-surface-alt);
 
-    --mform-custom-link-bg: #ffffff;
-    --mform-custom-link-border: #d8e0e8;
-    --mform-custom-link-empty-text: #7c8997;
-    --mform-custom-link-btn-bg: #f7f9fb;
-    --mform-custom-link-btn-border: #e3e8ee;
-    --mform-custom-link-btn-text: inherit;
-    --mform-custom-link-btn-hover-bg: #eaf1f8;
-    --mform-custom-link-btn-active-bg: #d0e8fa;
-    --mform-custom-link-btn-active-text: #1a6ca8;
-    --mform-custom-link-btn-active-border: #b0d0ef;
+    --mform-custom-link-bg: var(--mform-surface);
+    --mform-custom-link-border: var(--mform-input-border);
+    --mform-custom-link-empty-text: var(--mform-muted);
+    --mform-custom-link-btn-bg: var(--mform-surface-alt);
+    --mform-custom-link-btn-border: var(--mform-border);
+    --mform-custom-link-btn-text: var(--mform-text);
+    --mform-custom-link-btn-hover-bg: var(--mform-hover);
+    --mform-custom-link-btn-active-bg: var(--mform-active-bg);
+    --mform-custom-link-btn-active-text: var(--mform-active-text);
+    --mform-custom-link-btn-active-border: var(--mform-border-strong);
 
-    --mform-cl-multi-bg: #f7f9fb;
-    --mform-cl-multi-border: #dde4ec;
-    --mform-cl-multi-handle: #aaaaaa;
-    --mform-cl-multi-remove: #c0392b;
+    --mform-cl-multi-bg: var(--mform-surface-alt);
+    --mform-cl-multi-border: var(--mform-border);
+    --mform-cl-multi-handle: var(--mform-muted);
+    --mform-cl-multi-remove: var(--mform-danger);
 
-    --mform-accent: #79af8a;
-    --mform-accent-bg: rgba(121, 175, 138, 0.12);
-    --mform-accent-ring: rgba(121, 175, 138, 0.4);
+    --mform-accent: var(--mform-success);
+    --mform-accent-bg: var(--mform-active-bg);
+    --mform-accent-ring: var(--mform-focus-ring);
 
     --mform-grey-legend-bg: #d8d8d8;
     --mform-grey-legend-tab-bg: #f3f3f3;
     --mform-grey-legend-sort-bg: #ececec;
 
-    --mform-cbg-border: rgba(94, 94, 94, 0.3);
-    --mform-cbg-border-hover: rgba(94, 94, 94, 0.55);
-    --mform-cbg-indicator-border: rgba(94, 94, 94, 0.45);
-    --mform-cbg-text: inherit;
-    --mform-cbg-text-active: inherit;
+    --mform-cbg-border: var(--mform-input-border);
+    --mform-cbg-border-hover: var(--mform-border-strong);
+    --mform-cbg-indicator-border: var(--mform-border-strong);
+    --mform-cbg-text: var(--mform-text);
+    --mform-cbg-text-active: var(--mform-active-text);
 
-    --mform-cs-popup-bg: #ffffff;
-    --mform-cs-popup-border: rgba(0, 0, 0, 0.15);
-    --mform-cs-popup-text: inherit;
-    --mform-cs-preview-class-bg: #e0e0e0;
-    --mform-cs-preview-class-text: #333333;
-    --mform-cs-swatch-class-bg: #e0e0e0;
-    --mform-cs-swatch-class-text: #444444;
+    --mform-cs-popup-bg: var(--mform-surface);
+    --mform-cs-popup-border: var(--mform-border);
+    --mform-cs-popup-text: var(--mform-text);
+    --mform-cs-preview-class-bg: var(--mform-badge-bg);
+    --mform-cs-preview-class-text: var(--mform-badge-text);
+    --mform-cs-swatch-class-bg: var(--mform-badge-bg);
+    --mform-cs-swatch-class-text: var(--mform-badge-text);
 }
 
 body.rex-theme-dark .mform,
 body.rex-theme-dark .mfr-container {
-    --mform-field-bg: #243140;
-    --mform-field-text: #edf3f9;
-    --mform-field-border: #415266;
-    --mform-field-border-hover: #5a6d83;
-    --mform-field-focus: #7fb3e8;
-    --mform-field-placeholder: #a6b5c4;
+    --mform-field-bg: var(--mform-input-bg);
+    --mform-field-text: var(--mform-text);
+    --mform-field-border: var(--mform-input-border);
+    --mform-field-border-hover: var(--mform-border-strong);
+    --mform-field-focus: var(--mform-focus);
+    --mform-field-placeholder: var(--mform-muted);
     --mform-field-bg-disabled: #1e2935;
     --mform-field-border-disabled: #39495d;
     --mform-field-shadow: inset 0 1px 1px rgba(0, 0, 0, .28);
-    --mform-field-shadow-focus: 0 0 0 2px rgba(127, 179, 232, .28);
+    --mform-field-shadow-focus: 0 0 0 2px var(--mform-focus-ring);
 
-    --mform-btn-white-bg: #202b35;
-    --mform-btn-white-text: rgba(255, 255, 255, 0.75);
-    --mform-btn-white-border: #151c22;
-    --mform-btn-white-hover-bg: #0f4671;
-    --mform-btn-white-active-bg: #0f4671;
-    --mform-btn-white-active-text: rgba(255, 255, 255, 0.75);
-    --mform-btn-white-icon: rgba(255, 255, 255, 0.75);
-    --mform-btn-white-icon-active: #7abaec;
-    --mform-btn-white-tabs-bg: #202b35;
+    --mform-btn-white-bg: var(--mform-surface);
+    --mform-btn-white-text: var(--mform-text);
+    --mform-btn-white-border: var(--mform-border);
+    --mform-btn-white-hover-bg: var(--mform-link);
+    --mform-btn-white-active-bg: var(--mform-link);
+    --mform-btn-white-active-text: #ffffff;
+    --mform-btn-white-icon: var(--mform-link);
+    --mform-btn-white-icon-active: #ffffff;
+    --mform-btn-white-tabs-bg: var(--mform-surface-alt);
 
-    --mform-custom-link-bg: #1f2830;
-    --mform-custom-link-border: #3a4753;
-    --mform-custom-link-empty-text: #9fb0c0;
-    --mform-custom-link-btn-bg: #27323d;
-    --mform-custom-link-btn-border: #344150;
-    --mform-custom-link-btn-text: #c9d4df;
-    --mform-custom-link-btn-hover-bg: #30404d;
-    --mform-custom-link-btn-active-bg: #1a3a55;
-    --mform-custom-link-btn-active-text: #7ec8f4;
-    --mform-custom-link-btn-active-border: #2a5070;
+    --mform-custom-link-bg: var(--mform-surface);
+    --mform-custom-link-border: var(--mform-input-border);
+    --mform-custom-link-empty-text: var(--mform-muted);
+    --mform-custom-link-btn-bg: var(--mform-surface-alt);
+    --mform-custom-link-btn-border: var(--mform-border);
+    --mform-custom-link-btn-text: var(--mform-text);
+    --mform-custom-link-btn-hover-bg: var(--mform-hover);
+    --mform-custom-link-btn-active-bg: var(--mform-active-bg);
+    --mform-custom-link-btn-active-text: var(--mform-active-text);
+    --mform-custom-link-btn-active-border: var(--mform-border-strong);
 
-    --mform-cl-multi-bg: #1f2830;
-    --mform-cl-multi-border: #3a4753;
-    --mform-cl-multi-handle: #5a6a78;
-    --mform-cl-multi-remove: #e57373;
+    --mform-cl-multi-bg: var(--mform-surface-alt);
+    --mform-cl-multi-border: var(--mform-border);
+    --mform-cl-multi-handle: var(--mform-muted);
+    --mform-cl-multi-remove: var(--mform-danger);
 
-    --mform-accent: #79af8a;
-    --mform-accent-bg: rgba(121, 175, 138, 0.18);
-    --mform-accent-ring: rgba(121, 175, 138, 0.4);
+    --mform-accent: var(--mform-success);
+    --mform-accent-bg: var(--mform-active-bg);
+    --mform-accent-ring: var(--mform-focus-ring);
 
     --mform-grey-legend-bg: #1a3332;
     --mform-grey-legend-tab-bg: #f3f3f3;
     --mform-grey-legend-sort-bg: #ececec;
 
-    --mform-cbg-border: rgba(180, 180, 180, 0.25);
-    --mform-cbg-border-hover: rgba(180, 180, 180, 0.45);
-    --mform-cbg-indicator-border: rgba(180, 180, 180, 0.45);
-    --mform-cbg-text: rgba(220, 220, 220, 0.85);
-    --mform-cbg-text-active: #ffffff;
+    --mform-cbg-border: var(--mform-input-border);
+    --mform-cbg-border-hover: var(--mform-border-strong);
+    --mform-cbg-indicator-border: var(--mform-border-strong);
+    --mform-cbg-text: var(--mform-text);
+    --mform-cbg-text-active: var(--mform-active-text);
 
-    --mform-cs-popup-bg: #1e2a35;
-    --mform-cs-popup-border: rgba(255, 255, 255, 0.12);
-    --mform-cs-popup-text: #ccd4dc;
-    --mform-cs-preview-class-bg: #2d3b48;
-    --mform-cs-preview-class-text: #cccccc;
-    --mform-cs-swatch-class-bg: #2d3b48;
-    --mform-cs-swatch-class-text: #cccccc;
+    --mform-cs-popup-bg: var(--mform-surface);
+    --mform-cs-popup-border: var(--mform-border);
+    --mform-cs-popup-text: var(--mform-text);
+    --mform-cs-preview-class-bg: var(--mform-badge-bg);
+    --mform-cs-preview-class-text: var(--mform-badge-text);
+    --mform-cs-swatch-class-bg: var(--mform-badge-bg);
+    --mform-cs-swatch-class-text: var(--mform-badge-text);
 }
 
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .mform,
     body.rex-has-theme:not(.rex-theme-light) .mfr-container {
-        --mform-field-bg: #243140;
-        --mform-field-text: #edf3f9;
-        --mform-field-border: #415266;
-        --mform-field-border-hover: #5a6d83;
-        --mform-field-focus: #7fb3e8;
-        --mform-field-placeholder: #a6b5c4;
+        --mform-field-bg: var(--mform-input-bg);
+        --mform-field-text: var(--mform-text);
+        --mform-field-border: var(--mform-input-border);
+        --mform-field-border-hover: var(--mform-border-strong);
+        --mform-field-focus: var(--mform-focus);
+        --mform-field-placeholder: var(--mform-muted);
         --mform-field-bg-disabled: #1e2935;
         --mform-field-border-disabled: #39495d;
         --mform-field-shadow: inset 0 1px 1px rgba(0, 0, 0, .28);
-        --mform-field-shadow-focus: 0 0 0 2px rgba(127, 179, 232, .28);
+        --mform-field-shadow-focus: 0 0 0 2px var(--mform-focus-ring);
 
-        --mform-btn-white-bg: #202b35;
-        --mform-btn-white-text: rgba(255, 255, 255, 0.75);
-        --mform-btn-white-border: #151c22;
-        --mform-btn-white-hover-bg: #0f4671;
-        --mform-btn-white-active-bg: #0f4671;
-        --mform-btn-white-active-text: rgba(255, 255, 255, 0.75);
-        --mform-btn-white-icon: rgba(255, 255, 255, 0.75);
-        --mform-btn-white-icon-active: #7abaec;
-        --mform-btn-white-tabs-bg: #202b35;
+        --mform-btn-white-bg: var(--mform-surface);
+        --mform-btn-white-text: var(--mform-text);
+        --mform-btn-white-border: var(--mform-border);
+        --mform-btn-white-hover-bg: var(--mform-link);
+        --mform-btn-white-active-bg: var(--mform-link);
+        --mform-btn-white-active-text: #ffffff;
+        --mform-btn-white-icon: var(--mform-link);
+        --mform-btn-white-icon-active: #ffffff;
+        --mform-btn-white-tabs-bg: var(--mform-surface-alt);
 
-        --mform-custom-link-bg: #1f2830;
-        --mform-custom-link-border: #3a4753;
-        --mform-custom-link-empty-text: #9fb0c0;
-        --mform-custom-link-btn-bg: #27323d;
-        --mform-custom-link-btn-border: #344150;
-        --mform-custom-link-btn-text: #c9d4df;
-        --mform-custom-link-btn-hover-bg: #30404d;
-        --mform-custom-link-btn-active-bg: #1a3a55;
-        --mform-custom-link-btn-active-text: #7ec8f4;
-        --mform-custom-link-btn-active-border: #2a5070;
+        --mform-custom-link-bg: var(--mform-surface);
+        --mform-custom-link-border: var(--mform-input-border);
+        --mform-custom-link-empty-text: var(--mform-muted);
+        --mform-custom-link-btn-bg: var(--mform-surface-alt);
+        --mform-custom-link-btn-border: var(--mform-border);
+        --mform-custom-link-btn-text: var(--mform-text);
+        --mform-custom-link-btn-hover-bg: var(--mform-hover);
+        --mform-custom-link-btn-active-bg: var(--mform-active-bg);
+        --mform-custom-link-btn-active-text: var(--mform-active-text);
+        --mform-custom-link-btn-active-border: var(--mform-border-strong);
 
-        --mform-cl-multi-bg: #1f2830;
-        --mform-cl-multi-border: #3a4753;
-        --mform-cl-multi-handle: #5a6a78;
-        --mform-cl-multi-remove: #e57373;
+        --mform-cl-multi-bg: var(--mform-surface-alt);
+        --mform-cl-multi-border: var(--mform-border);
+        --mform-cl-multi-handle: var(--mform-muted);
+        --mform-cl-multi-remove: var(--mform-danger);
 
-        --mform-accent: #79af8a;
-        --mform-accent-bg: rgba(121, 175, 138, 0.18);
-        --mform-accent-ring: rgba(121, 175, 138, 0.4);
+        --mform-accent: var(--mform-success);
+        --mform-accent-bg: var(--mform-active-bg);
+        --mform-accent-ring: var(--mform-focus-ring);
 
         --mform-grey-legend-bg: #1a3332;
         --mform-grey-legend-tab-bg: #f3f3f3;
         --mform-grey-legend-sort-bg: #ececec;
 
-        --mform-cbg-border: rgba(180, 180, 180, 0.25);
-        --mform-cbg-border-hover: rgba(180, 180, 180, 0.45);
-        --mform-cbg-indicator-border: rgba(180, 180, 180, 0.45);
-        --mform-cbg-text: rgba(220, 220, 220, 0.85);
-        --mform-cbg-text-active: #ffffff;
+        --mform-cbg-border: var(--mform-input-border);
+        --mform-cbg-border-hover: var(--mform-border-strong);
+        --mform-cbg-indicator-border: var(--mform-border-strong);
+        --mform-cbg-text: var(--mform-text);
+        --mform-cbg-text-active: var(--mform-active-text);
 
-        --mform-cs-popup-bg: #1e2a35;
-        --mform-cs-popup-border: rgba(255, 255, 255, 0.12);
-        --mform-cs-popup-text: #ccd4dc;
-        --mform-cs-preview-class-bg: #2d3b48;
-        --mform-cs-preview-class-text: #cccccc;
-        --mform-cs-swatch-class-bg: #2d3b48;
-        --mform-cs-swatch-class-text: #cccccc;
+        --mform-cs-popup-bg: var(--mform-surface);
+        --mform-cs-popup-border: var(--mform-border);
+        --mform-cs-popup-text: var(--mform-text);
+        --mform-cs-preview-class-bg: var(--mform-badge-bg);
+        --mform-cs-preview-class-text: var(--mform-badge-text);
+        --mform-cs-swatch-class-bg: var(--mform-badge-bg);
+        --mform-cs-swatch-class-text: var(--mform-badge-text);
     }
 }
 
@@ -268,20 +268,41 @@ body.rex-theme-dark .mfr-container {
     margin-bottom: 0;
 }
 
+/* Horizontale Tabs: Flex statt Floats, damit umbrechende Reiter zeilenweise
+   bleiben und nicht (wegen der -1px-Margin des aktiven Reiters) spaltenweise
+   stapeln. Vertikale Tabs behalten ihr eigenes Layout (siehe unten). */
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li {
+    float: none;
+}
+
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li > a {
+    color: var(--mform-tab-link-color);
+}
+
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li.active > a {
+    color: var(--mform-tab-link-active-color);
+}
+
 .mform .mform-tabs .tab-content {
     padding: 20px;
     background: var(--mform-tab-content-bg);
 }
 
 .mform .mform-tabs {
-    --mform-tab-nav-bg: #f7f9fc;
-    --mform-tab-nav-border: #dfe5ee;
-    --mform-tab-content-bg: #ffffff;
-    --mform-tab-content-border: #dfe5ee;
-    --mform-tab-link-color: #48586b;
-    --mform-tab-link-active-bg: #ffffff;
-    --mform-tab-link-active-color: #1d2e40;
-    --mform-tab-link-hover-bg: #eef3f8;
+    --mform-tab-nav-bg: var(--mform-surface-alt);
+    --mform-tab-nav-border: var(--mform-border);
+    --mform-tab-content-bg: var(--mform-surface);
+    --mform-tab-content-border: var(--mform-border);
+    --mform-tab-link-color: var(--mform-muted);
+    --mform-tab-link-active-bg: var(--mform-surface);
+    --mform-tab-link-active-color: var(--mform-text);
+    --mform-tab-link-hover-bg: var(--mform-hover);
 }
 
 .mform .mform-tabs.mform-tabs--modern > .nav-tabs {
@@ -506,7 +527,7 @@ body.rex-theme-dark .mfr-container {
 }
 
 
-.mform a.mblock-info-tooltip {
+.mform a.mform-info-tooltip {
     margin-left: 7px;
 }
 
@@ -531,19 +552,19 @@ body.rex-theme-dark .mfr-container {
 }
 
 body.rex-theme-dark .mform .mform-tabs {
-    --mform-tab-nav-bg: #19222d;
-    --mform-tab-nav-border: #304050;
-    --mform-tab-content-bg: #202b35;
-    --mform-tab-content-border: #304050;
-    --mform-tab-link-color: #b9c7d6;
-    --mform-tab-link-active-bg: #202b35;
-    --mform-tab-link-active-color: #eef4fb;
-    --mform-tab-link-hover-bg: #243342;
+    --mform-tab-nav-bg: var(--mform-surface-alt);
+    --mform-tab-nav-border: var(--mform-border);
+    --mform-tab-content-bg: var(--mform-surface);
+    --mform-tab-content-border: var(--mform-border);
+    --mform-tab-link-color: var(--mform-muted);
+    --mform-tab-link-active-bg: var(--mform-surface);
+    --mform-tab-link-active-color: var(--mform-text);
+    --mform-tab-link-hover-bg: var(--mform-hover);
 }
 
 .mform .custom-link.input-group {
     border: 1px solid var(--mform-custom-link-border);
-    border-radius: 6px;
+    border-radius: var(--mform-radius);
     overflow: visible;
     background: var(--mform-custom-link-bg);
 }
@@ -589,14 +610,14 @@ body.rex-theme-dark .mform .mform-tabs {
 
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) .mform .mform-tabs {
-        --mform-tab-nav-bg: #19222d;
-        --mform-tab-nav-border: #304050;
-        --mform-tab-content-bg: #202b35;
-        --mform-tab-content-border: #304050;
-        --mform-tab-link-color: #b9c7d6;
-        --mform-tab-link-active-bg: #202b35;
-        --mform-tab-link-active-color: #eef4fb;
-        --mform-tab-link-hover-bg: #243342;
+        --mform-tab-nav-bg: var(--mform-surface-alt);
+        --mform-tab-nav-border: var(--mform-border);
+        --mform-tab-content-bg: var(--mform-surface);
+        --mform-tab-content-border: var(--mform-border);
+        --mform-tab-link-color: var(--mform-muted);
+        --mform-tab-link-active-bg: var(--mform-surface);
+        --mform-tab-link-active-color: var(--mform-text);
+        --mform-tab-link-hover-bg: var(--mform-hover);
     }
 
 }
@@ -894,7 +915,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     gap: 6px;
     padding: 5px 12px;
     border: 2px solid var(--mform-cbg-border);
-    border-radius: 4px;
+    border-radius: var(--mform-radius);
     cursor: pointer;
     font-weight: normal;
     user-select: none;
@@ -993,7 +1014,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     margin-bottom: 4px;
     background: var(--mform-cl-multi-bg);
     border: 1px solid var(--mform-cl-multi-border);
-    border-radius: 4px;
+    border-radius: var(--mform-radius);
     padding: 4px 6px;
 }
 
@@ -1168,3 +1189,41 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     text-overflow: clip;
 }
 
+
+/* Range-Felder mit Live-Wertanzeige: Slider und Wert in einer Zeile */
+.mform input[type="range"][data-mform-range] {
+    display: inline-block;
+    width: calc(100% - 4.5em);
+    height: auto;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    vertical-align: middle;
+    accent-color: var(--mform-link);
+}
+.mform .mform-range-output {
+    display: inline-block;
+    min-width: 3.5em;
+    margin-left: .5em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--mform-text);
+    vertical-align: middle;
+}
+.mform input[type="color"] {
+    display: inline-block;
+    width: 3.5em;
+    height: 34px;
+    padding: 2px 4px;
+    border: 1px solid var(--mform-input-border);
+    border-radius: var(--mform-radius);
+    background: var(--mform-input-bg);
+    cursor: pointer;
+}
+.mform input[type="color"]:focus {
+    outline: none;
+    border-color: var(--mform-focus);
+    box-shadow: 0 0 0 3px var(--mform-focus-ring);
+}

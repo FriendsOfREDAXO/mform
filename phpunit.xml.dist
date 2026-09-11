@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         failOnWarning="true"
+         displayDetailsOnTestsThatTriggerWarnings="true">
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="redaxo">
+            <directory>tests/Redaxo</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <!-- Pfad zu einer REDAXO-Installation (Ordner mit redaxo/src/core/boot.php).
+             Ohne diesen Wert werden die Tests in tests/Redaxo uebersprungen. -->
+        <env name="MFORM_REDAXO_PATH" value=""/>
+    </php>
+    <source>
+        <include>
+            <directory>lib</directory>
+        </include>
+    </source>
+</phpunit>

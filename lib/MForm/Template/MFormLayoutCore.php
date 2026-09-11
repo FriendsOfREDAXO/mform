@@ -127,6 +127,57 @@ class MFormLayoutCore
     }
 
     /**
+     * Steuer-Attribute eines Tabs, die nicht als HTML-Attribute am Tab-Pane landen duerfen.
+     *
+     * @var list<string>
+     */
+    public const TAB_META_ATTRIBUTES = ['tab-icon', 'nav-class', 'pull-right', 'data-group-open-tab', 'data-group-tab-layout', 'data-group-tab-style'];
+
+    /**
+     * Entfernt die Tab-Steuer-Attribute (siehe TAB_META_ATTRIBUTES) aus dem Attribut-Array.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function stripTabMetaAttributes(array &$attributes): void
+    {
+        foreach (self::TAB_META_ATTRIBUTES as $key) {
+            unset($attributes[$key]);
+        }
+    }
+
+    /**
+     * Beschriftung eines Tab-Navigationseintrags: optionales Icon (tab-icon) plus Label-HTML.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function tabNavLabel(array $attributes, string $labelHtml): string
+    {
+        $icon = isset($attributes['tab-icon']) && is_string($attributes['tab-icon']) && '' !== trim($attributes['tab-icon'])
+            ? '<i class="rex-icon ' . htmlspecialchars(trim($attributes['tab-icon']), ENT_QUOTES) . '"></i> '
+            : '';
+
+        return $icon . $labelHtml;
+    }
+
+    /**
+     * Klassen des Tab-Gruppen-Wrappers: Basisklassen plus Layout-/Style-Modifier aus den Gruppen-Attributen.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    public static function tabGroupClass(string $baseClass, array $attributes): string
+    {
+        $class = trim($baseClass);
+        if (self::isTabLayoutVertical($attributes)) {
+            $class = trim($class . ' mform-tabs--vertical');
+        }
+        if (self::isTabStyleModern($attributes)) {
+            $class = trim($class . ' mform-tabs--modern');
+        }
+
+        return $class;
+    }
+
+    /**
      * @param array<string, mixed> $attributes
      */
     public static function isTabLayoutVertical(array $attributes): bool

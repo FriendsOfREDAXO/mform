@@ -3,6 +3,8 @@
 namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
@@ -226,28 +228,20 @@ class MFormFlexRepeaterRenderer
                 $tabsMeta = self::collectTabsForGroup($items, $i);
                 $navHtml = '';
                 foreach ($tabsMeta as $idx => $meta) {
-                    $tabIcon = isset($meta['attrs']['tab-icon']) ? '<i class="rex-icon ' . htmlspecialchars((string) $meta['attrs']['tab-icon'], ENT_QUOTES) . '"></i> ' : '';
                     $isActive = MFormLayoutCore::isTabActive($meta['attrs']);
                     $navClass = MFormLayoutCore::buildTabNavClass($meta['attrs']);
                     $navHtml .= sprintf(
-                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s%s</a></li>',
+                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s</a></li>',
                         htmlspecialchars($navClass, ENT_QUOTES),
                         $idx,
                         $isActive ? 'true' : 'false',
                         $idx,
-                        $tabIcon,
-                        $meta['label'], // Label ist Entwickler-HTML
+                        MFormLayoutCore::tabNavLabel($meta['attrs'], $meta['label']), // Label ist Entwickler-HTML
                     );
                 }
                 $groupAttributes = $item->getAttributes();
 
-                $cls = trim('nav mform-tabs rex-page-nav ' . $item->getClass());
-                if (MFormLayoutCore::isTabLayoutVertical($groupAttributes)) {
-                    $cls .= ' mform-tabs--vertical';
-                }
-                if (MFormLayoutCore::isTabStyleModern($groupAttributes)) {
-                    $cls .= ' mform-tabs--modern';
-                }
+                $cls = MFormLayoutCore::tabGroupClass('nav mform-tabs rex-page-nav ' . $item->getClass(), $groupAttributes);
 
                 $html .= sprintf(
                     '<div class="%s" data-mform-tabs="1"%s><ul class="nav nav-tabs" role="tablist">%s</ul><div class="tab-content">',
@@ -262,7 +256,7 @@ class MFormFlexRepeaterRenderer
                 $tabIdx = self::tabIndexInGroup($items, $i);
                 $attrs = $item->getAttributes();
                 $isActive = MFormLayoutCore::isTabActive($attrs);
-                unset($attrs['tab-icon'], $attrs['nav-class'], $attrs['pull-right'], $attrs['data-group-open-tab'], $attrs['data-group-tab-layout'], $attrs['data-group-tab-style']);
+                MFormLayoutCore::stripTabMetaAttributes($attrs);
                 $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
                 $html .= sprintf(
                     '<div role="tabpanel" class="%s" data-tab-group-nav-tab-id="%d"%s>',
@@ -417,6 +411,13 @@ class MFormFlexRepeaterRenderer
         $attrs = self::renderAttributes($itemAttributes);
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
+
+        // Registrierter Feldtyp: Renderer liefert das Element mit data-mfr-field
+        $registered = FieldTypeRegistry::get($type);
+        if (null !== $registered) {
+            $context = new FieldRenderContext(FieldRenderContext::MODE_REPEATER, '', '', $fieldKey, '', $item->getClass(), $attrs);
+            return self::wrapFormGroup($label, $registered->render($item, $context), $item);
+        }
 
         $normalizedInputType = MFormFieldTypeCore::normalizeSimpleInputType($type);
         if (null !== $normalizedInputType) {

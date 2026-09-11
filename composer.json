@@ -1,0 +1,23 @@
+{
+    "name": "friendsofredaxo/mform",
+    "description": "MForm: Formulare für REDAXO-Module. Die composer.json dient nur der Test-Suite (require-dev), MForm wird über den REDAXO-Installer verteilt.",
+    "type": "redaxo-addon",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FriendsOfRedaxo\\MForm\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+}

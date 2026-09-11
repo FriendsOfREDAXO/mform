@@ -848,3 +848,25 @@ $(document).off('click.mformCsGlobal').on('click.mformCsGlobal', function (e) {
         });
     };
 })();
+
+
+// Range-Felder (addRangeField): Live-Wertanzeige als <output> hinter dem Slider
+(function () {
+    function initRange(input) {
+        if (input.dataset.mformRangeReady === '1') return;
+        input.dataset.mformRangeReady = '1';
+        var out = document.createElement('output');
+        out.className = 'mform-range-output';
+        out.textContent = input.value;
+        input.insertAdjacentElement('afterend', out);
+        input.addEventListener('input', function () { out.textContent = input.value; });
+    }
+    function initAll(root) {
+        (root || document).querySelectorAll('input[type="range"][data-mform-range]').forEach(initRange);
+    }
+    if (window.jQuery) {
+        jQuery(document).on('rex:ready', function (e, container) { initAll(container && container[0] ? container[0] : document); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { initAll(document); });
+    else initAll(document);
+})();

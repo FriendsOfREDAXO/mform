@@ -7,24 +7,24 @@
    CSS-Variablen (Light-Mode Defaults)
    ============================================================ */
 :root {
-    --mfr-bg:              #fff;
-    --mfr-bg-header:       #f8f9fa;
-    --mfr-bg-header-hover: #eef0f2;
-    --mfr-border:          #dee2e6;
-    --mfr-border-radius:   6px;
-    --mfr-shadow:          0 1px 4px rgba(0, 0, 0, .07);
-    --mfr-shadow-hover:    0 3px 10px rgba(0, 0, 0, .12);
-    --mfr-color-text:      #343a40;
-    --mfr-color-muted:     #6c757d;
-    --mfr-drag-handle:     #adb5bd;
+    --mfr-bg:              var(--mform-surface);
+    --mfr-bg-header:       var(--mform-surface-alt);
+    --mfr-bg-header-hover: var(--mform-hover);
+    --mfr-border:          var(--mform-border);
+    --mfr-border-radius:   var(--mform-radius-lg);
+    --mfr-shadow:          var(--mform-shadow);
+    --mfr-shadow-hover:    var(--mform-shadow-lift);
+    --mfr-color-text:      var(--mform-text);
+    --mfr-color-muted:     var(--mform-muted);
+    --mfr-drag-handle:     var(--mform-muted);
     --mfr-drag-cursor:     grab;
-    --mfr-ghost-bg:        rgba(0, 123, 255, .07);
-    --mfr-ghost-border:    #007bff;
-    --mfr-chosen-shadow:   0 6px 20px rgba(0, 0, 0, .18);
-    --mfr-nested-bg:       #f8f9fa;
-    --mfr-nested-border:   #e9ecef;
-    --mfr-flash-bg:        rgba(56, 139, 253, .16);
-    --mfr-flash-border:    rgba(56, 139, 253, .55);
+    --mfr-ghost-bg:        var(--mform-active-bg);
+    --mfr-ghost-border:    var(--mform-link);
+    --mfr-chosen-shadow:   var(--mform-shadow-lift);
+    --mfr-nested-bg:       var(--mform-surface-alt);
+    --mfr-nested-border:   var(--mform-border);
+    --mfr-flash-bg:        var(--mform-active-bg);
+    --mfr-flash-border:    var(--mform-link);
     --mfr-disabled-bg:          #f5f5f5;
     --mfr-disabled-border:       #d0d0d0;
     --mfr-disabled-accent:       #9e9e9e;
@@ -32,7 +32,7 @@
     --mfr-disabled-badge-bg:     #9e9e9e;
     --mfr-disabled-badge-text:   #fff;
     --mfr-disabled-body-opacity: 0.45;
-    --mfr-active-accent:         #27ae60;
+    --mfr-active-accent:         var(--mform-success);
     --mfr-add-mt:          .75rem;
     --mfr-item-gap:        .75rem;
     --mfr-transition:      150ms ease;
@@ -42,19 +42,19 @@
    Dark-Mode – explizit (body.rex-theme-dark)
    ============================================================ */
 body.rex-theme-dark {
-    --mfr-bg:              #2c2f33;
-    --mfr-bg-header:       #23272a;
-    --mfr-bg-header-hover: #1e2124;
-    --mfr-border:          #444;
-    --mfr-color-text:      #ddd;
-    --mfr-color-muted:     #999;
-    --mfr-drag-handle:     #777;
-    --mfr-ghost-bg:        rgba(66, 135, 245, .12);
-    --mfr-ghost-border:    #4287f5;
-    --mfr-nested-bg:       #25282b;
-    --mfr-nested-border:   #3a3d40;
-    --mfr-flash-bg:        rgba(72, 166, 255, .20);
-    --mfr-flash-border:    rgba(72, 166, 255, .62);
+    --mfr-bg:              var(--mform-surface);
+    --mfr-bg-header:       var(--mform-surface-alt);
+    --mfr-bg-header-hover: var(--mform-hover);
+    --mfr-border:          var(--mform-border);
+    --mfr-color-text:      var(--mform-text);
+    --mfr-color-muted:     var(--mform-muted);
+    --mfr-drag-handle:     var(--mform-muted);
+    --mfr-ghost-bg:        var(--mform-active-bg);
+    --mfr-ghost-border:    var(--mform-link);
+    --mfr-nested-bg:       var(--mform-surface-alt);
+    --mfr-nested-border:   var(--mform-border);
+    --mfr-flash-bg:        var(--mform-active-bg);
+    --mfr-flash-border:    var(--mform-link);
     --mfr-disabled-bg:          #2a2a2a;
     --mfr-disabled-border:       #555;
     --mfr-disabled-accent:       #777;
@@ -62,27 +62,27 @@ body.rex-theme-dark {
     --mfr-disabled-badge-bg:     #666;
     --mfr-disabled-badge-text:   #fff;
     --mfr-disabled-body-opacity: 0.4;
-    --mfr-active-accent:         #2ecc71;
-    --mfr-shadow:          0 1px 4px rgba(0, 0, 0, .35);
-    --mfr-shadow-hover:    0 3px 10px rgba(0, 0, 0, .5);
+    --mfr-active-accent:         var(--mform-success);
+    --mfr-shadow:          var(--mform-shadow);
+    --mfr-shadow-hover:    var(--mform-shadow-lift);
 }
 
 /* Auto Dark-Mode (Systemeinstellung) */
 @media (prefers-color-scheme: dark) {
     body.rex-has-theme:not(.rex-theme-light) {
-        --mfr-bg:              #2c2f33;
-        --mfr-bg-header:       #23272a;
-        --mfr-bg-header-hover: #1e2124;
-        --mfr-border:          #444;
-        --mfr-color-text:      #ddd;
-        --mfr-color-muted:     #999;
-        --mfr-drag-handle:     #777;
-        --mfr-ghost-bg:        rgba(66, 135, 245, .12);
-        --mfr-ghost-border:    #4287f5;
-        --mfr-nested-bg:       #25282b;
-        --mfr-nested-border:   #3a3d40;
-        --mfr-flash-bg:        rgba(72, 166, 255, .20);
-        --mfr-flash-border:    rgba(72, 166, 255, .62);
+        --mfr-bg:              var(--mform-surface);
+        --mfr-bg-header:       var(--mform-surface-alt);
+        --mfr-bg-header-hover: var(--mform-hover);
+        --mfr-border:          var(--mform-border);
+        --mfr-color-text:      var(--mform-text);
+        --mfr-color-muted:     var(--mform-muted);
+        --mfr-drag-handle:     var(--mform-muted);
+        --mfr-ghost-bg:        var(--mform-active-bg);
+        --mfr-ghost-border:    var(--mform-link);
+        --mfr-nested-bg:       var(--mform-surface-alt);
+        --mfr-nested-border:   var(--mform-border);
+        --mfr-flash-bg:        var(--mform-active-bg);
+        --mfr-flash-border:    var(--mform-link);
         --mfr-disabled-bg:          #2a2a2a;
         --mfr-disabled-border:       #555;
         --mfr-disabled-accent:       #777;
@@ -90,9 +90,9 @@ body.rex-theme-dark {
         --mfr-disabled-badge-bg:     #666;
         --mfr-disabled-badge-text:   #fff;
         --mfr-disabled-body-opacity: 0.4;
-        --mfr-active-accent:         #2ecc71;
-        --mfr-shadow:          0 1px 4px rgba(0, 0, 0, .35);
-        --mfr-shadow-hover:    0 3px 10px rgba(0, 0, 0, .5);
+        --mfr-active-accent:         var(--mform-success);
+        --mfr-shadow:          var(--mform-shadow);
+        --mfr-shadow-hover:    var(--mform-shadow-lift);
     }
 }
 
@@ -312,105 +312,42 @@ body.rex-theme-dark {
     padding: 3px 8px;
     font-size: 12px;
     line-height: 1;
-    border-radius: 4px;
-    background: #f8fafc;
-    border-color: #d8e0e8;
+    border-radius: var(--mform-radius);
+    background: var(--mform-surface-alt);
+    border-color: var(--mform-border);
+    color: var(--mform-text);
     transition: opacity var(--mfr-transition), background-color var(--mfr-transition), border-color var(--mfr-transition), color var(--mfr-transition);
 }
 
 .mfr-nested-actions .btn {
-    background: #f8fafc;
-    border-color: #d8e0e8;
+    background: var(--mform-surface-alt);
+    border-color: var(--mform-border);
+    color: var(--mform-text);
 }
 
 .mfr-item-actions .btn.btn-danger,
 .mfr-nested-actions .btn.btn-danger {
-    background: #f8fafc;
-    border-color: #d8e0e8;
-    color: #d9534f;
+    background: var(--mform-surface-alt);
+    border-color: var(--mform-border);
+    color: var(--mform-danger);
 }
 
 .mfr-item-actions .btn.btn-danger:hover,
 .mfr-item-actions .btn.btn-danger:focus,
 .mfr-nested-actions .btn.btn-danger:hover,
 .mfr-nested-actions .btn.btn-danger:focus {
-    background: #fff5f5;
-    border-color: #e3b5b3;
-    color: #c9302c;
+    background: var(--mform-hover);
+    border-color: var(--mform-border-strong);
+    color: var(--mform-danger);
 }
 
 .mfr-item-actions .btn:not(.btn-danger):hover,
 .mfr-item-actions .btn:not(.btn-danger):focus,
 .mfr-nested-actions .btn:not(.btn-danger):hover,
 .mfr-nested-actions .btn:not(.btn-danger):focus {
-    background: #eef3f7;
-    border-color: #ccd6e2;
-}
-
-body.rex-theme-dark .mfr-item-actions .btn:not(.btn-danger),
-body.rex-theme-dark .mfr-nested-actions .btn:not(.btn-danger) {
-    background: #202b35;
-    border-color: #151c22;
-    color: rgba(255, 255, 255, 0.82);
-}
-
-body.rex-theme-dark .mfr-item-actions .btn.btn-danger,
-body.rex-theme-dark .mfr-nested-actions .btn.btn-danger {
-    background: #202b35;
-    border-color: #151c22;
-    color: #f08a8a;
-}
-
-body.rex-theme-dark .mfr-item-actions .btn.btn-danger:hover,
-body.rex-theme-dark .mfr-item-actions .btn.btn-danger:focus,
-body.rex-theme-dark .mfr-nested-actions .btn.btn-danger:hover,
-body.rex-theme-dark .mfr-nested-actions .btn.btn-danger:focus {
-    background: #27323d;
-    border-color: #344150;
-    color: #ffb3b3;
-}
-
-body.rex-theme-dark .mfr-item-actions .btn:not(.btn-danger):hover,
-body.rex-theme-dark .mfr-item-actions .btn:not(.btn-danger):focus,
-body.rex-theme-dark .mfr-nested-actions .btn:not(.btn-danger):hover,
-body.rex-theme-dark .mfr-nested-actions .btn:not(.btn-danger):focus {
-    background: #27323d;
-    border-color: #344150;
-    color: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn:not(.btn-danger),
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn:not(.btn-danger) {
-        background: #202b35;
-        border-color: #151c22;
-        color: rgba(255, 255, 255, 0.82);
-    }
-
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn:not(.btn-danger):hover,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn:not(.btn-danger):focus,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn:not(.btn-danger):hover,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn:not(.btn-danger):focus {
-        background: #27323d;
-        border-color: #344150;
-        color: #ffffff;
-    }
-
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn.btn-danger,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn.btn-danger {
-        background: #202b35;
-        border-color: #151c22;
-        color: #f08a8a;
-    }
-
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn.btn-danger:hover,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-item-actions .btn.btn-danger:focus,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn.btn-danger:hover,
-    body.rex-has-theme:not(.rex-theme-light) .mfr-nested-actions .btn.btn-danger:focus {
-        background: #27323d;
-        border-color: #344150;
-        color: #ffb3b3;
-    }
+    background: var(--mform-hover);
+    border-color: var(--mform-border-strong);
+    color: var(--mform-text);
 }
 
 /* --- Body --- */

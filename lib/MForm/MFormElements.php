@@ -311,6 +311,16 @@ abstract class MFormElements
         return $this->addElement($typ, $id, null, $attributes, null, null, null, $defaultValue);
     }
 
+    /**
+     * Feld eines registrierten Feldtyps (MForm::registerFieldType()).
+     *
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addCustomField(string $type, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addElement(strtolower(trim($type)), $id, null, $attributes, null, null, null, $defaultValue);
+    }
+
     /** @param array<string, mixed>|null $attributes */
     public function addHiddenField(float|int|string $id, ?string $value = null, ?array $attributes = null): static
     {
@@ -321,6 +331,64 @@ abstract class MFormElements
     public function addTextField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
     {
         return $this->addInputField('text', $id, $attributes, $defaultValue);
+    }
+
+    /**
+     * HTML5-Eingabefelder (#409): duenne Wrapper um addInputField(), damit sie
+     * im Builder, in der Doku und in der Autovervollstaendigung als eigene
+     * Methoden erscheinen. min/max/step/pattern kommen ueber $attributes.
+     *
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addNumberField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('number', $id, $attributes, $defaultValue);
+    }
+
+    /**
+     * Schieberegler mit Live-Wertanzeige (assets/mform.js haengt ein <output> an).
+     *
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addRangeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        $attributes = $attributes ?? [];
+        $attributes['data-mform-range'] = $attributes['data-mform-range'] ?? '1';
+        return $this->addInputField('range', $id, $attributes, $defaultValue);
+    }
+
+    /** @param array<string, mixed>|null $attributes */
+    public function addDateField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('date', $id, $attributes, $defaultValue);
+    }
+
+    /** @param array<string, mixed>|null $attributes */
+    public function addDateTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('datetime-local', $id, $attributes, $defaultValue);
+    }
+
+    /** @param array<string, mixed>|null $attributes */
+    public function addTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('time', $id, $attributes, $defaultValue);
+    }
+
+    /** @param array<string, mixed>|null $attributes */
+    public function addEmailField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('email', $id, $attributes, $defaultValue);
+    }
+
+    /**
+     * Nativer Browser-Farbwaehler (Pendant zu addColorSwatchField()).
+     *
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addColorField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addInputField('color', $id, $attributes, $defaultValue);
     }
 
     /** @param array<string, mixed>|null $attributes */

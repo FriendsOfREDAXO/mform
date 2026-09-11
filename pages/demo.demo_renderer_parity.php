@@ -82,7 +82,7 @@ $flexHtml = MFormFlexRepeaterRenderer::renderTemplate($flexForm, 1);
 $checks = [
     [
         'label' => 'Tooltip-Icon gerendert',
-        'needle' => 'mblock-info-tooltip',
+        'needle' => 'mform-info-tooltip',
     ],
     [
         'label' => 'Tooltip-Default-Icon (info-circle) aktiv',

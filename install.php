@@ -1,4 +1,6 @@
 <?php
 
 require __DIR__ . '/update.php';
-// nothing to do
+
+// Protokolltabellen des Migrationsassistenten (Backup/Rollback, Umhaengen).
+FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterMigrator::ensureTables();

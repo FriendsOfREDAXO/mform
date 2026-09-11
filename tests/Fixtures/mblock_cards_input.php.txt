@@ -1,0 +1,32 @@
+<?php
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$id = 1;
+$mform = MForm::factory()
+    ->addTabElement('Content', MForm::factory()
+        ->addTextField("$id.0.header", ['label' => 'Header'])
+        ->addTextAreaField("$id.0.content", ['label' => 'Text', 'class' => 'cke5-editor'])
+        // ->addTextField("$id.0.old", ['label' => 'auskommentiert'])
+    , true)
+    ->addTabElement('Media', MForm::factory()
+        ->addMediaField(1, ['label' => 'Image', 'preview' => '1'])
+        ->addMediaField(2, ['label' => 'Background'])
+        ->addTextField("$id.0.imageAlt", ['label' => 'Alt'])
+    , false)
+    ->addTabElement('Link', MForm::factory()
+        ->addCustomLinkField("$id.0.1", ['label' => 'Link'])
+        ->addTextField("$id.0.linkText", ['label' => 'Link Text'])
+        ->addHiddenField("$id.0.mblock_offline", '0')
+    );
+
+#$blocks = MBlock::show($id, $mform->show(), ['max' => 5]);
+$blocks = MBlock::show($id, $mform->show(), ['max' => 100, 'online_offline' => true, 'copy_paste' => true, 'smooth_scroll' => true]);
+
+$main = MForm::factory()
+    ->addTabElement('Cards', MForm::factory()->addHtml($blocks), true)
+    ->addTabElement('Settings', MForm::factory()
+        ->addSelectField("2.0.gutter", ['s' => 'small', 'm' => 'medium'])
+        ->addMediaField(1, ['label' => 'Background Image'])
+    );
+echo $main->show();

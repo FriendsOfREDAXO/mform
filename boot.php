@@ -27,6 +27,8 @@ if (rex::isBackend()) {
     // add toggle files
     rex_view::addCssFile($addon->getAssetsUrl('toggle/toggle.css'));
     rex_view::addJsFile($addon->getAssetsUrl('toggle/toggle.js'));
+    // gemeinsame Design-Tokens zuerst (alle Widget-Stylesheets mappen darauf)
+    rex_view::addCssFile($addon->getAssetsUrl('css/mform-tokens.css'));
     // widgets
     rex_view::addCssFile($addon->getAssetsUrl('css/imglist.css'));
     rex_view::addCssFile($addon->getAssetsUrl('css/list-widget.css'));

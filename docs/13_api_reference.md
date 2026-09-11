@@ -275,6 +275,45 @@ Fieldset, das per JavaScript ein- oder ausgeblendet wird, basierend auf dem Wert
 
 ---
 
+### Eigene Feldtypen (Registry, ab 10.0)
+
+```php
+MForm::registerFieldType(string $type, string|FieldTypeInterface $renderer): void
+MForm::unregisterFieldType(string $type): void
+MForm::hasFieldType(string $type): bool
+addCustomField(string $type, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+
+Fremd-Addons registrieren in ihrer `boot.php` einen Typnamen samt Renderer. Der Renderer implementiert `FriendsOfRedaxo\MForm\FieldType\FieldTypeInterface` und liefert nur das Formularelement; Label, Notice und `form-group` baut MForm. Derselbe Renderer wird im klassischen Formular und im Flex-Repeater genutzt, der `FieldRenderContext` sagt ihm, was er ausgeben muss:
+
+- `MODE_FORM`: Element mit `name`/`id`/`value` (`$context->controlAttributes()` liefert `name` und `id`, `$context->value` den escapten Wert).
+- `MODE_REPEATER`: Template-Element ohne `name`, mit `data-mfr-field="{fieldKey}"` (`controlAttributes()` liefert genau das). Werte setzt das Repeater-JS.
+
+```php
+// boot.php eines Addons
+MForm::registerFieldType('rating', RatingFieldType::class);
+
+final class RatingFieldType implements FieldTypeInterface
+{
+    public function render(MFormItem $item, FieldRenderContext $context): string
+    {
+        $html = '<select class="form-control ' . htmlspecialchars($context->class) . '"' . $context->controlAttributes() . '>';
+        for ($i = 0; $i <= 5; ++$i) {
+            $selected = (!$context->isRepeater() && (string) $i === $context->value) ? ' selected' : '';
+            $html .= '<option value="' . $i . '"' . $selected . '>' . str_repeat('★', $i) . '</option>';
+        }
+        return $html . '</select>';
+    }
+}
+
+// im Modul
+->addCustomField('rating', '1.0.rating', ['label' => 'Bewertung'], '3')
+```
+
+Ein Element mit `data-mfr-field` pro Feld genügt für den Repeater; komplexere Widgets, die JS brauchen, initialisieren sich über `rex:ready` (Backend) und müssen geklonte Items selbst erkennen.
+
+---
+
 ### Text & Eingabe
 
 ```php
@@ -316,6 +355,25 @@ Verstecktes Feld (`<input type="hidden">`).
 addInputField(string $typ, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
 ```
 Generisches Input-Feld. `$typ` entspricht dem HTML-`type`-Attribut.
+
+---
+
+```php
+addNumberField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addRangeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addDateField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addDateTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addEmailField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addColorField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+HTML5-Eingabefelder (ab 10.0): `number`, `range` (Live-Wertanzeige), `date`, `datetime-local`, `time`, `email`, `color`. `min`, `max`, `step` und `pattern` kommen über `$attributes`:
+
+```php
+->addNumberField('1.0.menge', ['label' => 'Menge', 'min' => 1, 'max' => 99, 'step' => 1], '1')
+->addRangeField('1.0.opacity', ['label' => 'Deckkraft', 'min' => 0, 'max' => 100], '80')
+->addDateField('1.0.start', ['label' => 'Beginn'])
+```
 
 ---
 
@@ -1099,6 +1157,13 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 | `text-readonly` | `addTextReadOnlyField()` | Schreibgeschützter Text |
 | `textarea-readonly` | `addTextAreaReadOnlyField()` | Schreibgeschützte Textarea |
 | `hidden` | `addHiddenField()` | Verstecktes Feld |
+| `number` | `addNumberField()` | Zahleneingabe (min/max/step) |
+| `range` | `addRangeField()` | Schieberegler mit Wertanzeige |
+| `date` | `addDateField()` | Datum |
+| `datetime-local` | `addDateTimeField()` | Datum und Uhrzeit |
+| `time` | `addTimeField()` | Uhrzeit |
+| `email` | `addEmailField()` | E-Mail-Adresse |
+| `color` | `addColorField()` | Nativer Farbwähler |
 | `select` | `addSelectField()` | Dropdown-Auswahl |
 | `multiselect` | `addMultiSelectField()` | Mehrfach-Auswahl |
 | `checkbox` | `addCheckboxField()` | Checkbox-Gruppe |

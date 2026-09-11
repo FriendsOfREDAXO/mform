@@ -1,10 +1,33 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 9.5.1
+## 10.0.0-dev
+
+Entwicklungsstand für MForm 10 auf `main`, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
+
+### Neu
+
+- **Field-Type-Registry** (#399): `MForm::registerFieldType($type, $renderer)` registriert eigene Feldtypen aus Fremd-Addons, `addCustomField($type, $id, …)` setzt sie ins Formular. Der Renderer (`FieldTypeInterface`) wird im klassischen Parser und im Flex-Repeater genutzt; der `FieldRenderContext` liefert Name/Id/Wert bzw. den Repeater-Feldschlüssel. Grundlage für Linkmap-, MediaPlace- und relation_select-Feldtypen.
+- **Migrationsassistent MBlock → Repeater, Teil 1** (#450): Die Seite „MBlock zu Repeater“ führt in fünf Schritten: Inventar (M10: Module mit `MBlock::show()`, Slices, Slots, Feldtypen, Risiko), Code konvertieren, Modul-Kopie anlegen, Daten migrieren, Slices umhängen. Neu: Legacy-Key-Map automatisch aus dem Eingabe-Code (M1: `addMediaField(2)` → `media_2`, `addCustomLinkField("$id.0.1")` → `link`, editierbar), alle Slots eines Moduls in einem Lauf (M2), verschachtelte MBlock-Daten rekursiv und `MBlock::show($id, $form)` ohne `->show()` (M3), `mblock_offline` → `__disabled` inkl. Entfernen des Hidden-Felds (M4), Backup-Tabelle mit Rollback je Lauf-Token (M8), Console-Command `mform:migrate` mit Inventar, Dry-Run, `--apply`, `--create-module`, `--reassign`, `--rollback` (M9). Auskommentierter Code wird ignoriert, `copy_paste` wird übernommen. Klassen: `MBlockModuleAnalyzer`, `MBlockInventory`, erweiterte `MBlockToRepeaterConverter`/`MBlockToRepeaterMigrator`.
+- **Modul-Linter** (#454): `mform:lint [--module=ID] [--yform] [--severity=…] [--json]` findet `MBlock::show()`, MBlock-`use`, `mblock_offline`, numerische Widget-Ids und Präfix-Feldnamen in Repeater-Formularen, `rex_var::toArray()` für Repeater-Slots und YForm-Felder vom Typ mblock. Exit-Code 1 bei Fehlern. Klasse `FriendsOfRedaxo\MForm\Lint\ModuleLinter`.
+- **Test-Suite, Grundstock** (#453): PHPUnit 11 (`composer install`, `vendor/bin/phpunit`). Suite `unit` läuft ohne REDAXO (Analyzer, Konverter, Linter), Suite `redaxo` bootet eine Installation über `MFORM_REDAXO_PATH` (klassisches Layout) oder `MFORM_REDAXO_BOOT` (eigene Boot-Datei) und deckt Parser-Regressionen aus #443/#444 (show() mehrfach, Widget-IDs, Escaping) sowie Migrator, Backup/Rollback und Umhängen gegen die Datenbank ab. CI führt beide Suiten aus, dazu einen Playwright-Smoke (`tests/e2e`, `npm run test:e2e`) gegen die frisch installierte Instanz: Renderer-Parität, Demo-Seiten, Form Builder, Migrationsseite.
+- **Renderpfade** (#437): Tab-Logik in `MFormLayoutCore` zusammengezogen (`tabNavLabel()`, `tabGroupClass()`, `stripTabMetaAttributes()`, `TAB_META_ATTRIBUTES`), Parser und Flex-Repeater nutzen dieselben Helfer. Paritäts-Test `RenderParityTest` prüft Wrapper-Kombinationen (Tooltip, Spalten, Modal, Full, Tabs, Collapse) in beiden Pfaden und hält das Parser-HTML als Golden-Snapshot fest (`MFORM_UPDATE_SNAPSHOTS=1` erneuert ihn).
+- **HTML5-Eingabefelder** (#409): `addNumberField()`, `addRangeField()` (mit Live-Wertanzeige), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Dünne Wrapper um `addInputField()`, `min`/`max`/`step`/`pattern` über `$attributes`. Funktionieren im Flex-Repeater, stehen im Builder in der Palette (mit Min/Max/Step-Eingaben) und in der Demo „HTML5-Eingabefelder“.
+
+- **Gemeinsame Design-Tokens** (#455): `assets/css/mform-tokens.css` definiert eine Palette (`--mform-surface`, `--mform-text`, `--mform-border`, `--mform-link`, `--mform-radius`, …) für Light, Dark (`body.rex-theme-dark`) und Auto (`prefers-color-scheme`). Custom Link, Custom Link Multiple, Bild-/Linkliste, Flex-Repeater, Checkbox-Gruppe, Farb- und Range-Felder und die Tabs mappen ihre bisher drei voneinander abweichenden Farbsätze auf diese Basis. Abgestimmt auf Linkmap und MediaPlace, damit Overlay und Widget zusammenpassen. Eingabefelder, Input-Groups und Buttons sind eckig wie im REDAXO-Backend (`--mform-radius: 0`), abgerundet bleiben nur Container wie Repeater-Items. Eigene Anpassungen: Tokens im Projekt-CSS überschreiben, siehe `docs/09_templates.md`.
 
 ### Behoben
 
-- **`show()` mehrfach aufrufbar, Teil 3** (Backport aus 10.x): `setCustomId()` stellte bei jedem Durchlauf erneut das `rv`-Präfix voran (`rvrv1_1_0_t`), `setDefaultClass()` hängte die Standardklasse jedes Mal wieder an (`form-control form-control …`). Beide passieren jetzt nur noch einmal je Item. Betrifft `lib/MForm/DTO/MFormItem.php`, `lib/MForm/Utils/MFormItemManipulator.php`.
+- **Range-Feld:** Slider und Live-Wert stehen jetzt auch im klassischen Formular in einer Zeile (die Regel griff nur mit `form-control`, das Range-Felder nicht tragen). Farbfelder bekommen Rahmen und Fokus-Ring der übrigen Eingaben.
+- **Tabs:** Horizontale Reiter brechen bei wenig Platz zeilenweise um statt spaltenweise zu stapeln (Flex statt Bootstrap-Floats).
+- **`show()` mehrfach aufrufbar, Teil 3:** `setCustomId()` stellte bei jedem Durchlauf erneut das `rv`-Präfix voran (`rvrv1_1_0_t`), `setDefaultClass()` hängte die Standardklasse jedes Mal wieder an. Beide passieren jetzt nur noch einmal je Item.
+
+### Voraussetzungen
+
+- **PHP-Mindestversion 8.4** (bisher 8.0). Grund: der neue HTML5-Parser `\Dom\HTMLDocument` (#402, #446). CI prüft nur noch 8.4.
+
+### Entfernt
+
+- **MBlock-Support** (#449): MBlock wird nicht mehr getestet und dokumentiert. `MBlock::show($id, $mform->show())` mit String funktioniert technisch weiter. Das Demo-Modul „MBlock-Test: Medialist + Linklist“ und das Doku-Kapitel zur Weiterverwendung sind entfernt. Die Tooltip-Klasse heißt jetzt `mform-info-tooltip`, `mblock-info-tooltip` bleibt als zweite Klasse am Element erhalten.
 
 ## Version 9.5.0
 

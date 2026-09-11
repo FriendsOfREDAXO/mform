@@ -1,5 +1,5 @@
 package: mform
-version: '9.5.1'
+version: '10.0.0-dev'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -37,8 +37,12 @@ page:
             subPath: CHANGELOG.md
             itemClass: pull-right
 
+console_commands:
+    mform:migrate: FriendsOfRedaxo\MForm\Console\MigrateCommand
+    mform:lint: FriendsOfRedaxo\MForm\Console\LintCommand
+
 requires:
-    php: '>=8.0'
+    php: '>=8.4'
     redaxo: '^5.17.0'
 
 conflicts:
