@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Unveröffentlicht
+
+### Behoben
+
+- **`show()` mehrfach aufrufbar auch bei mehrteiligen Feld-IDs (`1.0.feld`):** Nachbesserung zu 9.4.2 (CodeRabbit-Hinweis in #443). `getWidgetId()` schrieb die Variablen-ID weiterhin als String ins Item zurück, und `setVarAndIds()` wandelt Arrays ohnehin in Klammer-Strings um. Beim zweiten `show()` (MBlock ruft es je Block auf) erkannte der Parser mehrteilige IDs deshalb nicht mehr und rendert Medien-, Medialist- und Link-Felder mit `REX_INPUT_MEDIA[1][0][feld]` statt `REX_INPUT_VALUE[1][0][feld]`. Jetzt liest `getWidgetId()` nur noch, Feldnamen entstehen über `varIdBracketed()`, und die Erkennung mehrteiliger IDs (`varIdParts()`) funktioniert für Array und String gleichermaßen. Betrifft `lib/MForm/Parser/MFormParser.php`.
+
 ## Version 9.4.2
 
 ### Behoben
