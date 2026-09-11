@@ -32,6 +32,13 @@ if (is_string($redaxoBoot) && '' !== $redaxoBoot && is_file($redaxoBoot)) {
     $REX['LOAD_PAGE'] = false;
     require $root . '/src/core/boot.php';
     require_once rex_path::core('packages.php');
+
+    // Widgets (Medien/Link) brauchen CSRF-Token und Benutzer: Session starten, Admin (Setup-User) setzen.
+    rex_login::startSession();
+    $adminId = rex_sql::factory()->getArray('SELECT id FROM ' . rex::getTable('user') . ' WHERE admin = 1 ORDER BY id LIMIT 1');
+    if ([] !== $adminId) {
+        rex::setProperty('user', rex_user::get((int) $adminId[0]['id']));
+    }
     define('MFORM_TESTS_REDAXO', true);
 } else {
     define('MFORM_TESTS_REDAXO', false);
