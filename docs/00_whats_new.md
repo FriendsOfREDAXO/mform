@@ -10,6 +10,10 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 - Berücksichtigt „dekorativ, kein ALT nötig“ (MediaPlace oder `med_alt_decorative`), mehrsprachige Felder aus metainfo_lang_fields je Online-Sprache und eigene MediaPlace-Metadaten (`mediaplace:<key>`).
 - Keine Änderung an gespeicherten Daten. Details: [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
 
+## Update 10.0: Linkmap-Overlay für Link-Felder
+
+- Mit installiertem [Linkmap](https://github.com/FriendsOfREDAXO/linkmap) öffnen Custom-Link, Link- und Linklist-Felder das Overlay; `ylink`-Datensätze kommen aus dem Linkmap-Picker. Details: [Custom-Link-Widget](03_customlink.md#linkmap-integration-ab-100).
+
 ## Update 10.0: Typisierte Repeater-Items und Versionsmarker
 
 - `MFormOutput::from(1)->items()` liefert `MFormRepeaterItem`-Objekte mit `media()`, `article()`, `dataset()`, `url()`, `items()` für verschachtelte Repeater.

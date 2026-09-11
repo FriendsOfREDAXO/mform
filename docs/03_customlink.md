@@ -548,3 +548,7 @@ echo '</pre>';
 
 ?>
 ```
+
+## Linkmap-Integration (ab 10.0)
+
+Ist das Addon [Linkmap](https://github.com/FriendsOfREDAXO/linkmap) installiert, öffnen die Link-Buttons des Custom-Link-Widgets das Linkmap-Overlay statt des klassischen Popups, analog zur MediaPlace-Bridge für Medien. Die `ylink`-Quellen nutzen den Datensatz-Picker von Linkmap (Container der YForm-Tabelle) statt des YForm-Popups; gespeichert wird weiterhin das MForm-Format `rex-<tabelle>://<id>`, Artikel bleiben als Id. Die Weiche liegt in `assets/js/linkmap-bridge.js` (`window.rex5LinkmapBridge`, wird von Linkmap selbst mitgeliefert, sobald dessen Einstellung „Klassische Linkmap ersetzen“ aktiv ist). Ohne Linkmap ändert sich nichts. `addLinkField()` und `addLinklistField()` laufen über die von Linkmap ersetzten Kernfunktionen `openLinkMap()`/`openREXLinklist()`.

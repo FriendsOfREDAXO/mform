@@ -171,8 +171,22 @@ function customlink_init_widget(element) {
         .on('click.mformCustomlink', function () {
                 let id = element.data('id'),
                     table = $(this).data('table'),
-                    column = $(this).data('column'),
-                    pool = newPoolWindow(
+                    column = $(this).data('column');
+
+                // Linkmap installiert: Datensatz-Picker im Overlay statt YForm-Popup.
+                // Gespeichert wird weiterhin das MForm-Format "rex-<tabelle>://<id>".
+                if (window.rex5LinkmapBridge && window.rex5LinkmapBridge.isActive() && typeof window.rex5LinkmapBridge.pickDataset === 'function') {
+                    clearInterval(timer);
+                    closeDropDown(id);
+                    window.rex5LinkmapBridge.pickDataset(String(table), function (link, name) {
+                        const datasetId = mformLinkmapDatasetId(link);
+                        if (!datasetId) return;
+                        setLinkValue('rex-' + String(table).split('_').join('-') + '://' + datasetId, name || (String(table) + ' [' + datasetId + ']'));
+                    }, { clang: clang });
+                    return false;
+                }
+
+                let pool = newPoolWindow(
                         'index.php?page=yform/manager/data_edit&table_name=' +
                         table +
                         '&rex_yform_manager_opener[id]=' +
@@ -286,6 +300,16 @@ function customlink_init_widget(element) {
 
             showed_input.attr('id', 'REX_LINK_' + link_id + '_NAME');
             hidden_input.attr('id', 'REX_LINK_' + link_id);
+
+            // Linkmap-Overlay (Bridge), sonst klassisches Popup. Wert bleibt die Artikel-Id.
+            if (window.rex5LinkmapBridge && window.rex5LinkmapBridge.isActive()) {
+                const pickOptions = { clang: clang };
+                if (link_category !== undefined) pickOptions.categoryId = link_category;
+                window.rex5LinkmapBridge.pick(function (linkurl, linktext, article) {
+                    setLinkValue(mformLinkmapArticleId(linkurl, article), linktext);
+                }, pickOptions);
+                return false;
+            }
 
             let linkMap = openLinkMap('REX_LINK_' + link_id, args);
             $(linkMap).on('rex:selectLink', (event, linkurl, linktext) => {

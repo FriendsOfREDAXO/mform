@@ -246,13 +246,23 @@ final class MediaMetaChecker
             return ['ok' => true, 'languages' => [], 'code' => ''];
         }
 
-        // MediaPlace: eigenes ALT-Feld (mit "dekorativ") oder klassisches med_alt mit med_alt_decorative.
+        // MediaPlace mit eigenem ALT-Feld: je Online-Sprache pruefen ("dekorativ" gilt fuer alle Sprachen).
+        // Ist das eigene Feld unvollstaendig, zaehlt ein gefuelltes klassisches med_alt trotzdem
+        // (Projekte pflegen oft nur eines von beiden).
+        $ownState = null;
         if (self::mediaplaceAvailable() && class_exists(\FriendsOfRedaxo\Mediaplace\AltTextStatus::class)) {
-            $ownData = class_exists(\FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::class) ? \FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::loadFromMedia($media) : [];
-            if (!\FriendsOfRedaxo\Mediaplace\AltTextStatus::isMissing($media, $ownData)) {
-                return ['ok' => true, 'languages' => [], 'code' => ''];
+            $ownField = \FriendsOfRedaxo\Mediaplace\AltTextStatus::resolveOwnAltField();
+            if (null !== $ownField) {
+                $ownState = $this->mediaplaceFieldState($media, $ownField->getKey());
+                if ($ownState['ok']) {
+                    return $ownState;
+                }
+            } else {
+                $ownData = class_exists(\FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::class) ? \FriendsOfRedaxo\Mediaplace\MetainfoJsonStorage::loadFromMedia($media) : [];
+                if (!\FriendsOfRedaxo\Mediaplace\AltTextStatus::isMissing($media, $ownData)) {
+                    return ['ok' => true, 'languages' => [], 'code' => ''];
+                }
             }
-            // Eigenes Feld leer: klassisches med_alt zaehlt trotzdem (Projekte pflegen oft nur eines von beiden).
         }
 
         $types = self::fieldTypes();
@@ -260,7 +270,7 @@ final class MediaMetaChecker
             return ['ok' => true, 'languages' => [], 'code' => ''];
         }
         if (!array_key_exists(self::FIELD_ALT, $types)) {
-            return ['ok' => false, 'languages' => [], 'code' => self::mediaplaceAvailable() ? 'missing_alt' : 'unknown_field'];
+            return $ownState ?? ['ok' => false, 'languages' => [], 'code' => self::mediaplaceAvailable() ? 'missing_alt' : 'unknown_field'];
         }
 
         $value = $media->getValue(self::FIELD_ALT);
@@ -268,10 +278,14 @@ final class MediaMetaChecker
             $state = $this->languageState($value);
             $state['code'] = 'missing_alt';
 
-            return $state;
+            return $state['ok'] ? $state : ($ownState ?? $state);
+        }
+        if ('' !== trim((string) $value)) {
+            return ['ok' => true, 'languages' => [], 'code' => ''];
         }
 
-        return ['ok' => '' !== trim((string) $value), 'languages' => [], 'code' => 'missing_alt'];
+        // Klassisch leer: Befund des eigenen MediaPlace-Feldes (mit fehlenden Sprachen) hat mehr Aussagekraft.
+        return $ownState ?? ['ok' => false, 'languages' => [], 'code' => 'missing_alt'];
     }
 
     /**
