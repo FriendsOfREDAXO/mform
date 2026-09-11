@@ -1533,10 +1533,19 @@
 
         _updateAddBtn() {
             if (!this.addBtns || this.addBtns.length === 0) return;
-            const hide = (this.max > 0 && this.data.length >= this.max)
-                || (!this.showAddButton && this.data.length > 0);
-            this.addBtns.forEach(function (btn) {
+            const maxReached = this.max > 0 && this.data.length >= this.max;
+            const empty = this.data.length === 0;
+            this.addBtns.forEach((btn, i) => {
+                let hide = maxReached;
+                // show_add_button=false: leer -> nur der erste (obere) Button,
+                // mit Items -> gar keiner (das "+" am Item reicht)
+                if (!this.showAddButton) hide = hide || !empty || i > 0;
                 btn.style.display = hide ? 'none' : '';
+            });
+            // Toolbar ohne sichtbare Buttons komplett ausblenden (kein leerer Rahmen)
+            Array.from(this.container.querySelectorAll(':scope > .mfr-toolbar')).forEach((toolbar) => {
+                const anyVisible = Array.from(toolbar.querySelectorAll('button')).some((b) => b.style.display !== 'none');
+                toolbar.style.display = anyVisible ? '' : 'none';
             });
         }
 

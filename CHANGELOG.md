@@ -4,7 +4,7 @@
 
 ### Neu
 
-- **Repeater-Option `show_add_button`:** Mit `'show_add_button' => false` erscheinen die „Hinzufügen"-Buttons der Toolbar (oben und unten) nur noch, solange der Repeater leer ist. Sobald ein Item existiert, reicht das „+"-Icon am Item, und die Toolbar-Buttons verschwinden. So bleibt der Einstieg bei `default_count => 0` möglich, ohne dass die Buttons danach doppelt herumstehen. Gilt auch für verschachtelte Repeater. `show_add_buttons` (Plural) wird als Alias akzeptiert. Im Formbuilder als Checkbox verfügbar. (#442)
+- **Repeater-Option `show_add_button`:** Mit `'show_add_button' => false` erscheint nur noch ein einzelner „Hinzufügen"-Button (oben), und nur solange der Repeater leer ist. Sobald ein Item existiert, reicht das „+"-Icon am Item, und die Toolbar-Buttons verschwinden. So bleibt der Einstieg bei `default_count => 0` möglich, ohne dass die Buttons danach doppelt herumstehen. Gilt auch für verschachtelte Repeater. `show_add_buttons` (Plural) wird als Alias akzeptiert. Im Formbuilder als Checkbox verfügbar. (#442)
 
 
 ### Behoben
