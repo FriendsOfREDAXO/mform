@@ -1168,3 +1168,7 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     text-overflow: clip;
 }
 
+
+/* Range-Felder mit Live-Wertanzeige */
+.mform input[type="range"][data-mform-range] { width: calc(100% - 4.5em); vertical-align: middle; }
+.mform .mform-range-output { display: inline-block; min-width: 3.5em; margin-left: .5em; text-align: right; font-variant-numeric: tabular-nums; }

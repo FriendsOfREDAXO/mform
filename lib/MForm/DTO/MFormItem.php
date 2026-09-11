@@ -18,6 +18,10 @@ class MFormItem
     public array|string|null $value = "";
     /** true, sobald setVarAndIds() den Wert fuer die HTML-Ausgabe escaped hat -- verhindert doppeltes Escaping bei wiederholtem show() */
     public bool $valueEscaped = false;
+    /** true, sobald setCustomId() das "rv"-Praefix gesetzt hat -- verhindert "rvrv..." bei wiederholtem show() */
+    public bool $idPrefixed = false;
+    /** true, sobald setDefaultClass() die Standardklasse vorangestellt hat -- verhindert doppelte Klassen bei wiederholtem show() */
+    public bool $defaultClassApplied = false;
     public string $stringValue = "";
     public string $defaultValue = "";
     public string $mode = "";

@@ -4,6 +4,14 @@
 
 Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
 
+### Neu
+
+- **HTML5-Eingabefelder** (#409): `addNumberField()`, `addRangeField()` (mit Live-Wertanzeige), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Dünne Wrapper um `addInputField()`, `min`/`max`/`step`/`pattern` über `$attributes`. Funktionieren im Flex-Repeater, stehen im Builder in der Palette (mit Min/Max/Step-Eingaben) und in der Demo „HTML5-Eingabefelder“.
+
+### Behoben
+
+- **`show()` mehrfach aufrufbar, Teil 3:** `setCustomId()` stellte bei jedem Durchlauf erneut das `rv`-Präfix voran (`rvrv1_1_0_t`), `setDefaultClass()` hängte die Standardklasse jedes Mal wieder an. Beide passieren jetzt nur noch einmal je Item.
+
 ### Voraussetzungen
 
 - **PHP-Mindestversion 8.4** (bisher 8.0). Grund: der neue HTML5-Parser `\Dom\HTMLDocument` (#402, #446). CI prüft nur noch 8.4.

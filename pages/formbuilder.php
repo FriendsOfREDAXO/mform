@@ -59,6 +59,13 @@ $body = <<<'HTML'
         <ul class="mform-fb__field-list" data-fb-palette>
             <li class="mform-fb__pal-item" data-type="text">Text</li>
             <li class="mform-fb__pal-item" data-type="textarea">Textarea</li>
+            <li class="mform-fb__pal-item" data-type="number">Number</li>
+            <li class="mform-fb__pal-item" data-type="range">Range</li>
+            <li class="mform-fb__pal-item" data-type="date">Date</li>
+            <li class="mform-fb__pal-item" data-type="datetime">Date/Time</li>
+            <li class="mform-fb__pal-item" data-type="time">Time</li>
+            <li class="mform-fb__pal-item" data-type="email">E-Mail</li>
+            <li class="mform-fb__pal-item" data-type="color">Color (nativ)</li>
             <li class="mform-fb__pal-item" data-type="select">Select</li>
             <li class="mform-fb__pal-item" data-type="radio">Radio</li>
             <li class="mform-fb__pal-item" data-type="checkbox">Checkbox</li>
@@ -144,6 +151,18 @@ $body = <<<'HTML'
             <div class="form-group" data-fb-prop-group="cssClass">
                 <label>CSS-Klassen</label>
                 <input type="text" class="form-control" data-fb-prop="cssClass" placeholder="z. B. mt-3 text-muted">
+            </div>
+            <div class="form-group" data-fb-prop-group="inputMin">
+                <label>Min <small>(min-Attribut)</small></label>
+                <input type="text" class="form-control" data-fb-prop="inputMin">
+            </div>
+            <div class="form-group" data-fb-prop-group="inputMax">
+                <label>Max <small>(max-Attribut)</small></label>
+                <input type="text" class="form-control" data-fb-prop="inputMax">
+            </div>
+            <div class="form-group" data-fb-prop-group="inputStep">
+                <label>Step <small>(step-Attribut)</small></label>
+                <input type="text" class="form-control" data-fb-prop="inputStep">
             </div>
             <div class="form-group" data-fb-prop-group="rows">
                 <label>Zeilen <small>(rows fuer Textarea)</small></label>

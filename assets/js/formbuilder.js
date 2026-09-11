@@ -62,6 +62,20 @@
         var TYPES = {
             text:        { label: 'Text', method: 'addTextField',
                 props: ['label', 'defaultValue', 'placeholder', 'notice', 'cssClass', 'required', 'full'] },
+            number:      { label: 'Number', method: 'addNumberField',
+                props: ['label', 'defaultValue', 'placeholder', 'inputMin', 'inputMax', 'inputStep', 'notice', 'cssClass', 'required', 'full'] },
+            range:       { label: 'Range', method: 'addRangeField',
+                props: ['label', 'defaultValue', 'inputMin', 'inputMax', 'inputStep', 'notice', 'cssClass', 'full'] },
+            date:        { label: 'Date', method: 'addDateField',
+                props: ['label', 'defaultValue', 'inputMin', 'inputMax', 'notice', 'cssClass', 'required', 'full'] },
+            datetime:    { label: 'Date/Time', method: 'addDateTimeField',
+                props: ['label', 'defaultValue', 'inputMin', 'inputMax', 'notice', 'cssClass', 'required', 'full'] },
+            time:        { label: 'Time', method: 'addTimeField',
+                props: ['label', 'defaultValue', 'inputMin', 'inputMax', 'inputStep', 'notice', 'cssClass', 'required', 'full'] },
+            email:       { label: 'E-Mail', method: 'addEmailField',
+                props: ['label', 'defaultValue', 'placeholder', 'notice', 'cssClass', 'required', 'full'] },
+            color:       { label: 'Color (nativ)', method: 'addColorField',
+                props: ['label', 'defaultValue', 'notice', 'cssClass', 'full'] },
             textarea:    { label: 'Textarea', method: 'addTextAreaField',
                 props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'tinymceProfile', 'required', 'full'] },
             select:      { label: 'Select', method: 'addSelectField',
@@ -161,6 +175,9 @@
                 label: def.label,
                 defaultValue: '',
                 placeholder: '',
+                inputMin: '',
+                inputMax: '',
+                inputStep: '',
                 notice: '',
                 cssClass: '',
                 rows: '',
@@ -692,6 +709,13 @@
 
         var TYPE_SEARCH_ALIASES = {
             colorswatch: 'color swatch farbe palette css preview',
+            number: 'zahl nummer numerisch min max step html5',
+            range: 'slider schieberegler bereich html5',
+            date: 'datum kalender html5',
+            datetime: 'datum uhrzeit datetime-local html5',
+            time: 'uhrzeit zeit html5',
+            email: 'e-mail mail adresse html5',
+            color: 'farbe colorpicker nativ html5',
             togglecheckbox: 'toggle switch umschalter',
             customlink: 'url link intern extern mailto tel',
             customlinkmultiple: 'url links mehrere intern extern mailto tel',
@@ -1038,6 +1062,12 @@
             if (item.required) a.required = 'required';
             if (item.notice) a.notice = item.notice;
             if (item.rows && item.type === 'textarea') a.rows = item.rows;
+            // HTML5-Felder: min/max/step nur, wenn gesetzt
+            if (['number', 'range', 'date', 'datetime', 'time'].indexOf(item.type) !== -1) {
+                if (item.inputMin !== '' && item.inputMin != null) a.min = item.inputMin;
+                if (item.inputMax !== '' && item.inputMax != null) a.max = item.inputMax;
+                if (item.inputStep !== '' && item.inputStep != null) a.step = item.inputStep;
+            }
             if (item.btnAdd && item.type === 'customlinkmultiple') a.btn_add = item.btnAdd;
 
             // CheckboxGroup: layout / mode / default-value laut docs/12_checkbox_group.md
@@ -1201,6 +1231,13 @@
                     if (attrPhp) line += ', ' + attrPhp;
                     break;
                 case 'text':
+                case 'number':
+                case 'range':
+                case 'date':
+                case 'datetime':
+                case 'time':
+                case 'email':
+                case 'color':
                 case 'textarea': {
                     // Signature: addText/TextAreaField(id, attributes?, defaultValue?)
                     var hasD = !!item.defaultValue;
@@ -1716,6 +1753,13 @@
                 case 'colorswatch': return 'gewaehlter Farbwertausdruck (z. B. #2f77bc oder .text-primary)';
                 case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
                 case 'hidden':      return 'verstecktes Feld';
+                case 'number':      return 'Zahl als String (min/max/step ueber Attribute)';
+                case 'range':       return 'Zahl als String (Schieberegler, Live-Anzeige)';
+                case 'date':        return 'Datum als YYYY-MM-DD';
+                case 'datetime':    return 'Datum/Uhrzeit als YYYY-MM-DDTHH:MM';
+                case 'time':        return 'Uhrzeit als HH:MM';
+                case 'email':       return 'E-Mail-Adresse (Browser-Validierung)';
+                case 'color':       return 'Hex-Farbwert (#rrggbb)';
                 default:            return '';
             }
         }

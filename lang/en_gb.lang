@@ -109,6 +109,7 @@ mform_changelog = Changelog
 mform_github = MForm FOR – Github Repository
 
 mform_example_base_text = Text input and hidden elements
+mform_example_base_html5_inputs = HTML5 input fields [number, range, date, time, e-mail, color]
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkradio = Checkbox and radio elements
 mform_example_base_radio_special = Visual radio variants [image, icon, color]

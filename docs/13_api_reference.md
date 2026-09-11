@@ -319,6 +319,25 @@ Generisches Input-Feld. `$typ` entspricht dem HTML-`type`-Attribut.
 
 ---
 
+```php
+addNumberField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addRangeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addDateField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addDateTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addTimeField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addEmailField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+addColorField(float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+HTML5-Eingabefelder (ab 10.0): `number`, `range` (Live-Wertanzeige), `date`, `datetime-local`, `time`, `email`, `color`. `min`, `max`, `step` und `pattern` kommen über `$attributes`:
+
+```php
+->addNumberField('1.0.menge', ['label' => 'Menge', 'min' => 1, 'max' => 99, 'step' => 1], '1')
+->addRangeField('1.0.opacity', ['label' => 'Deckkraft', 'min' => 0, 'max' => 100], '80')
+->addDateField('1.0.start', ['label' => 'Beginn'])
+```
+
+---
+
 ### Auswahl-Felder
 
 ```php
@@ -1099,6 +1118,13 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 | `text-readonly` | `addTextReadOnlyField()` | Schreibgeschützter Text |
 | `textarea-readonly` | `addTextAreaReadOnlyField()` | Schreibgeschützte Textarea |
 | `hidden` | `addHiddenField()` | Verstecktes Feld |
+| `number` | `addNumberField()` | Zahleneingabe (min/max/step) |
+| `range` | `addRangeField()` | Schieberegler mit Wertanzeige |
+| `date` | `addDateField()` | Datum |
+| `datetime-local` | `addDateTimeField()` | Datum und Uhrzeit |
+| `time` | `addTimeField()` | Uhrzeit |
+| `email` | `addEmailField()` | E-Mail-Adresse |
+| `color` | `addColorField()` | Nativer Farbwähler |
 | `select` | `addSelectField()` | Dropdown-Auswahl |
 | `multiselect` | `addMultiSelectField()` | Mehrfach-Auswahl |
 | `checkbox` | `addCheckboxField()` | Checkbox-Gruppe |
