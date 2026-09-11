@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-beta.2
+
+**BETA, nicht für Produktion.** Zweite Beta von MForm 10 (11.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt. Update von beta.1 ohne Datenänderung; die neue Repeater-Datenversion ist Opt-in.
+
+### Neu
+
+- **Migrationsassistent, Teil 2** (#451): M5 Medialist-/Linklist-/Bildlisten-Werte werden normalisiert und gegen Medienpool und Struktur geprüft (fehlende Dateien/Artikel als Warnung), Listenfelder kommen aus der Modul-Analyse. M6 mehrsprachige Werte (Sprach-Id → MBlock-Liste) werden je Sprache konvertiert. M7 YForm: Schritt 6 des Assistenten und `mform:migrate --yform[=tabelle.spalte]` konvertieren MBlock-Daten in YForm-Tabellen (Typ `mblock` oder Text-Spalten mit MBlock-JSON) mit Backup und Rollback und stellen den Feldtyp optional auf `textarea` um. Klasse `YFormMBlockMigrator`.
+- **Barrierefreiheits-Prüfung für Medien-Felder** (#397): Option `a11y` an `addMediaField()`, `addMedialistField()`, `addMFormMediaField()`, `addMFormMedialistField()`, `addImagelistField()`, `addCustomLinkField()` und `addCustomLinkMultipleField()`. Prüft zur Laufzeit gegen den Medienpool (API `mform_a11y_check`, nur für Backend-Benutzer), zeigt Befunde direkt unter dem Widget mit Link „Metadaten bearbeiten“, je Datei bei Listen, `strict` blockiert das Speichern. `med_alt` berücksichtigt dekorative Bilder (MediaPlace-ALT-Status, `med_alt_decorative`); ist MediaPlace mit eigenem ALT-Feld aktiv, zählt wie dort nur dieses Feld, jedes weitere `med_*`-Feld ist prüfbar, mehrsprachige metainfo_lang_fields-Felder je Online-Sprache, MediaPlace-Metadaten über `mediaplace:<key>`. Keine Änderung an gespeicherten Daten. Neue Seite „Einstellungen“: Prüfung global abschaltbar und optional als Standardprüfung (ALT-Text) für alle Medien-Felder; `'a11y' => false` nimmt ein Feld aus. Befunde haben einen „Erneut prüfen“-Button, nach Rückkehr aus dem Medienpool-Tab wird automatisch neu geprüft; direkt nach einer neuen Auswahl erscheint „Metadaten werden geprüft …“, bis die Antwort da ist; ohne Befund erscheint kein Hinweis. Klasse `FriendsOfRedaxo\MForm\A11y\MediaMetaChecker`, Doku `docs/16_a11y.md`. Nebenbei behoben: Steuerwerte `form-group-attributes` landeten im Parser auch als Attribute am Eingabeelement, und form-group-Attribute wurden im Parser nicht HTML-escaped.
+- **Repeater-Datenformat mit Version** (#452): Option `'data_version' => 2` speichert einen Umschlag `{"__v":2,"items":[...]}`; Standard bleibt die reine Liste, bestehende Werte bleiben lesbar. `MFormRepeaterHelper::decode()`, `MFormOutput` und die Ausgabehelfer lesen beide Formate (auch verschachtelt), neu `encode()`, `dataVersion()`, `unwrap()`, `items()`. Typisierter Zugriff über `MFormOutput::items()` / `item()` mit `MFormRepeaterItem`: `media()`, `medialist()`, `article()`, `linklist()`, `dataset()` (MForm- und Linkmap-Format), `url()`, `linkType()`, `items()` für verschachtelte Repeater.
+- **Linkmap-Bridge** (#447): Bei installiertem Linkmap öffnen Custom-Link-Buttons das Linkmap-Overlay, `ylink`-Quellen nutzen den Datensatz-Picker von Linkmap statt des YForm-Popups (Speicherformat unverändert `rex-<tabelle>://<id>`). `assets/js/linkmap-bridge.js` definiert `window.rex5LinkmapBridge` nur, wenn Linkmap es nicht schon tut; ohne Linkmap keine Verhaltensänderung.
+- **Form Builder**: Palette um Collapse, Accordion, Column, Inline, Radio Image/Icon/Color und Text/Textarea (readonly) ergänzt (#425); Medien-Felder haben eine Checkbox für die A11y-Prüfung (`'a11y' => ['med_alt']`). JSON-Export und -Import des Builder-Stands mit Versionsmarker `mformBuilderVersion` und Migrations-Hook (#406). Live-Vorschau im Iframe über die API `mform_builder_preview` (nur Admins, CSRF): rendert den erzeugten Eingabe-Code wie ein Modul, Backend-CSS und Theme (Light/Dark) inklusive, Auto-Aktualisierung mit Verzögerung oder per Button (#407).
+- **Renderpfade, Teil 2** (#437): Wrapper-Markup (Fieldset, Legend, Collapse mit Toggle, Collapse-Gruppe, Spalten, Tabs, Modal) kommt in beiden Pfaden aus dem Theme-Fragment `mform_wrapper.php` über den neuen `MFormWrapperRenderer`. Der Flex-Repeater hatte das Markup bisher per `sprintf` nachgebaut; eigene Themes greifen damit auch im Repeater. Nebenbei behoben: `addModalElement()` ignorierte im klassischen Parser die Button-Klasse (immer `btn-default`). Golden-Snapshots für beide Pfade unter `tests/__snapshots__`. Teil 4: Die Feld-Zeile (form-group mit Label- und Feldspalte, Notice) rendert der Flex-Repeater über das Parser-Fragment `mform_default.php` (`MFormWrapperRenderer::formGroup()`); die Repeater-Klassen `mfr-field-group`, `mfr-field-label`, `mfr-field-col` bleiben für die Layouts erhalten. Teil 3: Collapse- und Accordion-Gruppen werden auch im Flex-Repeater gebildet (vorher ließ sich ein Collapse im Repeater-Item nicht öffnen, weil `mform.js` Toggles nur in `.collapse-group` initialisiert), und `addInlineElement()` rendert im Repeater wie im Parser über das Fragment.
+
 ## Version 10.0.0-beta.1
 
 **BETA, nicht für Produktion.** Erste Beta von MForm 10 (11.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt.
@@ -10,12 +23,6 @@
 - **Migrationsassistent MBlock → Repeater, Teil 1** (#450): Die Seite „MBlock zu Repeater“ führt in fünf Schritten: Inventar (M10: Module mit `MBlock::show()`, Slices, Slots, Feldtypen, Risiko), Code konvertieren, Modul-Kopie anlegen, Daten migrieren, Slices umhängen. Neu: Legacy-Key-Map automatisch aus dem Eingabe-Code (M1: `addMediaField(2)` → `media_2`, `addCustomLinkField("$id.0.1")` → `link`, editierbar), alle Slots eines Moduls in einem Lauf (M2), verschachtelte MBlock-Daten rekursiv und `MBlock::show($id, $form)` ohne `->show()` (M3), `mblock_offline` → `__disabled` inkl. Entfernen des Hidden-Felds (M4), Backup-Tabelle mit Rollback je Lauf-Token (M8), Console-Command `mform:migrate` mit Inventar, Dry-Run, `--apply`, `--create-module`, `--reassign`, `--rollback` (M9). Auskommentierter Code wird ignoriert, `copy_paste` wird übernommen. Klassen: `MBlockModuleAnalyzer`, `MBlockInventory`, erweiterte `MBlockToRepeaterConverter`/`MBlockToRepeaterMigrator`.
 - **Modul-Linter** (#454): `mform:lint [--module=ID] [--yform] [--severity=…] [--json]` findet `MBlock::show()`, MBlock-`use`, `mblock_offline`, numerische Widget-Ids und Präfix-Feldnamen in Repeater-Formularen, `rex_var::toArray()` für Repeater-Slots und YForm-Felder vom Typ mblock. Exit-Code 1 bei Fehlern. Klasse `FriendsOfRedaxo\MForm\Lint\ModuleLinter`.
 - **Test-Suite, Grundstock** (#453): PHPUnit 11 (`composer install`, `vendor/bin/phpunit`). Suite `unit` läuft ohne REDAXO (Analyzer, Konverter, Linter), Suite `redaxo` bootet eine Installation über `MFORM_REDAXO_PATH` (klassisches Layout) oder `MFORM_REDAXO_BOOT` (eigene Boot-Datei) und deckt Parser-Regressionen aus #443/#444 (show() mehrfach, Widget-IDs, Escaping) sowie Migrator, Backup/Rollback und Umhängen gegen die Datenbank ab. CI führt beide Suiten aus, dazu einen Playwright-Smoke (`tests/e2e`, `npm run test:e2e`) gegen die frisch installierte Instanz: Renderer-Parität, Demo-Seiten, Form Builder, Migrationsseite.
-- **Form Builder**: Palette um Collapse, Accordion, Column, Inline, Radio Image/Icon/Color und Text/Textarea (readonly) ergänzt (#425); Medien-Felder haben eine Checkbox für die A11y-Prüfung (`'a11y' => ['med_alt']`). JSON-Export und -Import des Builder-Stands mit Versionsmarker `mformBuilderVersion` und Migrations-Hook (#406). Live-Vorschau im Iframe über die API `mform_builder_preview` (nur Admins, CSRF): rendert den erzeugten Eingabe-Code wie ein Modul, Backend-CSS und Theme (Light/Dark) inklusive, Auto-Aktualisierung mit Verzögerung oder per Button (#407).
-- **Linkmap-Bridge** (#447): Bei installiertem Linkmap öffnen Custom-Link-Buttons das Linkmap-Overlay, `ylink`-Quellen nutzen den Datensatz-Picker von Linkmap statt des YForm-Popups (Speicherformat unverändert `rex-<tabelle>://<id>`). `assets/js/linkmap-bridge.js` definiert `window.rex5LinkmapBridge` nur, wenn Linkmap es nicht schon tut; ohne Linkmap keine Verhaltensänderung.
-- **Repeater-Datenformat mit Version** (#452): Option `'data_version' => 2` speichert einen Umschlag `{"__v":2,"items":[...]}`; Standard bleibt die reine Liste, bestehende Werte bleiben lesbar. `MFormRepeaterHelper::decode()`, `MFormOutput` und die Ausgabehelfer lesen beide Formate (auch verschachtelt), neu `encode()`, `dataVersion()`, `unwrap()`, `items()`. Typisierter Zugriff über `MFormOutput::items()` / `item()` mit `MFormRepeaterItem`: `media()`, `medialist()`, `article()`, `linklist()`, `dataset()` (MForm- und Linkmap-Format), `url()`, `linkType()`, `items()` für verschachtelte Repeater.
-- **Migrationsassistent, Teil 2** (#451): M5 Medialist-/Linklist-/Bildlisten-Werte werden normalisiert und gegen Medienpool und Struktur geprüft (fehlende Dateien/Artikel als Warnung), Listenfelder kommen aus der Modul-Analyse. M6 mehrsprachige Werte (Sprach-Id → MBlock-Liste) werden je Sprache konvertiert. M7 YForm: Schritt 6 des Assistenten und `mform:migrate --yform[=tabelle.spalte]` konvertieren MBlock-Daten in YForm-Tabellen (Typ `mblock` oder Text-Spalten mit MBlock-JSON) mit Backup und Rollback und stellen den Feldtyp optional auf `textarea` um. Klasse `YFormMBlockMigrator`.
-- **Barrierefreiheits-Prüfung für Medien-Felder** (#397): Option `a11y` an `addMediaField()`, `addMedialistField()`, `addMFormMediaField()`, `addMFormMedialistField()`, `addImagelistField()`, `addCustomLinkField()` und `addCustomLinkMultipleField()`. Prüft zur Laufzeit gegen den Medienpool (API `mform_a11y_check`, nur für Backend-Benutzer), zeigt Befunde direkt unter dem Widget mit Link „Metadaten bearbeiten“, je Datei bei Listen, `strict` blockiert das Speichern. `med_alt` berücksichtigt dekorative Bilder (MediaPlace-ALT-Status, `med_alt_decorative`); ist MediaPlace mit eigenem ALT-Feld aktiv, zählt wie dort nur dieses Feld, jedes weitere `med_*`-Feld ist prüfbar, mehrsprachige metainfo_lang_fields-Felder je Online-Sprache, MediaPlace-Metadaten über `mediaplace:<key>`. Keine Änderung an gespeicherten Daten. Neue Seite „Einstellungen“: Prüfung global abschaltbar und optional als Standardprüfung (ALT-Text) für alle Medien-Felder; `'a11y' => false` nimmt ein Feld aus. Befunde haben einen „Erneut prüfen“-Button, nach Rückkehr aus dem Medienpool-Tab wird automatisch neu geprüft; direkt nach einer neuen Auswahl erscheint „Metadaten werden geprüft …“, bis die Antwort da ist; ohne Befund erscheint kein Hinweis. Klasse `FriendsOfRedaxo\MForm\A11y\MediaMetaChecker`, Doku `docs/16_a11y.md`. Nebenbei behoben: Steuerwerte `form-group-attributes` landeten im Parser auch als Attribute am Eingabeelement, und form-group-Attribute wurden im Parser nicht HTML-escaped.
-- **Renderpfade, Teil 2** (#437): Wrapper-Markup (Fieldset, Legend, Collapse mit Toggle, Collapse-Gruppe, Spalten, Tabs, Modal) kommt in beiden Pfaden aus dem Theme-Fragment `mform_wrapper.php` über den neuen `MFormWrapperRenderer`. Der Flex-Repeater hatte das Markup bisher per `sprintf` nachgebaut; eigene Themes greifen damit auch im Repeater. Nebenbei behoben: `addModalElement()` ignorierte im klassischen Parser die Button-Klasse (immer `btn-default`). Golden-Snapshots für beide Pfade unter `tests/__snapshots__`. Teil 4: Die Feld-Zeile (form-group mit Label- und Feldspalte, Notice) rendert der Flex-Repeater über das Parser-Fragment `mform_default.php` (`MFormWrapperRenderer::formGroup()`); die Repeater-Klassen `mfr-field-group`, `mfr-field-label`, `mfr-field-col` bleiben für die Layouts erhalten. Teil 3: Collapse- und Accordion-Gruppen werden auch im Flex-Repeater gebildet (vorher ließ sich ein Collapse im Repeater-Item nicht öffnen, weil `mform.js` Toggles nur in `.collapse-group` initialisiert), und `addInlineElement()` rendert im Repeater wie im Parser über das Fragment.
 - **Renderpfade** (#437): Tab-Logik in `MFormLayoutCore` zusammengezogen (`tabNavLabel()`, `tabGroupClass()`, `stripTabMetaAttributes()`, `TAB_META_ATTRIBUTES`), Parser und Flex-Repeater nutzen dieselben Helfer. Paritäts-Test `RenderParityTest` prüft Wrapper-Kombinationen (Tooltip, Spalten, Modal, Full, Tabs, Collapse) in beiden Pfaden und hält das Parser-HTML als Golden-Snapshot fest (`MFORM_UPDATE_SNAPSHOTS=1` erneuert ihn).
 - **HTML5-Eingabefelder** (#409): `addNumberField()`, `addRangeField()` (mit Live-Wertanzeige), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Dünne Wrapper um `addInputField()`, `min`/`max`/`step`/`pattern` über `$attributes`. Funktionieren im Flex-Repeater, stehen im Builder in der Palette (mit Min/Max/Step-Eingaben) und in der Demo „HTML5-Eingabefelder“.
 
@@ -40,7 +47,6 @@
 ### Neu
 
 - **Repeater-Option `show_add_button`:** Mit `'show_add_button' => false` erscheint nur noch ein einzelner „Hinzufügen"-Button (oben), und nur solange der Repeater leer ist. Sobald ein Item existiert, reicht das „+"-Icon am Item, und die Toolbar-Buttons verschwinden. So bleibt der Einstieg bei `default_count => 0` möglich, ohne dass die Buttons danach doppelt herumstehen. Gilt auch für verschachtelte Repeater. `show_add_buttons` (Plural) wird als Alias akzeptiert. Im Formbuilder als Checkbox verfügbar. (#442)
-
 
 ### Behoben
 
@@ -224,7 +230,6 @@
 ### Behoben
 
 - **Bugfix:** Beim Hinzufügen eines neuen Slices (function=add) werden die Formularfelder nicht mehr mit den Werten des Vorgängers vorbefüllt. Das Verhalten entspricht jetzt wieder dem REDAXO-Standard. Danke an @abra100pro für den Hinweis!
-
 
 ## Version 9.0.0
 
@@ -623,7 +628,6 @@ and much more
 - Allow callable @DanielWeitenauer
 - new check for JSON Values 1.x.x
 
-
 ## Version 6.0.6
 
 - fixed: delete all entries in imagelist @ynamite 
@@ -638,17 +642,14 @@ thx @lexplatt  @Hirbod
 ## Version 6.0.3
 prepareCustomLink fixed
 
-
 ## Version 6.0.2
 - readme style fixes @crydotsnake 
 - remove .formcontrol on input fields type color @olien
 - some validation methods changed and calls deleted @skerbis
 
-
 ## Version 6.0.1
 - added some docs
 - minor bugfixes
-
 
 ## Version 6.0.0
 
@@ -672,7 +673,6 @@ Parsley has been removed. AddValidation is functionless.
 
 removed `closeCollapse`, `closeTab`, `closeAccordion`
 > Look at the new wrapper field examples
-
 
 ## Version 5.3
 
@@ -709,7 +709,6 @@ Changes:
 * now uses includeCurrentPageSubPath to show pages @christophboecker
 * Cache buster will be added by rex core @staabm
 * init.js simplified @staabm
-
 
 ## Version 5.2.0 pre-release
 

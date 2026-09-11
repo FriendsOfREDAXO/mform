@@ -117,8 +117,8 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | Meilenstein | Inhalt |
 |---|---|
 | 10.0.0-beta.1 | Branch-Setup, PHP 8.4, MBlock-Aufräumen (2), Migrationsassistent M1–M4 und M8–M10, Field-Type-Registry (5.1), HTML5-Felder (5.6), Test-Suite-Grundstock (5.7), DOM-Umstellung (#402), Rest von #437. |
-| 10.0.0-beta.2 | Rest von #437 (Duplikat-Abbau Renderpfade), A11y-Prüfung (#397) vorgezogen, Migration M5–M7, Repeater-Datenversion (5.3), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
-| 10.0.0-rc.1 | Conditional-Editor (#417), Rating und Tags (#412), A11y-Prüfung (#397), Dark-Mode-Audit, Doku. |
+| 10.0.0-beta.2 (veröffentlicht 11.09.2026) | Rest von #437 (Duplikat-Abbau Renderpfade), A11y-Prüfung (#397) vorgezogen, Migration M5–M7, Repeater-Datenversion (5.3), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
+| 10.0.0-rc.1 | Conditional-Editor (#417), Rating und Tags (#412), Dark-Mode-Audit, Doku. |
 | 10.0.0 | Stabilisierung, Migrationsleitfaden 9 → 10. |
 | 10.1 | Undo/Redo (#411), weitere erweiterte Felder. |
 
