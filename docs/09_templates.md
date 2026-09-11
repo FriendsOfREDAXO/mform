@@ -180,3 +180,7 @@ body.rex-theme-dark {
 | `--mform-shadow`, `--mform-shadow-lift` | Schatten (Ruhe, Drag) |
 
 Die Palette ist auf Linkmap und MediaPlace abgestimmt. Das Dark-Theme greift über `body.rex-theme-dark`, bei Theme „Auto“ über `prefers-color-scheme: dark` in Verbindung mit `body.rex-has-theme:not(.rex-theme-light)`.
+
+## Wrapper-Fragment (ab 10.0)
+
+Das Markup aller Wrapper (Fieldset, Collapse, Spalten, Tabs, Modal) liegt in `fragments/mform/mform_wrapper.php`. Seit 10.0 nutzt auch der Flex-Repeater dieses Fragment (über `FriendsOfRedaxo\MForm\Template\MFormWrapperRenderer`), vorher hatte er das Markup nachgebaut. Wer das Fragment im Projekt überschreibt (`fragments/mform/mform_wrapper.php` im Project-Addon oder ein eigenes Theme), ändert damit beide Pfade. Der Paritäts-Test `tests/Redaxo/Parser/RenderParityTest.php` hält das Ergebnis beider Pfade als Snapshot fest.

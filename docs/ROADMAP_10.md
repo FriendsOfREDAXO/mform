@@ -45,7 +45,7 @@ Aufräumarbeiten für 10:
 | M4 | Online/Offline (`mblock_offline`, `checkbox_block_hold`) geht verloren | Mapping auf das Repeater-Metafeld `__disabled`. |
 | M5 | Medialist/Linklist-Werte (kommasepariert) werden als String übernommen | Werden in das Format der MForm-Custom-Widgets überführt, inklusive Prüfung, ob die Dateien existieren. |
 | M6 | Mehrsprachige Werte (clang-Arrays) | Werden erkannt und je Sprache migriert. |
-| M7 | MBlock in YForm-Tabellen (Wert-Typ `mblock`) | Konverter für YForm-Spalten: Zieltyp ist das neue YForm-Value `repeater_light` (siehe 5.4) oder ein JSON-Feld. |
+| M7 | MBlock in YForm-Tabellen (Wert-Typ `mblock`) | Konverter für YForm-Spalten: Zieltyp ist ein JSON-Feld (`repeater_light` aus #429 entfällt). |
 | M8 | Kein Backup der alten Werte | Vor dem Anwenden werden Slice-ID, Slot und alter Wert in eine Backup-Tabelle geschrieben; Rollback pro Lauf-Token wie beim Umhängen. |
 | M9 | Nur Backend, viele Klicks | Console-Command `mform:migrate --module=ID [--dry-run]` für große Installationen, mit Report. |
 | M10 | Man weiß nicht, wo MBlock überhaupt steckt | „Modul-Inventar“: listet alle Module mit `MBlock::show()`, Anzahl Slices, verwendete Feldtypen und Migrationsrisiko (grün/gelb/rot). |
@@ -61,7 +61,7 @@ Geprüft am 11.09.2026 gegen den Code von 9.5.0.
 | Issue | Stand in 9.5.0 | Einordnung für 10 |
 |---|---|---|
 | #437 Renderpfade vereinheitlichen | Teilweise umgesetzt: `MFormLabelRenderer`, `MFormLayoutCore`, `setFull()` in beiden Pfaden. Offen: Tab-Logik in gemeinsamen Helper, Paritäts-Tests. | 10.0 Beta 1. Wird durch die Test-Suite (5.7) abgesichert. |
-| #429 YForm `repeater_light` | Nicht umgesetzt. | 10.0 Beta 2, zugleich Ziel der YForm-Migration (M7). |
+| #429 YForm `repeater_light` | Nicht umgesetzt. | Entfällt, Issue geschlossen (11.09.2026). M7 zielt auf ein JSON-Feld. |
 | #425 / #403 Builder-Palette | Offen sind genau: `addCollapseElement`, `addAccordionElement`, `addColumnElement`, `addInlineElement`, `addRadioImgField`, `addRadioIconField`, `addRadioColorField`, `addTextReadOnlyField`, `addTextAreaReadOnlyField`, `addConditionalFieldsetArea`. `addInputField` fehlt ebenfalls. | 10.0 Beta 2. #403 kann geschlossen werden, #425 führt die Restliste. |
 | #418 Tracking 9.2 | Überholt. | Schließen, ersetzt durch ein Tracking-Issue „10.0“. |
 | #417 Conditional Logic, visueller Editor | API `addConditionalFieldsetArea()` und `data-mform-condition` existieren, der Builder emittiert die Attribute bereits (`conditionalWrapperAttrsPhp`). Der visuelle Editor fehlt. | 10.0 RC. |
@@ -86,7 +86,7 @@ Geprüft am 11.09.2026 gegen den Code von 9.5.0.
 Repeater-JSON bekommt einen Versionsmarker (`__v`), `MFormRepeaterHelper::decode()` migriert alte Werte transparent. Optional typisierte Zugriffe: `decode()->items()`, `->get('link')` mit Auflösung von Media-, Link- und Datensatz-Werten.
 
 ### 5.4 YForm `repeater_light` (#429)
-Schlankes Value mit Sub-Feldtypen text, textarea, select, checkbox, number, optional ein Richtext-Feld je Zeile. Nutzt die Repeater-Engine aus 5.3, kein eigener Datenpfad.
+Entfällt, Issue geschlossen. MForm 10 bekommt kein eigenes Repeater-Value für YForm.
 
 ### 5.5 Builder-Ausbau
 Palette-Parität (#425), JSON-Export/Import (#406), Live-Preview über `rex_api_function` in einer Iframe-Sandbox (#407), Conditional-Editor (#417). Undo/Redo (#411) erst danach.
@@ -111,7 +111,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | Meilenstein | Inhalt |
 |---|---|
 | 10.0.0-beta.1 | Branch-Setup, PHP 8.4, MBlock-Aufräumen (2), Migrationsassistent M1–M4 und M8–M10, Field-Type-Registry (5.1), HTML5-Felder (5.6), Test-Suite-Grundstock (5.7), DOM-Umstellung (#402), Rest von #437. |
-| 10.0.0-beta.2 | Migration M5–M7, Repeater-Datenversion (5.3), `repeater_light` (5.4), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
+| 10.0.0-beta.2 | Rest von #437 (Duplikat-Abbau Renderpfade), A11y-Prüfung (#397) vorgezogen, Migration M5–M7, Repeater-Datenversion (5.3), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
 | 10.0.0-rc.1 | Conditional-Editor (#417), Rating und Tags (#412), A11y-Prüfung (#397), Dark-Mode-Audit, Doku. |
 | 10.0.0 | Stabilisierung, Migrationsleitfaden 9 → 10. |
 | 10.1 | Undo/Redo (#411), weitere erweiterte Felder. |

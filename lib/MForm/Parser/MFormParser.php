@@ -20,6 +20,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Template\MFormWrapperRenderer;
 use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
 use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
 use FriendsOfRedaxo\MForm\Utils\HtmlFragment;
@@ -272,6 +273,7 @@ class MFormParser
         $element = new MFormElement();
         $attributes = $item->getAttributes();
         $removeAttributes = [];
+        $modalBtnClass = '';
 
         // MODAL MANIPULATIONS – raw label text needed, no <label> wrapper
         if ('modal' == $item->getType()) {
@@ -282,10 +284,8 @@ class MFormParser
             }
             $removeAttributes = ['data-modal-btn-class'];
             $element->setId('mform-modal-' . uniqid('', false));
-            // pass btn class via element class so the fragment can use it
-            if (isset($attributes['data-modal-btn-class'])) {
-                $element->setClass($attributes['data-modal-btn-class']);
-            }
+            // Button-Klasse geht als Element-Klasse ans Fragment (unten statt der Item-Klasse gesetzt).
+            $modalBtnClass = (string) ($attributes['data-modal-btn-class'] ?? '');
         } elseif ('' !== $item->getLabel() && [] !== $item->getLabel()) {
             $element->setLabel($this->parseElement($this->createLabelElement($item->setId('uid_' . uniqid())), 'base'));
         }
@@ -372,7 +372,7 @@ class MFormParser
 
         $element->setType($item->getType())
             ->setAttributes($this->parseAttributes($attributes))
-            ->setClass($item->getClass());
+            ->setClass('modal' === $item->getType() ? $modalBtnClass : $item->getClass());
 
         $this->elements[] = $this->parseElement($element, 'wrapper');
     }
@@ -1756,11 +1756,18 @@ class MFormParser
     {
         $element->setValue($element->value);
 
-        $fragment = new rex_fragment();
-
         $keys = $element->getKeys();
         $vals = $element->getValues();
 
+        // Wrapper laufen ueber den gemeinsamen Renderer (gleiches Fragment wie der Flex-Repeater).
+        if ('wrapper' === $fragmentType) {
+            /** @var array<string, mixed> $vars */
+            $vars = array_combine($keys, $vals);
+
+            return MFormWrapperRenderer::fragment((string) ($vars['type'] ?? ''), $vars, $this->theme);
+        }
+
+        $fragment = new rex_fragment();
         foreach ($keys as $index => $key) {
             $fragment->setVar($key, $vals[$index], false);
         }

@@ -9,6 +9,7 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Template\MFormWrapperRenderer;
 use FriendsOfRedaxo\MForm\Utils\MFormFormGroupHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
 use rex_var_custom_link;
@@ -80,14 +81,16 @@ class MFormFlexRepeaterRenderer
                 continue;
             }
 
-            // MODAL: collect all items until close-modal and render as block
+            // MODAL: Button-Zeile + Modal aus dem Wrapper-Fragment, Inhalt bis close-modal.
+            // __MFRID__ wird beim Klonen in JS durch eine eindeutige Id ersetzt (genau 2 Vorkommen je Modal).
             if ('modal' === $type) {
-                $modalLabel = self::getLabelString($item->getLabel());
                 $attrs = $item->getAttributes();
-                $btnClass = 'btn ' . (isset($attrs['data-modal-btn-class']) ? htmlspecialchars($attrs['data-modal-btn-class'], ENT_QUOTES) : 'btn-default');
-                $align = $attrs['data-modal-align'] ?? 'left';
-                $rowClass = MFormLayoutCore::consumeModalRowClass($attrs);
-                $innerHtml = '';
+                $html .= MFormWrapperRenderer::modalOpen(
+                    self::getLabelString($item->getLabel()),
+                    (string) ($attrs['data-modal-btn-class'] ?? 'btn-default'),
+                    '__MFRID__',
+                    $attrs,
+                );
                 ++$i;
                 while ($i < count($items)) {
                     $inner = $items[$i];
@@ -96,13 +99,13 @@ class MFormFlexRepeaterRenderer
                         break;
                     }
                     if ($inner instanceof MForm) {
-                        $innerHtml .= self::renderTemplate($inner, $level);
+                        $html .= self::renderTemplate($inner, $level);
                     } elseif ($inner instanceof MFormItem) {
-                        $innerHtml .= self::renderField($inner);
+                        $html .= self::renderField($inner);
                     }
                     ++$i;
                 }
-                $html .= self::renderModalBlock($modalLabel, $btnClass, $align, $innerHtml, $rowClass);
+                $html .= MFormWrapperRenderer::close('close-modal');
                 continue;
             }
 
@@ -113,21 +116,15 @@ class MFormFlexRepeaterRenderer
 
             // FIELDSET: <fieldset><legend>..</legend>..inner..</fieldset>
             if ('fieldset' === $type) {
-                $attrs = $item->getAttributes();
-                // Legend kommt aus addFieldsetArea(...) und wird vom AttributeHandler
-                // ueber setLegend() auf das Item gesetzt (nicht in attributes['legend']).
-                $legendStr = (string) $item->getLegend();
-                $legend = '' !== $legendStr
-                    ? '<legend>' . $legendStr . '</legend>' // Legend ist Entwickler-HTML
-                    : '';
-                $cls = htmlspecialchars($item->getClass(), ENT_QUOTES);
-                $attrHtml = self::renderAttributes($attrs);
-                $html .= sprintf('<fieldset class="%s"%s>%s', $cls, $attrHtml, $legend);
+                // Legend kommt aus addFieldsetArea(...) ueber setLegend() (Entwickler-HTML).
+                $html .= MFormWrapperRenderer::open('fieldset', $item->getClass(), $item->getAttributes(), [
+                    'legend' => MFormWrapperRenderer::legend((string) $item->getLegend()),
+                ]);
                 ++$i;
                 continue;
             }
             if ('close-fieldset' === $type) {
-                $html .= '</fieldset>';
+                $html .= MFormWrapperRenderer::close('close-fieldset');
                 ++$i;
                 continue;
             }
@@ -136,28 +133,19 @@ class MFormFlexRepeaterRenderer
             if ('collapse' === $type) {
                 $attrs = $item->getAttributes();
                 $labelStr = self::getLabelString($item->getLabel()); // Entwickler-HTML, nicht escapen
-                $hideToggleLinks = MFormLayoutCore::shouldHideCollapseToggle($attrs, '' !== $labelStr);
-                $openCollapse = MFormLayoutCore::isCollapseOpen($attrs);
-                $isAccordion = MFormLayoutCore::isCollapseAccordion($attrs);
-                $btnAttrs = ' data-toggle="collapse"';
-                if (!$isAccordion) {
-                    $btnAttrs .= ' data-collapse-open="' . ($openCollapse ? 1 : 0) . '"';
-                }
-                $btnAttrs .= ' aria-expanded="' . ($openCollapse ? 'true' : 'false') . '"';
-                $btnHidden = $hideToggleLinks ? ' hidden' : '';
-                $btnHtml = sprintf('<a class="btn btn-white btn-block%s"%s>%s</a>', $btnHidden, $btnAttrs, $labelStr);
-
-                // Wrapper-Attribute bereinigen wie im Fragment
+                $buttonHtml = MFormWrapperRenderer::collapseButton(
+                    $labelStr,
+                    MFormWrapperRenderer::collapseButtonAttributes($attrs),
+                    MFormLayoutCore::shouldHideCollapseToggle($attrs, '' !== $labelStr),
+                );
                 $wrapperAttrs = $attrs;
                 MFormLayoutCore::consumeCollapseWrapperAttributes($wrapperAttrs);
-                $cls = trim('collapse ' . $item->getClass() . ($openCollapse ? ' in' : ''));
-                $wrapperAttrHtml = self::renderAttributes($wrapperAttrs);
-                $html .= $btnHtml . sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), $wrapperAttrHtml);
+                $html .= MFormWrapperRenderer::open('collapse', $item->getClass() . (MFormLayoutCore::isCollapseOpen($attrs) ? ' in' : ''), $wrapperAttrs, ['label' => $buttonHtml]);
                 ++$i;
                 continue;
             }
             if ('close-collapse' === $type) {
-                $html .= '</div>';
+                $html .= MFormWrapperRenderer::close('close-collapse');
                 ++$i;
                 continue;
             }
@@ -170,13 +158,12 @@ class MFormFlexRepeaterRenderer
                     $attrs['data-group-accordion'] = 0;
                 }
                 unset($attrs['data-group-collapse-id']);
-                $cls = trim('collapse-group ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
+                $html .= MFormWrapperRenderer::open('start-group-collapse', $item->getClass(), $attrs);
                 ++$i;
                 continue;
             }
             if ('close-group-collapse' === $type) {
-                $html .= '</div>';
+                $html .= MFormWrapperRenderer::close('close-group-collapse');
                 ++$i;
                 continue;
             }
@@ -185,20 +172,17 @@ class MFormFlexRepeaterRenderer
             if ('start-group-column' === $type) {
                 $attrs = $item->getAttributes();
                 $rowExtraClass = MFormLayoutCore::consumeColumnGroupRowClass($attrs);
-
-                $cls = trim('row ' . $rowExtraClass . ' ' . $item->getClass());
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($attrs));
+                $html .= MFormWrapperRenderer::open('start-group-column', $rowExtraClass . ' ' . $item->getClass(), $attrs);
                 ++$i;
                 continue;
             }
             if ('column' === $type) {
-                $cls = $item->getClass();
-                $html .= sprintf('<div class="%s"%s>', htmlspecialchars($cls, ENT_QUOTES), self::renderAttributes($item->getAttributes()));
+                $html .= MFormWrapperRenderer::open('column', $item->getClass(), $item->getAttributes());
                 ++$i;
                 continue;
             }
             if ('close-column' === $type || 'close-group-column' === $type) {
-                $html .= '</div>';
+                $html .= MFormWrapperRenderer::close($type);
                 ++$i;
                 continue;
             }
@@ -228,52 +212,29 @@ class MFormFlexRepeaterRenderer
                 $tabsMeta = self::collectTabsForGroup($items, $i);
                 $navHtml = '';
                 foreach ($tabsMeta as $idx => $meta) {
-                    $isActive = MFormLayoutCore::isTabActive($meta['attrs']);
-                    $navClass = MFormLayoutCore::buildTabNavClass($meta['attrs']);
-                    $navHtml .= sprintf(
-                        '<li role="presentation" class="%s" data-tab-nav-item="%d"><a href="#" role="tab" aria-selected="%s" data-mform-tab-toggle="1" data-tab-item="%d">%s</a></li>',
-                        htmlspecialchars($navClass, ENT_QUOTES),
-                        $idx,
-                        $isActive ? 'true' : 'false',
-                        $idx,
-                        MFormLayoutCore::tabNavLabel($meta['attrs'], $meta['label']), // Label ist Entwickler-HTML
+                    // Label ist Entwickler-HTML; das Fragment liest den Aktiv-Zustand aus der Klasse.
+                    $navHtml .= MFormWrapperRenderer::tabNavItem(
+                        MFormLayoutCore::tabNavLabel($meta['attrs'], $meta['label']),
+                        MFormLayoutCore::buildTabNavClass($meta['attrs']),
+                        (string) $idx,
                     );
                 }
                 $groupAttributes = $item->getAttributes();
-
-                $cls = MFormLayoutCore::tabGroupClass('nav mform-tabs rex-page-nav ' . $item->getClass(), $groupAttributes);
-
-                $html .= sprintf(
-                    '<div class="%s" data-mform-tabs="1"%s><ul class="nav nav-tabs" role="tablist">%s</ul><div class="tab-content">',
-                    htmlspecialchars($cls, ENT_QUOTES),
-                    self::renderAttributes($item->getAttributes()),
-                    $navHtml,
-                );
+                $html .= MFormWrapperRenderer::open('start-group-tab', MFormLayoutCore::tabGroupClass($item->getClass(), $groupAttributes), $groupAttributes, ['element' => $navHtml]);
                 ++$i;
                 continue;
             }
             if ('tab' === $type) {
-                $tabIdx = self::tabIndexInGroup($items, $i);
                 $attrs = $item->getAttributes();
                 $isActive = MFormLayoutCore::isTabActive($attrs);
                 MFormLayoutCore::stripTabMetaAttributes($attrs);
-                $cls = trim('tab-pane ' . $item->getClass() . ($isActive ? ' active' : ''));
-                $html .= sprintf(
-                    '<div role="tabpanel" class="%s" data-tab-group-nav-tab-id="%d"%s>',
-                    htmlspecialchars($cls, ENT_QUOTES),
-                    $tabIdx,
-                    self::renderAttributes($attrs),
-                );
+                $attrs['data-tab-group-nav-tab-id'] = self::tabIndexInGroup($items, $i);
+                $html .= MFormWrapperRenderer::open('tab', $item->getClass() . ($isActive ? ' active' : ''), $attrs);
                 ++$i;
                 continue;
             }
-            if ('close-tab' === $type) {
-                $html .= '</div>';
-                ++$i;
-                continue;
-            }
-            if ('close-group-tab' === $type) {
-                $html .= '</div></div>';
+            if ('close-tab' === $type || 'close-group-tab' === $type) {
+                $html .= MFormWrapperRenderer::close($type);
                 ++$i;
                 continue;
             }
@@ -566,33 +527,6 @@ class MFormFlexRepeaterRenderer
         }
 
         return $html;
-    }
-
-    private static function renderModalBlock(string $label, string $btnClass, string $align, string $innerHtml, string $rowClass = ''): string
-    {
-        $alignClass = match ($align) {
-            'center' => 'text-center',
-            'right' => 'text-right',
-            default => 'text-left',
-        };
-        // __MFRID__ is replaced by a unique ID in JS (_renderItem) when the template is cloned
-        return '<div class="row form-group mfr-modal-wrapper ' . htmlspecialchars($rowClass, ENT_QUOTES) . '">' .
-            '<div class="col-sm-12 ' . $alignClass . '">' .
-            '<button type="button" class="' . htmlspecialchars($btnClass, ENT_QUOTES) . ' mfr-modal-btn"' .
-            ' data-toggle="modal" data-target="#__MFRID__">' .
-            '<i class="fa fa-cog"></i> ' . $label . '</button>' .
-            '</div></div>' .
-            '<div class="modal fade mfr-modal" id="__MFRID__" tabindex="-1" role="dialog">' .
-            '<div class="modal-dialog" role="document"><div class="modal-content">' .
-            '<div class="modal-header">' .
-            '<button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>' .
-            '<h4 class="modal-title">' . $label . '</h4>' .
-            '</div>' .
-            '<div class="modal-body" style="padding: 15px 30px"><div class="mform form-horizontal">' . $innerHtml . '</div></div>' .
-            '<div class="modal-footer">' .
-            '<button type="button" class="btn btn-primary" data-dismiss="modal">Übernehmen</button>' .
-            '</div>' .
-            '</div></div></div>';
     }
 
     private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true): string

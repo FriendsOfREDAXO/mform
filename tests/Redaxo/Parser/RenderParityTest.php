@@ -118,22 +118,38 @@ final class RenderParityTest extends TestCase
         }
     }
 
+    public function testModalButtonClassInBothPaths(): void
+    {
+        foreach (self::render() as $path => $out) {
+            self::assertStringContainsString('class="btn btn-info"', $out, $path . ': Modal-Button-Klasse aus addModalElement()');
+        }
+    }
+
     public function testParserWrapperSnapshot(): void
     {
-        $html = self::render()['parser'];
+        $this->assertSnapshot('parser_wrappers.html', self::render()['parser']);
+    }
+
+    public function testFlexWrapperSnapshot(): void
+    {
+        $this->assertSnapshot('flex_wrappers.html', self::render()['flex']);
+    }
+
+    private function assertSnapshot(string $name, string $html): void
+    {
         // uniqid()-Tokens (13 Hex), Zufallszahlen und 6-stellige Widget-Ids neutralisieren.
         $normalized = (string) preg_replace('/[0-9a-f]{13,}/i', 'U', $html);
         $normalized = (string) preg_replace('/\d{6,}/', 'N', $normalized);
         $normalized = (string) preg_replace('/(?<![0-9a-z])[0-9a-f]{6}(?![0-9a-z])/i', 'H', $normalized);
         $normalized = trim((string) preg_replace('/[ \t]+\n/', "\n", $normalized)) . "\n";
 
-        $file = __DIR__ . '/../../__snapshots__/parser_wrappers.html';
+        $file = __DIR__ . '/../../__snapshots__/' . $name;
         if ('1' === getenv('MFORM_UPDATE_SNAPSHOTS') || !is_file($file)) {
             @mkdir(dirname($file), 0775, true);
             file_put_contents($file, $normalized);
-            self::markTestIncomplete('Snapshot geschrieben: ' . basename($file));
+            self::markTestIncomplete('Snapshot geschrieben: ' . $name);
         }
 
-        self::assertSame((string) file_get_contents($file), $normalized, 'Parser-HTML weicht vom Snapshot ab. Absichtliche Aenderung? MFORM_UPDATE_SNAPSHOTS=1 setzt ihn neu.');
+        self::assertSame((string) file_get_contents($file), $normalized, 'HTML weicht vom Snapshot ' . $name . ' ab. Absichtliche Aenderung? MFORM_UPDATE_SNAPSHOTS=1 setzt ihn neu.');
     }
 }
