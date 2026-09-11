@@ -10,10 +10,16 @@ namespace FriendsOfRedaxo\MForm\Repeater;
 
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\Output\MFormOutput;
 
 class MFormRepeaterHelper
 {
     private const DISABLED_KEY = '__disabled';
+
+    /** Versionsmarker des Speicherformats (#452): {"__v": 2, "items": [...]}. Ohne Marker = Version 1 (reine Liste). */
+    public const DATA_VERSION_KEY = '__v';
+    public const DATA_VERSION_LIST = 1;
+    public const DATA_VERSION_ENVELOPE = 2;
 
     /**
      * @param array<int, MFormItem|MForm> $items
@@ -300,7 +306,60 @@ class MFormRepeaterHelper
             return [];
         }
 
-        return self::prepareItemsForOutput($decoded);
+        return self::prepareItemsForOutput(self::unwrap($decoded));
+    }
+
+    /**
+     * Entfernt den Versions-Umschlag {"__v": n, "items": [...]}; Listen (Version 1) bleiben wie sie sind.
+     *
+     * @param array<mixed> $decoded
+     * @return array<int, mixed>
+     */
+    public static function unwrap(array $decoded): array
+    {
+        if (isset($decoded[self::DATA_VERSION_KEY]) && isset($decoded['items']) && is_array($decoded['items'])) {
+            return array_values($decoded['items']);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Speicherformat-Version eines Wertes: 1 = Liste, 2 = Umschlag mit __v.
+     *
+     * @param string|array<mixed> $source Roh-JSON oder dekodiertes Array
+     */
+    public static function dataVersion(string|array $source): int
+    {
+        $decoded = is_string($source) ? json_decode(html_entity_decode($source, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true) : $source;
+        if (is_array($decoded) && isset($decoded[self::DATA_VERSION_KEY]) && is_numeric($decoded[self::DATA_VERSION_KEY])) {
+            return (int) $decoded[self::DATA_VERSION_KEY];
+        }
+
+        return self::DATA_VERSION_LIST;
+    }
+
+    /**
+     * Kodiert Items im gewuenschten Speicherformat (Version 1 = Liste, 2 = Umschlag mit Versionsmarker).
+     *
+     * @param array<int, array<string, mixed>> $items
+     */
+    public static function encode(array $items, int $version = self::DATA_VERSION_LIST): string
+    {
+        $items = array_values($items);
+        $payload = $version >= self::DATA_VERSION_ENVELOPE ? [self::DATA_VERSION_KEY => $version, 'items' => $items] : $items;
+
+        return (string) json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Typisierter Zugriff: Items als MFormOutput mit MFormRepeaterItem-Objekten (siehe MFormOutput::items()).
+     *
+     * @param int|string|array<int, array<string, mixed>> $source Slot-Id, Roh-JSON oder dekodierte Items
+     */
+    public static function items(int|string|array $source): MFormOutput
+    {
+        return MFormOutput::from($source);
     }
 
     /**
@@ -362,8 +421,11 @@ class MFormRepeaterHelper
             unset($item[self::DISABLED_KEY]);
 
             foreach ($item as $key => $value) {
-                if (is_array($value) && self::isRepeaterItemList($value)) {
-                    $item[$key] = self::prepareItemsForOutput($value);
+                if (is_array($value)) {
+                    $value = self::unwrap($value);
+                    if (self::isRepeaterItemList($value)) {
+                        $item[$key] = self::prepareItemsForOutput($value);
+                    }
                 }
             }
 

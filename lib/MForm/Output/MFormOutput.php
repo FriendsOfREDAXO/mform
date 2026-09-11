@@ -9,6 +9,7 @@
 namespace FriendsOfRedaxo\MForm\Output;
 
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterItem;
 
 /**
  * Fluent output helper for MForm repeater data.
@@ -210,6 +211,23 @@ final class MFormOutput
     public function count(): int
     {
         return count($this->items);
+    }
+
+    /**
+     * Items als typisierte Objekte (#452): Medien, Artikel, Datensaetze und verschachtelte Repeater
+     * werden ueber MFormRepeaterItem aufgeloest.
+     *
+     * @return list<MFormRepeaterItem>
+     */
+    public function items(): array
+    {
+        return array_values(array_map(static fn (array $item): MFormRepeaterItem => new MFormRepeaterItem($item), $this->items));
+    }
+
+    /** Ein Item als typisiertes Objekt (0-basiert), null wenn es nicht existiert. */
+    public function item(int $index): ?MFormRepeaterItem
+    {
+        return isset($this->items[$index]) ? new MFormRepeaterItem($this->items[$index]) : null;
     }
 
     public function isEmpty(): bool

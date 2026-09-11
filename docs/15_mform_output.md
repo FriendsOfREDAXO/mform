@@ -47,6 +47,32 @@ Alle Methoden geben eine **neue** Instanz zurück (immutable) – die Originalda
 | `->pluck(string $field)` | `array` (eine Spalte) |
 | `->group(string $field)` | `array<string, array>` (gruppiert) |
 
+## Typisierte Items
+
+`items()` liefert die Items als `MFormRepeaterItem`-Objekte, `item($index)` ein einzelnes (oder `null`). Die Objekte lösen Medien-, Link- und Datensatz-Werte auf und bleiben unabhängig vom Speicherformat (Liste oder Umschlag mit `__v`).
+
+| Methode | Ergebnis |
+|---|---|
+| `raw()`, `has($key)`, `get($key, $default)` | gespeicherte Werte |
+| `string($key)`, `int($key)`, `bool($key)`, `list($key)` | typisierte Werte, `list()` splittet kommaseparierte Werte |
+| `media($key)` | `rex_media` oder `null` (Media-Feld oder Custom Link mit Medium) |
+| `medialist($key)` | Liste vorhandener `rex_media` aus Medialist/Bildliste |
+| `article($key, $clang = null)` | `rex_article` oder `null` (Id oder `redaxo://ID`) |
+| `linklist($key)` | Liste vorhandener `rex_article` |
+| `dataset($key)` | `rex_yform_manager_dataset` oder `null` (`rex-<tabelle>://ID`, `yform://tabelle/ID`) |
+| `linkType($key)` | `article`, `media`, `dataset`, `url`, `mailto`, `tel`, `anchor` oder leer |
+| `url($key, $clang = null)` | Artikel über `rex_getUrl()`, Medium als Medienpool-URL, URL/mailto/tel/Anker unverändert, Datensatz leer |
+| `items($key)` | verschachtelter Repeater als `MFormOutput` (nur aktive Items) |
+
+```php
+foreach (MFormOutput::from(1)->items() as $item) {
+    if ($media = $item->media('image')) {
+        echo '<img src="' . rex_media_manager::getUrl('rex_media_medium', $media->getFileName()) . '" alt="' . rex_escape($media->getValue('med_alt')) . '">';
+    }
+    echo '<a href="' . rex_escape($item->url('link')) . '">' . rex_escape($item->string('title')) . '</a>';
+}
+```
+
 ## Rendern
 
 ### `render(callable $template): string`

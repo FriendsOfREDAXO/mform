@@ -736,6 +736,8 @@
             this.confirmDelete = container.dataset.mfrConfirmDelete === '1';
             this.confirmDeleteMsg = container.dataset.mfrConfirmDeleteMsg || 'Wirklich löschen?';
             this.copyPaste = container.dataset.mfrCopyPaste === '1';
+            // Speicherformat: 1 = Liste, 2 = Umschlag {__v, items} (Option data_version)
+            this.dataVersion = parseInt(container.dataset.mfrDataVersion, 10) || 1;
 
             this.itemsList = container.querySelector('.mfr-items-list');
             this.template = container.querySelector('template.mfr-item-template');
@@ -788,7 +790,8 @@
             try {
                 const raw = this.valueInput ? this.valueInput.value : '';
                 const parsed = raw ? JSON.parse(raw) : [];
-                this.data = Array.isArray(parsed) ? parsed : [];
+                // Umschlag mit Versionsmarker (data_version 2) transparent auspacken
+                this.data = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.items) ? parsed.items : []);
                 this._log('_init parsed initial data', {
                     rawLength: raw ? raw.length : 0,
                     items: this.data.length,
@@ -936,7 +939,7 @@
         syncValue() {
             if (!this.valueInput) return;
             const oldVal = this.valueInput.value;
-            this.valueInput.value = JSON.stringify(this.data);
+            this.valueInput.value = this.dataVersion >= 2 ? JSON.stringify({ __v: this.dataVersion, items: this.data }) : JSON.stringify(this.data);
             this._log('syncValue wrote hidden input', {
                 inputName: this.valueInput.name,
                 oldLength: oldVal ? oldVal.length : 0,

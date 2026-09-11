@@ -920,6 +920,15 @@ $page2 = MFormRepeaterHelper::limitItems($rows, 10, 10);
 
 ---
 
+### Speicherformat (ab 10.0)
+
+```php
+MFormRepeaterHelper::encode(array $items, int $version = 1): string   // 1 = Liste, 2 = {"__v":2,"items":[...]}
+MFormRepeaterHelper::dataVersion(string|array $source): int
+MFormRepeaterHelper::unwrap(array $decoded): array
+MFormRepeaterHelper::items(int|string|array $source): MFormOutput   // typisierter Zugriff, siehe MFormRepeaterItem
+```
+
 ## Klasse `MFormOutputHelper`
 
 **Namespace:** `FriendsOfRedaxo\MForm\Utils`  

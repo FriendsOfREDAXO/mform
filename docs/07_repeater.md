@@ -497,6 +497,24 @@ echo $mform->show();
 | `confirm_delete_msg` | string | `''` | Text der Bestätigungsmeldung |
 | `copy_paste` | bool | `true` | Kopieren/Einfügen-Funktion aktivieren |
 | `open` | bool | `true` | Toolbar / Bedienung aktiv (`false` = read-only) |
+| `data_version` | int | `1` | Speicherformat: `1` = reine Liste (wie bisher), `2` = Umschlag `{"__v":2,"items":[...]}` mit Versionsmarker (ab 10.0) |
+
+### Speicherformat und Version (ab 10.0)
+
+Der Repeater speichert standardmäßig weiterhin eine reine JSON-Liste (`[{...},{...}]`). Mit `'data_version' => 2` schreibt er einen Umschlag mit Versionsmarker: `{"__v":2,"items":[{...}]}`. `MFormRepeaterHelper::decode()`, `MFormOutput::from()` und die Ausgabehelfer lesen beide Formate, Werte ohne Marker bleiben also lesbar; bestehende Daten werden beim nächsten Speichern des Blocks in das gewählte Format überführt. Wer `rex_var::toArray("REX_VALUE[n]")` direkt liest, muss bei Version 2 `['items']` verwenden oder auf `decode()` umstellen. `MFormRepeaterHelper::encode($items, 2)` erzeugt das Format serverseitig, `MFormRepeaterHelper::dataVersion($raw)` erkennt es.
+
+Typisierter Zugriff auf die Items, unabhängig vom Format:
+
+```php
+foreach (MFormOutput::from(1)->items() as $item) {
+    $image = $item->media('image');            // rex_media|null
+    $url   = $item->url('link');               // Artikel-URL, Medien-URL, URL/mailto/tel
+    $tags  = $item->items('tags');             // verschachtelter Repeater als MFormOutput
+    echo rex_escape($item->string('title'));
+}
+```
+
+Details zu `MFormRepeaterItem` in der [MFormOutput-Doku](15_mform_output.md#typisierte-items).
 
 ---
 

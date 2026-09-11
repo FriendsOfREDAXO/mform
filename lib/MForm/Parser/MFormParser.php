@@ -18,6 +18,7 @@ use FriendsOfRedaxo\MForm\DTO\MFormElement;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\FlexRepeater\MFormFlexRepeaterRenderer;
 use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
@@ -120,6 +121,9 @@ class MFormParser
             $jsonValue = '[]';
         }
 
+        // Speicherformat (#452): 1 = Liste (Standard, unveraendert), 2 = Umschlag {"__v":2,"items":[...]}.
+        $dataVersion = (int) ($attrs['data_version'] ?? MFormRepeaterHelper::DATA_VERSION_LIST) >= MFormRepeaterHelper::DATA_VERSION_ENVELOPE ? MFormRepeaterHelper::DATA_VERSION_ENVELOPE : MFormRepeaterHelper::DATA_VERSION_LIST;
+
         $btnText = $attrs['btn_text'] ?? rex_i18n::msg('mform_flex_repeater_add');
         $btnClass = ' ' . ($attrs['btn_class'] ?? 'btn-primary');
         $copyPaste = !isset($attrs['copy_paste']) || $attrs['copy_paste'];
@@ -171,7 +175,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s">%s',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s" data-mfr-data-version="%d">%s',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -187,6 +191,7 @@ class MFormParser
             $addonDebug,
             $copyPaste ? 1 : 0,
             htmlspecialchars($layout, ENT_QUOTES),
+            $dataVersion,
             $label,
         );
 

@@ -10,6 +10,11 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 - Berücksichtigt „dekorativ, kein ALT nötig“ (MediaPlace oder `med_alt_decorative`), mehrsprachige Felder aus metainfo_lang_fields je Online-Sprache und eigene MediaPlace-Metadaten (`mediaplace:<key>`).
 - Keine Änderung an gespeicherten Daten. Details: [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
 
+## Update 10.0: Typisierte Repeater-Items und Versionsmarker
+
+- `MFormOutput::from(1)->items()` liefert `MFormRepeaterItem`-Objekte mit `media()`, `article()`, `dataset()`, `url()`, `items()` für verschachtelte Repeater.
+- Optionales Speicherformat mit Versionsmarker (`'data_version' => 2`), alle Ausgabehelfer lesen beide Formate. Details: [Repeater](07_repeater.md#speicherformat-und-version-ab-100), [MFormOutput](15_mform_output.md#typisierte-items).
+
 ---
 
 ## Update 9.4.0: MediaPlace-Unterstützung für Medien-Widgets
