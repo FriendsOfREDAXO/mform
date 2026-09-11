@@ -384,13 +384,16 @@ final class MediaMetaChecker
         return false;
     }
 
+    /**
+     * Unmaskierter Text: die Ausgabe (a11y-check.js, Backend-Seiten) maskiert selbst.
+     */
     private function defaultMessage(string $field, string $code): string
     {
         return match ($code) {
-            'missing_alt' => rex_i18n::msg('mform_a11y_missing_alt'),
-            'missing_language' => rex_i18n::msg('mform_a11y_missing_language', $field),
-            'unknown_field' => rex_i18n::msg('mform_a11y_unknown_field', $field),
-            default => rex_i18n::msg('mform_a11y_missing_field', $field),
+            'missing_alt' => rex_i18n::rawMsg('mform_a11y_missing_alt'),
+            'missing_language' => rex_i18n::rawMsg('mform_a11y_missing_language', $field),
+            'unknown_field' => rex_i18n::rawMsg('mform_a11y_unknown_field', $field),
+            default => rex_i18n::rawMsg('mform_a11y_missing_field', $field),
         };
     }
 

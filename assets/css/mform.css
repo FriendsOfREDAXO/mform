@@ -1260,6 +1260,8 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     color: var(--mform-link);
     white-space: nowrap;
 }
+.mform .mform-a11y-checking,
+.mfr-container .mform-a11y-checking { opacity: .75; }
 .mform .mform-a11y-actions,
 .mfr-container .mform-a11y-actions {
     clear: both;

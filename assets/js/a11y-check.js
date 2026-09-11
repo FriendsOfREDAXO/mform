@@ -11,7 +11,7 @@
 
     var CFG = (window.rex && window.rex.mform_a11y) || {};
     var API = CFG.api || (window.rex && window.rex.backend_url ? window.rex.backend_url + 'index.php?rex-api-call=mform_a11y_check' : 'index.php?rex-api-call=mform_a11y_check');
-    var POLL_MS = 1200;
+    var POLL_MS = 800;
 
     function looksLikeFilename(value) {
         value = $.trim(value || '');
@@ -56,6 +56,12 @@
         return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
     }
 
+    function renderChecking($group) {
+        feedbackContainer($group)
+            .html('<ul class="mform-a11y-list"><li class="mform-a11y-head"><i class="rex-icon fa-universal-access"></i></li><li class="mform-a11y-checking"><i class="rex-icon fa-spinner fa-spin"></i> ' + escapeHtml(CFG.checking || 'Metadaten werden geprüft …') + '</li></ul>')
+            .show();
+    }
+
     function render($group, results, files) {
         var $box = feedbackContainer($group);
         var issues = 0;
@@ -87,18 +93,32 @@
         var files = collectFiles($group);
         var key = files.join('|');
         if (!force && $group.data('mformA11yKey') === key) return;
+        var changed = $group.data('mformA11yKey') !== undefined && $group.data('mformA11yKey') !== key;
         $group.data('mformA11yKey', key);
-        if (!files.length) { render($group, [], files); return; }
-        $.ajax({
+        // Laufende Anfrage verwerfen: sonst kann eine spaete Antwort fuer den alten Wert den Befund
+        // des gerade gewaehlten Mediums ueberschreiben (Popup schliesst -> Fokus -> Neupruefung).
+        var pending = $group.data('mformA11yXhr');
+        if (pending && pending.abort) pending.abort();
+        var seq = ($group.data('mformA11ySeq') || 0) + 1;
+        $group.data('mformA11ySeq', seq);
+        if (!files.length) { $group.data('mformA11yXhr', null); render($group, [], files); return; }
+        // Neuer Wert: sofort Rueckmeldung zeigen, die Antwort kann hinter ladenden Vorschaubildern warten.
+        if (changed) renderChecking($group);
+        var xhr = $.ajax({
             url: API,
             type: 'POST',
             dataType: 'json',
             data: { files: JSON.stringify(files), rules: rules }
         }).done(function (data) {
+            if ($group.data('mformA11ySeq') !== seq) return; // veraltet
             render($group, (data && data.results) || [], files);
-        }).fail(function () {
+        }).fail(function (jq, status) {
+            if (status === 'abort' || $group.data('mformA11ySeq') !== seq) return;
             $group.data('mformA11yKey', null);
+        }).always(function () {
+            if ($group.data('mformA11ySeq') === seq) $group.data('mformA11yXhr', null);
         });
+        $group.data('mformA11yXhr', xhr);
     }
 
     function init(root) {
@@ -135,7 +155,7 @@
         $(this).prop('disabled', true);
         check($group, true);
     });
-    $(window).on('rex:selectMedia', function () { recheckAll(false); });
+    $(window).on('rex:selectMedia rex:selectCustomLink', function () { recheckAll(false); });
     // Zurueck aus dem Medienpool-Tab: Befunde neu pruefen, Metadaten koennten ergaenzt worden sein.
     $(window).on('focus', function () { recheckAll(true); });
     $(document).on('rex:ready', function (e, container) { init(container && container[0] ? container[0] : document); });
