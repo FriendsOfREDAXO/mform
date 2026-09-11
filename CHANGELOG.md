@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Unveröffentlicht (9.x)
+
+### Behoben
+
+- **`show()` mehrfach aufrufbar, Teil 3** (Backport aus 10.x): `setCustomId()` stellte bei jedem Durchlauf erneut das `rv`-Präfix voran (`rvrv1_1_0_t`), `setDefaultClass()` hängte die Standardklasse jedes Mal wieder an (`form-control form-control …`). Beide passieren jetzt nur noch einmal je Item. Betrifft `lib/MForm/DTO/MFormItem.php`, `lib/MForm/Utils/MFormItemManipulator.php`.
+
 ## Version 9.5.0
 
 ### Neu
