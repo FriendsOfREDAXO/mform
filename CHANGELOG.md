@@ -2,7 +2,7 @@
 
 ## Version 10.0.0-beta.1
 
-Erste Beta von MForm 10 (11.09.2026), zum Testen, nicht für Produktion. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt.
+**BETA, nicht für Produktion.** Erste Beta von MForm 10 (11.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt.
 
 ### Neu
 

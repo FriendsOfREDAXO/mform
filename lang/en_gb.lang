@@ -311,3 +311,5 @@ mform_migration_data_single_headline = Test a single raw value
 mform_migration_reassign_intro = Reassigns the slices of this module to the converted module. Afterwards the new module renders the migrated data. The reassignment is logged and can be reverted by token.
 mform_migration_reassign_runs_headline = Reassignments
 mform_migration_reassign_col_modules = Module old -> new
+mform_prerelease_title = BETA: MForm {0} is a pre-release.
+mform_prerelease_text = For testing only, not for production sites. Create a backup before using it. Please report bugs and feedback in GitHub issue #448. The stable 9.5.x line is maintained in branch 9.x.
