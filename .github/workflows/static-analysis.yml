@@ -159,8 +159,8 @@ jobs:
                   - ../../../../redaxo/src/addons/yform/vendor/
               excludePaths:
                   - ../../../../redaxo/src/addons/mform/tests/
-                  - ../../../../redaxo/src/addons/mform/vendor/
-                  - ../../../../redaxo/src/addons/mform/node_modules/
+                  - ../../../../redaxo/src/addons/mform/vendor (?)
+                  - ../../../../redaxo/src/addons/mform/node_modules (?)
               reportUnmatchedIgnoredErrors: false
           NEON
 
