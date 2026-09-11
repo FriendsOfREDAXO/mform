@@ -169,7 +169,7 @@ class MFormGroupExtensionHelper
         return $newItems;
     }
 
-    public static function createGroupItem(string $type, int $group = 0, int $groupCount = 0, string $groupKey = '0', MFormItem $item = null): MFormItem
+    public static function createGroupItem(string $type, int $group = 0, int $groupCount = 0, string $groupKey = '0', ?MFormItem $item = null): MFormItem
     {
         $newItem = new MFormItem();
 

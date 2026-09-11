@@ -2,7 +2,15 @@
 
 ## 10.0.0-dev
 
-Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. MBlock wird nicht mehr unterstützt; 9.5.x wird im Branch `9.x` gepflegt.
+Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
+
+### Voraussetzungen
+
+- **PHP-Mindestversion 8.4** (bisher 8.0). Grund: der neue HTML5-Parser `\Dom\HTMLDocument` (#402, #446). CI prüft nur noch 8.4.
+
+### Entfernt
+
+- **MBlock-Support** (#449): MBlock wird nicht mehr getestet und dokumentiert. `MBlock::show($id, $mform->show())` mit String funktioniert technisch weiter. Das Demo-Modul „MBlock-Test: Medialist + Linklist“ und das Doku-Kapitel zur Weiterverwendung sind entfernt. Die Tooltip-Klasse heißt jetzt `mform-info-tooltip`, `mblock-info-tooltip` bleibt als zweite Klasse am Element erhalten.
 
 ## Version 9.5.0
 

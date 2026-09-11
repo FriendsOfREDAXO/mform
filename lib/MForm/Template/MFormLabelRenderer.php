@@ -40,7 +40,8 @@ class MFormLabelRenderer
         $iconEsc = htmlspecialchars($icon, ENT_QUOTES);
         $tooltipEsc = htmlspecialchars($item->getInfoTooltip(), ENT_QUOTES);
 
-        return '<a href="#" class="mblock-info-tooltip" data-toggle="tooltip" title="'
+        // mform-info-tooltip ist die Klasse ab 10; mblock-info-tooltip bleibt als Alias fuer fremdes CSS
+        return '<a href="#" class="mform-info-tooltip mblock-info-tooltip" data-toggle="tooltip" title="'
             . $tooltipEsc
             . '"><i class="fa '
             . $iconEsc

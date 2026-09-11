@@ -29,8 +29,8 @@ class MForm extends MFormElements
     /**
      * Wenn true, werden addMediaField() und addLinkField() intern ueber das
      * custom_link-Widget gerendert. Das Speicherformat bleibt identisch
-     * (REX_MEDIA / REX_LINK). Vorteil: kein Reindex-Problem in MBlock,
-     * sauberes Clone/Reset-Verhalten, einheitlicher Widget-Stil.
+     * (REX_MEDIA / REX_LINK). Vorteil: sauberes Clone/Reset-Verhalten in
+     * wiederholten Formularen, einheitlicher Widget-Stil.
      */
     private static bool $useCustomLinkForClassicWidgets = false;
 

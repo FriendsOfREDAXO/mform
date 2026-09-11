@@ -8,7 +8,7 @@ Stand: 11.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für den Br
 |---|---|
 | Branches | `9.x` = Wartung für 9.5.x (nur Bugfixes, keine neuen Optionen). `10.x` = Entwicklung. `main` wechselt mit der ersten 10.0.0-beta auf den 10er-Stand. |
 | Version | `package.yml` auf `10.0.0-dev`, Releases als `10.0.0-beta.1` … `10.0.0`. Tags ohne „v“. |
-| PHP | Mindestversion `>=8.2` (bisher 8.0). REDAXO `^5.17` bleibt. `\Dom\HTMLDocument` (PHP 8.4) nur optional per `class_exists()`, nicht als Pflicht. |
+| PHP | Mindestversion `>=8.4` (bisher 8.0), damit `\Dom\HTMLDocument` ohne Fallback-Pfad eingesetzt wird. REDAXO `^5.17` bleibt. Wer PHP < 8.4 hat, bleibt auf 9.x. |
 | Kompatibilität | Keine Breaking Changes an der MForm-API: alle `add*()`-Signaturen, gespeicherten Datenformate, Templates und Fragmente bleiben. Einzige Ausnahme ist MBlock (siehe 2). |
 | Qualität | Jeder PR läuft gegen rexstan, php-cs-fixer und die neue Test-Suite (siehe 5.7). |
 
@@ -68,7 +68,7 @@ Geprüft am 11.09.2026 gegen den Code von 9.5.0.
 | #409 HTML5-Inputs | Keine der Methoden vorhanden. | 10.0 Beta 1, kleiner Aufwand, hoher Nutzen. |
 | #407 Builder Live-Preview | Nicht umgesetzt. | 10.0 Beta 2. |
 | #406 Builder JSON-Export/Import | Nicht umgesetzt. | 10.0 Beta 2. |
-| #402 `\Dom\HTMLDocument` | Nicht umgesetzt. Voraussetzung PHP 8.4 ist zu hart. | 10.0 Beta 1 als optionaler Pfad: `HtmlDocumentFactory` nutzt `\Dom\HTMLDocument`, wenn vorhanden, sonst `DOMDocument`. `utf8_decode()` fliegt in jedem Fall raus. |
+| #402 `\Dom\HTMLDocument` | Nicht umgesetzt. | 10.0 Beta 1, vollständig: Parser und SVG-Konverter auf `\Dom\HTMLDocument` / `\Dom\XMLDocument`, `utf8_decode()` und libxml-Workarounds entfallen. |
 | #399 Field-Type-Registry | Nicht umgesetzt. | 10.0 Beta 1, Fundament für 5.1 und 5.2. |
 | #397 A11y-Prüfung Media/Links | Nicht umgesetzt. | 10.0 RC, opt-in. |
 
@@ -105,7 +105,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 
 | Meilenstein | Inhalt |
 |---|---|
-| 10.0.0-beta.1 | Branch-Setup, PHP 8.2, MBlock-Aufräumen (2), Migrationsassistent M1–M4 und M8–M10, Field-Type-Registry (5.1), HTML5-Felder (5.6), Test-Suite-Grundstock (5.7), `\Dom\HTMLDocument`-Pfad (#402), Rest von #437. |
+| 10.0.0-beta.1 | Branch-Setup, PHP 8.4, MBlock-Aufräumen (2), Migrationsassistent M1–M4 und M8–M10, Field-Type-Registry (5.1), HTML5-Felder (5.6), Test-Suite-Grundstock (5.7), DOM-Umstellung (#402), Rest von #437. |
 | 10.0.0-beta.2 | Migration M5–M7, Repeater-Datenversion (5.3), `repeater_light` (5.4), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
 | 10.0.0-rc.1 | Conditional-Editor (#417), Rating und Tags (#412), A11y-Prüfung (#397), Dark-Mode-Audit, Doku. |
 | 10.0.0 | Stabilisierung, Migrationsleitfaden 9 → 10. |

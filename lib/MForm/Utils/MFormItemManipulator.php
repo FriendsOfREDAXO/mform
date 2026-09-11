@@ -22,7 +22,7 @@ class MFormItemManipulator
     public static function setVarAndIds(MFormItem $item): void
     {
         // set value for html out -- nur einmal: show() kann mehrfach laufen
-        // (MBlock rendert je Block), ein zweites htmlspecialchars() wuerde aus
+        // (Aufrufer duerfen show() wiederholen), ein zweites htmlspecialchars() wuerde aus
         // "&amp;" ein "&amp;amp;" machen. setValue() setzt die Markierung zurueck.
         if (!$item->valueEscaped) {
             $value = $item->getValue();

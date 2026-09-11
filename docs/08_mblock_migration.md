@@ -1,60 +1,11 @@
-# Mform und Mblock
+# Migration von MBlock
 
-Diese Seite beschreibt den pragmatischen Umgang mit bestehenden MBlock-Modulen im Zusammenspiel mit MForm 9.
+MForm 10 unterstützt MBlock nicht mehr. Bestehende Module mit `MBlock::show($id, $mform->show())` laufen technisch weiter, weil MForm nur HTML liefert, sie werden aber nicht mehr getestet und in Issues nicht mehr supportet. Der Weg nach vorn ist der MForm-Repeater. Diese Seite beschreibt den Konverter und die manuelle Migration.
 
-1. Hinweise bei Weiterverwendung von MBlock
-2. Konverter: was er kann und wie er genutzt wird
-3. Manuelle Migration auf den MForm-Repeater
+1. Konverter: was er kann und wie er genutzt wird
+2. Manuelle Migration auf den MForm-Repeater
 
-## 1) Hinweise bei Weiterverwendung von MBlock
-
-Wenn Module vorerst bei MBlock bleiben sollen, gibt es ein paar wichtige Praxisregeln.
-
-### Was weiterhin möglich ist
-
-- Bestehende MBlock-Module können unverändert weiterlaufen.
-- Für neue oder angepasste Module kann optional der Compat-Modus aktiviert werden.
-- Das REDAXO-Speicherformat bleibt dabei erhalten (`REX_MEDIA_n`, `REX_LINK_n`).
-
-### Wichtiger Hinweis zu klassischen Linklist-/Medialist-Widgets
-
-- Die klassischen REDAXO-Widgets für `linklist` und `medialist` sind im MBlock-Kontext historisch nicht zuverlässig, vor allem bei Reindexing- oder Clone-Szenarien.
-- Wenn du in MBlock robuste Link-/Medien-Felder brauchst, nutze bevorzugt die MForm-eigenen Custom-Widgets.
-
-### Compat-Modus mit MForm
-
-Mit MForm 9+ kannst du klassische Felder intern über das robustere `custom_link`-Widget rendern:
-
-```php
-<?php
-use FriendsOfRedaxo\MForm;
-use FriendsOfRedaxo\MBlock\MBlock;
-
-MForm::useCustomLinkForClassicWidgets(true);
-
-$id = 1;
-$mform = MForm::factory()
-    ->addTextField("$id.0.title", ['label' => 'Titel'])
-    ->addMediaField(1, ['label' => 'Bild'])
-    ->addLinkField(2, ['label' => 'Link']);
-
-echo MBlock::show($id, $mform->show());
-
-MForm::useCustomLinkForClassicWidgets(false);
-```
-
-Wichtig:
-
-- `useCustomLinkForClassicWidgets(true)` ist ein globales Flag für den aktuellen Request.
-- Nach dem betroffenen Formularbereich wieder auf `false` zurücksetzen.
-
-### Kurze Entscheidungshilfe
-
-- Neues MBlock-Modul, aber höhere Widget-Stabilität gewünscht: Compat-Modus aktivieren.
-- Bestehendes Modul ohne Umbau und mit produktiven Altwerten: bisheriges Verhalten beibehalten.
-- Geplante Umstellung auf Repeater: Compat-Modus als Übergang nutzen, dann sauber migrieren.
-
-## 2) Konverter: was er kann und wie es geht
+## 1) Konverter: was er kann und wie es geht
 
 Im Backend unter `MForm -> MBlock zu Repeater` steht ein geführter Konverter-Workflow bereit.
 
@@ -99,7 +50,7 @@ Der Konverter ist bewusst deterministisch und textbasiert. Deshalb erkennt er ni
 2. Danach auf Staging testen.
 3. Erst dann produktiv anwenden.
 
-## 3) Manuelle Migration
+## 2) Manuelle Migration
 
 Wenn der Konverter nicht alle Besonderheiten deines Moduls abdecken kann, ist die manuelle Migration der zuverlässige Weg.
 

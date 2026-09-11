@@ -2,25 +2,23 @@
 
 namespace FriendsOfRedaxo\MForm\Utils;
 
-use DOMDocument;
+use Dom\Element;
+use Dom\Node;
+use Dom\XMLDocument;
 
 /**
  * Konvertiert einfachen HTML/SVG-nahen Markup in ein eigenstaendiges SVG.
  */
 class HtmlToSvgConverter
 {
-    /** @phpstan-ignore property.onlyWritten */
-    private DOMDocument $dom;
-    private DOMDocument $svg;
+    private XMLDocument $svg;
     private string $svgNS = 'http://www.w3.org/2000/svg';
     private int $viewBoxWidth = 800;
     private int $viewBoxHeight = 600;
 
     public function __construct()
     {
-        $this->dom = new DOMDocument();
-        $this->svg = new DOMDocument();
-        libxml_use_internal_errors(true);
+        $this->svg = XMLDocument::createEmpty('1.0', 'UTF-8');
     }
 
     /**
@@ -66,7 +64,7 @@ class HtmlToSvgConverter
     /** @param array<string, mixed> $attributes */
     public function convert(string $html, array $attributes = []): string
     {
-        $this->svg = new DOMDocument('1.0', 'UTF-8');
+        $this->svg = XMLDocument::createEmpty('1.0', 'UTF-8');
         $this->svg->formatOutput = true;
 
         // Extrahiere ViewBox-Dimensionen aus den Attributen
@@ -76,12 +74,8 @@ class HtmlToSvgConverter
             $this->viewBoxHeight = isset($parts[3]) ? (int) $parts[3] : $this->viewBoxHeight;
         }
 
-        $svgEl = $this->svg->createElementNS($this->svgNS, 'svg');
-        if (!($svgEl instanceof \DOMElement)) {
-            return '';
-        }
-        $this->svg->appendChild($svgEl);
-        $svg = $svgEl;
+        $svg = $this->svg->createElementNS($this->svgNS, 'svg');
+        $this->svg->appendChild($svg);
 
         $defaultAttributes = [
             'xmlns' => $this->svgNS,
@@ -103,13 +97,13 @@ class HtmlToSvgConverter
 
         $this->processHTML($html, $group);
 
-        return (string) $this->svg->saveXML();
+        return (string) $this->svg->saveXml();
     }
 
     /**
      * Extrahiert unterstuetzte SVG-Tags aus dem HTML-Fragment und haengt sie an das Ziel-Element an.
      */
-    private function processHTML(string $html, \DOMNode $parent): void
+    private function processHTML(string $html, Node $parent): void
     {
         $elementTypes = 'rect|circle|ellipse|line|polyline|polygon|path|text|g|image';
         $pattern = "/<($elementTypes)([^>]*)(?:>(.*?)<\/\\1>|\/?>)/s";
@@ -128,12 +122,9 @@ class HtmlToSvgConverter
         }
     }
 
-    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?\DOMElement
+    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?Element
     {
         $element = $this->svg->createElementNS($this->svgNS, $tagName);
-        if (!($element instanceof \DOMElement)) {
-            return null;
-        }
 
         // Wenn es sich um ein Text-Element handelt, setze die Standard-Schriftart
         if ($tagName === 'text') {
@@ -203,7 +194,7 @@ class HtmlToSvgConverter
     }
 
     /** @param array<string, mixed> $styles */
-    private function applyStylesToElement(\DOMElement $element, array $styles): void
+    private function applyStylesToElement(Element $element, array $styles): void
     {
         $styleMap = [
             'fill' => 'fill',
@@ -243,7 +234,7 @@ class HtmlToSvgConverter
         }
     }
 
-    private function processBorderShorthand(\DOMElement $element, string $border): void
+    private function processBorderShorthand(Element $element, string $border): void
     {
         $parts = preg_split('/\s+/', trim($border)) ?: [];
         foreach ($parts as $part) {
