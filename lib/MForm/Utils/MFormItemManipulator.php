@@ -59,8 +59,11 @@ class MFormItemManipulator
      */
     public static function setCustomId(MFormItem $item): void
     {
-        // set default unique element id
-        $item->setId('rv' . $item->getId()); // add alpha prefix for valid html syntax
+        // set default unique element id -- nur einmal, show() darf mehrfach laufen
+        if (!$item->idPrefixed) {
+            $item->setId('rv' . $item->getId()); // add alpha prefix for valid html syntax
+            $item->idPrefixed = true;
+        }
         foreach ($item->getAttributes() as $key => $value) {
             // check is id in attributes set
             if ('id' == $key) {
@@ -75,9 +78,10 @@ class MFormItemManipulator
     public static function setDefaultClass(MFormItem $item): void
     {
         // is default class flag set
-        if ($item->isDefaultClass()) {
-            // set class by mform default dto
+        if ($item->isDefaultClass() && !$item->defaultClassApplied) {
+            // set class by mform default dto -- nur einmal, show() darf mehrfach laufen
             $item->setClass(MFormDefault::$classes[$item->getType()] . ' ' . $item->getClass()); // add default class as first class
+            $item->defaultClassApplied = true;
         }
     }
 }
