@@ -28,7 +28,7 @@
     margin: 0;
     padding: .35rem;
     border: 1px solid var(--mfl-border);
-    border-radius: 5px;
+    border-radius: var(--mform-radius);
     min-height: 84px;
     max-height: 220px;
     overflow: auto;
@@ -52,7 +52,7 @@
 .mform-list-widget .mform-list-items li {
     padding: .35rem .5rem;
     background: var(--mfl-item-bg);
-    border-radius: 4px;
+    border-radius: var(--mform-radius);
     border: 1px solid transparent;
     cursor: pointer;
     overflow: hidden;

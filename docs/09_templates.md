@@ -176,7 +176,7 @@ body.rex-theme-dark {
 | `--mform-input-bg` | Eingabefelder |
 | `--mform-success`, `--mform-danger`, `--mform-warning` | Statusfarben (Hinzufügen, Löschen, Warnung) |
 | `--mform-badge-bg`, `--mform-badge-text` | Badges (Anzahl, Typ) |
-| `--mform-radius`, `--mform-radius-lg` | Eckenradius Buttons/Felder bzw. Container |
+| `--mform-radius`, `--mform-radius-lg` | Eckenradius Felder/Buttons (Standard 0, eckig wie das Backend) bzw. Container (Repeater-Items, Listen-Rahmen) |
 | `--mform-shadow`, `--mform-shadow-lift` | Schatten (Ruhe, Drag) |
 
 Die Palette ist auf Linkmap und MediaPlace abgestimmt. Das Dark-Theme greift über `body.rex-theme-dark`, bei Theme „Auto“ über `prefers-color-scheme: dark` in Verbindung mit `body.rex-has-theme:not(.rex-theme-light)`.

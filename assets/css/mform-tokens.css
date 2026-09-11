@@ -28,7 +28,7 @@
     --mform-warning: #d98c1f;
     --mform-badge-bg: #dfe3e9;
     --mform-badge-text: #324050;
-    --mform-radius: 4px;
+    --mform-radius: 0;          /* Felder und Buttons eckig wie im REDAXO-Backend */
     --mform-radius-lg: 6px;
     --mform-shadow: 0 1px 3px rgba(0, 0, 0, .08);
     --mform-shadow-lift: 0 4px 14px rgba(0, 0, 0, .14);
