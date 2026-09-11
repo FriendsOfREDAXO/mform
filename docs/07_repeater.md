@@ -264,6 +264,7 @@ Verfügbare Optionen im Repeater-Array:
 - `collapsed` (bool, default: `false`): Initial alle Items reduziert anzeigen.
 - `first_open` (bool, default: `false`): Erstes Item trotz `collapsed=true` geoeffnet lassen.
 - `show_toggle_all` (bool, default: `true`): Button "Alle auf / zu" in der Toolbar anzeigen.
+- `show_add_button` (bool, default: `true`): Bei `false` erscheinen die "Hinzufügen"-Buttons der Toolbar (oben/unten) nur, solange der Repeater leer ist – sobald ein Item existiert, übernimmt das „+"-Icon am Item. Praktisch zusammen mit `default_count => 0`, damit das erste Item trotzdem angelegt werden kann. Gilt auch für verschachtelte Repeater.
 - `open` (bool, default: `true`): Toolbar / Aktionen sind nutzbar; bei `false` wird die Bedienoberflaeche eingefroren (read-only Anzeige).
 - `copy_paste` (bool, default: `true`): Pro Item ein Kopieren-Button und ein Einfuegen-Button in der Toolbar.
 - `confirm_delete` (bool, default: `true`): Loeschen eines Items mit Sicherheitsabfrage.
@@ -489,6 +490,7 @@ echo $mform->show();
 | `collapsed` | bool | `false` | Items initial zugeklappt |
 | `first_open` | bool | `false` | Erstes Item trotz `collapsed` offen |
 | `show_toggle_all` | bool | `true` | „Alle auf/zu"-Button in Toolbar |
+| `show_add_button` | bool | `true` | Toolbar-„Hinzufügen" auch bei vorhandenen Items; `false` = nur solange der Repeater leer ist |
 | `min` | int | `0` | Mindestanzahl Items |
 | `max` | int | `0` | Maximalanzahl Items (0 = unbegrenzt) |
 | `confirm_delete` | bool | `true` | Loeschen mit Bestaetigung |

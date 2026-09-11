@@ -2,6 +2,11 @@
 
 ## Unveröffentlicht
 
+### Neu
+
+- **Repeater-Option `show_add_button`:** Mit `'show_add_button' => false` erscheinen die „Hinzufügen"-Buttons der Toolbar (oben und unten) nur noch, solange der Repeater leer ist. Sobald ein Item existiert, reicht das „+"-Icon am Item, und die Toolbar-Buttons verschwinden. So bleibt der Einstieg bei `default_count => 0` möglich, ohne dass die Buttons danach doppelt herumstehen. Gilt auch für verschachtelte Repeater. `show_add_buttons` (Plural) wird als Alias akzeptiert. Im Formbuilder als Checkbox verfügbar. (#442)
+
+
 ### Behoben
 
 - **`show()` mehrfach aufrufbar auch bei mehrteiligen Feld-IDs (`1.0.feld`):** Nachbesserung zu 9.4.2 (CodeRabbit-Hinweis in #443). `getWidgetId()` schrieb die Variablen-ID weiterhin als String ins Item zurück, und `setVarAndIds()` wandelt Arrays ohnehin in Klammer-Strings um. Beim zweiten `show()` (MBlock ruft es je Block auf) erkannte der Parser mehrteilige IDs deshalb nicht mehr und rendert Medien-, Medialist- und Link-Felder mit `REX_INPUT_MEDIA[1][0][feld]` statt `REX_INPUT_VALUE[1][0][feld]`. Jetzt liest `getWidgetId()` nur noch, Feldnamen entstehen über `varIdBracketed()`, und die Erkennung mehrteiliger IDs (`varIdParts()`) funktioniert für Array und String gleichermaßen. Betrifft `lib/MForm/Parser/MFormParser.php`.
