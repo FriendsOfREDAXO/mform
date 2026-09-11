@@ -9,8 +9,12 @@ Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branc
 - **Field-Type-Registry** (#399): `MForm::registerFieldType($type, $renderer)` registriert eigene Feldtypen aus Fremd-Addons, `addCustomField($type, $id, …)` setzt sie ins Formular. Der Renderer (`FieldTypeInterface`) wird im klassischen Parser und im Flex-Repeater genutzt; der `FieldRenderContext` liefert Name/Id/Wert bzw. den Repeater-Feldschlüssel. Grundlage für Linkmap-, MediaPlace- und relation_select-Feldtypen.
 - **HTML5-Eingabefelder** (#409): `addNumberField()`, `addRangeField()` (mit Live-Wertanzeige), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Dünne Wrapper um `addInputField()`, `min`/`max`/`step`/`pattern` über `$attributes`. Funktionieren im Flex-Repeater, stehen im Builder in der Palette (mit Min/Max/Step-Eingaben) und in der Demo „HTML5-Eingabefelder“.
 
+- **Gemeinsame Design-Tokens** (#455): `assets/css/mform-tokens.css` definiert eine Palette (`--mform-surface`, `--mform-text`, `--mform-border`, `--mform-link`, `--mform-radius`, …) für Light, Dark (`body.rex-theme-dark`) und Auto (`prefers-color-scheme`). Custom Link, Custom Link Multiple, Bild-/Linkliste, Flex-Repeater, Checkbox-Gruppe, Farb- und Range-Felder und die Tabs mappen ihre bisher drei voneinander abweichenden Farbsätze auf diese Basis. Abgestimmt auf Linkmap und MediaPlace, damit Overlay und Widget zusammenpassen. Eigene Anpassungen: Tokens im Projekt-CSS überschreiben, siehe `docs/09_templates.md`.
+
 ### Behoben
 
+- **Range-Feld:** Slider und Live-Wert stehen jetzt auch im klassischen Formular in einer Zeile (die Regel griff nur mit `form-control`, das Range-Felder nicht tragen). Farbfelder bekommen Rahmen und Fokus-Ring der übrigen Eingaben.
+- **Tabs:** Horizontale Reiter brechen bei wenig Platz zeilenweise um statt spaltenweise zu stapeln (Flex statt Bootstrap-Floats).
 - **`show()` mehrfach aufrufbar, Teil 3:** `setCustomId()` stellte bei jedem Durchlauf erneut das `rv`-Präfix voran (`rvrv1_1_0_t`), `setDefaultClass()` hängte die Standardklasse jedes Mal wieder an. Beide passieren jetzt nur noch einmal je Item.
 
 ### Voraussetzungen

@@ -148,3 +148,35 @@ echo MForm::factory()
 - Halte den `$context` bewusst klein und dokumentiert.
 - Ohne registrierten Key bleibt die Form unveraendert.
 - Templates koennen kombiniert werden, z. B. `->applyTemplate('base')->applyTemplate('seo')`.
+
+## Design-Tokens (ab 10.0)
+
+Alle MForm-Widgets (Custom Link, Listen, Flex-Repeater, Checkbox-Gruppe, Farb- und Range-Felder, Tabs) nutzen eine gemeinsame Palette aus `assets/css/mform-tokens.css`. Die Widget-Stylesheets mappen ihre eigenen Variablen (`--mform-custom-link-*`, `--mfr-*`, `--mfl-*`) auf diese Basis. Wer das Erscheinungsbild anpassen will, überschreibt die Tokens im Projekt-CSS statt einzelne Widget-Regeln:
+
+```css
+/* Light */
+:root {
+    --mform-link: #8a2be2;
+    --mform-active-bg: #f1e6fb;
+    --mform-radius: 2px;
+}
+/* Dark */
+body.rex-theme-dark {
+    --mform-link: #c39bff;
+}
+```
+
+| Token | Verwendung |
+|---|---|
+| `--mform-surface`, `--mform-surface-alt` | Flächen (Widget, Toolbar, Item-Kopf) |
+| `--mform-text`, `--mform-muted` | Text, Hinweise, Icons |
+| `--mform-border`, `--mform-border-strong`, `--mform-input-border` | Linien und Rahmen |
+| `--mform-hover`, `--mform-active-bg`, `--mform-active-text` | Hover und aktive Zustände |
+| `--mform-link`, `--mform-focus`, `--mform-focus-ring` | Akzent, Fokus |
+| `--mform-input-bg` | Eingabefelder |
+| `--mform-success`, `--mform-danger`, `--mform-warning` | Statusfarben (Hinzufügen, Löschen, Warnung) |
+| `--mform-badge-bg`, `--mform-badge-text` | Badges (Anzahl, Typ) |
+| `--mform-radius`, `--mform-radius-lg` | Eckenradius Buttons/Felder bzw. Container |
+| `--mform-shadow`, `--mform-shadow-lift` | Schatten (Ruhe, Drag) |
+
+Die Palette ist auf Linkmap und MediaPlace abgestimmt. Das Dark-Theme greift über `body.rex-theme-dark`, bei Theme „Auto“ über `prefers-color-scheme: dark` in Verbindung mit `body.rex-has-theme:not(.rex-theme-light)`.

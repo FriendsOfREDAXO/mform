@@ -1,0 +1,87 @@
+/* ==========================================================================
+   MForm – gemeinsame Design-Tokens (ab 10.0)
+   Eine Palette fuer alle MForm-Widgets (Custom Link, Listen, Flex-Repeater,
+   Checkbox-Gruppe, Farbfelder, Range), abgestimmt auf Linkmap und MediaPlace
+   (be_style-Palette). Die Widget-Stylesheets mappen ihre eigenen Variablen
+   (--mform-custom-link-*, --mfr-*, --mfl-*) auf diese Basis-Tokens.
+   Themes: bare :root = Light, body.rex-theme-dark = Dark, Auto ueber
+   prefers-color-scheme + body.rex-has-theme:not(.rex-theme-light).
+   ========================================================================== */
+:root {
+    --mform-surface: #ffffff;
+    --mform-surface-alt: #f3f6fb;
+    --mform-text: #324050;
+    --mform-muted: #68727d;
+    --mform-border: #dfe3e9;
+    --mform-border-strong: #c7ccd3;
+    --mform-hover: #dfe3e9;
+    --mform-active-bg: #dbedf7;
+    --mform-active-text: #2f6ea8;
+    --mform-link: #2f6ea8;
+    --mform-focus: #2f6ea8;
+    --mform-focus-ring: rgba(47, 110, 168, .25);
+    --mform-input-bg: #ffffff;
+    --mform-input-border: #c7ccd3;
+    --mform-success: #5bb585;
+    --mform-success-strong: #45986c;
+    --mform-danger: #d9534f;
+    --mform-warning: #d98c1f;
+    --mform-badge-bg: #dfe3e9;
+    --mform-badge-text: #324050;
+    --mform-radius: 4px;
+    --mform-radius-lg: 6px;
+    --mform-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+    --mform-shadow-lift: 0 4px 14px rgba(0, 0, 0, .14);
+}
+
+body.rex-theme-dark {
+    --mform-surface: #1a202c;
+    --mform-surface-alt: #212836;
+    --mform-text: #d5dbe3;
+    --mform-muted: #8b95a3;
+    --mform-border: #3a4557;
+    --mform-border-strong: #4a5568;
+    --mform-hover: #384252;
+    --mform-active-bg: #2d3748;
+    --mform-active-text: #7fb3e6;
+    --mform-link: #7fb3e6;
+    --mform-focus: #6c9bd2;
+    --mform-focus-ring: rgba(108, 155, 210, .3);
+    --mform-input-bg: #2d3748;
+    --mform-input-border: #4a5568;
+    --mform-success: #5bb585;
+    --mform-success-strong: #6fc596;
+    --mform-danger: #e8857a;
+    --mform-warning: #e0a23c;
+    --mform-badge-bg: #3a4557;
+    --mform-badge-text: #d5dbe3;
+    --mform-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+    --mform-shadow-lift: 0 4px 14px rgba(0, 0, 0, .5);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.rex-has-theme:not(.rex-theme-light) {
+        --mform-surface: #1a202c;
+        --mform-surface-alt: #212836;
+        --mform-text: #d5dbe3;
+        --mform-muted: #8b95a3;
+        --mform-border: #3a4557;
+        --mform-border-strong: #4a5568;
+        --mform-hover: #384252;
+        --mform-active-bg: #2d3748;
+        --mform-active-text: #7fb3e6;
+        --mform-link: #7fb3e6;
+        --mform-focus: #6c9bd2;
+        --mform-focus-ring: rgba(108, 155, 210, .3);
+        --mform-input-bg: #2d3748;
+        --mform-input-border: #4a5568;
+        --mform-success: #5bb585;
+        --mform-success-strong: #6fc596;
+        --mform-danger: #e8857a;
+        --mform-warning: #e0a23c;
+        --mform-badge-bg: #3a4557;
+        --mform-badge-text: #d5dbe3;
+        --mform-shadow: 0 1px 3px rgba(0, 0, 0, .35);
+        --mform-shadow-lift: 0 4px 14px rgba(0, 0, 0, .5);
+    }
+}
