@@ -1,8 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## 10.0.0-dev
+## Version 10.0.0-beta.1
 
-Entwicklungsstand für MForm 10 auf `main`, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
+Erste Beta von MForm 10 (11.09.2026), zum Testen, nicht für Produktion. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt.
 
 ### Neu
 

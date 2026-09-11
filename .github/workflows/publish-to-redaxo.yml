@@ -8,13 +8,15 @@ on:
 
 jobs:
   redaxo_publish:
+    # Prereleases (Beta/RC) bleiben auf GitHub, nur finale Releases gehen zu redaxo.org.
+    if: github.event.release.prerelease == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - if: hashFiles('composer.json') != ''
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.4"
       - if: hashFiles('composer.json') != ''
         uses: ramsey/composer-install@v2
         with:
