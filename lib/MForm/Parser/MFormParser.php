@@ -1316,8 +1316,17 @@ class MFormParser
 
     private function getWidgetId(MFormItem $item): string
     {
-        $item->setVarId(substr($this->varIdStr($item), 1, -1));
-        $varId = explode('][', $this->varIdStr($item));
+        // varId als String ohne aeussere Klammern ("1" bzw. "1][0][feld") -- so
+        // ergibt '[' . varIdStr() . ']' spaeter den Feldnamen. Nur entklammern,
+        // wenn noch Klammern da sind: show() kann mehrfach laufen (MBlock ruft es
+        // je Block auf), und ein zweiter substr() haette aus "1" einen leeren
+        // String gemacht (REX_INPUT_MEDIA[] ohne ID, identische Widget-IDs).
+        $varIdStr = $this->varIdStr($item);
+        if (str_starts_with($varIdStr, '[') && str_ends_with($varIdStr, ']')) {
+            $varIdStr = substr($varIdStr, 1, -1);
+        }
+        $item->setVarId($varIdStr);
+        $varId = explode('][', $varIdStr);
 
         foreach ($varId as $key => $val) {
             if (!is_numeric($val)) {

@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.4.2
+
+### Behoben
+
+- **Medien-/Medialist-Felder im zweiten und jedem weiteren MBlock-Block verloren ihren Feldnamen:** `MFormParser::getWidgetId()` schrieb die Variablen-ID beim ersten `show()` ohne äußere Klammern zurück ins Item (`[1]` → `1`) und schnitt bei jedem weiteren `show()` erneut ein Zeichen vorn und hinten ab (`1` → leer). MBlock ruft `show()` bei übergebenem MForm-Objekt je Block auf, ab dem zweiten Block hießen die Felder deshalb `REX_INPUT_MEDIA[]` statt `REX_INPUT_VALUE[1][n][REX_MEDIA_1]` und alle Widgets bekamen dieselbe ID. Sichtbarer Effekt: Das gewählte Medium stand zwar im Feld, wurde beim Speichern aber nicht dem Block zugeordnet – unabhängig davon, ob Medienpool oder MediaPlace die Auswahl lieferte. `getWidgetId()` entklammert jetzt nur noch, wenn tatsächlich Klammern vorhanden sind, und ist damit beliebig oft aufrufbar. Betrifft `lib/MForm/Parser/MFormParser.php`.
+
 ## Version 9.4.1
 
 > **Voraussetzung: [MediaPlace](https://github.com/FriendsOfREDAXO/mediaplace) ≥ 2.0.0.** Wer MediaPlace einsetzt, sollte vor diesem Update auf Version 2.0.0 oder neuer aktualisieren (siehe "Behoben" unten) – mit einer älteren MediaPlace-Version wird das Overlay sonst nicht mehr erkannt und es öffnet sich wieder der klassische Medienpool-Popup.
