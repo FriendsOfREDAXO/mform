@@ -82,6 +82,33 @@ final class MFormWrapperRenderer
     }
 
     /**
+     * Feld-Zeile (form-group mit Label- und Feldspalte) ueber das Theme-Fragment `mform_default.php`,
+     * dasselbe, das der klassische Parser fuer jedes Feld nutzt.
+     *
+     * @param array<string, mixed> $vars class, formGroupAttributes, labelColClass, formItemColClass, label, element, notice, infoTooltip, infoCollapseButton, infoCollapse
+     * @param string $type default | default_custom | default_full | default_custom_full
+     */
+    public static function formGroup(array $vars, string $type = 'default_custom', ?string $theme = null): string
+    {
+        $fragment = new rex_fragment();
+        $fragment->setVar('type', $type, false);
+        foreach (['formGroupAttributes', 'label', 'element', 'notice', 'infoTooltip', 'infoCollapseButton', 'infoCollapse', 'class'] as $key) {
+            $fragment->setVar($key, $vars[$key] ?? '', false);
+        }
+        foreach ($vars as $key => $value) {
+            $fragment->setVar($key, $value, false);
+        }
+
+        try {
+            return $fragment->parse(($theme ?? self::DEFAULT_THEME) . '/mform_default.php');
+        } catch (Exception $e) {
+            rex_logger::logException($e);
+
+            return rex_view::error($e->getMessage());
+        }
+    }
+
+    /**
      * Oeffnendes Wrapper-Element mit Klasse und Attributen (start-group-column, column, tab, start-group-collapse, ...).
      *
      * @param array<string, mixed> $attributes

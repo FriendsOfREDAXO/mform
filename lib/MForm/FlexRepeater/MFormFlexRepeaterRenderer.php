@@ -595,70 +595,32 @@ class MFormFlexRepeaterRenderer
 
     private static function wrapFormGroup(string $label, string $field, MFormItem $item): string
     {
-        $notice = $item->getNotice();
-        $noticeHtml = '';
-        if ('' !== $notice) {
-            $noticeHtml = sprintf('<p class="help-block">%s</p>', htmlspecialchars($notice, ENT_QUOTES));
-        }
-        // Optionale Zusatzklasse (z. B. mform-inline-color-radios / mform-inline-radios)
-        // aus den Item-Attributen uebernehmen – analog zum klassischen MFormParser-Pfad.
-        // Diese Klasse steuert per CSS u. a. die Darstellung der Farb-Swatch-Radios.
-        $attrs = $item->getAttributes();
-        $extraClass = '';
+        // Feld-Zeile ueber das Parser-Fragment mform_default.php (#437): gleiche Struktur wie im
+        // klassischen Formular (Label-Spalte als div.control-label, Feld-Spalte, Notice), plus die
+        // Repeater-Klassen row/mfr-field-group/mfr-field-label/mfr-field-col fuer CSS-Layouts.
         $formGroupClass = MFormFormGroupHelper::getExtraClass($item);
-        if ('' !== $formGroupClass) {
-            $extraClass = ' ' . htmlspecialchars($formGroupClass, ENT_QUOTES);
-        }
-        $formGroupAttributeHtml = self::renderAttributes(MFormFormGroupHelper::getAttributes($item));
 
         $labelColClass = 'control-label col-sm-3 mfr-field-label';
         $fieldColClass = 'col-sm-9 mfr-field-col';
-        $hasCustomGridClasses = false;
-
         if ('' !== $item->getLabelColClass() && '' !== $item->getFormItemColClass()) {
             $labelColClass = trim($item->getLabelColClass() . ' mfr-field-label');
             $fieldColClass = trim($item->getFormItemColClass() . ' mfr-field-col');
-            $hasCustomGridClasses = true;
         }
-
-        // Keep behavior aligned with the default parser templates:
-        // setFull() forces both label and field columns to full width.
+        // setFull() wie in den Parser-Templates: beide Spalten volle Breite.
         if ($item->isFull()) {
             $labelColClass = 'control-label col-sm-12 mfr-field-label';
             $fieldColClass = 'col-sm-12 mfr-field-col';
         }
 
-        $labelColClassEsc = htmlspecialchars($labelColClass, ENT_QUOTES);
-        $fieldColClassEsc = htmlspecialchars($fieldColClass, ENT_QUOTES);
-
-        // Bootstrap-3 form-horizontal Markup (col-sm-3 / col-sm-9). Die Layout-Variante
-        // (vertical/inline) wird per CSS via [data-mfr-layout] auf dem .mfr-container
-        // ueberschrieben.
-        if ('' === $label) {
-            $fieldNoLabelClass = $fieldColClass;
-            if (!$item->isFull() && !$hasCustomGridClasses) {
-                $fieldNoLabelClass = 'col-sm-9 col-sm-offset-3 mfr-field-col';
-            }
-
-            return sprintf(
-                '<div class="row form-group mfr-field-group%s"%s><div class="%s">%s%s</div></div>',
-                $extraClass,
-                $formGroupAttributeHtml,
-                htmlspecialchars($fieldNoLabelClass, ENT_QUOTES),
-                $field,
-                $noticeHtml,
-            );
-        }
-        return sprintf(
-            '<div class="row form-group mfr-field-group%s"%s><label class="%s">%s</label><div class="%s">%s%s</div></div>',
-            $extraClass,
-            $formGroupAttributeHtml,
-            $labelColClassEsc,
-            $label,
-            $fieldColClassEsc,
-            $field,
-            $noticeHtml,
-        );
+        return MFormWrapperRenderer::formGroup([
+            'class' => trim('row mfr-field-group ' . $formGroupClass),
+            'formGroupAttributes' => MFormWrapperRenderer::attributes(MFormFormGroupHelper::getAttributes($item), []),
+            'labelColClass' => $labelColClass,
+            'formItemColClass' => $fieldColClass,
+            'label' => '' !== $label ? '<label>' . $label . '</label>' : '',
+            'element' => $field,
+            'notice' => htmlspecialchars($item->getNotice(), ENT_QUOTES),
+        ]);
     }
 
     /**

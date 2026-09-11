@@ -80,15 +80,21 @@ Geprüft am 11.09.2026 gegen den Code von 9.5.0.
 `MForm::registerFieldType('relation-select', RendererClass::class)`, ein Interface mit `render(MFormItem, Context)` für Parser und Flex-Repeater, dazu Registrierung eines Builder-Palette-Eintrags. Erste Nutzer: `relation_select`, `linkmap`, `mediaplace`. Damit müssen Fremd-Addons nicht mehr auf `addHtml()` ausweichen.
 
 ### 5.2 Linkmap-Bridge für Link-Felder
+Stand Beta 2: umgesetzt (#447, `assets/js/linkmap-bridge.js`, ylink über den Linkmap-Datensatz-Picker).
+
 `addLinkField()`, `addCustomLinkField()` und `addLinklistField()` öffnen bei installiertem Linkmap das Overlay statt des Popups, analog zur MediaPlace-Bridge in 9.4. Die `ylink`-Quellen des Custom-Link-Widgets nutzen den Datensatz-Picker von Linkmap (`yform://tabelle/id`), das eigene YForm-Popup wird optional. Fallback ohne Linkmap bleibt wie heute.
 
 ### 5.3 Datenformat des Repeaters mit Version
+Stand Beta 2: umgesetzt (#452), Umschlag als Opt-in `data_version => 2`, typisierte Items über `MFormOutput::items()`.
+
 Repeater-JSON bekommt einen Versionsmarker (`__v`), `MFormRepeaterHelper::decode()` migriert alte Werte transparent. Optional typisierte Zugriffe: `decode()->items()`, `->get('link')` mit Auflösung von Media-, Link- und Datensatz-Werten.
 
 ### 5.4 YForm `repeater_light` (#429)
 Entfällt, Issue geschlossen. MForm 10 bekommt kein eigenes Repeater-Value für YForm.
 
 ### 5.5 Builder-Ausbau
+Stand Beta 2: Palette komplett (#425), Export/Import (#406), Live-Vorschau (#407) umgesetzt.
+
 Palette-Parität (#425), JSON-Export/Import (#406), Live-Preview über `rex_api_function` in einer Iframe-Sandbox (#407), Conditional-Editor (#417). Undo/Redo (#411) erst danach.
 
 ### 5.6 HTML5-Felder und erweiterte Felder
