@@ -1,5 +1,9 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## 10.0.0-dev
+
+Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. MBlock wird nicht mehr unterstützt; 9.5.x wird im Branch `9.x` gepflegt.
+
 ## Version 9.5.0
 
 ### Neu
