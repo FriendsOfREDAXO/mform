@@ -1,0 +1,11 @@
+<?php
+use FriendsOfRedaxo\MBlock\MBlock;
+
+$items = rex_var::toArray("REX_VALUE[1]");
+$settings = rex_var::toArray("REX_VALUE[2]");
+foreach ($items as $i => $item) {
+    $image = $item['REX_MEDIA_1'];
+    $bg = $item["REX_MEDIA_2"];
+    $link = $item[1];
+    echo '<div class="card">' . $item['header'] . $image . $bg . $link . '</div>';
+}

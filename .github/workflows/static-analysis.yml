@@ -61,6 +61,26 @@ jobs:
             php-cs-fixer fix --dry-run --diff --ansi --rules=@PSR12 lib pages
           fi
 
+  phpunit:
+    name: PHPUnit (unit)
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run unit tests
+        run: vendor/bin/phpunit --testsuite unit
+
   rexstan:
     name: rexstan
     runs-on: ubuntu-latest
@@ -153,3 +173,7 @@ jobs:
       - name: Run rexstan
         run: redaxo_cms/redaxo/bin/console rexstan:analyze "redaxo/src/addons/${ADDON_KEY}"
 
+      - name: Run PHPUnit against REDAXO
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist --working-dir="redaxo_cms/redaxo/src/addons/${ADDON_KEY}"
+          MFORM_REDAXO_PATH="$PWD/redaxo_cms" "redaxo_cms/redaxo/src/addons/${ADDON_KEY}/vendor/bin/phpunit" -c "redaxo_cms/redaxo/src/addons/${ADDON_KEY}/phpunit.xml.dist" --testsuite redaxo

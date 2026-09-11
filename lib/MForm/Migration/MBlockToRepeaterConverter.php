@@ -7,9 +7,16 @@
 
 namespace FriendsOfRedaxo\MForm\Migration;
 
+use function array_key_exists;
+use function count;
+use function in_array;
+use function is_array;
+use function sprintf;
+use function strlen;
+
 /**
- * Konvertiert MBlock-basierten Modul-Code (Eingabe + Ausgabe) in den
- * MForm-9-Repeater.
+ * Konvertiert MBlock-basierten Modul-Code (Eingabe + Ausgabe) und gespeicherte
+ * MBlock-Daten in den MForm-Repeater.
  *
  * Das Werkzeug fuehrt ausschliesslich textbasierte, deterministische
  * Transformationen durch. Es erzeugt Vorschlags-Code, der vor dem Einsatz
@@ -17,9 +24,15 @@ namespace FriendsOfRedaxo\MForm\Migration;
  * automatisch umgeschrieben, sondern als Hinweis ausgegeben.
  *
  * Kern-Transformationen:
- * - Eingabe: Feldnamen-Praefix `1.0.` bzw. `$id.0.` -> sprechender Key
- * - Eingabe: `MBlock::show($id, $form->show(), [...])` -> `addRepeaterElement(...)`
+ * - Eingabe: Feldnamen-Praefix `1.0.` bzw. `$id.0.` -> sprechender Key (alle Slots)
+ * - Eingabe: numerische Widgets (`addMediaField(1)`) -> Key aus der Legacy-Key-Map
+ * - Eingabe: `MBlock::show($id, $form->show(), [...])` -> `addFlexRepeaterElement(...)`
+ * - Eingabe: Hidden-Feld `mblock_offline` entfaellt (Repeater bringt Online/Offline mit)
  * - Ausgabe: `rex_var::toArray("REX_VALUE[n]")` -> `MFormRepeaterHelper::decode(n)`
+ * - Daten: GBS-Wrapper aufloesen, Legacy-Keys mappen, `mblock_offline` -> `__disabled`,
+ *   verschachtelte MBlock-Listen rekursiv
+ *
+ * @phpstan-import-type Analysis from MBlockModuleAnalyzer
  */
 final class MBlockToRepeaterConverter
 {
@@ -29,47 +42,84 @@ final class MBlockToRepeaterConverter
     /** @var list<string> */
     private array $warnings = [];
 
+    private MBlockModuleAnalyzer $analyzer;
+
+    public function __construct(?MBlockModuleAnalyzer $analyzer = null)
+    {
+        $this->analyzer = $analyzer ?? new MBlockModuleAnalyzer();
+    }
+
+    public function getAnalyzer(): MBlockModuleAnalyzer
+    {
+        return $this->analyzer;
+    }
+
     /**
      * Konvertiert den Eingabe-Code (input.php) eines MBlock-Moduls.
      *
-     * @param string|null $repeaterId Optionale Repeater-Slot-Id (z. B. "1").
-     *                                Ohne Angabe wird sie aus dem Code erkannt.
+     * Alle `MBlock::show()`-Aufrufe werden umgestellt. `$repeaterId` ist nur noch
+     * ein Fallback, wenn der Slot nicht aus dem Code hervorgeht.
+     *
+     * @param Analysis|null $analysis Vorab berechnete Analyse (sonst intern)
      *
      * @return array{code: string, notes: list<string>, warnings: list<string>}
      */
-    public function convertInput(string $code, ?string $repeaterId = null): array
+    public function convertInput(string $code, ?string $repeaterId = null, ?array $analysis = null): array
     {
         $this->reset();
 
         if ('' === trim($code)) {
-            $this->warnings[] = 'Kein Eingabe-Code uebergeben.';
+            $this->warn('Kein Eingabe-Code uebergeben.');
 
             return $this->result($code);
         }
 
-        if (!str_contains($code, 'MBlock')) {
-            $this->notes[] = 'Kein `MBlock::show(...)` gefunden. Es werden nur Feldnamen-Praefixe bereinigt.';
+        $analysis ??= $this->analyzer->analyze($code);
+
+        if (!$analysis['has_mblock']) {
+            $this->note('Kein `MBlock::show(...)` gefunden. Es werden nur Feldnamen-Praefixe bereinigt.');
         }
 
-        [$idToken, $numericId] = $this->detectRepeaterId($code);
-        if (null !== $repeaterId && '' !== trim($repeaterId)) {
-            $numericId = trim($repeaterId);
+        foreach ($analysis['warnings'] as $warning) {
+            $this->warn($warning);
         }
 
-        // 1) Feldnamen-Praefix entfernen ("1.0.header" / "$id.0.header" -> "header").
-        $code = $this->stripFieldPrefixes($code, $idToken, $numericId);
+        // Slots/Id-Tokens, deren Praefixe entfernt werden.
+        $pairs = [];
+        foreach ($analysis['calls'] as $call) {
+            $pairs[$call['id_token'] . '|' . $call['slot']] = [$call['id_token'], $call['slot']];
+        }
+        if ([] === $pairs) {
+            [$idToken, $numericId] = $this->detectRepeaterId($code);
+            if (null !== $repeaterId && '' !== trim($repeaterId)) {
+                $numericId = trim($repeaterId);
+            }
+            $pairs[$idToken . '|' . $numericId] = [$idToken, $numericId];
+        }
 
-        // 2a) Numerische Media-/Link-Felder im Repeater-Formular auf sprechende Keys mappen.
-        $code = $this->normalizeNumericRepeaterWidgetKeys($code);
+        // 1) Numerische Widget-Keys je Formular auf die abgeleiteten Zielnamen mappen (vor dem Praefix-Strip,
+        //    damit "$id.0.1" noch als Custom-Link-Feld erkennbar ist).
+        $code = $this->normalizeNumericWidgetKeys($code, $analysis);
 
-        // 2a.1) $var = MBlock::show(...); ... ->addHTML($var) Pattern inlinen.
+        // 2) Praefixe "$id.0." / "1.0." entfernen (alle Slots).
+        foreach ($pairs as [$idToken, $numericId]) {
+            $code = $this->stripFieldPrefixes($code, $idToken, $numericId);
+        }
+
+        // 3) Hidden-Feld mblock_offline entfernen.
+        $code = $this->removeOfflineHiddenField($code);
+
+        // 4) $var = MBlock::show(...); ... ->addHtml($var) Pattern inlinen (alle Vorkommen).
         $code = $this->inlineMBlockHtmlPattern($code);
 
-        // 2b) MBlock::show(...) durch addFlexRepeaterElement(...) ersetzen.
-        $code = $this->replaceMBlockShow($code, $idToken);
+        // 5) Restliche MBlock::show(...) durch MForm::factory()->addFlexRepeaterElement(...)->show() ersetzen.
+        $code = $this->replaceMBlockShow($code);
 
-        // 3) Hinweise auf manuell zu pruefende Konstrukte sammeln.
-        $this->collectInputWarnings($code);
+        // 6) use-Statements fuer MBlock entfernen.
+        $this->removeMBlockUseStatements($code);
+
+        // 7) Hinweise auf manuell zu pruefende Konstrukte sammeln.
+        $this->collectInputWarnings($code, $analysis);
 
         return $this->result($code);
     }
@@ -77,34 +127,34 @@ final class MBlockToRepeaterConverter
     /**
      * Konvertiert den Ausgabe-Code (output.php) eines MBlock-Moduls.
      *
-     * Nur der angegebene Repeater-Slot wird auf `MFormRepeaterHelper::decode()`
+     * Die angegebenen Repeater-Slots werden auf `MFormRepeaterHelper::decode()`
      * umgestellt. Weitere `rex_var::toArray("REX_VALUE[n]")`-Aufrufe (z. B. fuer
      * gruppierte Einstellungsfelder) bleiben unangetastet.
      *
-     * @param string|null $repeaterId Repeater-Slot-Id (Standard "1").
+     * @param string|null $repeaterId Repeater-Slot-Id (Standard "1"), auch als Liste "1,3"
+     * @param array<string, array<string, string>> $keyMaps Legacy-Key-Map je Slot fuer Output-Fallbacks
      *
      * @return array{code: string, notes: list<string>, warnings: list<string>}
      */
-    public function convertOutput(string $code, ?string $repeaterId = null): array
+    public function convertOutput(string $code, ?string $repeaterId = null, array $keyMaps = []): array
     {
         $this->reset();
 
         if ('' === trim($code)) {
-            $this->warnings[] = 'Kein Ausgabe-Code uebergeben.';
+            $this->warn('Kein Ausgabe-Code uebergeben.');
 
             return $this->result($code);
         }
 
-        $targetId = (null !== $repeaterId && '' !== trim($repeaterId)) ? trim($repeaterId) : '1';
+        $targets = $this->parseSlotList($repeaterId);
 
         $replaced = 0;
         $skipped = [];
 
-        // Nur rex_var::toArray("REX_VALUE[<targetId>]") -> decode(<targetId>).
         $code = (string) preg_replace_callback(
             '/rex_var::toArray\(\s*([\'"])REX_VALUE\[(\d+)\]\1\s*\)/',
-            static function (array $m) use (&$replaced, &$skipped, $targetId): string {
-                if ($m[2] === $targetId) {
+            static function (array $m) use (&$replaced, &$skipped, $targets): string {
+                if (in_array($m[2], $targets, true)) {
                     ++$replaced;
 
                     return 'MFormRepeaterHelper::decode(' . $m[2] . ')';
@@ -117,23 +167,22 @@ final class MBlockToRepeaterConverter
         );
 
         if ($replaced > 0) {
-            $this->notes[] = sprintf('%d Aufruf(e) von `rex_var::toArray("REX_VALUE[%s]")` auf `MFormRepeaterHelper::decode(%s)` umgestellt.', $replaced, $targetId, $targetId);
+            $this->note(sprintf('%d Aufruf(e) von `rex_var::toArray("REX_VALUE[%s]")` auf `MFormRepeaterHelper::decode()` umgestellt.', $replaced, implode('|', $targets)));
             $this->removeMBlockUseStatements($code);
             $this->ensureRepeaterHelperUse($code);
-            $code = $this->addOutputKeyFallbacks($code);
-            $this->notes[] = 'Die Datenstruktur ist identisch (`[$index => [feldname => wert]]`), Zugriffe wie `$item[\'header\']` bleiben gueltig.';
+            $code = $this->addOutputKeyFallbacks($code, $keyMaps);
+            $this->note('Die Datenstruktur ist identisch (`[$index => [feldname => wert]]`), Zugriffe wie `$item[\'header\']` bleiben gueltig.');
         } else {
-            $this->notes[] = sprintf('Kein `rex_var::toArray("REX_VALUE[%s]")` gefunden. Pruefe die Repeater-Slot-Id.', $targetId);
+            $this->note(sprintf('Kein `rex_var::toArray("REX_VALUE[%s]")` gefunden. Pruefe die Repeater-Slot-Id.', implode('|', $targets)));
         }
 
         if ([] !== $skipped) {
             $ids = implode(', ', array_keys($skipped));
-            $this->notes[] = sprintf('Unveraendert gelassen: `REX_VALUE[%s]` (vermutlich gruppierte Einzel-Einstellungen, keine Repeater).', $ids);
+            $this->note(sprintf('Unveraendert gelassen: `REX_VALUE[%s]` (vermutlich gruppierte Einzel-Einstellungen, keine Repeater).', $ids));
         }
 
-        // Hinweise zu Spezial-Keys im Ausgabe-Code.
-        if (preg_match('/\[\s*([\'"])REX_MEDIA_\d+\1\s*\]/', $code) || str_contains($code, 'REX_MEDIA_')) {
-            $this->warnings[] = 'Zugriff auf `REX_MEDIA_n` gefunden: Numerische Media-Felder bekommen im Repeater einen sprechenden Namen. Passe den Key entsprechend an (z. B. `$item[\'media\']`).';
+        if (preg_match('/REX_(MEDIA|LINK|MEDIALIST|LINKLIST)_\d+/', $code)) {
+            $this->warn('Zugriff auf `REX_MEDIA_n`/`REX_LINK_n` gefunden: Numerische Felder bekommen im Repeater einen sprechenden Namen. Fallbacks wurden ergaenzt, bitte die Keys bereinigen.');
         }
 
         return $this->result($code);
@@ -142,30 +191,34 @@ final class MBlockToRepeaterConverter
     /**
      * Konvertiert gespeicherte MBlock-Daten in das flache Repeater-JSON.
      *
-     * MBlock speichert je Slice-Wert ein Wrapper-Objekt der Form
-     * `{"GBS<hash>":{"VALUE":{"<id>":[ {item}, {item} ]}}}`. Der Repeater
-     * erwartet hingegen ein flaches Array `[{item}, {item}]`, in dem der
-     * Aktiv/Inaktiv-Status pro Item ueber den Key `__disabled` abgebildet wird.
+     * MBlock speichert je Slice-Wert entweder ein flaches Array `[{item}, {item}]`
+     * oder (mit Gridblock) ein Wrapper-Objekt `{"GBS<hash>":{"VALUE":{"<id>":[...]}}}`.
+     * Der Repeater erwartet ein flaches Array, in dem der Aktiv/Inaktiv-Status pro
+     * Item ueber den Key `__disabled` abgebildet wird.
      *
      * Transformation pro Item:
      * - technisches Halte-Feld `checkbox_block_hold` wird entfernt
      * - `mblock_offline == '1'` wird zu `__disabled = true`, sonst kein Flag
-     * - alle uebrigen (sprechenden) Keys bleiben unveraendert erhalten
+     * - Legacy-Keys werden ueber `$legacyKeyMap` (und Standard-Heuristiken) gemappt
+     * - Listen von Item-Arrays innerhalb eines Items (verschachteltes MBlock)
+     *   werden rekursiv nach denselben Regeln konvertiert
      *
-    * @param string|null $repeaterId Repeater-Slot-Id (Standard "1").
-    * @param array<int|string, string> $legacyKeyMap Optionales Mapping alter Keys auf neue Repeater-Feldnamen,
-    *                                            z. B. ['1' => 'link'].
+     * @param string|null $repeaterId Repeater-Slot-Id (Standard "1")
+     * @param array<int|string, string> $legacyKeyMap Mapping alter Keys auf neue Repeater-Feldnamen, z. B. ['REX_MEDIA_1' => 'media', '1' => 'link']
+     * @param array{merge_columns?: bool, nested?: bool} $options merge_columns: mehrere GBS-Wrapper (Gridblock-Spalten) der Reihe nach zusammenfuehren statt nur die erste zu nehmen; nested: verschachtelte Listen konvertieren (Standard true)
      *
      * @return array{json: string, count: int, notes: list<string>, warnings: list<string>}
      */
-    public function convertData(string $rawValue, ?string $repeaterId = null, array $legacyKeyMap = []): array
+    public function convertData(string $rawValue, ?string $repeaterId = null, array $legacyKeyMap = [], array $options = []): array
     {
         $this->reset();
 
         $targetId = (null !== $repeaterId && '' !== trim($repeaterId)) ? trim($repeaterId) : '1';
+        $mergeColumns = (bool) ($options['merge_columns'] ?? false);
+        $nested = (bool) ($options['nested'] ?? true);
 
         if ('' === trim($rawValue)) {
-            $this->warnings[] = 'Keine Daten uebergeben.';
+            $this->warn('Keine Daten uebergeben.');
 
             return $this->dataResult('', 0);
         }
@@ -174,77 +227,120 @@ final class MBlockToRepeaterConverter
         $decoded = json_decode($normalized, true);
 
         if (!is_array($decoded)) {
-            $this->warnings[] = 'Daten sind kein gueltiges JSON. Pruefe den Slice-Wert.';
+            $this->warn('Daten sind kein gueltiges JSON. Pruefe den Slice-Wert.');
 
             return $this->dataResult('', 0);
         }
 
-        $items = $this->extractMBlockItems($decoded, $targetId);
-        if (null === $items) {
-            $this->warnings[] = sprintf('Konnte keine MBlock-Items fuer Slot %s finden. Erwartet wird `{"GBS<hash>":{"VALUE":{"%s":[...]}}}`.', $targetId, $targetId);
-
-            return $this->dataResult('', 0);
-        }
-
-        // Gridblock-Verschachtelung erkennen (mehrere GBS-Wrapper).
         $wrapperCount = $this->countWrappersWithValue($decoded, $targetId);
-        if ($wrapperCount > 1) {
-            $this->warnings[] = sprintf('%d separate Daten-Spalten gefunden (GBS-Wrapper). Das deutet auf Gridblock-verschachtelte Daten hin. Es wurde nur die erste Spalte konvertiert; verschachtelte Gridblock-Daten muessen separat behandelt werden.', $wrapperCount);
+        if ($wrapperCount > 1 && $mergeColumns) {
+            $items = $this->extractAllWrapperItems($decoded, $targetId);
+            $this->note(sprintf('%d GBS-Wrapper (Gridblock-Spalten) der Reihe nach zusammengefuehrt.', $wrapperCount));
+        } else {
+            $items = $this->extractMBlockItems($decoded, $targetId);
+            if ($wrapperCount > 1) {
+                $this->warn(sprintf('%d separate Daten-Spalten gefunden (GBS-Wrapper). Es wurde nur die erste Spalte konvertiert. Mit der Option "Spalten zusammenfuehren" werden alle Spalten in einen Repeater uebernommen.', $wrapperCount));
+            }
         }
 
+        if (null === $items) {
+            $this->warn(sprintf('Konnte keine MBlock-Items fuer Slot %s finden. Erwartet wird ein Item-Array oder `{"GBS<hash>":{"VALUE":{"%s":[...]}}}`.', $targetId, $targetId));
+
+            return $this->dataResult('', 0);
+        }
+
+        $stats = ['offline' => 0, 'hold' => 0, 'mapped' => [], 'nested' => 0];
+        $migrated = $this->convertItems($items, $legacyKeyMap, $nested, $stats, 0);
+
+        $json = (string) json_encode($migrated, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        $this->note(sprintf('%d Item(s) aus Slot %s konvertiert.', count($migrated), $targetId));
+        foreach ($stats['mapped'] as $old => $new) {
+            $this->note(sprintf('Legacy-Key `%s` auf `%s` gemappt.', $old, $new));
+        }
+        if ($stats['offline'] > 0) {
+            $this->note(sprintf('%d Item(s) waren offline (`mblock_offline`) und wurden als `__disabled` markiert.', $stats['offline']));
+        }
+        if ($stats['nested'] > 0) {
+            $this->note(sprintf('%d verschachtelte Item-Liste(n) rekursiv konvertiert.', $stats['nested']));
+        }
+        if (0 === $stats['hold'] && 0 === $stats['offline'] && $this->isListOfArrays($decoded)) {
+            $this->note('Keine MBlock-Marker (`checkbox_block_hold`/`mblock_offline`) gefunden. Die Daten sind vermutlich bereits im Repeater-Format.');
+        }
+
+        // Problematische Daten-Keys melden (z. B. REX_MEDIA_1, rein numerische Keys).
+        $problemKeys = [];
+        foreach ($migrated as $item) {
+            foreach (array_keys($item) as $key) {
+                $keyStr = (string) $key;
+                if (preg_match('/^REX_(MEDIA|LINK|MEDIALIST|LINKLIST)_\d+$|^\d+$/', $keyStr)) {
+                    $problemKeys[$keyStr] = true;
+                }
+            }
+        }
+        if ([] !== $problemKeys) {
+            $this->warn(sprintf(
+                'Daten-Keys ohne sprechenden Namen gefunden: `%s`. Diese muessen auf die neuen Repeater-Feldnamen gemappt werden, sonst landen die Werte nicht im richtigen Feld.',
+                implode('`, `', array_keys($problemKeys)),
+            ));
+        }
+
+        return $this->dataResult($json, count($migrated));
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     * @param array<int|string, string> $legacyKeyMap
+     * @param array{offline: int, hold: int, mapped: array<int|string, string>, nested: int} $stats
+     * @return list<array<string, mixed>>
+     */
+    private function convertItems(array $items, array $legacyKeyMap, bool $nested, array &$stats, int $depth): array
+    {
         $migrated = [];
-        $offlineCount = 0;
-        $holdCount = 0;
         foreach ($items as $item) {
             if (!is_array($item)) {
                 continue;
             }
 
-            // Legacy-Media-Key aus numerischen addMediaField()-Definitionen auf sprechenden Key mappen.
-            if (array_key_exists('REX_MEDIA_1', $item) && !array_key_exists('media', $item)) {
-                $item['media'] = $item['REX_MEDIA_1'];
-                unset($item['REX_MEDIA_1']);
-                $this->notes[] = 'Legacy-Key `REX_MEDIA_1` auf `media` gemappt.';
-            }
-
-            // Legacy-Link-Key aus klassischen Widgets auf sprechenden Key mappen.
-            if (array_key_exists('REX_LINK_1', $item) && !array_key_exists('link', $item)) {
-                $item['link'] = $item['REX_LINK_1'];
-                unset($item['REX_LINK_1']);
-                $this->notes[] = 'Legacy-Key `REX_LINK_1` auf `link` gemappt.';
-            }
-
-            // Plausibler Default: numerischer Key `1` ist bei Legacy-Repeatern meist das Link-Feld.
-            if (array_key_exists('1', $item) && !array_key_exists('link', $item)) {
-                $legacyLink = trim((string) $item['1']);
-                if ('' !== $legacyLink) {
-                    $item['link'] = $item['1'];
-                    unset($item['1']);
-                    $this->notes[] = 'Plausibilitaetskorrektur: numerischen Legacy-Key `1` auf `link` gemappt.';
-                }
-            }
-
-            // Leeren numerischen Legacy-Key entfernen (haeufig aus alten Widgets).
-            if (array_key_exists('1', $item) && '' === trim((string) $item['1'])) {
-                unset($item['1']);
-            }
-
+            // Explizite Map zuerst, dann Standard-Heuristiken fuer nicht abgedeckte Keys.
             foreach ($legacyKeyMap as $oldKey => $newKey) {
                 $oldKey = trim((string) $oldKey);
                 $newKey = trim((string) $newKey);
-                if ('' === $oldKey || '' === $newKey) {
+                if ('' === $oldKey || '' === $newKey || $oldKey === $newKey) {
                     continue;
                 }
                 if (array_key_exists($oldKey, $item) && !array_key_exists($newKey, $item)) {
                     $item[$newKey] = $item[$oldKey];
                     unset($item[$oldKey]);
-                    $this->notes[] = sprintf('Legacy-Key `%s` auf `%s` gemappt.', $oldKey, $newKey);
+                    $stats['mapped'][$oldKey] = $newKey;
+                }
+            }
+
+            if (array_key_exists('REX_MEDIA_1', $item) && !array_key_exists('media', $item)) {
+                $item['media'] = $item['REX_MEDIA_1'];
+                unset($item['REX_MEDIA_1']);
+                $stats['mapped']['REX_MEDIA_1'] = 'media';
+            }
+            if (array_key_exists('REX_LINK_1', $item) && !array_key_exists('link', $item)) {
+                $item['link'] = $item['REX_LINK_1'];
+                unset($item['REX_LINK_1']);
+                $stats['mapped']['REX_LINK_1'] = 'link';
+            }
+            // Plausibler Default: numerischer Key `1` ist bei Legacy-Blocks meist das Custom-Link-Feld.
+            // Leer -> weg; gefuellt und `link` frei -> umbenennen; sonst bleibt er und wird als Problem-Key gemeldet.
+            if (array_key_exists('1', $item)) {
+                if ('' === trim((string) $item['1'])) {
+                    unset($item['1']);
+                } elseif (!array_key_exists('link', $item)) {
+                    $item['link'] = $item['1'];
+                    unset($item['1']);
+                    $stats['mapped']['1'] = 'link';
                 }
             }
 
             if (array_key_exists('checkbox_block_hold', $item)) {
                 unset($item['checkbox_block_hold']);
-                ++$holdCount;
+                ++$stats['hold'];
             }
 
             $disabled = false;
@@ -254,41 +350,37 @@ final class MBlockToRepeaterConverter
             }
             if ($disabled) {
                 $item['__disabled'] = true;
-                ++$offlineCount;
+                ++$stats['offline'];
+            }
+
+            // Verschachtelte MBlock-Listen rekursiv konvertieren.
+            if ($nested && $depth < 5) {
+                foreach ($item as $key => $value) {
+                    if (is_array($value) && $this->isListOfArrays($value) && $this->hasMBlockMarkers($value)) {
+                        ++$stats['nested'];
+                        $item[$key] = $this->convertItems($value, $legacyKeyMap, true, $stats, $depth + 1);
+                    }
+                }
             }
 
             $migrated[] = $item;
         }
 
-        $json = (string) json_encode($migrated, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $migrated;
+    }
 
-        $this->notes[] = sprintf('%d Item(s) aus Slot %s konvertiert.', count($migrated), $targetId);
-        if ($offlineCount > 0) {
-            $this->notes[] = sprintf('%d Item(s) waren offline (`mblock_offline`) und wurden als `__disabled` markiert.', $offlineCount);
-        }
-        if (0 === $holdCount && 0 === $offlineCount && $this->isListOfArrays($decoded)) {
-            $this->notes[] = 'Keine MBlock-Marker (`checkbox_block_hold`/`mblock_offline`) gefunden. Die Daten sind vermutlich bereits im Repeater-Format.';
-        }
-
-        // Problematische Daten-Keys melden (z. B. REX_MEDIA_1, rein numerische Keys).
-        $problemKeys = [];
-        $first = $migrated[0] ?? [];
-        foreach (array_keys($first) as $key) {
-            $keyStr = (string) $key;
-            if (str_starts_with($keyStr, 'REX_MEDIA_') || str_starts_with($keyStr, 'REX_LINK_') || preg_match('/^\d+$/', $keyStr)) {
-                $problemKeys[$keyStr] = true;
+    /**
+     * @param array<mixed> $list
+     */
+    private function hasMBlockMarkers(array $list): bool
+    {
+        foreach ($list as $item) {
+            if (is_array($item) && (array_key_exists('checkbox_block_hold', $item) || array_key_exists('mblock_offline', $item))) {
+                return true;
             }
         }
-        if ([] !== $problemKeys) {
-            $this->warnings[] = sprintf(
-                'Daten-Keys ohne sprechenden Namen gefunden: `%s`. Diese muessen auf die neuen Repeater-Feldnamen gemappt werden, sonst landen die Werte nicht im richtigen Feld.',
-                implode('`, `', array_keys($problemKeys)),
-            );
-        }
 
-        $this->notes[] = 'Schreibe das Ergebnis in dieselbe `valueN`-Spalte des Slices (gleiche Slot-Id). Vorher immer ein DB-Backup erstellen.';
-
-        return $this->dataResult($json, count($migrated));
+        return false;
     }
 
     /**
@@ -304,12 +396,10 @@ final class MBlockToRepeaterConverter
      */
     private function extractMBlockItems(array $decoded, string $targetId): ?array
     {
-        // Reines MBlock-Format: flaches Array von Items (Standardfall ohne Gridblock).
         if ($this->isListOfArrays($decoded)) {
             return array_values($decoded);
         }
 
-        // Direktes VALUE-Objekt.
         if (isset($decoded['VALUE']) && is_array($decoded['VALUE'])) {
             $value = $decoded['VALUE'];
             if (isset($value[$targetId]) && is_array($value[$targetId])) {
@@ -317,7 +407,6 @@ final class MBlockToRepeaterConverter
             }
         }
 
-        // GBS-Wrapper: erstes Element mit VALUE-Schluessel.
         foreach ($decoded as $wrapper) {
             if (is_array($wrapper) && isset($wrapper['VALUE']) && is_array($wrapper['VALUE'])) {
                 $value = $wrapper['VALUE'];
@@ -331,13 +420,35 @@ final class MBlockToRepeaterConverter
     }
 
     /**
+     * Items aller GBS-Wrapper (Gridblock-Spalten) der Reihe nach.
+     *
+     * @param array<mixed> $decoded
+     * @return array<int, mixed>
+     */
+    private function extractAllWrapperItems(array $decoded, string $targetId): array
+    {
+        $items = [];
+        foreach ($decoded as $wrapper) {
+            if (is_array($wrapper) && isset($wrapper['VALUE']) && is_array($wrapper['VALUE'])) {
+                $value = $wrapper['VALUE'];
+                if (isset($value[$targetId]) && is_array($value[$targetId])) {
+                    foreach ($value[$targetId] as $item) {
+                        $items[] = $item;
+                    }
+                }
+            }
+        }
+
+        return $items;
+    }
+
+    /**
      * Zaehlt, wie viele GBS-Wrapper einen VALUE-Eintrag fuer die Slot-Id enthalten.
      *
      * @param array<mixed> $decoded
      */
     private function countWrappersWithValue(array $decoded, string $targetId): int
     {
-        // Direktes VALUE-Objekt zaehlt als ein Wrapper.
         if (isset($decoded['VALUE']) && is_array($decoded['VALUE'])) {
             return isset($decoded['VALUE'][$targetId]) ? 1 : 0;
         }
@@ -385,9 +496,23 @@ final class MBlockToRepeaterConverter
     }
 
     /**
-     * Ermittelt den Repeater-Identifier aus dem Code.
-     *
-     * Liefert [idToken, numericId], z. B. ['$id', '1'] oder ['1', '1'].
+     * @return list<string>
+     */
+    private function parseSlotList(?string $repeaterId): array
+    {
+        $targets = [];
+        foreach (explode(',', (string) $repeaterId) as $part) {
+            $part = trim($part);
+            if (preg_match('/^\d+$/', $part)) {
+                $targets[] = $part;
+            }
+        }
+
+        return [] === $targets ? ['1'] : array_values(array_unique($targets));
+    }
+
+    /**
+     * Ermittelt den Repeater-Identifier aus dem Code (Fallback ohne Analyse).
      *
      * @return array{0: string, 1: string}
      */
@@ -396,12 +521,10 @@ final class MBlockToRepeaterConverter
         $idToken = '$id';
         $numericId = '1';
 
-        // MBlock::show($id, ...) -> Token aus erstem Argument.
         if (preg_match('/MBlock::show\(\s*(\$\w+|\d+)\s*,/', $code, $m)) {
             $idToken = $m[1];
         }
 
-        // $id = 1; -> numerischen Wert aufloesen, falls Token eine Variable ist.
         if (str_starts_with($idToken, '$')) {
             $var = substr($idToken, 1);
             if (preg_match('/\$' . preg_quote($var, '/') . '\s*=\s*(\d+)\s*;/', $code, $m)) {
@@ -419,13 +542,13 @@ final class MBlockToRepeaterConverter
      *
      * Behandelt sowohl die Variablen-Schreibweise ("$id.0.header") als auch
      * die numerische Schreibweise ("1.0.header"). Andere Slot-Ids (z. B.
-     * Einstellungsfelder "2.0.gutterWidth") bleiben unangetastet.
+     * Einstellungsfelder "2.0.gutterWidth") bleiben unangetastet. Verschachtelte
+     * Namen ("$id.0.inner.0.field") werden auf den inneren Feldnamen reduziert.
      */
     private function stripFieldPrefixes(string $code, string $idToken, string $numericId): string
     {
         $alternatives = [];
         if (str_starts_with($idToken, '$')) {
-            // "$id.0." innerhalb doppelter Quotes (Interpolation).
             $alternatives[] = preg_quote($idToken, '/') . '\.0\.';
         }
         $alternatives[] = preg_quote($numericId, '/') . '\.0\.';
@@ -434,94 +557,125 @@ final class MBlockToRepeaterConverter
         $prefixPattern = '(?:' . implode('|', $alternatives) . ')';
 
         $stripped = 0;
+        $nestedStripped = 0;
         $code = (string) preg_replace_callback(
             '/([\'"])' . $prefixPattern . '([^\'"]+)\1/',
-            static function (array $m) use (&$stripped): string {
+            static function (array $m) use (&$stripped, &$nestedStripped): string {
                 ++$stripped;
+                $name = $m[2];
+                if (preg_match('/^\w+\.0\.(\w+)$/', $name, $nm)) {
+                    ++$nestedStripped;
+                    $name = $nm[1];
+                }
 
-                // Einheitlich auf einfache Quotes normalisieren.
-                return "'" . $m[2] . "'";
+                return "'" . $name . "'";
             },
             $code,
         );
 
         if ($stripped > 0) {
-            $this->notes[] = sprintf('%d Feldnamen-Praefix(e) (`%s.0.` / `%s.0.`) entfernt.', $stripped, $idToken, $numericId);
+            $this->note(sprintf('%d Feldnamen-Praefix(e) (`%s.0.` / `%s.0.`) entfernt.', $stripped, $idToken, $numericId));
+        }
+        if ($nestedStripped > 0) {
+            $this->warn(sprintf('%d verschachtelte(r) Feldname(n) (`%s.0.<block>.0.<feld>`) auf den inneren Feldnamen reduziert. Der innere Block muss ein eigener `addFlexRepeaterElement(\'<block>\', ...)` innerhalb des aeusseren Formulars sein.', $nestedStripped, $idToken));
         }
 
         return $code;
     }
 
     /**
-     * Behandelt das Muster:
-     *   $mm = MBlock::show($id, $MBlock->show(), [...]);
-     *   ...->addHTML($mm)...
-     *
-     * Dabei wird:
-     *   1. `$mm = MBlock::show(...)` durch einen Kommentar ersetzt (die Variable entfaellt)
-     *   2. `->addHTML($mm)` durch `->addFlexRepeaterElement($id, $form, [...])` ersetzt
-     *
-     * Ohne diese Transformation wuerde der FlexRepeater als ->show()-String in addHTML() enden
-     * und der aeussere MForm-Aufbau wuerde ihn nur als HTML-String einbetten.
+     * Entfernt `->addHiddenField('mblock_offline', ...)` (vor oder nach dem Praefix-Strip).
      */
-    private function inlineMBlockHtmlPattern(string $code): string
+    private function removeOfflineHiddenField(string $code): string
     {
-        // Suche: $someVar = MBlock::show($id, $formVar->show(), [...]) oder array(...);
-        $pattern = '/(\$(\w+))\s*=\s*MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)->show\(\)\s*(?:,\s*(\[[^\]]*\]|array\s*\([^)]*\)))?\s*\)\s*;/s';
-        if (!preg_match($pattern, $code, $m)) {
-            return $code;
-        }
-
-        $assignVar = $m[1];  // z.B. $mm
-        $id        = $m[3];  // z.B. $id oder 1
-        $formVar   = $m[4];  // z.B. $MBlock
-        $rawOpts   = $m[5] ?? '';
-        $options   = $this->mapMBlockOptions($rawOpts);
-
-        $repeaterCall = 'addFlexRepeaterElement(' . $id . ', ' . $formVar
-            . ('' !== $options ? ', ' . $options : '') . ')';
-
-        // addHTML($mm) -> addFlexRepeaterElement(...)
-        $escapedVar = preg_quote($assignVar, '/');
-        $codeNew = (string) preg_replace(
-            '/->addHTML\(\s*' . $escapedVar . '\s*\)/',
-            '->' . $repeaterCall,
+        $count = 0;
+        $code = (string) preg_replace(
+            '/^[ \t]*(?:\$\w+)?->addHiddenField\(\s*[\'"](?:[\w$]+\.0\.)?mblock_offline[\'"]\s*(?:,[^;\n]*)?\)\s*;?[ \t]*\n?/m',
+            '',
             $code,
             -1,
-            $replaceCount,
+            $count,
         );
-
-        if ((int) $replaceCount > 0) {
-            // Urspruengliche Zuweisung entfernen (durch Kommentar ersetzen, damit Kontext sichtbar bleibt)
-            $codeNew = (string) preg_replace(
-                '/' . $escapedVar . '\s*=\s*MBlock::show\([^;]+\)\s*;/s',
-                '// [mform-migration] $mm-Variable inlined in ->addFlexRepeaterElement() oben',
-                $codeNew,
-            );
-            $this->notes[] = sprintf(
-                '`%s = MBlock::show(...)` + `->addHTML(%s)` erkannt: Repeater direkt in den Tab-Baum eingebettet (addHTML-Pattern).',
-                $assignVar,
-                $assignVar,
-            );
+        // Chained inside a factory chain (kein Zeilenanfang / ohne Semikolon).
+        $code = (string) preg_replace(
+            '/->addHiddenField\(\s*[\'"](?:[\w$]+\.0\.)?mblock_offline[\'"]\s*(?:,[^)]*)?\)/',
+            '',
+            $code,
+            -1,
+            $count2,
+        );
+        $total = (int) $count + (int) $count2;
+        if ($total > 0) {
+            $this->note(sprintf('%d Hidden-Feld(er) `mblock_offline` entfernt: Der Repeater bringt Online/Offline je Item mit (`__disabled`).', $total));
         }
 
-        return $codeNew;
+        return $code;
     }
 
     /**
-     * Ersetzt `MBlock::show($id, $form->show(), [...])` durch
-     * `MForm::factory()->addFlexRepeaterElement($id, $form, [...])->show()`.
+     * Behandelt das Muster (alle Vorkommen):
+     *   $mm = MBlock::show($id, $MBlock->show(), [...]);
+     *   ...->addHtml($mm)...
      *
-     * Es wird `addFlexRepeaterElement()` verwendet, weil dort das
-     * Options-Array der dritte Parameter ist. Bei `addRepeaterElement()`
-     * waeren die ersten beiden zusaetzlichen Parameter `bool $open` und
-     * `bool $confirmDelete`.
+     * `->addHtml($mm)` wird zu `->addFlexRepeaterElement($id, $form, [...])`, die
+     * Zuweisung entfaellt. Ohne diese Transformation wuerde der Repeater als
+     * ->show()-String in addHtml() enden.
      */
-    private function replaceMBlockShow(string $code, string $idToken): string
+    private function inlineMBlockHtmlPattern(string $code): string
+    {
+        $scan = MBlockModuleAnalyzer::blankComments($code);
+        $pattern = '/(\$(\w+))\s*=\s*MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)(?:->show\(\))?\s*(?:,\s*(\[.*?\]|array\s*\(.*?\)))?\s*\)\s*;/s';
+        if (!preg_match_all($pattern, $scan, $all, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
+            return $code;
+        }
+
+        // Von hinten nach vorn ersetzen, damit Offsets gueltig bleiben.
+        foreach (array_reverse($all) as $m) {
+            $assignVar = $m[1][0];
+            $id = $m[3][0];
+            $formVar = $m[4][0];
+            $rawOpts = $m[5][0] ?? '';
+            $options = $this->mapMBlockOptions($rawOpts);
+
+            $repeaterCall = 'addFlexRepeaterElement(' . $id . ', ' . $formVar
+                . ('' !== $options ? ', ' . $options : '') . ')';
+
+            $escapedVar = preg_quote($assignVar, '/');
+            $replaceCount = 0;
+            $code = (string) preg_replace(
+                '/->addHtml\(\s*' . $escapedVar . '\s*\)/i',
+                '->' . $repeaterCall,
+                $code,
+                -1,
+                $replaceCount,
+            );
+
+            if ((int) $replaceCount > 0) {
+                $offset = (int) $m[0][1];
+                $length = strlen($m[0][0]);
+                $code = substr($code, 0, $offset)
+                    . '// [mform-migration] ' . $assignVar . ' = MBlock::show(...) ist jetzt ->addFlexRepeaterElement(...) im Formular.'
+                    . substr($code, $offset + $length);
+                $this->note(sprintf(
+                    '`%s = MBlock::show(...)` + `->addHtml(%s)` erkannt: Repeater direkt in den Formular-Baum eingebettet.',
+                    $assignVar,
+                    $assignVar,
+                ));
+            }
+        }
+
+        return $code;
+    }
+
+    /**
+     * Ersetzt `MBlock::show($id, $form->show(), [...])` bzw. `MBlock::show($id, $form, [...])`
+     * durch `MForm::factory()->addFlexRepeaterElement($id, $form, [...])->show()`.
+     */
+    private function replaceMBlockShow(string $code): string
     {
         $count = 0;
         $code = (string) preg_replace_callback(
-            '/MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)->show\(\)\s*(?:,\s*(\[[^\]]*\]|array\s*\([^)]*\)))?\s*\)/s',
+            '/MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)(?:->show\(\))?\s*(?:,\s*(\[.*?\]|array\s*\(.*?\)))?\s*\)/s',
             function (array $m) use (&$count): string {
                 ++$count;
                 $id = $m[1];
@@ -542,7 +696,7 @@ final class MBlockToRepeaterConverter
         );
 
         if ($count > 0) {
-            $this->notes[] = sprintf('%d `MBlock::show(...)`-Aufruf(e) auf `addFlexRepeaterElement(...)` umgestellt (`$form->show()` -> `$form`).', $count);
+            $this->note(sprintf('%d `MBlock::show(...)`-Aufruf(e) auf `addFlexRepeaterElement(...)` umgestellt (`$form->show()` -> `$form`).', $count));
         }
 
         return $code;
@@ -559,19 +713,23 @@ final class MBlockToRepeaterConverter
         }
 
         $options = [];
+        $seen = [];
 
-        if (preg_match('/[\'"]max[\'"]\s*=>\s*(\d+)/', $rawOptions, $m)) {
-            $options[] = "'max' => " . $m[1];
-        }
-        if (preg_match('/[\'"]min[\'"]\s*=>\s*(\d+)/', $rawOptions, $m)) {
-            $options[] = "'min' => " . $m[1];
-        }
+        if (preg_match_all('/[\'"]([a-zA-Z_]\w*)[\'"]\s*=>\s*([^,\]\)]+)/', $rawOptions, $mm, PREG_SET_ORDER)) {
+            foreach ($mm as $match) {
+                $key = $match[1];
+                $value = trim($match[2]);
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
 
-        // Unbekannte MBlock-Optionen melden (z. B. smooth_link_top, sortable etc.).
-        if (preg_match_all('/[\'"]([a-zA-Z_][\w]*)[\'"]\s*=>/', $rawOptions, $mm)) {
-            foreach ($mm[1] as $key) {
-                if (!in_array($key, ['min', 'max'], true)) {
-                    $this->warnings[] = sprintf('MBlock-Option `%s` hat keine direkte Repeater-Entsprechung und wurde verworfen. Bitte pruefen.', $key);
+                if (array_key_exists($key, MBlockModuleAnalyzer::OPTION_MAP)) {
+                    $options[] = "'" . MBlockModuleAnalyzer::OPTION_MAP[$key] . "' => " . $value;
+                } elseif (in_array($key, MBlockModuleAnalyzer::OPTIONS_BUILT_IN, true)) {
+                    $this->note(sprintf('MBlock-Option `%s` entfaellt: Der Repeater bringt diese Funktion immer mit.', $key));
+                } else {
+                    $this->warn(sprintf('MBlock-Option `%s` hat keine direkte Repeater-Entsprechung und wurde verworfen. Bitte pruefen.', $key));
                 }
             }
         }
@@ -585,133 +743,191 @@ final class MBlockToRepeaterConverter
 
     /**
      * Sammelt Hinweise zu Konstrukten, die im Repeater manuell angepasst werden muessen.
+     *
+     * @param Analysis $analysis
      */
-    private function collectInputWarnings(string $code): void
+    private function collectInputWarnings(string $code, array $analysis): void
     {
-        // Numerische Media-/Link-Felder (REX_MEDIA[n] / REX_LINK[n]) im Repeater.
-        if (preg_match('/addMediaField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code)) {
-            $this->warnings[] = 'Numerisches `addMediaField(n, ...)` gefunden: Im Repeater muss das Feld einen sprechenden Namen erhalten (z. B. `addMediaField(\'media\', ...)`), da `REX_MEDIA[n]`-Slots dort nicht funktionieren.';
+        $numericWidgets = implode('|', ['addMediaField', 'addMFormMediaField', 'addMedialistField', 'addMFormMedialistField', 'addLinkField', 'addMFormLinkField', 'addLinklistField', 'addMFormLinklistField', 'addCustomLinkField']);
+        $scan = MBlockModuleAnalyzer::blankComments($code);
+        foreach ($analysis['calls'] as $call) {
+            if (null === $call['form_var'] || 'mform' !== $call['form_kind']) {
+                continue;
+            }
+            if (!preg_match('/addFlexRepeaterElement\(\s*(?:\$\w+|\d+)\s*,\s*' . preg_quote($call['form_var'], '/') . '\b/', $scan, $m, PREG_OFFSET_CAPTURE)) {
+                continue;
+            }
+            $region = MBlockModuleAnalyzer::formRegion($scan, $call['form_var'], (int) $m[0][1]);
+            if (null !== $region && preg_match('/->(' . $numericWidgets . ')\(\s*(?:\$\w+|\d+|[\'"]\d+[\'"])\s*[,)]/', $region['code'])) {
+                $this->warn(sprintf('Slot %s: Im Block-Formular sind noch numerische Widget-Aufrufe (`addMediaField(n, ...)`, `addLinkField(n)`, ...) uebrig. Im Repeater brauchen Felder sprechende Namen.', $call['slot']));
+            }
         }
-        if (preg_match('/addLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code) || preg_match('/addLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*\)/', $code)) {
-            $this->warnings[] = 'Numerisches `addLinkField(n, ...)` gefunden: Im Repeater einen sprechenden Namen vergeben (z. B. `addLinkField(\'link\', ...)`).';
+
+        if ($analysis['html_mblock']) {
+            $this->warn('MBlock mit HTML-/Heredoc-Formular: Der Repeater braucht ein MForm-Objekt. Das Formular muss von Hand mit MForm-Feldern nachgebaut werden.');
         }
-        if (preg_match('/addCustomLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*,/', $code) || preg_match('/addCustomLinkField\(\s*(\$\w+|\d+|[\'"]\d+[\'"])\s*\)/', $code)) {
-            $this->warnings[] = 'Numerisches `addCustomLinkField(n, ...)` gefunden: Im Repeater einen sprechenden Namen vergeben (z. B. `addCustomLinkField(\'link\', ...)`), sonst drohen Schluesselkollisionen.';
+        if ($analysis['nested']) {
+            $this->warn('Verschachteltes MBlock erkannt: Innere Bloecke werden zu `addFlexRepeaterElement(\'<block>\', MForm::factory()...)` innerhalb des aeusseren Formulars. Daten werden rekursiv konvertiert.');
         }
 
         if (str_contains($code, 'useCustomLinkForClassicWidgets')) {
-            $this->notes[] = '`MForm::useCustomLinkForClassicWidgets()` erkannt: Im Repeater empfehlenswert, damit klassische Media-/Link-Widgets robust klonen.';
+            $this->note('`MForm::useCustomLinkForClassicWidgets()` erkannt: Im Repeater empfehlenswert, damit klassische Media-/Link-Widgets robust klonen.');
         }
 
         if (str_contains($code, 'cke5-editor')) {
-            $this->notes[] = 'CKE5-Editor-Felder erkannt: Der Repeater initialisiert CKE5 beim Klonen automatisch (keine Anpassung noetig).';
+            $this->note('CKE5-Editor-Felder erkannt: Der Repeater initialisiert CKE5 beim Klonen automatisch (keine Anpassung noetig).');
         }
 
         $this->ensureMFormUse($code);
     }
 
     /**
-     * Mapped numerische Widget-Keys im eigentlichen Repeater-Formular auf
-     * sprechende Namen. Aktuell bewusst konservativ fuer die gaengigsten
-     * Legacy-Faelle.
+     * Mapped numerische Widget-Keys in den Block-Formularen auf die aus der
+     * Analyse abgeleiteten Zielnamen (`addMediaField(1)` -> `'media'`,
+     * `addMediaField(2)` -> `'media_2'`, `addCustomLinkField("$id.0.1")` -> `'link'`).
+     *
+     * @param Analysis $analysis
      */
-    private function normalizeNumericRepeaterWidgetKeys(string $code): string
+    private function normalizeNumericWidgetKeys(string $code, array $analysis): string
     {
-        $countMedia = 0;
-        $countMFormMedia = 0;
-        $countLink = 0;
-        $countMFormLink = 0;
-        $countCustomLink = 0;
+        $mapped = [];
 
-        // Repeater-Form-Variable aus MBlock::show($id, $formVar->show(), ...) ermitteln.
-        if (!preg_match('/MBlock::show\(\s*(\$\w+|\d+)\s*,\s*(\$\w+)->show\(\)/', $code, $m)) {
-            return $code;
+        foreach ($analysis['calls'] as $call) {
+            if (null === $call['form_var'] || 'mform' !== $call['form_kind']) {
+                continue;
+            }
+            $formVar = $call['form_var'];
+
+            // Aufruf im (kommentarbereinigten) Code finden, dann den Formularbereich bestimmen.
+            $scan = MBlockModuleAnalyzer::blankComments($code);
+            $callOffset = null;
+            if (preg_match_all('/MBlock::show\(\s*(?:\$\w+|\d+)\s*,\s*' . preg_quote($formVar, '/') . '\b/', $scan, $mm, PREG_OFFSET_CAPTURE)) {
+                foreach ($mm[0] as $match) {
+                    $callOffset = (int) $match[1];
+                    break;
+                }
+            }
+            if (null === $callOffset) {
+                continue;
+            }
+            $region = MBlockModuleAnalyzer::formRegion($scan, $formVar, $callOffset);
+            if (null === $region) {
+                continue;
+            }
+
+            foreach ($call['fields'] as $field) {
+                if (null === $field['legacy_key'] || null === $field['target']) {
+                    continue;
+                }
+                $target = $field['target'];
+                $n = preg_quote($field['name'], '/');
+
+                if ('custom_link' === $field['type'] || preg_match('/^\d+$/', $field['legacy_key'])) {
+                    $pattern = '/(->addCustomLinkField\(\s*)([\'"])(?:[\w$]+\.0\.)' . $n . '\2/';
+                    $replacement = '$1\'' . $target . '\'';
+                } else {
+                    $method = $this->methodForLegacyKey($field['legacy_key']);
+                    $pattern = '/(->(?:' . $method . ')\(\s*)(?:' . $n . '|[\'"]' . $n . '[\'"])(\s*[,)])/';
+                    $replacement = '$1\'' . $target . '\'$2';
+                }
+
+                $count = 0;
+                $code = $this->replaceInRegion($code, $region['offset'], $region['code'], $pattern, $replacement, $count);
+                if ($count > 0) {
+                    $mapped[$field['legacy_key']] = $target;
+                    // Region nach der Aenderung neu bestimmen (Laengen haben sich geaendert).
+                    $scan = MBlockModuleAnalyzer::blankComments($code);
+                    if (preg_match('/MBlock::show\(\s*(?:\$\w+|\d+)\s*,\s*' . preg_quote($formVar, '/') . '\b/', $scan, $m2, PREG_OFFSET_CAPTURE)) {
+                        $region = MBlockModuleAnalyzer::formRegion($scan, $formVar, (int) $m2[0][1]) ?? $region;
+                    }
+                }
+            }
         }
 
-        $formVar = $m[2];
-        $pattern = '/' . preg_quote($formVar, '/') . '\s*=\s*MForm::factory\(\).*?;/s';
-
-        $code = (string) preg_replace_callback(
-            $pattern,
-            static function (array $mm) use (&$countMedia, &$countMFormMedia, &$countLink, &$countMFormLink, &$countCustomLink): string {
-                $block = $mm[0];
-
-                // Media-Widgets: numerische/quoted 1 auf sprechenden Key mappen.
-                $block = (string) preg_replace('/->addMediaField\(\s*(?:1|[\'"]1[\'"])\s*,/m', '->addMediaField(\'media\',', $block, -1, $countMedia);
-                $block = (string) preg_replace('/->addMFormMediaField\(\s*(?:1|[\'"]1[\'"])\s*,/m', '->addMFormMediaField(\'media\',', $block, -1, $countMFormMedia);
-
-                // Link-Widgets: numerische/quoted 1 auf sprechenden Key mappen.
-                $block = (string) preg_replace('/->addLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addLinkField(\'link\'$1', $block, -1, $countLink);
-                $block = (string) preg_replace('/->addMFormLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addMFormLinkField(\'link\'$1', $block, -1, $countMFormLink);
-                $block = (string) preg_replace('/->addCustomLinkField\(\s*(?:1|[\'"]1[\'"])\s*(,|\))/m', '->addCustomLinkField(\'link\'$1', $block, -1, $countCustomLink);
-
-                return $block;
-            },
-            $code,
-            1,
-        );
-
-        if ($countMedia > 0) {
-            $this->notes[] = sprintf('%d numerische(s) `addMediaField(1, ...)` auf `addMediaField(\'media\', ...)` umgestellt.', $countMedia);
-        }
-        if ($countMFormMedia > 0) {
-            $this->notes[] = sprintf('%d numerische(s) `addMFormMediaField(1, ...)` auf `addMFormMediaField(\'media\', ...)` umgestellt.', $countMFormMedia);
-        }
-        if ($countLink > 0) {
-            $this->notes[] = sprintf('%d numerische(s) `addLinkField(1, ...)` auf `addLinkField(\'link\', ...)` umgestellt.', $countLink);
-        }
-        if ($countMFormLink > 0) {
-            $this->notes[] = sprintf('%d numerische(s) `addMFormLinkField(1, ...)` auf `addMFormLinkField(\'link\', ...)` umgestellt.', $countMFormLink);
-        }
-        if ($countCustomLink > 0) {
-            $this->notes[] = sprintf('%d numerische(s) `addCustomLinkField(1, ...)` auf `addCustomLinkField(\'link\', ...)` umgestellt.', $countCustomLink);
+        foreach ($mapped as $legacy => $target) {
+            $this->note(sprintf('Numerisches Widget `%s` im Block-Formular auf sprechenden Key `%s` umgestellt.', $legacy, $target));
         }
 
         return $code;
     }
 
     /**
-     * Macht Output-Zugriffe auf Legacy-Keys rueckwaertskompatibel.
+     * Ersetzt Treffer eines Musters nur innerhalb eines (offset-treuen) Bereichs
+     * des Codes. Der Bereichstext darf ausgeblendete Luecken enthalten, seine
+     * Offsets muessen aber zu `$code` ab `$regionOffset` passen.
      */
-    private function addOutputKeyFallbacks(string $code): string
+    private function replaceInRegion(string $code, int $regionOffset, string $region, string $pattern, string $replacement, int &$count): string
     {
-        $mediaFallbacks = 0;
-        $linkFallbacks = 0;
-        $numericLinkFallbacks = 0;
+        $count = 0;
+        if (!preg_match_all($pattern, $region, $matches, PREG_OFFSET_CAPTURE)) {
+            return $code;
+        }
+        foreach (array_reverse($matches[0]) as $match) {
+            $text = $match[0];
+            $offset = $regionOffset + (int) $match[1];
+            $new = (string) preg_replace($pattern, $replacement, $text, 1);
+            $code = substr($code, 0, $offset) . $new . substr($code, $offset + strlen($text));
+            ++$count;
+        }
 
-        // Legacy REX_MEDIA_1 -> bevorzugt neuer Key `media`.
+        return $code;
+    }
+
+    private function methodForLegacyKey(string $legacyKey): string
+    {
+        if (str_starts_with($legacyKey, 'REX_MEDIALIST_')) {
+            return 'addMedialistField|addMFormMedialistField';
+        }
+        if (str_starts_with($legacyKey, 'REX_MEDIA_')) {
+            return 'addMediaField|addMFormMediaField';
+        }
+        if (str_starts_with($legacyKey, 'REX_LINKLIST_')) {
+            return 'addLinklistField|addMFormLinklistField';
+        }
+
+        return 'addLinkField|addMFormLinkField';
+    }
+
+    /**
+     * Macht Output-Zugriffe auf Legacy-Keys rueckwaertskompatibel.
+     *
+     * @param array<string, array<string, string>> $keyMaps
+     */
+    private function addOutputKeyFallbacks(string $code, array $keyMaps = []): string
+    {
+        $fallbacks = 0;
+
+        // Zielnamen je Legacy-Key: explizite Maps, sonst Standard (REX_MEDIA_1 -> media, REX_LINK_1 -> link, ...).
+        $targets = [];
+        foreach ($keyMaps as $map) {
+            foreach ($map as $old => $new) {
+                $targets[(string) $old] = $new;
+            }
+        }
+
         $code = (string) preg_replace_callback(
-            '/(\$\w+)\[\s*([\'\"])REX_MEDIA_1\2\s*\]/',
-            static function (array $m) use (&$mediaFallbacks): string {
-                ++$mediaFallbacks;
+            '/(\$\w+)\[\s*([\'"])(REX_(?:MEDIA|LINK|MEDIALIST|LINKLIST)_(\d+))\2\s*\]/',
+            static function (array $m) use (&$fallbacks, $targets): string {
+                ++$fallbacks;
                 $var = $m[1];
+                $legacy = $m[3];
+                $n = $m[4];
+                $target = $targets[$legacy] ?? null;
+                if (null === $target) {
+                    $base = strtolower((string) preg_replace('/^REX_|_\d+$/', '', $legacy));
+                    $target = '1' === $n ? $base : $base . '_' . $n;
+                }
 
-                return '(' . $var . '[\'media\'] ?? (' . $var . '[\'REX_MEDIA_1\'] ?? \'\'))';
+                return '(' . $var . '[\'' . $target . '\'] ?? (' . $var . '[\'' . $legacy . '\'] ?? \'\'))';
             },
             $code,
         );
 
-        if ($mediaFallbacks > 0) {
-            $this->notes[] = sprintf('%d Output-Zugriff(e) auf `REX_MEDIA_1` mit Fallback `media`/`REX_MEDIA_1` versehen.', $mediaFallbacks);
+        if ($fallbacks > 0) {
+            $this->note(sprintf('%d Output-Zugriff(e) auf `REX_MEDIA_n`/`REX_LINK_n` mit Fallback auf den neuen Key versehen.', $fallbacks));
         }
 
-        // Legacy REX_LINK_1 -> bevorzugt neuer Key `link`.
-        $code = (string) preg_replace_callback(
-            '/(\$\w+)\[\s*([\'\"])REX_LINK_1\2\s*\]/',
-            static function (array $m) use (&$linkFallbacks): string {
-                ++$linkFallbacks;
-                $var = $m[1];
-
-                return '(' . $var . '[\'link\'] ?? (' . $var . '[\'REX_LINK_1\'] ?? \'\'))';
-            },
-            $code,
-        );
-
-        if ($linkFallbacks > 0) {
-            $this->notes[] = sprintf('%d Output-Zugriff(e) auf `REX_LINK_1` mit Fallback `link`/`REX_LINK_1` versehen.', $linkFallbacks);
-        }
-
-        // Numerischer Legacy-Link-Key (z. B. $item[1]) -> sprechender Key `link`.
+        // Numerischer Legacy-Link-Key (z. B. $item[1] / $item['1']) -> sprechender Key.
         $itemVars = [];
         if (preg_match_all('/foreach\s*\(\s*[^)]*?\sas\s+(?:\$\w+\s*=>\s*)?(\$\w+)\s*\)/', $code, $foreachMatches)) {
             foreach ($foreachMatches[1] as $itemVar) {
@@ -719,15 +935,23 @@ final class MBlockToRepeaterConverter
             }
         }
 
+        $numericFallbacks = 0;
         foreach (array_keys($itemVars) as $itemVar) {
-            $pattern = '/' . preg_quote($itemVar, '/') . '\[\s*1\s*\]/';
-            $replacement = '(' . $itemVar . '[\'link\'] ?? (' . $itemVar . '[\'1\'] ?? \'\'))';
-            $code = (string) preg_replace($pattern, $replacement, $code, -1, $count);
-            $numericLinkFallbacks += (int) $count;
+            $code = (string) preg_replace_callback(
+                '/' . preg_quote($itemVar, '/') . '\[\s*(?:(\d+)|[\'"](\d+)[\'"])\s*\]/',
+                static function (array $m) use ($itemVar, $targets, &$numericFallbacks): string {
+                    $n = '' !== $m[1] ? $m[1] : $m[2];
+                    $target = $targets[$n] ?? ('1' === $n ? 'link' : 'link_' . $n);
+                    ++$numericFallbacks;
+
+                    return '(' . $itemVar . '[\'' . $target . '\'] ?? (' . $itemVar . '[\'' . $n . '\'] ?? \'\'))';
+                },
+                $code,
+            );
         }
 
-        if ($numericLinkFallbacks > 0) {
-            $this->notes[] = sprintf('%d numerische Output-Zugriff(e) auf `[1]` mit Fallback `link`/`1` versehen.', $numericLinkFallbacks);
+        if ($numericFallbacks > 0) {
+            $this->note(sprintf('%d numerische Output-Zugriff(e) (`[1]`) mit Fallback auf den neuen Key versehen.', $numericFallbacks));
         }
 
         return $code;
@@ -740,9 +964,8 @@ final class MBlockToRepeaterConverter
         }
         $useStatement = 'use FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;';
         if (preg_match('/use\s+FriendsOfRedaxo\\\\MForm\\\\Repeater\\\\MFormRepeaterHelper\s*;/', $code)) {
-            return; // bereits vorhanden
+            return;
         }
-        // Nach dem letzten use-Statement einfuegen; falls keins da ist: nach <?php.
         $useMatchCount = preg_match_all('/^\s*use\s+[^;]+;\s*$/m', $code, $matches, PREG_OFFSET_CAPTURE);
         if ($useMatchCount > 0) {
             $last = $matches[0][count($matches[0]) - 1];
@@ -752,7 +975,7 @@ final class MBlockToRepeaterConverter
             $afterPhp = $phpPos + 5;
             $code = substr($code, 0, $afterPhp) . "\n" . $useStatement . substr($code, $afterPhp);
         }
-        $this->notes[] = '`use FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;` automatisch ergaenzt.';
+        $this->note('`use FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;` automatisch ergaenzt.');
     }
 
     private function removeMBlockUseStatements(string &$code): void
@@ -765,14 +988,28 @@ final class MBlockToRepeaterConverter
             $removed,
         );
         if ((int) $removed > 0) {
-            $this->notes[] = sprintf('%d MBlock-`use`-Statement(s) entfernt.', (int) $removed);
+            $this->note(sprintf('%d MBlock-`use`-Statement(s) entfernt.', (int) $removed));
         }
     }
 
     private function ensureMFormUse(string $code): void
     {
         if (str_contains($code, 'MForm::factory') && !preg_match('/use\s+FriendsOfRedaxo\\\\MForm\s*;/', $code)) {
-            $this->notes[] = 'Stelle sicher, dass `use FriendsOfRedaxo\\MForm;` im Code vorhanden ist.';
+            $this->note('Stelle sicher, dass `use FriendsOfRedaxo\\MForm;` im Code vorhanden ist.');
+        }
+    }
+
+    private function note(string $text): void
+    {
+        if (!in_array($text, $this->notes, true)) {
+            $this->notes[] = $text;
+        }
+    }
+
+    private function warn(string $text): void
+    {
+        if (!in_array($text, $this->warnings, true)) {
+            $this->warnings[] = $text;
         }
     }
 

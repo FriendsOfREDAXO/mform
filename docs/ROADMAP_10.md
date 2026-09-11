@@ -52,6 +52,8 @@ Aufräumarbeiten in 10.x:
 
 Zielbild ist ein Assistent in fünf Schritten: Inventar → Code konvertieren und prüfen → neues Modul anlegen → Daten migrieren (Dry-Run, dann Anwenden mit Backup) → Slices umhängen. Jeder Schritt hat ein Rückgängig.
 
+Stand Beta 1: M1, M2, M3 (Daten rekursiv, Code-Hinweise), M4, M8, M9, M10 umgesetzt (`pages/migration.php`, `mform:migrate`, `mform:lint`). Offen für Beta 2: M5, M6, M7.
+
 ## 4. Offene Issues: Prüfung und Einordnung
 
 Geprüft am 11.09.2026 gegen den Code von 9.5.0.
@@ -93,6 +95,9 @@ Palette-Parität (#425), JSON-Export/Import (#406), Live-Preview über `rex_api_
 `addNumberField`, `addRangeField`, `addDateField`, `addDateTimeField`, `addTimeField`, `addEmailField`, `addColorField` (#409). Danach `addRatingField` und `addTagsField` (#412) als erste zwei der erweiterten Felder.
 
 ### 5.7 Test-Suite
+
+Stand Beta 1: PHPUnit-Grundstock vorhanden (`tests/Unit`, `tests/Redaxo`, CI-Jobs). Offen: Golden-Snapshots für Wrapper-Kombinationen, Playwright-Smoke im Workflow.
+
 PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML-Snapshots für Wrapper-Kombinationen in beiden Renderpfaden (#437). Ein Playwright-Smoke-Test für Repeater, Builder und Migrationsseite im GitHub-Workflow. Die Regressionen aus 9.4.x bis 9.5.0 (Widget-IDs, doppeltes Escaping) werden als erste Tests festgehalten.
 
 ### 5.8 Kleinere Punkte

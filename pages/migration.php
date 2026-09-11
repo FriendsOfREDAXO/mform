@@ -1,10 +1,13 @@
 <?php
 
 /**
- * MBlock -> MForm-9-Repeater Migrationswerkzeug.
+ * MBlock -> Repeater: Migrationsassistent in fuenf Schritten.
  *
- * Konvertiert Modul-Code (Eingabe + Ausgabe) von MBlock auf den MForm-Repeater.
- * Das Werkzeug erzeugt Vorschlags-Code und veraendert keine Module oder Daten.
+ * 1. Inventar: Module mit MBlock::show(), Slices, Slots, Feldtypen, Risiko
+ * 2. Code: Analyse (Legacy-Key-Map je Slot, editierbar) und Konvertierung von Eingabe/Ausgabe
+ * 3. Modul: konvertierte Kopie anlegen
+ * 4. Daten: Dry-Run aller Slots, Anwenden mit Backup je Lauf-Token, Rollback
+ * 5. Umhaengen: Slices auf das neue Modul, Rueckgaengig per Token
  *
  * @author Friends Of REDAXO
  * @license MIT
@@ -12,818 +15,564 @@
  * @var rex_addon $this
  */
 
+use FriendsOfRedaxo\MForm\Migration\MBlockInventory;
+use FriendsOfRedaxo\MForm\Migration\MBlockModuleAnalyzer;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterMigrator;
 
-$converter = new MBlockToRepeaterConverter();
+$analyzer = new MBlockModuleAnalyzer();
+$converter = new MBlockToRepeaterConverter($analyzer);
 $migrator = new MBlockToRepeaterMigrator($converter);
+$inventory = new MBlockInventory($analyzer, $migrator);
+
+MBlockToRepeaterMigrator::ensureTables();
 
 $func = rex_request('func', 'string', '');
-$repeaterId = rex_request('repeater_id', 'string', '1');
-$inputCode = rex_request('input_code', 'string', '');
-$outputCode = rex_request('output_code', 'string', '');
-$dataValue = rex_request('data_value', 'string', '');
-$legacyKeyMapJson = rex_request('legacy_key_map_json', 'string', '');
-$legacyKey1Target = trim(rex_request('legacy_key_1_target', 'string', ''));
-$createConvertedModule = 1 === rex_request('create_converted_module', 'int', 0);
-$lastCreatedModuleId = rex_request('last_created_module_id', 'int', 0);
-$lastReassignToken = rex_request('last_reassign_token', 'string', '');
-$reassignSliceIds = (array) rex_request('reassign_slice_ids', 'array', []);
-$reassignTargetModuleId = rex_request('reassign_target_module_id', 'int', 0);
+$moduleId = rex_request('module_id', 'int', 0);
+$csrfToken = rex_csrf_token::factory('mform_migration');
+$csrf = $csrfToken->getHiddenField();
+$csrfOk = '' === $func || $csrfToken->isValid();
 
-$batchModuleId = rex_request('batch_module_id', 'int', 0);
-$batchSlotId = rex_request('batch_slot_id', 'string', '1');
-$batchSliceIds = (array) rex_request('slice_ids', 'array', []);
+$messages = '';
+if (!$csrfOk) {
+    $messages .= rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    $func = '';
+}
 
-$inputResult = null;
-$outputResult = null;
-$dataResult = null;
-$batchResult = null;
-$batchApplyResult = null;
-$moduleCreateMessage = '';
-$convertMessage = '';
-$pageMessages = '';
-$reassignHistoryTable = rex::getTable('mform_migration_reassign_history');
+$t = static fn (string $key, mixed ...$args): string => rex_i18n::msg('mform_migration_' . $key, ...$args);
+$pageUrl = static fn (array $params = []): string => rex_url::currentBackendPage(array_merge($moduleId > 0 ? ['module_id' => $moduleId] : [], $params));
 
-/** @var array<string, string> $legacyKeyMap */
-$legacyKeyMap = [];
-if ('' !== trim($legacyKeyMapJson)) {
-    $decodedMap = json_decode($legacyKeyMapJson, true);
-    if (is_array($decodedMap)) {
-        foreach ($decodedMap as $oldKey => $newKey) {
-            if (is_scalar($newKey)) {
-                $old = trim((string) $oldKey);
-                $new = trim((string) $newKey);
-                if ('' !== $old && '' !== $new) {
-                    $legacyKeyMap[$old] = $new;
-                }
+/**
+ * Key-Map je Slot aus dem Request: key_map[slot][alt] = neu.
+ *
+ * @return array<string, array<string, string>>
+ */
+$readKeyMaps = static function (): array {
+    $raw = rex_request('key_map', 'array', []);
+    $maps = [];
+    foreach ($raw as $slot => $pairs) {
+        if (!is_array($pairs)) {
+            continue;
+        }
+        foreach ($pairs as $old => $new) {
+            $old = trim((string) $old);
+            $new = trim((string) $new);
+            if ('' !== $old && '' !== $new) {
+                $maps[(string) $slot][$old] = $new;
             }
         }
-    } elseif (in_array($func, ['convert', 'data_dryrun', 'data_apply'], true)) {
-        $pageMessages .= rex_view::warning(rex_i18n::msg('mform_migration_mapping_json_invalid'));
+    }
+
+    return $maps;
+};
+
+/**
+ * Hinweis-/Warnungsliste eines Ergebnisses.
+ *
+ * @param list<string> $warnings
+ * @param list<string> $notes
+ */
+$renderNotes = static function (array $warnings, array $notes) use ($t): string {
+    $html = '';
+    if ([] !== $warnings) {
+        $items = '';
+        foreach ($warnings as $w) {
+            $items .= '<li>' . rex_escape($w) . '</li>';
+        }
+        $html .= '<div class="alert alert-warning"><strong><i class="rex-icon fa-exclamation-triangle"></i> ' . $t('warnings') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
+    }
+    if ([] !== $notes) {
+        $items = '';
+        foreach ($notes as $n) {
+            $items .= '<li>' . rex_escape($n) . '</li>';
+        }
+        $html .= '<div class="alert alert-info"><strong><i class="rex-icon fa-info-circle"></i> ' . $t('notes') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
+    }
+
+    return $html;
+};
+
+$codeArea = static fn (string $name, string $value, int $rows = 16, bool $readonly = false): string => '<textarea class="form-control" name="' . rex_escape($name) . '" rows="' . $rows . '" style="font-family:monospace;font-size:12px;white-space:pre;"' . ($readonly ? ' readonly onclick="this.select();"' : '') . '>' . rex_escape($value) . '</textarea>';
+
+$riskBadge = static function (string $risk) use ($t): string {
+    $class = ['red' => 'label-danger', 'yellow' => 'label-warning', 'green' => 'label-success'][$risk] ?? 'label-default';
+
+    return '<span class="label ' . $class . '">' . $t('risk_' . $risk) . '</span>';
+};
+
+$sectionTitle = static fn (int $step, string $title): string => '<span class="badge" style="margin-right:.5em;">' . $step . '</span>' . $title;
+
+// ── Modul laden ─────────────────────────────────────────────────────────────
+$module = null;
+$analysis = null;
+if ($moduleId > 0) {
+    $rows = rex_sql::factory()->getArray('SELECT id, name, input, output FROM ' . rex::getTable('module') . ' WHERE id = :id', ['id' => $moduleId]);
+    if ([] !== $rows) {
+        $module = ['id' => (int) $rows[0]['id'], 'name' => (string) $rows[0]['name'], 'input' => (string) $rows[0]['input'], 'output' => (string) $rows[0]['output']];
+        $analysis = $analyzer->analyze($module['input'], $module['output']);
+    } else {
+        $messages .= rex_view::error($t('module_not_found', $moduleId));
+        $moduleId = 0;
     }
 }
-if ('' !== $legacyKey1Target) {
-    $legacyKeyMap['1'] = $legacyKey1Target;
+
+// Key-Maps: Request (editiert) vor Analyse (automatisch).
+$keyMaps = $readKeyMaps();
+if ([] === $keyMaps && null !== $analysis) {
+    $keyMaps = $analysis['key_maps'];
 }
-
-$pageUrl = rex_url::currentBackendPage();
-$convertAction = $pageUrl . '#mform-migration-tool';
-$dataAction = $pageUrl . '#mform-migration-data';
-$batchAction = $pageUrl . '#mform-migration-batch';
-
-// Historientabelle fuer Reassign/Rollback bei Bedarf anlegen.
-rex_sql::factory()->setQuery(
-    'CREATE TABLE IF NOT EXISTS ' . $reassignHistoryTable . ' (
-        id int(10) unsigned NOT NULL AUTO_INCREMENT,
-        reassign_token varchar(32) NOT NULL,
-        slice_id int(10) unsigned NOT NULL,
-        old_module_id int(10) unsigned NOT NULL,
-        new_module_id int(10) unsigned NOT NULL,
-        createdate datetime NOT NULL,
-        createuser varchar(255) NOT NULL,
-        reverted tinyint(1) NOT NULL DEFAULT 0,
-        revertedate datetime NULL,
-        PRIMARY KEY (id),
-        KEY reassign_token_idx (reassign_token),
-        KEY slice_id_idx (slice_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-);
-
-// Fuer die Migration nur Module mit MBlock-Bezug laden (Input/Output).
-$allModules = rex_sql::factory()->getArray(
-    'SELECT id, name FROM ' . rex::getTable('module') . '
-     WHERE input LIKE :mblock OR output LIKE :mblock
-     ORDER BY name ASC, id ASC',
-    ['mblock' => '%MBlock%'],
-);
-
-if ([] === $allModules) {
-    // Fallback: Wenn keine Treffer gefunden werden, alle Module anzeigen.
-    $allModules = rex_sql::factory()->getArray(
-        'SELECT id, name FROM ' . rex::getTable('module') . ' ORDER BY name ASC, id ASC'
-    );
-    $pageMessages .= rex_view::info(rex_i18n::msg('mform_migration_select_module_fallback_all'));
-}
-
-// Modul aus DB laden.
-$loadModuleId = rex_request('load_module_id', 'int', 0);
-if ('load_module' === $func && $loadModuleId > 0) {
-    $modSql = rex_sql::factory();
-    $modSql->setQuery('SELECT input, output FROM ' . rex::getTable('module') . ' WHERE id = :id LIMIT 1', ['id' => $loadModuleId]);
-    if ($modSql->getRows() === 1) {
-        $inputCode = (string) $modSql->getValue('input');
-        $outputCode = (string) $modSql->getValue('output');
-        $pageMessages .= rex_view::success(rex_i18n::msg('mform_migration_module_loaded', $loadModuleId));
+$mergeColumns = 1 === rex_request('merge_columns', 'int', 0);
+$slotConfig = [];
+if (null !== $analysis) {
+    foreach ($analysis['slots'] as $slot) {
+        $slotConfig[$slot] = ['key_map' => $keyMaps[$slot] ?? [], 'options' => ['merge_columns' => $mergeColumns]];
     }
 }
+
+// ── Aktionen ────────────────────────────────────────────────────────────────
+$inputCode = rex_request('input_code', 'string', $module['input'] ?? '');
+$outputCode = rex_request('output_code', 'string', $module['output'] ?? '');
+$convertResultsHtml = '';
+$convertedInput = rex_request('converted_input', 'string', '');
+$convertedOutput = rex_request('converted_output', 'string', '');
+$createdModule = null;
+$dryRun = null;
+$applyResult = null;
+$singleResult = null;
 
 if ('convert' === $func) {
-    if (!rex_csrf_token::factory('mform_migration')->isValid()) {
-        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
+    $codeAnalysis = $analyzer->analyze($inputCode, $outputCode);
+    $inputResult = $converter->convertInput($inputCode, null, $codeAnalysis);
+    $outputResult = $converter->convertOutput($outputCode, implode(',', [] !== $codeAnalysis['slots'] ? $codeAnalysis['slots'] : ['1']), $keyMaps);
+    $convertedInput = $inputResult['code'];
+    $convertedOutput = $outputResult['code'];
+    $convertResultsHtml = '<hr><div class="row">
+        <div class="col-md-6"><h5><i class="rex-icon fa-sign-in"></i> ' . $t('input_label') . '</h5>' . $renderNotes($inputResult['warnings'], $inputResult['notes']) . $codeArea('input_result', $inputResult['code'], 18, true) . '</div>
+        <div class="col-md-6"><h5><i class="rex-icon fa-sign-out"></i> ' . $t('output_label') . '</h5>' . $renderNotes($outputResult['warnings'], $outputResult['notes']) . $codeArea('output_result', $outputResult['code'], 18, true) . '</div>
+    </div>';
+    $messages .= rex_view::success($t('convert_done'));
+}
+
+if ('create_module' === $func && $moduleId > 0) {
+    if ('' === trim($convertedInput) && '' === trim($convertedOutput)) {
+        $messages .= rex_view::warning($t('create_nothing'));
     } else {
-        if ('' !== trim($inputCode)) {
-            $inputResult = $converter->convertInput($inputCode, $repeaterId);
-        }
-        if ('' !== trim($outputCode)) {
-            $outputResult = $converter->convertOutput($outputCode, $repeaterId);
-        }
-        if ('' !== trim($dataValue)) {
-            $dataResult = $converter->convertData($dataValue, $repeaterId, $legacyKeyMap);
-        }
-
-        if (null !== $inputResult || null !== $outputResult || null !== $dataResult) {
-            $convertMessage .= rex_view::success(rex_i18n::msg('mform_migration_convert_done'));
-        }
-
-        if ($createConvertedModule) {
-            if ($loadModuleId <= 0) {
-                $moduleCreateMessage .= rex_view::error(rex_i18n::msg('mform_migration_create_missing_module'));
-            } else {
-                $inputForNewModule = null !== $inputResult ? $inputResult['code'] : trim($inputCode);
-                $outputForNewModule = null !== $outputResult ? $outputResult['code'] : trim($outputCode);
-
-                if ('' === trim((string) $inputForNewModule) && '' === trim((string) $outputForNewModule)) {
-                    $moduleCreateMessage .= rex_view::info(rex_i18n::msg('mform_migration_create_nothing'));
-                } else {
-                    $sourceSql = rex_sql::factory();
-                    $sourceSql->setQuery('SELECT * FROM ' . rex::getTable('module') . ' WHERE id = :id LIMIT 1', ['id' => $loadModuleId]);
-
-                    if (1 !== $sourceSql->getRows()) {
-                        $moduleCreateMessage .= rex_view::error(rex_i18n::msg('mform_migration_create_missing_module'));
-                    } else {
-                        $source = $sourceSql->getArray()[0];
-
-                        $timestamp = date('Ymd_His');
-                        $suffix = substr((string) md5((string) microtime(true) . (string) $loadModuleId), 0, 6);
-                        $newKey = 'mfr_' . $timestamp . '_' . $suffix;
-                        $newName = 'mfr_' . $timestamp . ' ' . (string) $source['name'];
-
-                        $insertSql = rex_sql::factory();
-                        $insertSql->setTable(rex::getTable('module'));
-
-                        foreach ($source as $column => $value) {
-                            if ('id' === (string) $column) {
-                                continue;
-                            }
-                            $insertSql->setValue((string) $column, $value);
-                        }
-
-                        $insertSql->setValue('name', $newName);
-                        if (array_key_exists('key', $source)) {
-                            $insertSql->setValue('key', $newKey);
-                        }
-                        if ('' !== trim((string) $inputForNewModule)) {
-                            $insertSql->setValue('input', (string) $inputForNewModule);
-                        }
-                        if ('' !== trim((string) $outputForNewModule)) {
-                            $insertSql->setValue('output', (string) $outputForNewModule);
-                        }
-
-                        $insertSql->insert();
-                        $newModuleId = (int) $insertSql->getLastId();
-                        $createdKey = array_key_exists('key', $source) ? $newKey : '-';
-
-                        $loadModuleId = $newModuleId;
-                        $lastCreatedModuleId = $newModuleId;
-                        $moduleCreateMessage .= rex_view::success(rex_i18n::msg('mform_migration_create_success', $newModuleId, $createdKey));
-                    }
-                }
-            }
-        }
-    }
-}
-
-// Batch-Dry-Run: Slices eines Moduls in den Speicher konvertieren (kein Schreiben).
-if ('data_dryrun' === $func) {
-    if (!rex_csrf_token::factory('mform_migration')->isValid()) {
-        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
-    } elseif ($batchModuleId > 0) {
-        $batchResult = $migrator->dryRun($batchModuleId, $batchSlotId, $legacyKeyMap);
-        $batchMessages = rex_view::success(rex_i18n::msg('mform_migration_batch_dryrun_done'));
-    }
-}
-
-// Batch-Apply: ausgewaehlte Slices wirklich schreiben, danach erneut Dry-Run anzeigen.
-if ('data_apply' === $func) {
-    if (!rex_csrf_token::factory('mform_migration')->isValid()) {
-        echo rex_view::error(rex_i18n::msg('csrf_token_invalid'));
-    } elseif ($batchModuleId > 0) {
-        $sliceIds = [];
-        foreach ($batchSliceIds as $sid) {
-            $sid = (int) $sid;
-            if ($sid > 0) {
-                $sliceIds[] = $sid;
-            }
-        }
-        if ([] === $sliceIds) {
-            $batchApplyResult = [
-                'updated' => 0,
-                'skipped' => 0,
-                'errors' => [],
-            ];
-            $batchMessages = rex_view::info(rex_i18n::msg('mform_migration_batch_nothing_selected'));
+        $createdModule = $migrator->createConvertedModule($moduleId, $convertedInput, $convertedOutput);
+        if (null === $createdModule) {
+            $messages .= rex_view::error($t('create_missing_module'));
         } else {
-            $batchApplyResult = $migrator->apply($sliceIds, $batchSlotId, $legacyKeyMap);
+            $messages .= rex_view::success($t('create_success', $createdModule['id'], $createdModule['key']));
         }
-        $batchResult = $migrator->dryRun($batchModuleId, $batchSlotId, $legacyKeyMap);
     }
 }
 
-$csrf = rex_csrf_token::factory('mform_migration')->getHiddenField();
+if ('data_dryrun' === $func && $moduleId > 0) {
+    $dryRun = $migrator->dryRunSlots($moduleId, $slotConfig);
+    $messages .= rex_view::success($t('batch_dryrun_done'));
+}
 
-$sliceReassignMessage = '';
-
-// Slices auf anderes Modul umhaengen.
-if ('slice_reassign' === $func) {
-    if (!rex_csrf_token::factory('mform_migration')->isValid()) {
-        $sliceReassignMessage .= rex_view::error(rex_i18n::msg('csrf_token_invalid'));
-    } elseif ($reassignTargetModuleId <= 0) {
-        $sliceReassignMessage .= rex_view::error(rex_i18n::msg('mform_migration_reassign_missing_target'));
+if ('data_apply' === $func && $moduleId > 0) {
+    $sliceIds = [];
+    foreach ((array) rex_request('slice_ids', 'array', []) as $sid) {
+        if ((int) $sid > 0) {
+            $sliceIds[] = (int) $sid;
+        }
+    }
+    if ([] === $sliceIds) {
+        $messages .= rex_view::info($t('batch_nothing_selected'));
     } else {
-        $validIds = [];
-        foreach ($reassignSliceIds as $sid) {
-            $sid = (int) $sid;
-            if ($sid > 0) {
-                $validIds[] = $sid;
-            }
+        $applyResult = $migrator->applySlots($moduleId, $slotConfig, $sliceIds);
+        if ($applyResult['updated'] > 0) {
+            $messages .= rex_view::success($t('batch_applied_token', $applyResult['updated'], $applyResult['token']));
         }
-        if ([] === $validIds) {
-            $sliceReassignMessage .= rex_view::info(rex_i18n::msg('mform_migration_reassign_none_selected'));
-        } else {
-            $token = substr((string) md5((string) microtime(true) . implode('-', $validIds) . '-' . $reassignTargetModuleId), 0, 12);
-            $placeholders = implode(',', array_fill(0, count($validIds), '?'));
-
-            // Vorherigen module_id-Stand protokollieren (Rollback-Basis).
-            $oldRows = rex_sql::factory()->getArray(
-                'SELECT id, module_id FROM ' . rex::getTable('article_slice') . ' WHERE id IN (' . $placeholders . ')',
-                $validIds,
-            );
-
-            foreach ($oldRows as $oldRow) {
-                $ins = rex_sql::factory();
-                $ins->setTable($reassignHistoryTable);
-                $ins->setValue('reassign_token', $token);
-                $ins->setValue('slice_id', (int) $oldRow['id']);
-                $ins->setValue('old_module_id', (int) $oldRow['module_id']);
-                $ins->setValue('new_module_id', $reassignTargetModuleId);
-                $ins->setValue('createdate', date('Y-m-d H:i:s'));
-                $ins->setValue('createuser', rex::getUser() ? (string) rex::getUser()->getLogin() : 'system');
-                $ins->setValue('reverted', 0);
-                $ins->insert();
-            }
-
-            $params = array_merge([$reassignTargetModuleId], $validIds);
-            rex_sql::factory()->setQuery(
-                'UPDATE ' . rex::getTable('article_slice') . ' SET module_id = ? WHERE id IN (' . $placeholders . ')',
-                $params,
-            );
-            $lastReassignToken = $token;
-            $sliceReassignMessage .= rex_view::success(rex_i18n::msg('mform_migration_reassign_success', count($validIds), $reassignTargetModuleId));
-            $sliceReassignMessage .= rex_view::info(rex_i18n::msg('mform_migration_reassign_token', $token));
+        if ($applyResult['skipped'] > 0) {
+            $messages .= rex_view::info($t('batch_skipped', $applyResult['skipped']));
+        }
+        foreach ($applyResult['errors'] as $err) {
+            $messages .= rex_view::error(rex_escape($err));
         }
     }
-    if ($batchModuleId > 0) {
-        $batchResult = $migrator->dryRun($batchModuleId, $batchSlotId, $legacyKeyMap);
+    $dryRun = $migrator->dryRunSlots($moduleId, $slotConfig);
+}
+
+if ('data_rollback' === $func) {
+    $result = $migrator->rollback(rex_request('run_token', 'string', ''));
+    foreach ($result['errors'] as $err) {
+        $messages .= rex_view::error(rex_escape($err));
+    }
+    if ($result['restored'] > 0) {
+        $messages .= rex_view::success($t('rollback_success', $result['restored']));
+    }
+    if ($moduleId > 0) {
+        $dryRun = $migrator->dryRunSlots($moduleId, $slotConfig);
     }
 }
 
-// Letzte Reassign-Aktion rueckgaengig machen.
+if ('data_single' === $func) {
+    $singleValue = rex_request('data_value', 'string', '');
+    $singleSlot = rex_request('single_slot', 'string', '1');
+    $singleMap = $keyMaps[$singleSlot] ?? [];
+    if ('' !== trim($singleValue)) {
+        $singleResult = $converter->convertData($singleValue, $singleSlot, $singleMap, ['merge_columns' => $mergeColumns]);
+    }
+}
+
+if ('slice_reassign' === $func && $moduleId > 0) {
+    $target = rex_request('reassign_target_module_id', 'int', 0);
+    $ids = [];
+    foreach ((array) rex_request('reassign_slice_ids', 'array', []) as $sid) {
+        if ((int) $sid > 0) {
+            $ids[] = (int) $sid;
+        }
+    }
+    if ($target <= 0) {
+        $messages .= rex_view::error($t('reassign_missing_target'));
+    } elseif ([] === $ids) {
+        $messages .= rex_view::info($t('reassign_none_selected'));
+    } else {
+        $result = $migrator->reassign($ids, $target);
+        foreach ($result['errors'] as $err) {
+            $messages .= rex_view::error(rex_escape($err));
+        }
+        if ($result['moved'] > 0) {
+            $messages .= rex_view::success($t('reassign_success', $result['moved'], $target)) . rex_view::info($t('reassign_token', $result['token']));
+        }
+    }
+}
+
 if ('slice_reassign_revert' === $func) {
-    if (!rex_csrf_token::factory('mform_migration')->isValid()) {
-        $sliceReassignMessage .= rex_view::error(rex_i18n::msg('csrf_token_invalid'));
-    } else {
-        $token = trim($lastReassignToken);
-        if ('' === $token) {
-            $latest = rex_sql::factory()->getArray(
-                'SELECT reassign_token FROM ' . $reassignHistoryTable . ' WHERE reverted = 0 ORDER BY id DESC LIMIT 1'
-            );
-            if ([] !== $latest) {
-                $token = (string) $latest[0]['reassign_token'];
-            }
-        }
-
-        if ('' === $token) {
-            $sliceReassignMessage .= rex_view::info(rex_i18n::msg('mform_migration_reassign_revert_none'));
-        } else {
-            $rows = rex_sql::factory()->getArray(
-                'SELECT id, slice_id, old_module_id FROM ' . $reassignHistoryTable . ' WHERE reassign_token = :t AND reverted = 0 ORDER BY id ASC',
-                ['t' => $token],
-            );
-
-            if ([] === $rows) {
-                $sliceReassignMessage .= rex_view::info(rex_i18n::msg('mform_migration_reassign_revert_none_for_token', $token));
-            } else {
-                $count = 0;
-                foreach ($rows as $row) {
-                    rex_sql::factory()->setQuery(
-                        'UPDATE ' . rex::getTable('article_slice') . ' SET module_id = :m WHERE id = :id',
-                        [
-                            'm' => (int) $row['old_module_id'],
-                            'id' => (int) $row['slice_id'],
-                        ],
-                    );
-                    ++$count;
-                }
-
-                rex_sql::factory()->setQuery(
-                    'UPDATE ' . $reassignHistoryTable . ' SET reverted = 1, revertedate = :dt WHERE reassign_token = :t AND reverted = 0',
-                    [
-                        'dt' => date('Y-m-d H:i:s'),
-                        't' => $token,
-                    ],
-                );
-
-                $sliceReassignMessage .= rex_view::success(rex_i18n::msg('mform_migration_reassign_revert_success', $count, $token));
-                $lastReassignToken = '';
-            }
-        }
+    $result = $migrator->revertReassign(rex_request('reassign_token', 'string', ''));
+    foreach ($result['errors'] as $err) {
+        $messages .= rex_view::info(rex_escape($err));
     }
-
-    if ($batchModuleId > 0) {
-        $batchResult = $migrator->dryRun($batchModuleId, $batchSlotId, $legacyKeyMap);
+    if ($result['restored'] > 0) {
+        $messages .= rex_view::success($t('reassign_revert_success', $result['restored'], $result['token']));
     }
 }
 
-// ── Intro ─────────────────────────────────────────────────────────────────
-$introBody = '<p>' . rex_i18n::msg('mform_migration_intro') . '</p>'
-    . '<ul>'
-    . '<li>' . rex_i18n::msg('mform_migration_intro_input') . '</li>'
-    . '<li>' . rex_i18n::msg('mform_migration_intro_output') . '</li>'
-    . '</ul>'
-    . '<div class="alert alert-warning"><i class="rex-icon fa-exclamation-triangle"></i> ' . rex_i18n::msg('mform_migration_limitations') . '</div>'
-    . '<p class="text-muted"><i class="rex-icon fa-info-circle"></i> ' . rex_i18n::msg('mform_migration_intro_hint') . '</p>';
+// ── Intro ───────────────────────────────────────────────────────────────────
+$entries = $inventory->collect();
+$summary = MBlockInventory::summary($entries);
 
+$steps = '';
+foreach ([1 => 'inventory', 2 => 'code', 3 => 'module', 4 => 'data', 5 => 'reassign'] as $n => $key) {
+    $steps .= '<li><a href="#mform-migration-step' . $n . '"><span class="badge">' . $n . '</span> ' . $t('step_' . $key) . '</a></li>';
+}
+$introBody = '<p>' . $t('intro') . '</p>'
+    . '<ol class="list-unstyled" style="display:flex;flex-wrap:wrap;gap:.5em 1.5em;margin:0 0 10px;">' . $steps . '</ol>'
+    . '<p class="rex-note">' . $t('intro_console') . '</p>'
+    . '<div class="alert alert-warning rex-mb-0"><i class="rex-icon fa-exclamation-triangle"></i> ' . $t('limitations') . '</div>';
+
+echo $messages;
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_migration'), false);
 $fragment->setVar('body', $introBody, false);
-echo $pageMessages;
 echo $fragment->parse('core/page/section.php');
 
-/**
- * Rendert die Hinweis-/Warnungs-Liste eines Konvertierungsergebnisses.
- *
- * @param array{code: string, notes: list<string>, warnings: list<string>}|null $result
- */
-$renderResult = static function (?array $result, string $textareaName, string $emptyMsg): string {
-    if (null === $result) {
-        return '<p class="text-muted">' . rex_escape($emptyMsg) . '</p>';
-    }
-
-    $html = '';
-
-    if ([] !== $result['warnings']) {
-        $items = '';
-        foreach ($result['warnings'] as $w) {
-            $items .= '<li>' . rex_escape($w) . '</li>';
-        }
-        $html .= '<div class="alert alert-warning"><strong><i class="rex-icon fa-exclamation-triangle"></i> '
-            . rex_i18n::msg('mform_migration_warnings') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
-    }
-
-    if ([] !== $result['notes']) {
-        $items = '';
-        foreach ($result['notes'] as $n) {
-            $items .= '<li>' . rex_escape($n) . '</li>';
-        }
-        $html .= '<div class="alert alert-info"><strong><i class="rex-icon fa-info-circle"></i> '
-            . rex_i18n::msg('mform_migration_notes') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
-    }
-
-    $html .= '<label class="control-label">' . rex_i18n::msg('mform_migration_result') . '</label>';
-    $html .= '<textarea class="form-control" name="' . rex_escape($textareaName) . '" rows="18" readonly '
-        . 'style="font-family:monospace;font-size:12px;white-space:pre;" onclick="this.select();">'
-        . rex_escape($result['code']) . '</textarea>';
-
-    return $html;
-};
-
-/**
- * Rendert das Ergebnis der Datenmigration (JSON statt Code).
- *
- * @param array{json: string, count: int, notes: list<string>, warnings: list<string>}|null $result
- */
-$renderDataResult = static function (?array $result): string {
-    if (null === $result) {
-        return '<p class="text-muted">' . rex_escape(rex_i18n::msg('mform_migration_data_empty')) . '</p>';
-    }
-
-    $html = '';
-
-    if ([] !== $result['warnings']) {
-        $items = '';
-        foreach ($result['warnings'] as $w) {
-            $items .= '<li>' . rex_escape($w) . '</li>';
-        }
-        $html .= '<div class="alert alert-warning"><strong><i class="rex-icon fa-exclamation-triangle"></i> '
-            . rex_i18n::msg('mform_migration_warnings') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
-    }
-
-    if ([] !== $result['notes']) {
-        $items = '';
-        foreach ($result['notes'] as $n) {
-            $items .= '<li>' . rex_escape($n) . '</li>';
-        }
-        $html .= '<div class="alert alert-info"><strong><i class="rex-icon fa-info-circle"></i> '
-            . rex_i18n::msg('mform_migration_notes') . '</strong><ul class="rex-mb-0">' . $items . '</ul></div>';
-    }
-
-    $html .= '<label class="control-label">' . rex_i18n::msg('mform_migration_data_result') . '</label>';
-    $html .= '<textarea class="form-control" name="data_result" rows="10" readonly '
-        . 'style="font-family:monospace;font-size:12px;white-space:pre;" onclick="this.select();">'
-        . rex_escape($result['json']) . '</textarea>';
-
-    return $html;
-};
-
-// ── Formular ───────────────────────────────────────────────────────────────
-// Modul-Auswahl Dropdown
-$moduleSelectOptions = '<option value="0">&ndash; ' . rex_i18n::msg('mform_migration_select_module') . '</option>';
-foreach ($allModules as $mod) {
-    $sel = ((int) $mod['id'] === $loadModuleId) ? ' selected' : '';
-    $moduleSelectOptions .= '<option value="' . (int) $mod['id'] . '"' . $sel . '>'
-        . rex_escape((string) $mod['name']) . ' [' . (int) $mod['id'] . ']</option>';
-}
-
-$content = '
-    <div id="mform-migration-tool"></div>
-    ' . $convertMessage . '
-    ' . $moduleCreateMessage . '
-<form action="' . $convertAction . '" method="post">
-    ' . $csrf . '
-    <input type="hidden" name="func" value="convert">
-
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-load-module">' . rex_i18n::msg('mform_migration_select_module_label') . '</label>
-                <div class="input-group">
-                    <select class="form-control" id="mform-migration-load-module" name="load_module_id">' . $moduleSelectOptions . '</select>
-                    <span class="input-group-btn">
-                        <button type="submit" name="func" value="load_module" class="btn btn-default"><i class="rex-icon fa-download"></i> ' . rex_i18n::msg('mform_migration_load_module_btn') . '</button>
-                    </span>
-                </div>
-                <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_select_module_note') . '</p>
-            </div>
-        </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-repeater-id">' . rex_i18n::msg('mform_migration_repeater_id') . '</label>
-                <input type="text" class="form-control" id="mform-migration-repeater-id" name="repeater_id" value="' . rex_escape($repeaterId) . '">
-                <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_repeater_id_note') . '</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-input"><i class="rex-icon fa-sign-in"></i> ' . rex_i18n::msg('mform_migration_input_label') . '</label>
-                <textarea class="form-control" id="mform-migration-input" name="input_code" rows="18" style="font-family:monospace;font-size:12px;white-space:pre;">' . rex_escape($inputCode) . '</textarea>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-output"><i class="rex-icon fa-sign-out"></i> ' . rex_i18n::msg('mform_migration_output_label') . '</label>
-                <textarea class="form-control" id="mform-migration-output" name="output_code" rows="18" style="font-family:monospace;font-size:12px;white-space:pre;">' . rex_escape($outputCode) . '</textarea>
-            </div>
-        </div>
-    </div>
-
-    <div class="rex-form-panel-footer">
-        <div class="checkbox" style="margin-top:0; margin-bottom:10px;">
-            <label>
-                <input type="checkbox" name="create_converted_module" value="1"' . ($createConvertedModule ? ' checked' : '') . ' onclick="if(this.checked){return confirm(\'' . rex_escape(rex_i18n::msg('mform_migration_create_confirm')) . '\');}">
-                ' . rex_i18n::msg('mform_migration_create_module') . '
-            </label>
-            <p class="help-block rex-note" style="margin-bottom:0;">' . rex_i18n::msg('mform_migration_create_note') . '</p>
-        </div>
-        <div class="btn-toolbar">
-            <button type="submit" class="btn btn-primary"><i class="rex-icon fa-cogs"></i> ' . rex_i18n::msg('mform_migration_convert') . '</button>
-        </div>
-    </div>
-</form>';
-
-$fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_migration_tool'), false);
-$fragment->setVar('body', $content, false);
-echo $fragment->parse('core/page/section.php');
-
-// ── Ergebnisse (ausserhalb der Form, eigene Section) ─────────────────────────
-if (null !== $inputResult || null !== $outputResult) {
-    $resultsContent = '<div class="row">
-        <div class="col-md-6">
-            <h5><i class="rex-icon fa-sign-in"></i> ' . rex_i18n::msg('mform_migration_input_label') . '</h5>
-            ' . $renderResult($inputResult, 'input_result', rex_i18n::msg('mform_migration_input_empty')) . '
-        </div>
-        <div class="col-md-6">
-            <h5><i class="rex-icon fa-sign-out"></i> ' . rex_i18n::msg('mform_migration_output_label') . '</h5>
-            ' . $renderResult($outputResult, 'output_result', rex_i18n::msg('mform_migration_output_empty')) . '
-        </div>
-    </div>';
-    $fragment = new rex_fragment();
-    $fragment->setVar('title', rex_i18n::msg('mform_migration_result'), false);
-    $fragment->setVar('body', $resultsContent, false);
-    echo $fragment->parse('core/page/section.php');
-}
-
-// ── Datenmigration ───────────────────────────────────────────────────────────
-$dataContent = '
-<div id="mform-migration-data"></div>
-<form action="' . $dataAction . '" method="post">
-    ' . $csrf . '
-    <input type="hidden" name="func" value="convert">
-    <input type="hidden" name="repeater_id" value="' . rex_escape($repeaterId) . '">
-
-    <p>' . rex_i18n::msg('mform_migration_data_intro') . '</p>
-
-    <div class="form-group">
-        <label class="control-label" for="mform-migration-data"><i class="rex-icon fa-database"></i> ' . rex_i18n::msg('mform_migration_data_label') . '</label>
-        <textarea class="form-control" id="mform-migration-data" name="data_value" rows="8" style="font-family:monospace;font-size:12px;white-space:pre;">' . rex_escape($dataValue) . '</textarea>
-        <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_data_note') . '</p>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-legacy-1">' . rex_i18n::msg('mform_migration_mapping_key1') . '</label>
-                <input type="text" class="form-control" id="mform-migration-legacy-1" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '" placeholder="link">
-            </div>
-        </div>
-        <div class="col-sm-8">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-legacy-map-json">' . rex_i18n::msg('mform_migration_mapping_json') . '</label>
-                <input type="text" class="form-control" id="mform-migration-legacy-map-json" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '" placeholder="{&quot;1&quot;:&quot;link&quot;}">
-                <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_mapping_note') . '</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="rex-form-panel-footer">
-        <div class="btn-toolbar">
-            <button type="submit" class="btn btn-primary"><i class="rex-icon fa-database"></i> ' . rex_i18n::msg('mform_migration_data_convert') . '</button>
-        </div>
-    </div>
-</form>';
-
-$fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_migration_data_tool'), false);
-$fragment->setVar('body', $dataContent, false);
-echo $fragment->parse('core/page/section.php');
-
-if (null !== $dataResult) {
-    $dataResultContent = $renderDataResult($dataResult);
-    $fragment = new rex_fragment();
-    $fragment->setVar('title', rex_i18n::msg('mform_migration_data_result'), false);
-    $fragment->setVar('body', $dataResultContent, false);
-    echo $fragment->parse('core/page/section.php');
-}
-
-// ── Batch-Datenmigration (Datenbank) ─────────────────────────────────────────
-$modules = $migrator->getModulesWithSlices();
-
-$moduleOptions = '<option value="0">&ndash;</option>';
-foreach ($modules as $mod) {
-    $selected = ($mod['id'] === $batchModuleId) ? ' selected' : '';
-    $label = $mod['name'] . ' [' . $mod['id'] . '] – ' . rex_i18n::msg('mform_migration_batch_slices', $mod['slice_count']);
-    $moduleOptions .= '<option value="' . $mod['id'] . '"' . $selected . '>' . rex_escape($label) . '</option>';
-}
-
-$batchMessages = $batchMessages ?? '';
-if (null !== $batchApplyResult) {
-    if ($batchApplyResult['updated'] > 0) {
-        $batchMessages .= rex_view::success(rex_i18n::msg('mform_migration_batch_applied', $batchApplyResult['updated']));
-    }
-    if ($batchApplyResult['skipped'] > 0) {
-        $batchMessages .= rex_view::info(rex_i18n::msg('mform_migration_batch_skipped', $batchApplyResult['skipped']));
-    }
-    foreach ($batchApplyResult['errors'] as $err) {
-        $batchMessages .= rex_view::error(rex_escape($err));
-    }
-}
-
-// Dry-Run-Tabelle (falls vorhanden) als auswaehlbare Apply-Form rendern.
-$batchTable = '';
-if (null !== $batchResult && [] !== $batchResult['rows']) {
-    $summary = rex_i18n::msg(
-        'mform_migration_batch_summary',
-        $batchResult['total'],
-        $batchResult['changed'],
-        $batchResult['warnings'],
-        rex_escape($batchResult['column']),
-    );
-
+// ── Schritt 1: Inventar ─────────────────────────────────────────────────────
+$inventoryBody = '<div id="mform-migration-step1"></div>';
+if ([] === $entries) {
+    $inventoryBody .= '<p class="text-muted rex-mb-0">' . $t('inventory_empty') . '</p>';
+} else {
     $rowsHtml = '';
-    $selectableCount = 0;
-    foreach ($batchResult['rows'] as $row) {
-        if ($row['skipped']) {
-            $stateBadge = '<span class="label label-default">' . rex_i18n::msg('mform_migration_batch_state_skip') . '</span>';
-        } elseif ($row['changed']) {
-            $stateBadge = '<span class="label label-success">' . rex_i18n::msg('mform_migration_batch_state_change') . '</span>';
-        } else {
-            $stateBadge = '<span class="label label-default">' . rex_i18n::msg('mform_migration_batch_state_nochange') . '</span>';
+    foreach ($entries as $entry) {
+        $a = $entry['analysis'];
+        $hints = '';
+        foreach ($a['risk_reasons'] as $reason) {
+            $hints .= '<li>' . rex_escape($reason) . '</li>';
         }
-
-        $warnHtml = '';
-        if ([] !== $row['warnings']) {
-            $items = '';
-            foreach ($row['warnings'] as $w) {
-                $items .= '<li>' . rex_escape($w) . '</li>';
-            }
-            $warnHtml = '<ul class="text-warning rex-mb-0" style="font-size:11px;">' . $items . '</ul>';
+        $types = [];
+        foreach ($entry['field_types'] as $type => $count) {
+            $types[] = rex_escape($type) . ' &times;' . $count;
         }
-
-        $checkbox = '<span class="text-muted">&ndash;</span>';
-        if ($row['changed']) {
-            ++$selectableCount;
-            $checkbox = '<input type="checkbox" name="slice_ids[]" value="' . $row['slice_id'] . '" checked>';
+        $probe = [];
+        foreach ($entry['probes'] as $slot => $p) {
+            $probe[] = $slot . ': ' . $t('inventory_probe', $p['with_markers'], $p['slices'], $p['empty']);
         }
-
-        $rowsHtml .= '<tr>'
-            . '<td>' . $checkbox . '</td>'
-            . '<td>' . $row['slice_id'] . '</td>'
-            . '<td>' . $row['article_id']
-            . ('' !== trim($row['article_name']) ? ' &ndash; ' . rex_escape($row['article_name']) : '')
-            . '</td>'
-            . '<td>' . $row['clang_id'] . '</td>'
-            . '<td>' . $row['count'] . '</td>'
-            . '<td>' . $stateBadge . $warnHtml . '</td>'
+        $active = $entry['id'] === $moduleId;
+        $rowsHtml .= '<tr' . ($active ? ' class="info"' : '') . '>'
+            . '<td>' . rex_escape($entry['name']) . ' <span class="text-muted">[' . $entry['id'] . ']</span></td>'
+            . '<td class="text-right">' . $entry['slice_count'] . '</td>'
+            . '<td>' . rex_escape(implode(', ', $a['slots'])) . '<br><small class="text-muted">' . implode('<br>', $probe) . '</small></td>'
+            . '<td><small>' . implode(', ', $types) . '</small></td>'
+            . '<td>' . $riskBadge($a['risk']) . ('' !== $hints ? '<ul class="rex-mb-0" style="padding-left:1.2em;font-size:11px;">' . $hints . '</ul>' : '') . '</td>'
+            . '<td>' . (null !== $entry['migrated_module_id'] ? '<a href="' . rex_url::backendPage('modules/modules', ['function' => 'edit', 'module_id' => $entry['migrated_module_id']]) . '">[' . $entry['migrated_module_id'] . ']</a>' : '&ndash;') . '</td>'
+            . '<td class="text-right"><a class="btn btn-xs ' . ($active ? 'btn-primary' : 'btn-default') . '" href="' . rex_url::currentBackendPage(['module_id' => $entry['id']]) . '#mform-migration-step2"><i class="rex-icon fa-search"></i> ' . $t('inventory_analyze') . '</a></td>'
             . '</tr>';
     }
+    $inventoryBody .= '<p class="rex-note">' . $t('inventory_summary', $summary['total'], $summary['slices'], $summary['red'], $summary['yellow'], $summary['green']) . '</p>'
+        . '<div class="table-responsive"><table class="table table-striped table-hover">'
+        . '<thead><tr><th>' . $t('inventory_col_module') . '</th><th class="text-right">' . $t('inventory_col_slices') . '</th><th>' . $t('inventory_col_slots') . '</th><th>' . $t('inventory_col_fields') . '</th><th>' . $t('inventory_col_risk') . '</th><th>' . $t('inventory_col_copy') . '</th><th></th></tr></thead>'
+        . '<tbody>' . $rowsHtml . '</tbody></table></div>';
+}
+$fragment = new rex_fragment();
+$fragment->setVar('title', $sectionTitle(1, $t('step_inventory')), false);
+$fragment->setVar('body', $inventoryBody, false);
+echo $fragment->parse('core/page/section.php');
 
-    $batchTable = '
-    <p class="rex-note rex-mt-2">' . $summary . '</p>';
+if (null === $module) {
+    $analysis = null;
+}
+if (null === $analysis) {
+    $fragment = new rex_fragment();
+    $fragment->setVar('title', $sectionTitle(2, $t('step_code')), false);
+    $fragment->setVar('body', '<div id="mform-migration-step2"></div><p class="text-muted rex-mb-0">' . $t('select_module_hint') . '</p>', false);
+    echo $fragment->parse('core/page/section.php');
 
-    if ($selectableCount > 0) {
-        $batchTable .= '
-    <form action="' . $batchAction . '" method="post" onsubmit="return confirm(\'' . rex_escape(rex_i18n::msg('mform_migration_batch_confirm')) . '\');">
-        ' . $csrf . '
-        <input type="hidden" name="func" value="data_apply">
-        <input type="hidden" name="batch_module_id" value="' . $batchModuleId . '">
-        <input type="hidden" name="batch_slot_id" value="' . rex_escape($batchSlotId) . '">
-        <input type="hidden" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '">
-        <input type="hidden" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead><tr>
-                    <th style="width:32px;"><i class="rex-icon fa-check"></i></th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_slice') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_article') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_clang') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_count') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_state') . '</th>
-                </tr></thead>
-                <tbody>' . $rowsHtml . '</tbody>
-            </table>
-        </div>
-        <div class="alert alert-warning"><i class="rex-icon fa-exclamation-triangle"></i> ' . rex_i18n::msg('mform_migration_batch_backup') . '</div>
-        <button type="submit" class="btn btn-save"><i class="rex-icon fa-database"></i> ' . rex_i18n::msg('mform_migration_batch_apply') . '</button>
-    </form>';
-    }
-
-    // ── Reassign-Formular (immer sichtbar, wenn Slices vorhanden) ──────────
-    $reassignModuleOptions = '<option value="0">&ndash;</option>';
-    foreach ($allModules as $mod) {
-        $selRa = ((int) $mod['id'] === $lastCreatedModuleId) ? ' selected' : '';
-        $reassignModuleOptions .= '<option value="' . (int) $mod['id'] . '"' . $selRa . '>'
-            . rex_escape((string) $mod['name']) . ' [' . (int) $mod['id'] . ']</option>';
-    }
-
-    // Checkboxen fuer alle Slices (nicht nur geaenderte)
-    $reassignRowsHtml = '';
-    foreach ($batchResult['rows'] as $row) {
-        if ($row['skipped']) {
-            continue;
-        }
-        $reassignRowsHtml .= '<tr>'
-            . '<td><input type="checkbox" name="reassign_slice_ids[]" value="' . $row['slice_id'] . '" checked></td>'
-            . '<td>' . $row['slice_id'] . '</td>'
-            . '<td>' . $row['article_id']
-            . ('' !== trim($row['article_name']) ? ' &ndash; ' . rex_escape($row['article_name']) : '')
-            . '</td>'
-            . '<td>' . $row['clang_id'] . '</td>'
-            . '</tr>';
-    }
-
-    $batchTable .= '
-    <hr>
-    ' . $sliceReassignMessage . '
-    <form action="' . $batchAction . '" method="post" onsubmit="return confirm(\'' . rex_escape(rex_i18n::msg('mform_migration_reassign_confirm')) . '\');">
-        ' . $csrf . '
-        <input type="hidden" name="func" value="slice_reassign">
-        <input type="hidden" name="batch_module_id" value="' . $batchModuleId . '">
-        <input type="hidden" name="batch_slot_id" value="' . rex_escape($batchSlotId) . '">
-        <input type="hidden" name="last_created_module_id" value="' . $lastCreatedModuleId . '">
-        <input type="hidden" name="last_reassign_token" value="' . rex_escape($lastReassignToken) . '">
-        <input type="hidden" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '">
-        <input type="hidden" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '">
-        <h5><i class="rex-icon fa-exchange"></i> ' . rex_i18n::msg('mform_migration_reassign_title') . '</h5>
-        <div class="row">
-            <div class="col-sm-8">
-                <div class="form-group">
-                    <label class="control-label" for="mform-migration-reassign-target">' . rex_i18n::msg('mform_migration_reassign_target') . '</label>
-                    <select class="form-control" id="mform-migration-reassign-target" name="reassign_target_module_id">' . $reassignModuleOptions . '</select>
-                    <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_reassign_note') . '</p>
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-condensed">
-                <thead><tr>
-                    <th style="width:32px;"><i class="rex-icon fa-check"></i></th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_slice') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_article') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_clang') . '</th>
-                </tr></thead>
-                <tbody>' . $reassignRowsHtml . '</tbody>
-            </table>
-        </div>
-        <div class="btn-toolbar">
-            <button type="submit" class="btn btn-warning"><i class="rex-icon fa-exchange"></i> ' . rex_i18n::msg('mform_migration_reassign_btn') . '</button>
-        </div>
-    </form>
-    <form action="' . $batchAction . '" method="post" style="margin-top:8px;" onsubmit="return confirm(\'' . rex_escape(rex_i18n::msg('mform_migration_reassign_revert_confirm')) . '\');">
-        ' . $csrf . '
-        <input type="hidden" name="func" value="slice_reassign_revert">
-        <input type="hidden" name="batch_module_id" value="' . $batchModuleId . '">
-        <input type="hidden" name="batch_slot_id" value="' . rex_escape($batchSlotId) . '">
-        <input type="hidden" name="last_created_module_id" value="' . $lastCreatedModuleId . '">
-        <input type="hidden" name="last_reassign_token" value="' . rex_escape($lastReassignToken) . '">
-        <input type="hidden" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '">
-        <input type="hidden" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '">
-        <button type="submit" class="btn btn-default"><i class="rex-icon fa-undo"></i> ' . rex_i18n::msg('mform_migration_reassign_revert_btn') . '</button>
-    </form>';
-
-    if (0 === $selectableCount) {
-        $batchTable .= '
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead><tr>
-                    <th style="width:32px;"><i class="rex-icon fa-check"></i></th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_slice') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_article') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_clang') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_count') . '</th>
-                    <th>' . rex_i18n::msg('mform_migration_batch_col_state') . '</th>
-                </tr></thead>
-                <tbody>' . $rowsHtml . '</tbody>
-            </table>
-        </div>
-        <div class="alert alert-info"><i class="rex-icon fa-info-circle"></i> ' . rex_i18n::msg('mform_migration_batch_nothing_selectable') . '</div>';
-    }
-} elseif (null !== $batchResult) {
-    $batchTable = '<p class="text-muted rex-mt-2">' . rex_escape(rex_i18n::msg('mform_migration_batch_no_slices')) . '</p>';
+    return;
 }
 
-$batchContent = '<div id="mform-migration-batch"></div>' . $batchMessages . '
-<form action="' . $batchAction . '" method="post">
+// ── Schritt 2: Analyse und Code ─────────────────────────────────────────────
+$analysisHtml = '<div id="mform-migration-step2"></div>'
+    . '<p>' . $t('module_headline', rex_escape($module['name']), $module['id']) . ' ' . $riskBadge($analysis['risk']) . '</p>';
+
+if (!$analysis['has_mblock']) {
+    $analysisHtml .= '<div class="alert alert-info rex-mb-0">' . $t('no_mblock_in_module') . '</div>';
+} else {
+    $analysisHtml .= $renderNotes(array_merge($analysis['risk_reasons'], $analysis['warnings']), []);
+
+    // Key-Map je Slot (editierbar) und Felder.
+    $keyMapForm = '';
+    foreach ($analysis['calls'] as $call) {
+        $slot = $call['slot'];
+        $fieldRows = '';
+        foreach ($call['fields'] as $field) {
+            $fieldRows .= '<tr><td><code>' . rex_escape($field['name']) . '</code></td><td>' . rex_escape($field['type']) . '</td>'
+                . '<td>' . (null !== $field['legacy_key'] ? '<code>' . rex_escape($field['legacy_key']) . '</code>' : '&ndash;') . '</td>'
+                . '<td>' . (null !== $field['legacy_key'] ? '<input type="text" class="form-control input-sm" name="key_map[' . rex_escape($slot) . '][' . rex_escape($field['legacy_key']) . ']" value="' . rex_escape($keyMaps[$slot][$field['legacy_key']] ?? $field['target'] ?? '') . '">' : '&ndash;') . '</td></tr>';
+        }
+        $options = [];
+        foreach ($call['options'] as $k => $v) {
+            $options[] = rex_escape($k . ' => ' . $v);
+        }
+        $keyMapForm .= '<h5>' . $t('slot_headline', rex_escape($slot), $call['line'], rex_escape($call['form_var'] ?? '-')) . '</h5>'
+            . ([] !== $options ? '<p class="rex-note">' . $t('slot_options') . ': ' . implode(', ', $options) . '</p>' : '')
+            . ([] !== $call['unknown_options'] ? '<p class="text-warning">' . $t('slot_unknown_options') . ': ' . rex_escape(implode(', ', $call['unknown_options'])) . '</p>' : '');
+        if ('' !== $fieldRows) {
+            $keyMapForm .= '<div class="table-responsive"><table class="table table-condensed"><thead><tr><th>' . $t('col_field') . '</th><th>' . $t('col_type') . '</th><th>' . $t('col_legacy_key') . '</th><th>' . $t('col_new_key') . '</th></tr></thead><tbody>' . $fieldRows . '</tbody></table></div>';
+        } elseif ('html' === $call['form_kind']) {
+            $keyMapForm .= '<p class="text-warning">' . $t('html_form_manual') . '</p>';
+        }
+    }
+    $analysisHtml .= $keyMapForm;
+}
+
+// Konvertierungsformular (Code editierbar, Key-Map wird mitgeschickt).
+$analysisHtml .= '
+<form action="' . $pageUrl() . '#mform-migration-step2" method="post">
+    ' . $csrf . '
+    <input type="hidden" name="func" value="convert">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">
+    <p class="rex-note">' . $t('keymap_note') . '</p>
+    <div class="row">
+        <div class="col-md-6"><div class="form-group"><label class="control-label"><i class="rex-icon fa-sign-in"></i> ' . $t('input_label') . '</label>' . $codeArea('input_code', $inputCode) . '</div></div>
+        <div class="col-md-6"><div class="form-group"><label class="control-label"><i class="rex-icon fa-sign-out"></i> ' . $t('output_label') . '</label>' . $codeArea('output_code', $outputCode) . '</div></div>
+    </div>
+    <div class="rex-form-panel-footer"><div class="btn-toolbar">
+        <button type="submit" class="btn btn-primary"><i class="rex-icon fa-cogs"></i> ' . $t('convert') . '</button>
+    </div></div>
+</form>';
+
+$analysisHtml .= $convertResultsHtml;
+
+$fragment = new rex_fragment();
+$fragment->setVar('title', $sectionTitle(2, $t('step_code')), false);
+$fragment->setVar('body', $analysisHtml, false);
+echo $fragment->parse('core/page/section.php');
+
+// Key-Map als Hidden-Felder fuer die Folgeschritte.
+$keyMapHidden = '<input type="hidden" name="merge_columns" value="' . ($mergeColumns ? 1 : 0) . '">';
+foreach ($keyMaps as $slot => $map) {
+    foreach ($map as $old => $new) {
+        $keyMapHidden .= '<input type="hidden" name="key_map[' . rex_escape((string) $slot) . '][' . rex_escape((string) $old) . ']" value="' . rex_escape($new) . '">';
+    }
+}
+
+// ── Schritt 3: Modul anlegen ────────────────────────────────────────────────
+$existingCopy = null;
+foreach ($entries as $entry) {
+    if ($entry['id'] === $moduleId) {
+        $existingCopy = $entry['migrated_module_id'];
+    }
+}
+$moduleBody = '<div id="mform-migration-step3"></div><p>' . $t('create_intro') . '</p>';
+if (null !== $createdModule) {
+    $moduleBody .= '<div class="alert alert-success">' . $t('create_success', $createdModule['id'], $createdModule['key']) . ' <a href="' . rex_url::backendPage('modules/modules', ['function' => 'edit', 'module_id' => $createdModule['id']]) . '">' . $t('create_open') . '</a></div>';
+} elseif (null !== $existingCopy) {
+    $moduleBody .= '<p class="rex-note">' . $t('create_existing', $existingCopy) . ' <a href="' . rex_url::backendPage('modules/modules', ['function' => 'edit', 'module_id' => $existingCopy]) . '">' . $t('create_open') . '</a></p>';
+}
+if ('' !== trim($convertedInput) || '' !== trim($convertedOutput)) {
+    $moduleBody .= '
+<form action="' . $pageUrl() . '#mform-migration-step3" method="post" onsubmit="return confirm(\'' . rex_escape($t('create_confirm')) . '\');">
+    ' . $csrf . $keyMapHidden . '
+    <input type="hidden" name="func" value="create_module">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">
+    <textarea name="converted_input" hidden>' . rex_escape($convertedInput) . '</textarea>
+    <textarea name="converted_output" hidden>' . rex_escape($convertedOutput) . '</textarea>
+    <button type="submit" class="btn btn-save"><i class="rex-icon fa-plus"></i> ' . $t('create_module') . '</button>
+</form>';
+} else {
+    $moduleBody .= '<p class="text-muted rex-mb-0">' . $t('create_convert_first') . '</p>';
+}
+$fragment = new rex_fragment();
+$fragment->setVar('title', $sectionTitle(3, $t('step_module')), false);
+$fragment->setVar('body', $moduleBody, false);
+echo $fragment->parse('core/page/section.php');
+
+// ── Schritt 4: Daten ────────────────────────────────────────────────────────
+$dataBody = '<div id="mform-migration-step4"></div><p>' . $t('data_intro_wizard') . '</p>';
+
+$slotList = implode(', ', array_map(static fn (string $s): string => 'value' . $s, $analysis['slots']));
+$dataBody .= '
+<form action="' . $pageUrl() . '#mform-migration-step4" method="post">
     ' . $csrf . '
     <input type="hidden" name="func" value="data_dryrun">
-    <input type="hidden" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '">
-    <input type="hidden" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">';
+foreach ($keyMaps as $slot => $map) {
+    foreach ($map as $old => $new) {
+        $dataBody .= '<input type="hidden" name="key_map[' . rex_escape((string) $slot) . '][' . rex_escape((string) $old) . ']" value="' . rex_escape($new) . '">';
+    }
+}
+$dataBody .= '
+    <p class="rex-note">' . $t('data_slots', rex_escape($slotList)) . '</p>
+    <div class="checkbox"><label><input type="checkbox" name="merge_columns" value="1"' . ($mergeColumns ? ' checked' : '') . '> ' . $t('merge_columns') . '</label><p class="help-block rex-note" style="margin-bottom:0;">' . $t('merge_columns_note') . '</p></div>
+    <div class="rex-form-panel-footer"><div class="btn-toolbar">
+        <button type="submit" class="btn btn-primary"><i class="rex-icon fa-search"></i> ' . $t('batch_dryrun') . '</button>
+    </div></div>
+</form>';
 
-    <p>' . rex_i18n::msg('mform_migration_batch_intro') . '</p>
+if (null !== $dryRun) {
+    $selectable = 0;
+    $tables = '';
+    foreach ($dryRun as $slot => $result) {
+        $rowsHtml = '';
+        foreach ($result['rows'] as $row) {
+            if ($row['skipped']) {
+                $state = '<span class="label label-default">' . $t('batch_state_skip') . '</span>';
+            } elseif ($row['changed']) {
+                $state = '<span class="label label-success">' . $t('batch_state_change') . '</span>';
+            } else {
+                $state = '<span class="label label-default">' . $t('batch_state_nochange') . '</span>';
+            }
+            $warn = '';
+            if ([] !== $row['warnings']) {
+                $items = '';
+                foreach ($row['warnings'] as $w) {
+                    $items .= '<li>' . rex_escape($w) . '</li>';
+                }
+                $warn = '<ul class="text-warning rex-mb-0" style="font-size:11px;padding-left:1.2em;">' . $items . '</ul>';
+            }
+            $checkbox = '<span class="text-muted">&ndash;</span>';
+            if ($row['changed']) {
+                ++$selectable;
+                $checkbox = '<input type="checkbox" name="slice_ids[]" value="' . $row['slice_id'] . '" checked>';
+            }
+            $rowsHtml .= '<tr><td>' . $checkbox . '</td><td>' . $row['slice_id'] . '</td><td>' . $row['article_id'] . ('' !== trim($row['article_name']) ? ' &ndash; ' . rex_escape($row['article_name']) : '') . '</td><td>' . $row['clang_id'] . '</td><td>' . $row['count'] . '</td><td>' . $state . $warn . '</td></tr>';
+        }
+        $tables .= '<h5>' . $t('batch_slot_headline', rex_escape((string) $slot), rex_escape($result['column'])) . '</h5>'
+            . '<p class="rex-note">' . $t('batch_summary', $result['total'], $result['changed'], $result['warnings'], rex_escape($result['column'])) . '</p>'
+            . '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th style="width:32px;"><i class="rex-icon fa-check"></i></th><th>' . $t('batch_col_slice') . '</th><th>' . $t('batch_col_article') . '</th><th>' . $t('batch_col_clang') . '</th><th>' . $t('batch_col_count') . '</th><th>' . $t('batch_col_state') . '</th></tr></thead><tbody>' . $rowsHtml . '</tbody></table></div>';
+    }
 
+    if ($selectable > 0) {
+        $dataBody .= '
+<form action="' . $pageUrl() . '#mform-migration-step4" method="post" onsubmit="return confirm(\'' . rex_escape($t('batch_confirm_backup')) . '\');">
+    ' . $csrf . $keyMapHidden . '
+    <input type="hidden" name="func" value="data_apply">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">
+    ' . $tables . '
+    <div class="alert alert-info"><i class="rex-icon fa-shield"></i> ' . $t('batch_backup_note') . '</div>
+    <button type="submit" class="btn btn-save"><i class="rex-icon fa-database"></i> ' . $t('batch_apply') . '</button>
+</form>';
+    } else {
+        $dataBody .= $tables . '<div class="alert alert-info">' . $t('batch_nothing_selectable') . '</div>';
+    }
+}
+
+// Rollback-Liste.
+$runs = $migrator->getRuns(10);
+if ([] !== $runs) {
+    $runRows = '';
+    foreach ($runs as $run) {
+        $action = $run['open'] > 0
+            ? '<form action="' . $pageUrl() . '#mform-migration-step4" method="post" style="display:inline" onsubmit="return confirm(\'' . rex_escape($t('rollback_confirm')) . '\');">' . $csrf . $keyMapHidden . '<input type="hidden" name="func" value="data_rollback"><input type="hidden" name="module_id" value="' . $moduleId . '"><input type="hidden" name="run_token" value="' . rex_escape($run['token']) . '"><button type="submit" class="btn btn-xs btn-warning"><i class="rex-icon fa-undo"></i> ' . $t('rollback_btn') . '</button></form>'
+            : '<span class="label label-default">' . $t('rollback_done') . '</span>';
+        $runRows .= '<tr><td><code>' . rex_escape($run['token']) . '</code></td><td>' . rex_escape($run['module_name']) . ' [' . $run['module_id'] . ']</td><td>' . $run['slices'] . '</td><td>' . rex_escape($run['columns']) . '</td><td>' . rex_escape($run['createdate']) . '<br><small class="text-muted">' . rex_escape($run['createuser']) . '</small></td><td>' . $action . '</td></tr>';
+    }
+    $dataBody .= '<hr><h5><i class="rex-icon fa-history"></i> ' . $t('runs_headline') . '</h5><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>' . $t('runs_col_token') . '</th><th>' . $t('inventory_col_module') . '</th><th>' . $t('inventory_col_slices') . '</th><th>' . $t('runs_col_columns') . '</th><th>' . $t('runs_col_date') . '</th><th></th></tr></thead><tbody>' . $runRows . '</tbody></table></div>';
+}
+
+// Einzelwert testen.
+$dataBody .= '<hr><details' . (null !== $singleResult ? ' open' : '') . '><summary style="cursor:pointer;"><strong>' . $t('data_single_headline') . '</strong></summary>
+<form action="' . $pageUrl() . '#mform-migration-step4" method="post" style="margin-top:10px;">
+    ' . $csrf . $keyMapHidden . '
+    <input type="hidden" name="func" value="data_single">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">
     <div class="row">
-        <div class="col-sm-8">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-batch-module">' . rex_i18n::msg('mform_migration_batch_module') . '</label>
-                <select class="form-control selectpicker" id="mform-migration-batch-module" name="batch_module_id">' . $moduleOptions . '</select>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-batch-slot">' . rex_i18n::msg('mform_migration_batch_slot') . '</label>
-                <input type="text" class="form-control" id="mform-migration-batch-slot" name="batch_slot_id" value="' . rex_escape($batchSlotId) . '">
-                <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_batch_slot_note') . '</p>
-            </div>
-        </div>
+        <div class="col-sm-9"><div class="form-group"><label class="control-label">' . $t('data_label') . '</label>' . $codeArea('data_value', rex_request('data_value', 'string', ''), 6) . '</div></div>
+        <div class="col-sm-3"><div class="form-group"><label class="control-label">' . $t('batch_slot') . '</label><input type="text" class="form-control" name="single_slot" value="' . rex_escape(rex_request('single_slot', 'string', $analysis['slots'][0] ?? '1')) . '"></div></div>
     </div>
-
-    <div class="row">
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-batch-legacy-1">' . rex_i18n::msg('mform_migration_mapping_key1') . '</label>
-                <input type="text" class="form-control" id="mform-migration-batch-legacy-1" name="legacy_key_1_target" value="' . rex_escape($legacyKey1Target) . '" placeholder="link">
-            </div>
-        </div>
-        <div class="col-sm-8">
-            <div class="form-group">
-                <label class="control-label" for="mform-migration-batch-map-json">' . rex_i18n::msg('mform_migration_mapping_json') . '</label>
-                <input type="text" class="form-control" id="mform-migration-batch-map-json" name="legacy_key_map_json" value="' . rex_escape($legacyKeyMapJson) . '" placeholder="{&quot;1&quot;:&quot;link&quot;}">
-                <p class="help-block rex-note">' . rex_i18n::msg('mform_migration_mapping_note') . '</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="rex-form-panel-footer">
-        <div class="btn-toolbar">
-            <button type="submit" class="btn btn-primary"><i class="rex-icon fa-search"></i> ' . rex_i18n::msg('mform_migration_batch_dryrun') . '</button>
-        </div>
-    </div>
-</form>' . $batchTable;
+    <button type="submit" class="btn btn-default"><i class="rex-icon fa-database"></i> ' . $t('data_convert') . '</button>
+</form>';
+if (null !== $singleResult) {
+    $dataBody .= $renderNotes($singleResult['warnings'], $singleResult['notes']) . '<label class="control-label" style="margin-top:10px;">' . $t('data_result') . '</label>' . $codeArea('data_result', $singleResult['json'], 8, true);
+}
+$dataBody .= '</details>';
 
 $fragment = new rex_fragment();
-$fragment->setVar('title', rex_i18n::msg('mform_migration_batch_tool'), false);
-$fragment->setVar('body', $batchContent, false);
+$fragment->setVar('title', $sectionTitle(4, $t('step_data')), false);
+$fragment->setVar('body', $dataBody, false);
+echo $fragment->parse('core/page/section.php');
+
+// ── Schritt 5: Umhaengen ────────────────────────────────────────────────────
+$reassignBody = '<div id="mform-migration-step5"></div><p>' . $t('reassign_intro') . '</p>';
+
+$targetId = $createdModule['id'] ?? $existingCopy ?? 0;
+$targetOptions = '<option value="0">&ndash;</option>';
+foreach (rex_sql::factory()->getArray('SELECT id, name FROM ' . rex::getTable('module') . ' WHERE id <> :id ORDER BY name ASC', ['id' => $moduleId]) as $mod) {
+    $targetOptions .= '<option value="' . (int) $mod['id'] . '"' . ((int) $mod['id'] === $targetId ? ' selected' : '') . '>' . rex_escape((string) $mod['name']) . ' [' . (int) $mod['id'] . ']</option>';
+}
+
+$sliceRows = '';
+$slices = rex_sql::factory()->getArray(
+    'SELECT s.id, s.article_id, s.clang_id, COALESCE(a.name, \'\') AS article_name FROM ' . rex::getTable('article_slice') . ' s LEFT JOIN ' . rex::getTable('article') . ' a ON a.id = s.article_id AND a.clang_id = s.clang_id WHERE s.module_id = :m ORDER BY s.id',
+    ['m' => $moduleId],
+);
+foreach ($slices as $slice) {
+    $sliceRows .= '<tr><td><input type="checkbox" name="reassign_slice_ids[]" value="' . (int) $slice['id'] . '" checked></td><td>' . (int) $slice['id'] . '</td><td>' . (int) $slice['article_id'] . ('' !== (string) $slice['article_name'] ? ' &ndash; ' . rex_escape((string) $slice['article_name']) : '') . '</td><td>' . (int) $slice['clang_id'] . '</td></tr>';
+}
+
+if ('' === $sliceRows) {
+    $reassignBody .= '<p class="text-muted">' . $t('batch_no_slices') . '</p>';
+} else {
+    $reassignBody .= '
+<form action="' . $pageUrl() . '#mform-migration-step5" method="post" onsubmit="return confirm(\'' . rex_escape($t('reassign_confirm')) . '\');">
+    ' . $csrf . $keyMapHidden . '
+    <input type="hidden" name="func" value="slice_reassign">
+    <input type="hidden" name="module_id" value="' . $moduleId . '">
+    <div class="row"><div class="col-sm-8"><div class="form-group">
+        <label class="control-label" for="mform-migration-reassign-target">' . $t('reassign_target') . '</label>
+        <select class="form-control selectpicker" data-live-search="true" id="mform-migration-reassign-target" name="reassign_target_module_id">' . $targetOptions . '</select>
+        <p class="help-block rex-note">' . $t('reassign_note') . '</p>
+    </div></div></div>
+    <div class="table-responsive"><table class="table table-striped table-condensed"><thead><tr><th style="width:32px;"><i class="rex-icon fa-check"></i></th><th>' . $t('batch_col_slice') . '</th><th>' . $t('batch_col_article') . '</th><th>' . $t('batch_col_clang') . '</th></tr></thead><tbody>' . $sliceRows . '</tbody></table></div>
+    <button type="submit" class="btn btn-warning"><i class="rex-icon fa-exchange"></i> ' . $t('reassign_btn') . '</button>
+</form>';
+}
+
+$reassignRuns = $migrator->getReassignRuns(10);
+if ([] !== $reassignRuns) {
+    $runRows = '';
+    foreach ($reassignRuns as $run) {
+        $action = $run['open'] > 0
+            ? '<form action="' . $pageUrl() . '#mform-migration-step5" method="post" style="display:inline" onsubmit="return confirm(\'' . rex_escape($t('reassign_revert_confirm')) . '\');">' . $csrf . $keyMapHidden . '<input type="hidden" name="func" value="slice_reassign_revert"><input type="hidden" name="module_id" value="' . $moduleId . '"><input type="hidden" name="reassign_token" value="' . rex_escape($run['token']) . '"><button type="submit" class="btn btn-xs btn-warning"><i class="rex-icon fa-undo"></i> ' . $t('reassign_revert_btn') . '</button></form>'
+            : '<span class="label label-default">' . $t('rollback_done') . '</span>';
+        $runRows .= '<tr><td><code>' . rex_escape($run['token']) . '</code></td><td>' . $run['slices'] . '</td><td>' . $run['old_module_id'] . ' &rarr; ' . $run['new_module_id'] . '</td><td>' . rex_escape($run['createdate']) . '</td><td>' . $action . '</td></tr>';
+    }
+    $reassignBody .= '<hr><h5><i class="rex-icon fa-history"></i> ' . $t('reassign_runs_headline') . '</h5><div class="table-responsive"><table class="table table-condensed"><thead><tr><th>' . $t('runs_col_token') . '</th><th>' . $t('inventory_col_slices') . '</th><th>' . $t('reassign_col_modules') . '</th><th>' . $t('runs_col_date') . '</th><th></th></tr></thead><tbody>' . $runRows . '</tbody></table></div>';
+}
+
+$fragment = new rex_fragment();
+$fragment->setVar('title', $sectionTitle(5, $t('step_reassign')), false);
+$fragment->setVar('body', $reassignBody, false);
 echo $fragment->parse('core/page/section.php');

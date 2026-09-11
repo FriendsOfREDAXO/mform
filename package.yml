@@ -37,6 +37,10 @@ page:
             subPath: CHANGELOG.md
             itemClass: pull-right
 
+console_commands:
+    mform:migrate: FriendsOfRedaxo\MForm\Console\MigrateCommand
+    mform:lint: FriendsOfRedaxo\MForm\Console\LintCommand
+
 requires:
     php: '>=8.4'
     redaxo: '^5.17.0'
