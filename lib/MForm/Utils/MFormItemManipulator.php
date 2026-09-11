@@ -21,22 +21,27 @@ class MFormItemManipulator
      */
     public static function setVarAndIds(MFormItem $item): void
     {
-        // set value for html out
-        $value = $item->getValue();
-        if (!is_array($value)) {
-            // '0' stays unchanged; null/empty string: no setValue call needed
-            if ($value !== '0' && $value !== null && $value !== '') {
-                $item->setValue(htmlspecialchars($value));
+        // set value for html out -- nur einmal: show() kann mehrfach laufen
+        // (MBlock rendert je Block), ein zweites htmlspecialchars() wuerde aus
+        // "&amp;" ein "&amp;amp;" machen. setValue() setzt die Markierung zurueck.
+        if (!$item->valueEscaped) {
+            $value = $item->getValue();
+            if (!is_array($value)) {
+                // '0' stays unchanged; null/empty string: no setValue call needed
+                if ($value !== '0' && $value !== null && $value !== '') {
+                    $item->setValue(htmlspecialchars($value));
+                }
+            } elseif (is_array($item->getVarId()) && 1 === count($item->getVarId())) {
+                $item->setValue(htmlspecialchars($item->getStringValue()));
             }
-        } elseif (is_array($item->getVarId()) && 1 === count($item->getVarId())) {
-            $item->setValue(htmlspecialchars($item->getStringValue()));
-        }
 
-        // is mode add and default value defined
-        // getDefaultValue() always returns string (never int, never null)
-        $defaultValue = $item->getDefaultValue();
-        if ($item->getMode() === 'add' && $defaultValue !== '') {
-            $item->setValue(htmlspecialchars($defaultValue));
+            // is mode add and default value defined
+            // getDefaultValue() always returns string (never int, never null)
+            $defaultValue = $item->getDefaultValue();
+            if ($item->getMode() === 'add' && $defaultValue !== '') {
+                $item->setValue(htmlspecialchars($defaultValue));
+            }
+            $item->valueEscaped = true;
         }
 
         // set element id - add var id for unique

@@ -16,6 +16,8 @@ class MFormItem
     public array|string $varId = "";
     /** @var array<mixed>|string|null */
     public array|string|null $value = "";
+    /** true, sobald setVarAndIds() den Wert fuer die HTML-Ausgabe escaped hat -- verhindert doppeltes Escaping bei wiederholtem show() */
+    public bool $valueEscaped = false;
     public string $stringValue = "";
     public string $defaultValue = "";
     public string $mode = "";
@@ -93,6 +95,7 @@ class MFormItem
     public function setValue(array|string|null $value): static
     {
         $this->value = $value;
+        $this->valueEscaped = false;
         return $this;
     }
 

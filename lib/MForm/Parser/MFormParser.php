@@ -941,10 +941,13 @@ class MFormParser
         $dom = new DOMDocument();
         $inputValue = false;
 
+        // Mehrteilige IDs (1.0.feld) speichern in REX_INPUT_VALUE. Die Form der
+        // Variablen-ID (Array oder bereits von setVarAndIds() geklammerter String
+        // nach einem frueheren show()) darf das Ergebnis nicht aendern.
+        if (count($this->varIdParts($item)) > 1) {
+            $inputValue = true;
+        }
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
-            if (count($item->getVarId()) > 1) {
-                $inputValue = true;
-            }
             $this->executeDefaultManipulations($item, false, false);
         }
 
@@ -985,14 +988,14 @@ class MFormParser
                     if (isset($parameter['preview'])) {
                         $mediaArgs['preview'] = $parameter['preview'];
                     }
-                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . $this->varIdBracketed($item), $item->getValue(), $mediaArgs, false);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_MEDIA';
-                    $html = rex_var_media::getWidget((int) $id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
+                    $html = rex_var_media::getWidget((int) $id, $inputValue . $this->varIdBracketed($item), $item->getValue(), $parameter);
                     $dom = new DOMDocument();
                     @$dom->loadHTML(utf8_decode($html));
                     $inputs = $dom->getElementsByTagName('input');
@@ -1023,7 +1026,7 @@ class MFormParser
                     $mediaArgs['media_category'] = $parameter['category'];
                 }
 
-                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $mediaArgs, false);
+                $html = rex_var_custom_link::getWidget($id, $inputValue . $this->varIdBracketed($item), $item->getValue(), $mediaArgs, false);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -1037,14 +1040,14 @@ class MFormParser
                 $value = (!is_string($item->getValue())) ? '' : $item->getValue();
                 if ('medialist' === $item->getType()) {
                     if (MForm::isUsingCustomLinkForClassicWidgets()) {
-                        $html = rex_var_custom_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                        $html = rex_var_custom_medialist::getWidget($id, $inputValue . $this->varIdBracketed($item), $value, $parameter);
                     } else {
-                        $html = rex_var_medialist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                        $html = rex_var_medialist::getWidget($id, $inputValue . $this->varIdBracketed($item), $value, $parameter);
                     }
                 } else {
                     $class = 'rex_var_' . $item->getType();
                     // @phpstan-ignore-next-line
-                    $html = $class::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $value, $parameter);
+                    $html = $class::getWidget($id, $inputValue . $this->varIdBracketed($item), $value, $parameter);
                 }
 
                 $dom = new DOMDocument();
@@ -1081,10 +1084,13 @@ class MFormParser
         $dom = new DOMDocument();
         $inputValue = false;
 
+        // Mehrteilige IDs (1.0.feld) speichern in REX_INPUT_VALUE. Die Form der
+        // Variablen-ID (Array oder bereits von setVarAndIds() geklammerter String
+        // nach einem frueheren show()) darf das Ergebnis nicht aendern.
+        if (count($this->varIdParts($item)) > 1) {
+            $inputValue = true;
+        }
         if (is_array($item->getVarId()) && count($item->getVarId()) > 0) {
-            if (count($item->getVarId()) > 1) {
-                $inputValue = true;
-            }
             $this->executeDefaultManipulations($item, false, false);
         }
 
@@ -1117,14 +1123,14 @@ class MFormParser
                     if (isset($parameter['category'])) {
                         $linkArgs['category'] = $parameter['category'];
                     }
-                    $html = rex_var_custom_link::getWidget($id, $inputSlot . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
+                    $html = rex_var_custom_link::getWidget($id, $inputSlot . $this->varIdBracketed($item), $item->getValue(), $linkArgs, false);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
                     $this->prepareLinkInput($dom, $inputs, $item, $attributes);
                 } else {
                     $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINK';
-                    $html = rex_var_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $parameter);
+                    $html = rex_var_link::getWidget($id, $inputValue . $this->varIdBracketed($item), $item->getValue(), $parameter);
                     $dom = new DOMDocument('1.0', 'utf-8');
                     @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
                     $inputs = $dom->getElementsByTagName('input');
@@ -1154,7 +1160,7 @@ class MFormParser
                     $linkArgs['category'] = $parameter['category'];
                 }
 
-                $html = rex_var_custom_link::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', $item->getValue(), $linkArgs, false);
+                $html = rex_var_custom_link::getWidget($id, $inputValue . $this->varIdBracketed($item), $item->getValue(), $linkArgs, false);
 
                 $dom = new DOMDocument('1.0', 'utf-8');
                 @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
@@ -1165,9 +1171,9 @@ class MFormParser
                 $inputValue = ($inputValue) ? 'REX_INPUT_VALUE' : 'REX_INPUT_LINKLIST';
                 $id = $this->getWidgetId($item);
                 if (MForm::isUsingCustomLinkForClassicWidgets()) {
-                    $html = rex_var_custom_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                    $html = rex_var_custom_linklist::getWidget($id, $inputValue . $this->varIdBracketed($item), is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
                 } else {
-                    $html = rex_var_linklist::getWidget($id, $inputValue . '[' . $this->varIdStr($item) . ']', is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
+                    $html = rex_var_linklist::getWidget($id, $inputValue . $this->varIdBracketed($item), is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''), $parameter);
                 }
 
                 $dom = new DOMDocument('1.0', 'utf-8');
@@ -1314,19 +1320,17 @@ class MFormParser
         }
     }
 
+    /**
+     * Widget-ID (crc32 der Variablen-ID) fuer REX_MEDIA_/REX_LINK_-Widgets.
+     * Liest die Variablen-ID nur -- keine Mutation des Items: show() kann
+     * mehrfach laufen (MBlock ruft es je Block auf), und ein zurueckgeschriebener
+     * String liess is_array(getVarId()) beim naechsten Durchlauf fehlschlagen
+     * (REX_INPUT_MEDIA statt REX_INPUT_VALUE bei mehrteiligen IDs) bzw. wurde
+     * erneut beschnitten (leerer Feldname, identische Widget-IDs).
+     */
     private function getWidgetId(MFormItem $item): string
     {
-        // varId als String ohne aeussere Klammern ("1" bzw. "1][0][feld") -- so
-        // ergibt '[' . varIdStr() . ']' spaeter den Feldnamen. Nur entklammern,
-        // wenn noch Klammern da sind: show() kann mehrfach laufen (MBlock ruft es
-        // je Block auf), und ein zweiter substr() haette aus "1" einen leeren
-        // String gemacht (REX_INPUT_MEDIA[] ohne ID, identische Widget-IDs).
-        $varIdStr = $this->varIdStr($item);
-        if (str_starts_with($varIdStr, '[') && str_ends_with($varIdStr, ']')) {
-            $varIdStr = substr($varIdStr, 1, -1);
-        }
-        $item->setVarId($varIdStr);
-        $varId = explode('][', $varIdStr);
+        $varId = $this->varIdParts($item);
 
         foreach ($varId as $key => $val) {
             if (!is_numeric($val)) {
@@ -1335,6 +1339,35 @@ class MFormParser
         }
 
         return (string) abs(crc32(implode('', $varId)));
+    }
+
+    /**
+     * Segmente der Variablen-ID ("1.0.feld" -> ['1', '0', 'feld']), unabhaengig
+     * von der Form (Array oder geklammerter String).
+     *
+     * @return list<string>
+     */
+    private function varIdParts(MFormItem $item): array
+    {
+        $inner = trim($this->varIdBracketed($item), '[]');
+        return '' === $inner ? [] : explode('][', $inner);
+    }
+
+    /**
+     * Variablen-ID in Klammerform fuer Feldnamen: "[1]" bzw. "[1][0][feld]",
+     * unabhaengig davon, ob das Item ein Array oder einen String traegt.
+     */
+    private function varIdBracketed(MFormItem $item): string
+    {
+        $v = $item->getVarId();
+        if (is_array($v)) {
+            return '[' . implode('][', $v) . ']';
+        }
+        $v = (string) $v;
+        if (str_starts_with($v, '[') && str_ends_with($v, ']')) {
+            return $v;
+        }
+        return '[' . $v . ']';
     }
 
     private function generateCustomLinkElement(MFormItem $item): void

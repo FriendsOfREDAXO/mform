@@ -1,5 +1,12 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Unveröffentlicht
+
+### Behoben
+
+- **`show()` mehrfach aufrufbar auch bei mehrteiligen Feld-IDs (`1.0.feld`):** Nachbesserung zu 9.4.2 (CodeRabbit-Hinweis in #443). `getWidgetId()` schrieb die Variablen-ID weiterhin als String ins Item zurück, und `setVarAndIds()` wandelt Arrays ohnehin in Klammer-Strings um. Beim zweiten `show()` (MBlock ruft es je Block auf) erkannte der Parser mehrteilige IDs deshalb nicht mehr und rendert Medien-, Medialist- und Link-Felder mit `REX_INPUT_MEDIA[1][0][feld]` statt `REX_INPUT_VALUE[1][0][feld]`. Jetzt liest `getWidgetId()` nur noch, Feldnamen entstehen über `varIdBracketed()`, und die Erkennung mehrteiliger IDs (`varIdParts()`) funktioniert für Array und String gleichermaßen. Betrifft `lib/MForm/Parser/MFormParser.php`.
+- **Werte wurden bei wiederholtem `show()` doppelt escaped:** `MFormItemManipulator::setVarAndIds()` wendete `htmlspecialchars()` bei jedem Durchlauf erneut auf den bereits escapten Wert an – aus `&amp;` wurde `&amp;amp;`, aus `&quot;` `&amp;quot;`. Betraf Text-, Textarea- und ähnliche Felder, sobald `show()` mehrfach lief (MBlock mit übergebenem MForm-Objekt). `MFormItem` merkt sich jetzt, dass der Wert escaped ist (`$valueEscaped`, wird von `setValue()` zurückgesetzt), das Escaping passiert nur noch einmal. Betrifft `lib/MForm/DTO/MFormItem.php`, `lib/MForm/Utils/MFormItemManipulator.php`.
+
 ## Version 9.4.2
 
 ### Behoben
