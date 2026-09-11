@@ -250,7 +250,7 @@ Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repe
 - Im Header jedes Items gibt es einen "Danach hinzufügen"-Button.
 - Im Header jedes Items gibt es ein Auge-Icon zum Aktivieren/Deaktivieren für die Ausgabe.
 - Ist ein Item deaktiviert, bleibt es im Backend editierbar, wird aber in der Ausgabe über `MFormRepeaterHelper::decode()` (oder alternativ `prepareItemsForOutput()`) entfernt.
-- Im Repeater-Toolbar gibt es optional einen "Alle auf / zu"-Button.
+- Der Repeater hat eine Kopfzeile: links das Label mit der Anzahl der Einträge, rechts "Alle auf / zu" und "Hinzufügen" (plus "Einfügen", solange ein Item kopiert ist). Unter der Liste schließt ein durchgehender "Hinzufügen"-Streifen ab; verschachtelte Repeater nutzen denselben Streifen.
 
 ### Aktiv/Inaktiv (Auge) und Ausgabe
 
@@ -263,8 +263,8 @@ Verfügbare Optionen im Repeater-Array:
 
 - `collapsed` (bool, default: `false`): Initial alle Items reduziert anzeigen.
 - `first_open` (bool, default: `false`): Erstes Item trotz `collapsed=true` geoeffnet lassen.
-- `show_toggle_all` (bool, default: `true`): Button "Alle auf / zu" in der Toolbar anzeigen.
-- `show_add_button` (bool, default: `true`): Bei `false` erscheint nur ein einzelner "Hinzufügen"-Button (oben), und nur solange der Repeater leer ist – sobald ein Item existiert, übernimmt das „+"-Icon am Item. Praktisch zusammen mit `default_count => 0`, damit das erste Item trotzdem angelegt werden kann. Gilt auch für verschachtelte Repeater.
+- `show_toggle_all` (bool, default: `true`): Button "Alle auf / zu" in der Kopfzeile anzeigen.
+- `show_add_button` (bool, default: `true`): Bei `false` erscheint nur der "Hinzufügen"-Streifen unter der Liste, und nur solange der Repeater leer ist – sobald ein Item existiert, übernimmt das „+"-Icon am Item. Praktisch zusammen mit `default_count => 0`, damit das erste Item trotzdem angelegt werden kann. Gilt auch für verschachtelte Repeater.
 - `open` (bool, default: `true`): Toolbar / Aktionen sind nutzbar; bei `false` wird die Bedienoberflaeche eingefroren (read-only Anzeige).
 - `copy_paste` (bool, default: `true`): Pro Item ein Kopieren-Button und ein Einfuegen-Button in der Toolbar.
 - `confirm_delete` (bool, default: `true`): Loeschen eines Items mit Sicherheitsabfrage.

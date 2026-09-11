@@ -103,11 +103,44 @@ body.rex-theme-dark {
     position: relative;
 }
 
+/* Kopfzeile: Label + Anzahl links, Aktionen rechts */
+.mfr-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: .5rem .75rem;
+    margin-bottom: .55rem;
+}
+
 .mfr-label {
-    display: block;
-    margin-bottom: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
     font-weight: 600;
+    text-align: left;
     color: var(--mfr-color-text);
+}
+
+.mfr-count {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: 2px 7px;
+    border: 1px solid var(--mfr-border);
+    border-radius: 999px;
+    background: var(--mfr-bg-header);
+    color: var(--mfr-color-muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.mfr-count:empty {
+    display: none;
 }
 
 /* ============================================================
@@ -132,16 +165,76 @@ body.rex-theme-dark {
 }
 
 .mfr-toolbar-top {
-    margin-top: 0;
-    margin-bottom: .55rem;
+    margin: 0 0 0 auto;
 }
 
+.mfr-toolbar-top .btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.mfr-toolbar-top .mfr-btn-toggle-all {
+    color: var(--mfr-color-muted);
+}
+
+.mfr-toolbar-top .mfr-btn-toggle-all:hover,
+.mfr-toolbar-top .mfr-btn-toggle-all:focus {
+    color: var(--mfr-color-text);
+}
+
+/* Unten: durchgehender Hinzufuegen-Streifen als Abschluss der Liste */
 .mfr-toolbar-bottom {
     margin-top: var(--mfr-add-mt);
 }
 
 .mfr-toolbar .mfr-btn-add {
     margin-top: 0;
+}
+
+.mfr-toolbar-bottom .mfr-btn-add {
+    flex: 1 1 auto;
+}
+
+.mfr-toolbar-bottom .mfr-btn-add.btn-primary,
+.mfr-toolbar-bottom .mfr-btn-add.btn-default,
+.mfr-btn-add-nested {
+    display: block;
+    width: 100%;
+    padding: .5rem 1rem;
+    background: transparent;
+    border: 1px dashed var(--mfr-border);
+    border-radius: var(--mfr-border-radius);
+    box-shadow: none;
+    color: var(--mform-link);
+    font-weight: 600;
+    text-shadow: none;
+    transition: background var(--mfr-transition), border-color var(--mfr-transition);
+}
+
+.mfr-toolbar-bottom .mfr-btn-add.btn-primary:hover,
+.mfr-toolbar-bottom .mfr-btn-add.btn-primary:focus,
+.mfr-toolbar-bottom .mfr-btn-add.btn-default:hover,
+.mfr-toolbar-bottom .mfr-btn-add.btn-default:focus,
+.mfr-btn-add-nested:hover,
+.mfr-btn-add-nested:focus {
+    background: var(--mform-active-bg);
+    border-style: solid;
+    border-color: var(--mform-link);
+    color: var(--mform-link);
+    outline: none;
+}
+
+.mfr-toolbar-bottom .mfr-btn-add.btn-primary:active,
+.mfr-toolbar-bottom .mfr-btn-add.btn-default:active,
+.mfr-btn-add-nested:active {
+    background: var(--mform-active-bg);
+    box-shadow: none;
+}
+
+.mfr-toolbar-bottom .mfr-btn-paste,
+.mfr-toolbar-bottom .mfr-btn-clipboard-clear {
+    flex: 0 0 auto;
 }
 
 /* ============================================================
@@ -468,7 +561,13 @@ body.rex-theme-dark {
 }
 
 .mfr-btn-add-nested {
-    margin-top: .4rem;
+    margin-top: .5rem;
+    padding: .4rem .9rem;
+    font-size: 12px;
+}
+
+.mfr-nested-items:empty + .mfr-btn-add-nested {
+    margin-top: 0;
 }
 
 .mfr-container .mfr-btn-add-after,
@@ -745,7 +844,8 @@ body.rex-theme-dark .mfr-container .mfr-btn-clipboard-clear {
 /* ============================================================
    Leer-Zustand (keine Items)
    ============================================================ */
-.mfr-items-list:empty::after {
+/* Platzhalter nur, wenn ein Text gesetzt ist; sonst ist der Hinzufuegen-Streifen der Leerzustand */
+.mfr-items-list[data-empty-text]:empty::after {
     content: attr(data-empty-text);
     display: block;
     text-align: center;

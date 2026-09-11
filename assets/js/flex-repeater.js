@@ -776,7 +776,7 @@
         }
 
         _getToolbarButtons(selector) {
-            const direct = Array.from(this.container.querySelectorAll(':scope > .mfr-toolbar ' + selector));
+            const direct = Array.from(this.container.querySelectorAll(':scope > .mfr-header > .mfr-toolbar ' + selector + ', :scope > .mfr-toolbar ' + selector));
             if (direct.length > 0) return direct;
 
             // Fallback: robust against markup differences where :scope selectors fail
@@ -1538,18 +1538,23 @@
             if (!this.addBtns || this.addBtns.length === 0) return;
             const maxReached = this.max > 0 && this.data.length >= this.max;
             const empty = this.data.length === 0;
+            const last = this.addBtns.length - 1;
             this.addBtns.forEach((btn, i) => {
                 let hide = maxReached;
-                // show_add_button=false: leer -> nur der erste (obere) Button,
+                // show_add_button=false: leer -> nur der Streifen unter der Liste,
                 // mit Items -> gar keiner (das "+" am Item reicht)
-                if (!this.showAddButton) hide = hide || !empty || i > 0;
+                if (!this.showAddButton) hide = hide || !empty || i !== last;
                 btn.style.display = hide ? 'none' : '';
             });
+            // "Alle auf / zu" nur mit Items
+            (this.toggleAllBtns || []).forEach((btn) => { btn.style.display = empty ? 'none' : ''; });
             // Toolbar ohne sichtbare Buttons komplett ausblenden (kein leerer Rahmen)
-            Array.from(this.container.querySelectorAll(':scope > .mfr-toolbar')).forEach((toolbar) => {
+            Array.from(this.container.querySelectorAll(':scope > .mfr-header > .mfr-toolbar, :scope > .mfr-toolbar')).forEach((toolbar) => {
                 const anyVisible = Array.from(toolbar.querySelectorAll('button')).some((b) => b.style.display !== 'none');
                 toolbar.style.display = anyVisible ? '' : 'none';
             });
+            const countEl = this.container.querySelector(':scope > .mfr-header .mfr-count');
+            if (countEl) countEl.textContent = this.data.length > 0 ? String(this.data.length) : '';
         }
 
         _indexOf(itemEl) {

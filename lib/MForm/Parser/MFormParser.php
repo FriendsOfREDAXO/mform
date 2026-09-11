@@ -131,7 +131,7 @@ class MFormParser
         if ('' !== $item->getLabel() && [] !== $item->getLabel()) {
             $labelStr = MFormLabelRenderer::resolveLabelValue($item->getLabel());
             // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. FontAwesome-Icons).
-            $label = '<label class="control-label mfr-label">' . $labelStr . '</label>';
+            $label = '<label class="mfr-label">' . $labelStr . ' <span class="mfr-count" aria-live="polite"></span></label>';
         }
 
         $min = (int) ($attrs['min'] ?? 0);
@@ -175,7 +175,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s" data-mfr-data-version="%d">%s',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s" data-mfr-data-version="%d">',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -192,7 +192,6 @@ class MFormParser
             $copyPaste ? 1 : 0,
             htmlspecialchars($layout, ENT_QUOTES),
             $dataVersion,
-            $label,
         );
 
         $copyPasteButtons = $copyPaste ? sprintf(
@@ -230,10 +229,12 @@ class MFormParser
             htmlspecialchars($btnClass, ENT_QUOTES),
             htmlspecialchars($btnText, ENT_QUOTES),
         );
+        // Kopfzeile: Label mit Anzahl links, Aktionen rechts. Unten nur der Hinzufuegen-Streifen
+        // (plus Einfuegen/Zwischenablage, solange kopiert wird).
         $toolbarGroupTop = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonTop . $clearClipboardButton . '</div>';
-        $toolbarGroupBottom = '<div class="btn-group">' . $toolbarToggle . $toolbarAdd . $pasteButtonBottom . $clearClipboardButton . '</div>';
+        $toolbarGroupBottom = $toolbarAdd . $pasteButtonBottom . $clearClipboardButton;
 
-        $this->elements[] = '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroupTop . '</div>';
+        $this->elements[] = '<div class="mfr-header">' . $label . '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroupTop . '</div></div>';
 
         $this->elements[] = '<div class="mfr-items-list"></div>';
 

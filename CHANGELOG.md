@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-beta.3 (in Arbeit)
+
+### Neu
+
+- **Repeater-Bedienung:** Kopfzeile mit Label, Anzahl der Einträge und den Aktionen rechts („Alle auf / zu“, „Hinzufügen“, „Einfügen“); unter der Liste ein durchgehender „Hinzufügen“-Streifen statt eines frei stehenden Buttons, ebenso in verschachtelten Repeatern. `show_add_button => false` zeigt bei leerem Repeater den Streifen unter der Liste. Das Label trägt nicht mehr `control-label` (stand im horizontalen Formular rechtsbündig).
+
 ## Version 10.0.0-beta.2
 
 **BETA, nicht für Produktion.** Zweite Beta von MForm 10 (11.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt. Update von beta.1 ohne Datenänderung; die neue Repeater-Datenversion ist Opt-in.
