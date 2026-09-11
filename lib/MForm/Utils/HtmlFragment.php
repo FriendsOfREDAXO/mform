@@ -35,6 +35,8 @@ final class HtmlFragment
             return null !== $node->body ? $node->body->innerHTML : '';
         }
         // Element inkl. Tag -- ueber saveHtml(), outerHTML ist in Dom\Element (8.4) nicht verfuegbar
-        return $node->ownerDocument?->saveHtml($node) ?? '';
+        $document = $node->ownerDocument;
+
+        return $document instanceof HTMLDocument ? $document->saveHtml($node) : '';
     }
 }

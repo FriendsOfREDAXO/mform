@@ -115,14 +115,11 @@ class HtmlToSvgConverter
             $attributes = $match[2];
             $content = $match[3] ?? '';
 
-            $element = $this->createSvgElement($tagName, $attributes, $content);
-            if ($element) {
-                $parent->appendChild($element);
-            }
+            $parent->appendChild($this->createSvgElement($tagName, $attributes, $content));
         }
     }
 
-    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): ?Element
+    private function createSvgElement(string $tagName, string $attributeString, string $content = ''): Element
     {
         $element = $this->svg->createElementNS($this->svgNS, $tagName);
 
