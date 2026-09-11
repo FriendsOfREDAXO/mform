@@ -344,20 +344,14 @@ class MFormParser
                     $element = new MFormElement();
                     $element->setType('tabnavli')
                         ->setValue($itm->getGroup() . $itm->getGroupCount() . '_' . (string) $item->getGroupKey())
-                        ->setLabel(((array_key_exists('tab-icon', $itm->getAttributes())) ? '<i class="rex-icon ' . $itm->getAttributes()['tab-icon'] . '"></i> ' : '') . MFormLabelRenderer::resolveLabelValue($itm->getLabel()))
+                        ->setLabel(MFormLayoutCore::tabNavLabel($itm->getAttributes(), MFormLabelRenderer::resolveLabelValue($itm->getLabel())))
                         ->setClass(MFormLayoutCore::buildTabNavClass($itm->getAttributes()));
                     $nav[] = $this->parseElement($element, 'wrapper');
                 }
             }
             $element->setElement(implode('', $nav));
 
-            if (MFormLayoutCore::isTabLayoutVertical($attributes)) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--vertical'));
-            }
-
-            if (MFormLayoutCore::isTabStyleModern($attributes)) {
-                $item->setClass(trim($item->getClass() . ' mform-tabs--modern'));
-            }
+            $item->setClass(MFormLayoutCore::tabGroupClass($item->getClass(), $attributes));
         }
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
@@ -365,14 +359,7 @@ class MFormParser
                 $item->setClass(trim($item->getClass() . ' active'));
             }
 
-            unset(
-                $attributes['tab-icon'],
-                $attributes['nav-class'],
-                $attributes['pull-right'],
-                $attributes['data-group-open-tab'],
-                $attributes['data-group-tab-layout'],
-                $attributes['data-group-tab-style'],
-            );
+            MFormLayoutCore::stripTabMetaAttributes($attributes);
         }
 
         if (count($removeAttributes) > 0) {
