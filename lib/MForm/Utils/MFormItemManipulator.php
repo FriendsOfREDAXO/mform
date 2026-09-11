@@ -79,8 +79,13 @@ class MFormItemManipulator
     {
         // is default class flag set
         if ($item->isDefaultClass() && !$item->defaultClassApplied) {
-            // set class by mform default dto -- nur einmal, show() darf mehrfach laufen
-            $item->setClass(MFormDefault::$classes[$item->getType()] . ' ' . $item->getClass()); // add default class as first class
+            // set class by mform default dto -- nur einmal, show() darf mehrfach laufen.
+            // Registrierte Feldtypen haben keinen Eintrag in MFormDefault::$classes,
+            // ihr Renderer setzt die Klassen selbst.
+            $defaultClass = MFormDefault::$classes[$item->getType()] ?? '';
+            if ('' !== $defaultClass) {
+                $item->setClass(trim($defaultClass . ' ' . $item->getClass())); // add default class as first class
+            }
             $item->defaultClassApplied = true;
         }
     }
