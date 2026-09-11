@@ -275,6 +275,45 @@ Fieldset, das per JavaScript ein- oder ausgeblendet wird, basierend auf dem Wert
 
 ---
 
+### Eigene Feldtypen (Registry, ab 10.0)
+
+```php
+MForm::registerFieldType(string $type, string|FieldTypeInterface $renderer): void
+MForm::unregisterFieldType(string $type): void
+MForm::hasFieldType(string $type): bool
+addCustomField(string $type, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+
+Fremd-Addons registrieren in ihrer `boot.php` einen Typnamen samt Renderer. Der Renderer implementiert `FriendsOfRedaxo\MForm\FieldType\FieldTypeInterface` und liefert nur das Formularelement; Label, Notice und `form-group` baut MForm. Derselbe Renderer wird im klassischen Formular und im Flex-Repeater genutzt, der `FieldRenderContext` sagt ihm, was er ausgeben muss:
+
+- `MODE_FORM`: Element mit `name`/`id`/`value` (`$context->controlAttributes()` liefert `name` und `id`, `$context->value` den escapten Wert).
+- `MODE_REPEATER`: Template-Element ohne `name`, mit `data-mfr-field="{fieldKey}"` (`controlAttributes()` liefert genau das). Werte setzt das Repeater-JS.
+
+```php
+// boot.php eines Addons
+MForm::registerFieldType('rating', RatingFieldType::class);
+
+final class RatingFieldType implements FieldTypeInterface
+{
+    public function render(MFormItem $item, FieldRenderContext $context): string
+    {
+        $html = '<select class="form-control ' . htmlspecialchars($context->class) . '"' . $context->controlAttributes() . '>';
+        for ($i = 0; $i <= 5; ++$i) {
+            $selected = (!$context->isRepeater() && (string) $i === $context->value) ? ' selected' : '';
+            $html .= '<option value="' . $i . '"' . $selected . '>' . str_repeat('★', $i) . '</option>';
+        }
+        return $html . '</select>';
+    }
+}
+
+// im Modul
+->addCustomField('rating', '1.0.rating', ['label' => 'Bewertung'], '3')
+```
+
+Ein Element mit `data-mfr-field` pro Feld genügt für den Repeater; komplexere Widgets, die JS brauchen, initialisieren sich über `rex:ready` (Backend) und müssen geklonte Items selbst erkennen.
+
+---
+
 ### Text & Eingabe
 
 ```php

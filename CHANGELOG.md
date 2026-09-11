@@ -6,6 +6,7 @@ Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branc
 
 ### Neu
 
+- **Field-Type-Registry** (#399): `MForm::registerFieldType($type, $renderer)` registriert eigene Feldtypen aus Fremd-Addons, `addCustomField($type, $id, …)` setzt sie ins Formular. Der Renderer (`FieldTypeInterface`) wird im klassischen Parser und im Flex-Repeater genutzt; der `FieldRenderContext` liefert Name/Id/Wert bzw. den Repeater-Feldschlüssel. Grundlage für Linkmap-, MediaPlace- und relation_select-Feldtypen.
 - **HTML5-Eingabefelder** (#409): `addNumberField()`, `addRangeField()` (mit Live-Wertanzeige), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Dünne Wrapper um `addInputField()`, `min`/`max`/`step`/`pattern` über `$attributes`. Funktionieren im Flex-Repeater, stehen im Builder in der Palette (mit Min/Max/Step-Eingaben) und in der Demo „HTML5-Eingabefelder“.
 
 ### Behoben

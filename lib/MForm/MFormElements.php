@@ -311,6 +311,16 @@ abstract class MFormElements
         return $this->addElement($typ, $id, null, $attributes, null, null, null, $defaultValue);
     }
 
+    /**
+     * Feld eines registrierten Feldtyps (MForm::registerFieldType()).
+     *
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addCustomField(string $type, float|int|string $id, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        return $this->addElement(strtolower(trim($type)), $id, null, $attributes, null, null, null, $defaultValue);
+    }
+
     /** @param array<string, mixed>|null $attributes */
     public function addHiddenField(float|int|string $id, ?string $value = null, ?array $attributes = null): static
     {

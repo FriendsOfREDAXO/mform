@@ -8,6 +8,8 @@
 
 namespace FriendsOfRedaxo;
 
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeInterface;
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
 use FriendsOfRedaxo\MFormTemplate\TemplateInterface;
 use FriendsOfRedaxo\MForm\MFormElements;
 use FriendsOfRedaxo\MForm\Parser\MFormParser;
@@ -117,6 +119,28 @@ class MForm extends MFormElements
     public static function hasTemplate(string $key): bool
     {
         return TemplateRegistry::has($key);
+    }
+
+    /**
+     * Registriert einen eigenen Feldtyp (#399). Der Renderer wird im klassischen
+     * Parser und im Flex-Repeater genutzt; Felder des Typs kommen per
+     * addCustomField($type, $id, ...) ins Formular.
+     *
+     * @param class-string<FieldTypeInterface>|FieldTypeInterface $renderer
+     */
+    public static function registerFieldType(string $type, string|FieldTypeInterface $renderer): void
+    {
+        FieldTypeRegistry::register($type, $renderer);
+    }
+
+    public static function unregisterFieldType(string $type): void
+    {
+        FieldTypeRegistry::unregister($type);
+    }
+
+    public static function hasFieldType(string $type): bool
+    {
+        return FieldTypeRegistry::has($type);
     }
 
     /**

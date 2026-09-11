@@ -3,6 +3,8 @@
 namespace FriendsOfRedaxo\MForm\FlexRepeater;
 
 use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
@@ -417,6 +419,13 @@ class MFormFlexRepeaterRenderer
         $attrs = self::renderAttributes($itemAttributes);
         $class = htmlspecialchars($item->getClass(), ENT_QUOTES);
         $key = htmlspecialchars($fieldKey, ENT_QUOTES);
+
+        // Registrierter Feldtyp: Renderer liefert das Element mit data-mfr-field
+        $registered = FieldTypeRegistry::get($type);
+        if (null !== $registered) {
+            $context = new FieldRenderContext(FieldRenderContext::MODE_REPEATER, '', '', $fieldKey, '', $item->getClass(), $attrs);
+            return self::wrapFormGroup($label, $registered->render($item, $context), $item);
+        }
 
         $normalizedInputType = MFormFieldTypeCore::normalizeSimpleInputType($type);
         if (null !== $normalizedInputType) {

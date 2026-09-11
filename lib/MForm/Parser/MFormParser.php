@@ -20,6 +20,8 @@ use FriendsOfRedaxo\MForm\Handler\MFormAttributeHandler;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
 use FriendsOfRedaxo\MForm\Utils\HtmlFragment;
 use FriendsOfRedaxo\MForm\Utils\MFormFormGroupHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
@@ -1559,6 +1561,11 @@ class MFormParser
                         continue;
                     }
 
+                    if (FieldTypeRegistry::has($itemType)) {
+                        $this->generateRegisteredElement($item);
+                        continue;
+                    }
+
                     switch ($itemType) {
                         // OPEN REPEATER
                         case 'repeater':
@@ -1646,6 +1653,47 @@ class MFormParser
         } catch (Exception $e) {
             rex_logger::logException($e);
         }
+    }
+
+    /**
+     * Registrierter Feldtyp (FieldTypeRegistry): Label, Notice und form-group
+     * kommen von MForm, das Formularelement vom Renderer des Typs.
+     */
+    private function generateRegisteredElement(MFormItem $item): void
+    {
+        $renderer = FieldTypeRegistry::get($item->getType());
+        if (null === $renderer) {
+            return;
+        }
+        $this->executeDefaultManipulations($item);
+
+        $attributes = $item->getAttributes();
+        unset($attributes['label'], $attributes['notice'], $attributes['id'], $attributes['class'], $attributes['full'], $attributes['default-value']);
+        $attributeHtml = '';
+        foreach ($attributes as $key => $value) {
+            if (is_scalar($value)) {
+                $attributeHtml .= ' ' . htmlspecialchars((string) $key, ENT_QUOTES) . '="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"';
+            }
+        }
+        $context = new FieldRenderContext(
+            FieldRenderContext::MODE_FORM,
+            'REX_INPUT_VALUE' . $this->varIdBracketed($item),
+            $item->getId(),
+            '',
+            is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? ''),
+            $item->getClass(),
+            $attributeHtml,
+        );
+
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'))
+            ->setElement($renderer->render($item, $context))
+            ->setNotice($item->getNotice())
+            ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
+
+        $this->elements[] = $this->parseElement($templateElement, 'default');
     }
 
     private function createLabelElement(MFormItem $item): MFormElement
