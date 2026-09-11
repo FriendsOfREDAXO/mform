@@ -52,7 +52,7 @@ Aufräumarbeiten für 10:
 
 Zielbild ist ein Assistent in fünf Schritten: Inventar → Code konvertieren und prüfen → neues Modul anlegen → Daten migrieren (Dry-Run, dann Anwenden mit Backup) → Slices umhängen. Jeder Schritt hat ein Rückgängig.
 
-Stand Beta 1: M1, M2, M3 (Daten rekursiv, Code-Hinweise), M4, M8, M9, M10 umgesetzt (`pages/migration.php`, `mform:migrate`, `mform:lint`). Offen für Beta 2: M5, M6, M7.
+Stand Beta 1: M1, M2, M3 (Daten rekursiv, Code-Hinweise), M4, M8, M9, M10 umgesetzt (`pages/migration.php`, `mform:migrate`, `mform:lint`). Beta 2: M5, M6, M7 (Schritt 6 YForm, `--yform`) umgesetzt.
 
 ## 4. Offene Issues: Prüfung und Einordnung
 

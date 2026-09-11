@@ -1260,9 +1260,15 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     color: var(--mform-link);
     white-space: nowrap;
 }
-.mform .mform-a11y-ok,
-.mfr-container .mform-a11y-ok {
-    color: var(--mform-success-strong);
+.mform .mform-a11y-actions,
+.mfr-container .mform-a11y-actions {
+    clear: both;
+    padding-top: 4px;
+}
+.mform .mform-a11y-refresh,
+.mfr-container .mform-a11y-refresh {
+    font-size: 11px;
+    padding: 1px 6px;
 }
 .mform .mform-a11y-has-issues.has-error .mform-a11y-list,
 .mfr-container .mform-a11y-has-issues.has-error .mform-a11y-list {

@@ -72,20 +72,21 @@
         });
         $group.toggleClass('mform-a11y-has-issues', issues > 0);
         if (issues > 0) {
-            $box.html('<ul class="mform-a11y-list"><li class="mform-a11y-head"><i class="rex-icon fa-universal-access"></i></li>' + html + '</ul>').show();
-        } else if (files.length) {
-            $box.html('<span class="mform-a11y-ok"><i class="rex-icon fa-check"></i> ' + escapeHtml(CFG.ok || 'OK') + '</span>').show();
+            // Kein Hinweis, wenn alles passt; bei Befunden ein "Erneut pruefen"-Button (Metadaten
+            // werden meist im Medienpool-Tab nachgetragen, das Formular bekommt das nicht mit).
+            var refresh = '<button type="button" class="btn btn-xs btn-default mform-a11y-refresh" title="' + escapeHtml(CFG.recheck || 'Erneut prüfen') + '"><i class="rex-icon fa-refresh"></i> ' + escapeHtml(CFG.recheck || 'Erneut prüfen') + '</button>';
+            $box.html('<ul class="mform-a11y-list"><li class="mform-a11y-head"><i class="rex-icon fa-universal-access"></i></li>' + html + '<li class="mform-a11y-actions">' + refresh + '</li></ul>').show();
         } else {
             $box.empty().hide();
         }
         $group.data('mformA11yIssues', issues);
     }
 
-    function check($group) {
+    function check($group, force) {
         var rules = $group.attr('data-mform-a11y');
         var files = collectFiles($group);
         var key = files.join('|');
-        if ($group.data('mformA11yKey') === key) return;
+        if (!force && $group.data('mformA11yKey') === key) return;
         $group.data('mformA11yKey', key);
         if (!files.length) { render($group, [], files); return; }
         $.ajax({
@@ -124,7 +125,19 @@
         window.alert(CFG.blocked || 'Barrierefreiheits-Metadaten fehlen.');
     });
 
-    $(window).on('rex:selectMedia', function () { $('[data-mform-a11y]').each(function () { var $g = $(this); setTimeout(function () { check($g); }, 100); }); });
+    function recheckAll(force) {
+        $('[data-mform-a11y]').each(function () { var $g = $(this); setTimeout(function () { check($g, force); }, 100); });
+    }
+
+    $(document).on('click', '.mform-a11y-refresh', function (e) {
+        e.preventDefault();
+        var $group = $(this).closest('[data-mform-a11y]');
+        $(this).prop('disabled', true);
+        check($group, true);
+    });
+    $(window).on('rex:selectMedia', function () { recheckAll(false); });
+    // Zurueck aus dem Medienpool-Tab: Befunde neu pruefen, Metadaten koennten ergaenzt worden sein.
+    $(window).on('focus', function () { recheckAll(true); });
     $(document).on('rex:ready', function (e, container) { init(container && container[0] ? container[0] : document); });
     $(function () { init(document); });
 })(jQuery);

@@ -122,14 +122,24 @@ final class MediaMetaChecker
         // Custom-Link ueber die Attribute. Beide Quellen lesen und leeren, damit nichts ans Widget geht.
         $attributes = $item->getAttributes();
         $parameter = $item->getParameter();
-        if (!array_key_exists(self::ATTRIBUTE, $attributes) && !array_key_exists(self::ATTRIBUTE, $parameter)) {
+        $isMediaType = in_array($item->getType(), self::MEDIA_ITEM_TYPES, true);
+        $hasOption = array_key_exists(self::ATTRIBUTE, $attributes) || array_key_exists(self::ATTRIBUTE, $parameter);
+        if (!$hasOption && !($isMediaType && self::isDefaultEnabled())) {
             return;
         }
-        $rules = self::normalizeRules($attributes[self::ATTRIBUTE] ?? $parameter[self::ATTRIBUTE] ?? null);
+        $option = $attributes[self::ATTRIBUTE] ?? $parameter[self::ATTRIBUTE] ?? null;
         unset($attributes[self::ATTRIBUTE], $parameter[self::ATTRIBUTE]);
         $item->setParameter($parameter);
 
-        if (null !== $rules && in_array($item->getType(), self::MEDIA_ITEM_TYPES, true)) {
+        // Global aus, oder je Feld mit 'a11y' => false abgeschaltet: keine Pruefung.
+        if (!self::isEnabled() || false === $option) {
+            $item->setAttributes($attributes);
+
+            return;
+        }
+        $rules = null !== $option ? self::normalizeRules($option) : ['required_media_meta' => [['field' => self::FIELD_ALT, 'message' => '']], 'strict' => false];
+
+        if (null !== $rules && $isMediaType) {
             $formGroup = isset($attributes['form-group-attributes']) && is_array($attributes['form-group-attributes']) ? $attributes['form-group-attributes'] : [];
             $formGroup[self::DATA_ATTRIBUTE] = (string) json_encode($rules['required_media_meta'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             if ($rules['strict']) {
@@ -368,6 +378,18 @@ final class MediaMetaChecker
             'unknown_field' => rex_i18n::msg('mform_a11y_unknown_field', $field),
             default => rex_i18n::msg('mform_a11y_missing_field', $field),
         };
+    }
+
+    /** Globaler Schalter (Einstellungen), Standard an. */
+    public static function isEnabled(): bool
+    {
+        return class_exists(\rex_config::class) ? (bool) \rex_config::get('mform', 'a11y_check', true) : true;
+    }
+
+    /** Standardpruefung (ALT-Text) fuer alle Medien-Felder ohne eigene Option, Standard aus. */
+    public static function isDefaultEnabled(): bool
+    {
+        return class_exists(\rex_config::class) && (bool) \rex_config::get('mform', 'a11y_default', false);
     }
 
     private static function mediaplaceAvailable(): bool

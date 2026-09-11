@@ -98,6 +98,14 @@ final class MBlockModuleAnalyzerTest extends TestCase
         self::assertSame('link_2', $map['REX_LINK_1']);
     }
 
+    public function testCollectsListFields(): void
+    {
+        $code = '<?php $id = 1; $f = MForm::factory()->addMedialistField(1)->addLinklistField("$id.0.links")->addImagelistField("$id.0.gallery")->addTextField("$id.0.t"); echo MBlock::show($id, $f->show());';
+        $analysis = $this->analyzer->analyze($code);
+
+        self::assertEquals(['medialist' => 'media', 'links' => 'link', 'gallery' => 'media'], $analysis['list_fields']['1']);
+    }
+
     public function testNoMBlock(): void
     {
         $analysis = $this->analyzer->analyze('<?php echo MForm::factory()->addTextField(1)->show();');

@@ -42,11 +42,19 @@ Daten:
 - verschachtelte Item-Listen mit MBlock-Markern werden rekursiv nach denselben Regeln konvertiert
 - mehrere GBS-Wrapper (Gridblock-Spalten): standardmäßig nur die erste Spalte mit Warnung, mit „Spalten zusammenführen“ alle der Reihe nach
 
+Daten, Listen und Sprachen:
+
+- Medialist-/Linklist-/Bildlisten-Werte (kommasepariert) werden normalisiert (getrimmt, Leereinträge und Dubletten entfernt) und gegen Medienpool bzw. Struktur geprüft; fehlende Dateien oder Artikel erscheinen als Warnung je Slice. Welche Felder Listen sind, leitet der Analyzer aus dem Modul-Code ab.
+- Mehrsprachige Werte, also ein Objekt mit Sprach-Ids als Schlüssel und MBlock-Listen als Werte, werden je Sprache konvertiert; die Struktur bleibt erhalten.
+
+### YForm-Tabellen (Schritt 6)
+
+Felder vom Wert-Typ `mblock` oder Text-Spalten, deren Werte MBlock-Marker tragen, listet Schritt 6 des Assistenten (bzw. `mform:migrate --yform`). Probelauf und Anwenden je Datensatz wie in Schritt 4, mit Backup unter einem Lauf-Token und Rückgängig in der Liste der Migrationsläufe. Die Spalte behält das konvertierte JSON (Repeater-Format), ein eigenes YForm-Value dafür gibt es nicht. Optional stellt der Assistent den Feldtyp von `mblock` auf `textarea` um, damit YForm kein MBlock-Widget mehr erwartet. Ein Key-Mapping muss hier von Hand angegeben werden, weil es keinen Modul-Code gibt.
+
 ### Grenzen
 
 - HTML-/Heredoc-Formulare (`MBlock::show($id, $htmlString)`) werden erkannt, aber nicht umgeschrieben. Der Repeater braucht ein MForm-Objekt.
 - Verschachteltes MBlock wird erkannt und die Daten rekursiv konvertiert; den inneren Repeater (`addFlexRepeaterElement('block', MForm::factory()...)`) musst du im konvertierten Code prüfen.
-- Medialist/Linklist-Werte bleiben kommaseparierte Strings (M5), mehrsprachige Werte (M6) und MBlock in YForm (M7) folgen in Beta 2.
 - Der Konverter erzeugt Vorschlagscode. Prüfe das Ergebnis vor dem Einsatz, teste auf Staging.
 
 ### Konsole
@@ -61,6 +69,8 @@ php bin/console mform:migrate --module=12 --reassign=57
 php bin/console mform:migrate --rollback=TOKEN
 php bin/console mform:migrate --revert-reassign=TOKEN   # oder "last"
 php bin/console mform:migrate --runs
+php bin/console mform:migrate --yform                       # YForm-Felder mit MBlock-Daten
+php bin/console mform:migrate --yform=rex_news.blocks --map='{"REX_MEDIA_1":"media"}' [--apply] [--switch-type]
 php bin/console mform:lint [--module=12] [--yform] [--severity=warning] [--json]
 ```
 

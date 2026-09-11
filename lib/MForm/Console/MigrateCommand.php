@@ -11,6 +11,7 @@ use FriendsOfRedaxo\MForm\Migration\MBlockInventory;
 use FriendsOfRedaxo\MForm\Migration\MBlockModuleAnalyzer;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterMigrator;
+use FriendsOfRedaxo\MForm\Migration\YFormMBlockMigrator;
 use rex;
 use rex_console_command;
 use rex_sql;
@@ -53,6 +54,8 @@ final class MigrateCommand extends rex_console_command
             ->addOption('rollback', null, InputOption::VALUE_REQUIRED, 'Datenmigration mit diesem Lauf-Token zuruecknehmen')
             ->addOption('revert-reassign', null, InputOption::VALUE_REQUIRED, 'Umhaengen mit diesem Token zuruecknehmen ("last" = letztes)')
             ->addOption('runs', null, InputOption::VALUE_NONE, 'Letzte Migrationslaeufe und Umhaengungen auflisten')
+            ->addOption('yform', null, InputOption::VALUE_OPTIONAL, 'YForm: ohne Wert Kandidaten auflisten, mit "tabelle.spalte" Dry-Run (mit --apply schreiben)', false)
+            ->addOption('switch-type', null, InputOption::VALUE_NONE, 'YForm: Feldtyp mblock nach dem Anwenden auf textarea umstellen')
             ->addOption('json', null, InputOption::VALUE_NONE, 'Inventar/Dry-Run als JSON');
     }
 
@@ -94,6 +97,11 @@ final class MigrateCommand extends rex_console_command
             $this->printRuns($io, $migrator);
 
             return self::SUCCESS;
+        }
+
+        $yformOpt = $input->getOption('yform');
+        if (false !== $yformOpt) {
+            return $this->runYForm($io, $input, $converter, is_string($yformOpt) ? $yformOpt : '');
         }
 
         $moduleOpt = $input->getOption('module');
@@ -159,7 +167,7 @@ final class MigrateCommand extends rex_console_command
         $options = ['merge_columns' => (bool) $input->getOption('merge-columns')];
         $slotConfig = [];
         foreach ($slots as $slot) {
-            $slotConfig[$slot] = ['key_map' => $mapOverride ?? ($analysis['key_maps'][$slot] ?? []), 'options' => $options];
+            $slotConfig[$slot] = ['key_map' => $mapOverride ?? ($analysis['key_maps'][$slot] ?? []), 'options' => $options + ['list_fields' => $analysis['list_fields'][$slot] ?? []]];
         }
 
         // Code-Konvertierung.
@@ -210,6 +218,82 @@ final class MigrateCommand extends rex_console_command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * YForm-Felder (M7): Kandidaten, Dry-Run, Anwenden, Typumstellung.
+     */
+    private function runYForm(SymfonyStyle $io, InputInterface $input, MBlockToRepeaterConverter $converter, string $target): int
+    {
+        if (!YFormMBlockMigrator::available()) {
+            $io->error('YForm ist nicht installiert.');
+
+            return self::FAILURE;
+        }
+        $yform = new YFormMBlockMigrator($converter);
+
+        if ('' === $target) {
+            $io->title('YForm-Felder mit MBlock-Daten');
+            $rows = [];
+            foreach ($yform->findCandidates() as $c) {
+                $rows[] = [$c['table'] . '.' . $c['field'], $c['label'], $c['type_name'], $c['rows'], $c['with_markers']];
+            }
+            if ([] === $rows) {
+                $io->success('Keine YForm-Felder mit MBlock-Daten gefunden.');
+            } else {
+                $io->table(['Tabelle.Spalte', 'Label', 'Typ', 'Datensaetze', 'mit MBlock-Daten'], $rows);
+                $io->writeln('Naechster Schritt: mform:migrate --yform=tabelle.spalte [--map=…] [--apply] [--switch-type]');
+            }
+
+            return self::SUCCESS;
+        }
+
+        [$table, $field] = array_pad(explode('.', $target, 2), 2, '');
+        if (!YFormMBlockMigrator::validName($table) || !YFormMBlockMigrator::validName($field)) {
+            $io->error('Erwartet wird --yform=tabelle.spalte');
+
+            return self::FAILURE;
+        }
+        $keyMap = [];
+        $mapOpt = $input->getOption('map');
+        if (is_string($mapOpt) && '' !== $mapOpt) {
+            $decoded = json_decode($mapOpt, true);
+            if (!is_array($decoded)) {
+                $io->error('--map ist kein gueltiges JSON-Objekt.');
+
+                return self::FAILURE;
+            }
+            $keyMap = array_map('strval', $decoded);
+        }
+        $options = ['merge_columns' => (bool) $input->getOption('merge-columns')];
+
+        $dry = $yform->dryRun($table, $field, $keyMap, $options);
+        $io->section(sprintf('Dry-Run %s.%s: %d Datensaetze, %d mit Aenderung, %d mit Warnungen', $table, $field, $dry['total'], $dry['changed'], $dry['warnings']));
+        $rows = [];
+        foreach ($dry['rows'] as $row) {
+            $rows[] = [$row['id'], $row['count'], $row['skipped'] ? 'uebersprungen' : ($row['changed'] ? 'AENDERUNG' : 'unveraendert'), implode("\n", $row['warnings'])];
+        }
+        if ([] !== $rows) {
+            $io->table(['Id', 'Items', 'Status', 'Warnungen'], $rows);
+        }
+
+        if (!(bool) $input->getOption('apply')) {
+            $io->note('Vorschau. Mit --apply werden die Werte geschrieben (Backup je Lauf-Token), --switch-type stellt den Feldtyp mblock auf textarea um.');
+
+            return self::SUCCESS;
+        }
+
+        $result = $yform->apply($table, $field, $keyMap, $options);
+        foreach ($result['errors'] as $error) {
+            $io->error($error);
+        }
+        $io->success(sprintf('%d Datensatz/Datensaetze migriert, %d uebersprungen. Lauf-Token: %s (Rollback: mform:migrate --rollback=%s)', $result['updated'], $result['skipped'], $result['token'], $result['token']));
+        if ((bool) $input->getOption('switch-type')) {
+            $switch = $yform->switchFieldToTextarea($table, $field);
+            $io->writeln(($switch['changed'] ? ' - ' : ' ! ') . $switch['message']);
+        }
+
+        return [] === $result['errors'] ? self::SUCCESS : self::FAILURE;
     }
 
     private function printInventory(SymfonyStyle $io, OutputInterface $output, bool $json): int

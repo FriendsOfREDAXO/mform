@@ -36,6 +36,7 @@ use function strlen;
  *     unknown_options: list<string>,
  *     fields: list<FieldInfo>,
  *     key_map: array<string, string>,
+ *     list_fields: array<string, 'media'|'link'>,
  *     nested_keys: list<string>,
  *     has_offline_field: bool
  * }
@@ -44,6 +45,7 @@ use function strlen;
  *     calls: list<CallInfo>,
  *     slots: list<string>,
  *     key_maps: array<string, array<string, string>>,
+ *     list_fields: array<string, array<string, 'media'|'link'>>,
  *     nested: bool,
  *     gridblock: bool,
  *     html_mblock: bool,
@@ -101,6 +103,7 @@ final class MBlockModuleAnalyzer
 
         $slots = [];
         $keyMaps = [];
+        $listFields = [];
         $nested = false;
         $htmlMBlock = false;
         foreach ($calls as $call) {
@@ -108,6 +111,7 @@ final class MBlockModuleAnalyzer
                 $slots[] = $call['slot'];
             }
             $keyMaps[$call['slot']] = ($keyMaps[$call['slot']] ?? []) + $call['key_map'];
+            $listFields[$call['slot']] = ($listFields[$call['slot']] ?? []) + $call['list_fields'];
             if ([] !== $call['nested_keys']) {
                 $nested = true;
             }
@@ -149,6 +153,7 @@ final class MBlockModuleAnalyzer
             'calls' => $calls,
             'slots' => $slots,
             'key_maps' => $keyMaps,
+            'list_fields' => $listFields,
             'nested' => $nested,
             'gridblock' => $gridblock,
             'html_mblock' => $htmlMBlock,
@@ -218,6 +223,7 @@ final class MBlockModuleAnalyzer
 
             $fields = [];
             $keyMap = [];
+            $listFields = [];
             $nestedKeys = [];
             $hasOffline = false;
             if ('mform' === $formKind) {
@@ -225,6 +231,7 @@ final class MBlockModuleAnalyzer
                 $regionStart = $region['offset'];
                 $fields = $this->collectFields($region['code'], $idToken, $slot, $regionStart, $code);
                 $keyMap = $this->buildKeyMap($fields);
+                $listFields = $this->buildListFields($fields);
                 foreach ($fields as $field) {
                     if ('nested' === $field['type']) {
                         $nestedKeys[] = $field['name'];
@@ -248,6 +255,7 @@ final class MBlockModuleAnalyzer
                 'unknown_options' => $unknown,
                 'fields' => $fields,
                 'key_map' => $keyMap,
+                'list_fields' => $listFields,
                 'nested_keys' => $nestedKeys,
                 'has_offline_field' => $hasOffline,
             ];
@@ -381,6 +389,35 @@ final class MBlockModuleAnalyzer
         }
 
         return $map;
+    }
+
+    /**
+     * Listenfelder (Medialist, Bildliste, Linklist) mit ihrem Zielnamen: fuer die
+     * Normalisierung kommaseparierter Werte und die Existenzpruefung (M5).
+     *
+     * @param list<FieldInfo> $fields
+     * @return array<string, 'media'|'link'>
+     */
+    private function buildListFields(array $fields): array
+    {
+        $list = [];
+        foreach ($fields as $field) {
+            $kind = match ($field['type']) {
+                'medialist', 'imagelist' => 'media',
+                'linklist' => 'link',
+                default => null,
+            };
+            if (null === $kind) {
+                continue;
+            }
+            $name = $field['target'] ?? $field['name'];
+            if (preg_match('/^\d+$/', $name)) {
+                continue;
+            }
+            $list[$name] = $kind;
+        }
+
+        return $list;
     }
 
     private function typeFromMethod(string $method): string

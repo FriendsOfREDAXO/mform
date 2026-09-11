@@ -154,6 +154,33 @@ final class MBlockToRepeaterConverterTest extends TestCase
         self::assertNotSame([], $result['warnings']);
     }
 
+    public function testConvertDataNormalizesListFields(): void
+    {
+        $raw = json_encode([['checkbox_block_hold' => 'x', 'REX_MEDIALIST_1' => ' a.jpg, b.jpg,,a.jpg ', 'links' => ['5', ' 7', '']]]);
+        $result = $this->converter->convertData((string) $raw, '1', ['REX_MEDIALIST_1' => 'medialist'], ['list_fields' => ['medialist' => 'media', 'links' => 'link'], 'check_existence' => false]);
+        $items = json_decode($result['json'], true);
+
+        self::assertSame('a.jpg,b.jpg', $items[0]['medialist']);
+        self::assertSame('5,7', $items[0]['links']);
+        self::assertStringContainsString('Listenwert', implode("\n", $result['notes']));
+    }
+
+    public function testConvertDataLanguageArray(): void
+    {
+        $raw = json_encode([
+            '1' => [['checkbox_block_hold' => 'x', 'title' => 'de', 'mblock_offline' => '1']],
+            '2' => [['checkbox_block_hold' => 'x', 'title' => 'en']],
+        ]);
+        $result = $this->converter->convertData((string) $raw, '1');
+        $decoded = json_decode($result['json'], true);
+
+        self::assertSame(2, $result['count']);
+        self::assertSame(['1', '2'], array_map('strval', array_keys($decoded)));
+        self::assertSame(['title' => 'de', '__disabled' => true], $decoded['1'][0]);
+        self::assertSame(['title' => 'en'], $decoded['2'][0]);
+        self::assertStringContainsString('Mehrsprachiger Wert', implode("\n", $result['notes']));
+    }
+
     public function testConvertDataIsIdempotent(): void
     {
         $raw = json_encode([['checkbox_block_hold' => 'x', 'header' => 'A', 'mblock_offline' => '1']]);

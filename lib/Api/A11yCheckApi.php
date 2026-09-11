@@ -51,7 +51,7 @@ class A11yCheckApi extends rex_api_function
         }
 
         $normalized = MediaMetaChecker::normalizeRules(is_array($rules) ? $rules : null);
-        if (null === $normalized || [] === $filenames) {
+        if (!MediaMetaChecker::isEnabled() || null === $normalized || [] === $filenames) {
             rex_response::sendJson(['results' => []]);
             exit;
         }

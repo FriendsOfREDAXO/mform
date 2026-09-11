@@ -32,10 +32,18 @@ page:
             title: 'translate:migration'
             icon: rex-icon fa-rotate
 
+        settings:
+            title: 'translate:mform_settings'
+            icon: rex-icon fa-sliders
+
         changelog:
             title: 'translate:changelog'
             subPath: CHANGELOG.md
             itemClass: pull-right
+
+default_config:
+    a11y_check: true
+    a11y_default: false
 
 console_commands:
     mform:migrate: FriendsOfRedaxo\MForm\Console\MigrateCommand

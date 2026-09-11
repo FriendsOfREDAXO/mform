@@ -205,7 +205,14 @@ final class MBlockToRepeaterConverter
      *
      * @param string|null $repeaterId Repeater-Slot-Id (Standard "1")
      * @param array<int|string, string> $legacyKeyMap Mapping alter Keys auf neue Repeater-Feldnamen, z. B. ['REX_MEDIA_1' => 'media', '1' => 'link']
-     * @param array{merge_columns?: bool, nested?: bool} $options merge_columns: mehrere GBS-Wrapper (Gridblock-Spalten) der Reihe nach zusammenfuehren statt nur die erste zu nehmen; nested: verschachtelte Listen konvertieren (Standard true)
+     * @param array{merge_columns?: bool, nested?: bool, list_fields?: array<string, string>, check_existence?: bool} $options
+     *        merge_columns: mehrere GBS-Wrapper (Gridblock-Spalten) der Reihe nach zusammenfuehren statt nur die erste zu nehmen;
+     *        nested: verschachtelte Listen konvertieren (Standard true);
+     *        list_fields: Feldname => 'media'|'link' fuer Medialist-/Linklist-Werte (M5: normalisieren, Existenz pruefen);
+     *        check_existence: Dateien/Artikel gegen Medienpool und Struktur pruefen (Standard true, braucht REDAXO)
+     *
+     * Mehrsprachige Werte (M6): ein Objekt, dessen Schluessel Sprach-Ids sind und dessen Werte
+     * MBlock-Listen, wird je Sprache konvertiert; die Struktur bleibt erhalten.
      *
      * @return array{json: string, count: int, notes: list<string>, warnings: list<string>}
      */
@@ -216,6 +223,13 @@ final class MBlockToRepeaterConverter
         $targetId = (null !== $repeaterId && '' !== trim($repeaterId)) ? trim($repeaterId) : '1';
         $mergeColumns = (bool) ($options['merge_columns'] ?? false);
         $nested = (bool) ($options['nested'] ?? true);
+        $listFields = [];
+        foreach ($options['list_fields'] ?? [] as $name => $kind) {
+            if (in_array($kind, ['media', 'link'], true)) {
+                $listFields[(string) $name] = $kind;
+            }
+        }
+        $checkExistence = (bool) ($options['check_existence'] ?? true);
 
         if ('' === trim($rawValue)) {
             $this->warn('Keine Daten uebergeben.');
@@ -230,6 +244,22 @@ final class MBlockToRepeaterConverter
             $this->warn('Daten sind kein gueltiges JSON. Pruefe den Slice-Wert.');
 
             return $this->dataResult('', 0);
+        }
+
+        // M6: Sprach-Arrays {clangId: [items]} je Sprache konvertieren, Struktur behalten.
+        if ($this->isLanguageArray($decoded)) {
+            $stats = ['offline' => 0, 'hold' => 0, 'mapped' => [], 'nested' => 0, 'lists' => 0, 'missing' => []];
+            $perLanguage = [];
+            $total = 0;
+            foreach ($decoded as $clangId => $languageItems) {
+                $items = is_array($languageItems) ? ($this->extractMBlockItems($languageItems, $targetId) ?? []) : [];
+                $perLanguage[(string) $clangId] = $this->convertItems($items, $legacyKeyMap, $nested, $stats, 0, $listFields, $checkExistence);
+                $total += count($perLanguage[(string) $clangId]);
+            }
+            $this->note(sprintf('Mehrsprachiger Wert: %d Sprache(n) je Sprache konvertiert (%d Items).', count($perLanguage), $total));
+            $this->reportStats($stats);
+
+            return $this->dataResult((string) json_encode($perLanguage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $total);
         }
 
         $wrapperCount = $this->countWrappersWithValue($decoded, $targetId);
@@ -249,21 +279,13 @@ final class MBlockToRepeaterConverter
             return $this->dataResult('', 0);
         }
 
-        $stats = ['offline' => 0, 'hold' => 0, 'mapped' => [], 'nested' => 0];
-        $migrated = $this->convertItems($items, $legacyKeyMap, $nested, $stats, 0);
+        $stats = ['offline' => 0, 'hold' => 0, 'mapped' => [], 'nested' => 0, 'lists' => 0, 'missing' => []];
+        $migrated = $this->convertItems($items, $legacyKeyMap, $nested, $stats, 0, $listFields, $checkExistence);
 
         $json = (string) json_encode($migrated, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $this->note(sprintf('%d Item(s) aus Slot %s konvertiert.', count($migrated), $targetId));
-        foreach ($stats['mapped'] as $old => $new) {
-            $this->note(sprintf('Legacy-Key `%s` auf `%s` gemappt.', $old, $new));
-        }
-        if ($stats['offline'] > 0) {
-            $this->note(sprintf('%d Item(s) waren offline (`mblock_offline`) und wurden als `__disabled` markiert.', $stats['offline']));
-        }
-        if ($stats['nested'] > 0) {
-            $this->note(sprintf('%d verschachtelte Item-Liste(n) rekursiv konvertiert.', $stats['nested']));
-        }
+        $this->reportStats($stats);
         if (0 === $stats['hold'] && 0 === $stats['offline'] && $this->isListOfArrays($decoded)) {
             $this->note('Keine MBlock-Marker (`checkbox_block_hold`/`mblock_offline`) gefunden. Die Daten sind vermutlich bereits im Repeater-Format.');
         }
@@ -289,12 +311,89 @@ final class MBlockToRepeaterConverter
     }
 
     /**
+     * @param array{offline: int, hold: int, mapped: array<int|string, string>, nested: int, lists: int, missing: list<string>} $stats
+     */
+    private function reportStats(array $stats): void
+    {
+        foreach ($stats['mapped'] as $old => $new) {
+            $this->note(sprintf('Legacy-Key `%s` auf `%s` gemappt.', $old, $new));
+        }
+        if ($stats['offline'] > 0) {
+            $this->note(sprintf('%d Item(s) waren offline (`mblock_offline`) und wurden als `__disabled` markiert.', $stats['offline']));
+        }
+        if ($stats['nested'] > 0) {
+            $this->note(sprintf('%d verschachtelte Item-Liste(n) rekursiv konvertiert.', $stats['nested']));
+        }
+        if ($stats['lists'] > 0) {
+            $this->note(sprintf('%d Listenwert(e) (Medialist/Linklist) normalisiert: getrimmt, Leereintraege und Dubletten entfernt.', $stats['lists']));
+        }
+        foreach (array_unique($stats['missing']) as $missing) {
+            $this->warn($missing);
+        }
+    }
+
+    /**
+     * Sprach-Array: alle Schluessel numerisch (Sprach-Ids), alle Werte Arrays, keine Item-Liste.
+     *
+     * @param array<mixed> $decoded
+     */
+    private function isLanguageArray(array $decoded): bool
+    {
+        if ([] === $decoded || array_is_list($decoded)) {
+            return false;
+        }
+        foreach ($decoded as $key => $value) {
+            if (!preg_match('/^\d+$/', (string) $key) || !is_array($value)) {
+                return false;
+            }
+            if ([] !== $value && !$this->isListOfArrays($value) && !isset($value['VALUE']) && null === $this->extractMBlockItems($value, '1')) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * M5: kommaseparierte Listenwerte normalisieren und optional auf Existenz pruefen.
+     *
+     * @param array{offline: int, hold: int, mapped: array<int|string, string>, nested: int, lists: int, missing: list<string>} $stats
+     */
+    private function normalizeListValue(mixed $value, string $field, string $kind, bool $checkExistence, array &$stats): string
+    {
+        $parts = is_array($value) ? array_map(static fn (mixed $v): string => (string) (is_scalar($v) ? $v : ''), $value) : explode(',', (string) $value);
+        $normalized = [];
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ('' === $part || in_array($part, $normalized, true)) {
+                continue;
+            }
+            $normalized[] = $part;
+            if (!$checkExistence) {
+                continue;
+            }
+            if ('media' === $kind && class_exists(\rex_media::class) && null === \rex_media::get($part)) {
+                $stats['missing'][] = sprintf('Feld `%s`: Datei `%s` liegt nicht im Medienpool.', $field, $part);
+            } elseif ('link' === $kind && class_exists(\rex_article::class) && preg_match('/^\d+$/', $part) && null === \rex_article::get((int) $part)) {
+                $stats['missing'][] = sprintf('Feld `%s`: Artikel %s existiert nicht.', $field, $part);
+            }
+        }
+        $result = implode(',', $normalized);
+        if ($result !== (is_array($value) ? implode(',', $parts) : (string) $value)) {
+            ++$stats['lists'];
+        }
+
+        return $result;
+    }
+
+    /**
      * @param array<int, mixed> $items
      * @param array<int|string, string> $legacyKeyMap
-     * @param array{offline: int, hold: int, mapped: array<int|string, string>, nested: int} $stats
+     * @param array{offline: int, hold: int, mapped: array<int|string, string>, nested: int, lists: int, missing: list<string>} $stats
+     * @param array<string, string> $listFields
      * @return list<array<string, mixed>>
      */
-    private function convertItems(array $items, array $legacyKeyMap, bool $nested, array &$stats, int $depth): array
+    private function convertItems(array $items, array $legacyKeyMap, bool $nested, array &$stats, int $depth, array $listFields = [], bool $checkExistence = true): array
     {
         $migrated = [];
         foreach ($items as $item) {
@@ -353,12 +452,19 @@ final class MBlockToRepeaterConverter
                 ++$stats['offline'];
             }
 
+            // M5: Medialist-/Linklist-Werte normalisieren.
+            foreach ($listFields as $field => $kind) {
+                if (array_key_exists($field, $item) && (is_string($item[$field]) || is_array($item[$field]))) {
+                    $item[$field] = $this->normalizeListValue($item[$field], $field, $kind, $checkExistence, $stats);
+                }
+            }
+
             // Verschachtelte MBlock-Listen rekursiv konvertieren.
             if ($nested && $depth < 5) {
                 foreach ($item as $key => $value) {
                     if (is_array($value) && $this->isListOfArrays($value) && $this->hasMBlockMarkers($value)) {
                         ++$stats['nested'];
-                        $item[$key] = $this->convertItems($value, $legacyKeyMap, true, $stats, $depth + 1);
+                        $item[$key] = $this->convertItems($value, $legacyKeyMap, true, $stats, $depth + 1, $listFields, $checkExistence);
                     }
                 }
             }

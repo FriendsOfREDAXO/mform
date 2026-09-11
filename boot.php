@@ -42,7 +42,7 @@ if (rex::isBackend()) {
     rex_view::setJsProperty('mform_a11y', [
         'api' => rex_url::backendController(['rex-api-call' => 'mform_a11y_check'], false),
         'edit' => rex_i18n::msg('mform_a11y_edit'),
-        'ok' => rex_i18n::msg('mform_a11y_ok'),
+        'recheck' => rex_i18n::msg('mform_a11y_recheck'),
         'blocked' => rex_i18n::msg('mform_a11y_strict_blocked'),
         'checking' => rex_i18n::msg('mform_a11y_checking'),
     ]);

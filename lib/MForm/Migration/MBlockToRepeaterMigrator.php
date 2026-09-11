@@ -43,7 +43,7 @@ use function trim;
  *     notes: list<string>
  * }
  * @phpstan-type DryRunResult array{column: string, rows: list<DryRunRow>, total: int, changed: int, warnings: int}
- * @phpstan-type SlotConfig array{key_map?: array<int|string, string>, options?: array{merge_columns?: bool, nested?: bool}}
+ * @phpstan-type SlotConfig array{key_map?: array<int|string, string>, options?: array{merge_columns?: bool, nested?: bool, list_fields?: array<string, string>, check_existence?: bool}}
  */
 final class MBlockToRepeaterMigrator
 {
@@ -73,7 +73,7 @@ final class MBlockToRepeaterMigrator
             ->ensureColumn(new rex_sql_column('run_token', 'varchar(32)'))
             ->ensureColumn(new rex_sql_column('module_id', 'int(10) unsigned', false, '0'))
             ->ensureColumn(new rex_sql_column('slice_id', 'int(10) unsigned'))
-            ->ensureColumn(new rex_sql_column('slot_column', 'varchar(16)'))
+            ->ensureColumn(new rex_sql_column('slot_column', 'varchar(191)'))
             ->ensureColumn(new rex_sql_column('old_value', 'longtext', true))
             ->ensureColumn(new rex_sql_column('new_value', 'longtext', true))
             ->ensureColumn(new rex_sql_column('createdate', 'datetime'))
@@ -151,7 +151,7 @@ final class MBlockToRepeaterMigrator
      * Speicher und liefert eine Vorschau, ohne etwas zu schreiben.
      *
      * @param array<int|string, string> $legacyKeyMap
-     * @param array{merge_columns?: bool, nested?: bool} $options
+     * @param array{merge_columns?: bool, nested?: bool, list_fields?: array<string, string>, check_existence?: bool} $options
      *
      * @return DryRunResult
      */
@@ -240,7 +240,7 @@ final class MBlockToRepeaterMigrator
      *
      * @param list<int> $sliceIds
      * @param array<int|string, string> $legacyKeyMap
-     * @param array{merge_columns?: bool, nested?: bool} $options
+     * @param array{merge_columns?: bool, nested?: bool, list_fields?: array<string, string>, check_existence?: bool} $options
      *
      * @return array{updated: int, skipped: int, errors: list<string>, token: string}
      */
@@ -363,16 +363,27 @@ final class MBlockToRepeaterMigrator
         $errors = [];
         foreach ($rows as $row) {
             $column = (string) $row['slot_column'];
-            if (!preg_match('/^value\d+$/', $column)) {
-                $errors[] = sprintf('Sicherung %d: ungueltige Spalte.', (int) $row['id']);
-                continue;
-            }
+            $oldValue = is_string($row['old_value']) ? $row['old_value'] : '';
             try {
-                $write = rex_sql::factory();
-                $write->setTable(rex::getTable('article_slice'));
-                $write->setWhere('id = :id', ['id' => (int) $row['slice_id']]);
-                $write->setValue($column, is_string($row['old_value']) ? $row['old_value'] : '');
-                $write->update();
+                if (str_starts_with($column, YFormMBlockMigrator::COLUMN_PREFIX)) {
+                    // YForm-Datensatz: "yform:tabelle.spalte", slice_id = Datensatz-Id.
+                    [$table, $field] = array_pad(explode('.', substr($column, strlen(YFormMBlockMigrator::COLUMN_PREFIX)), 2), 2, '');
+                    if (!YFormMBlockMigrator::validName($table) || !YFormMBlockMigrator::validName($field)) {
+                        $errors[] = sprintf('Sicherung %d: ungueltige Spalte.', (int) $row['id']);
+                        continue;
+                    }
+                    rex_sql::factory()->setQuery('UPDATE `' . $table . '` SET `' . $field . '` = ? WHERE id = ?', [$oldValue, (int) $row['slice_id']]);
+                } else {
+                    if (!preg_match('/^value\d+$/', $column)) {
+                        $errors[] = sprintf('Sicherung %d: ungueltige Spalte.', (int) $row['id']);
+                        continue;
+                    }
+                    $write = rex_sql::factory();
+                    $write->setTable(rex::getTable('article_slice'));
+                    $write->setWhere('id = :id', ['id' => (int) $row['slice_id']]);
+                    $write->setValue($column, $oldValue);
+                    $write->update();
+                }
 
                 rex_sql::factory()->setQuery(
                     'UPDATE ' . rex::getTable(self::TABLE_BACKUP) . ' SET reverted = 1, revertedate = :dt WHERE id = :id',

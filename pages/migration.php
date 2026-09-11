@@ -19,6 +19,7 @@ use FriendsOfRedaxo\MForm\Migration\MBlockInventory;
 use FriendsOfRedaxo\MForm\Migration\MBlockModuleAnalyzer;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterConverter;
 use FriendsOfRedaxo\MForm\Migration\MBlockToRepeaterMigrator;
+use FriendsOfRedaxo\MForm\Migration\YFormMBlockMigrator;
 
 $analyzer = new MBlockModuleAnalyzer();
 $converter = new MBlockToRepeaterConverter($analyzer);
@@ -125,7 +126,7 @@ $mergeColumns = 1 === rex_request('merge_columns', 'int', 0);
 $slotConfig = [];
 if (null !== $analysis) {
     foreach ($analysis['slots'] as $slot) {
-        $slotConfig[$slot] = ['key_map' => $keyMaps[$slot] ?? [], 'options' => ['merge_columns' => $mergeColumns]];
+        $slotConfig[$slot] = ['key_map' => $keyMaps[$slot] ?? [], 'options' => ['merge_columns' => $mergeColumns, 'list_fields' => $analysis['list_fields'][$slot] ?? []]];
     }
 }
 
@@ -250,12 +251,62 @@ if ('slice_reassign_revert' === $func) {
     }
 }
 
+// ── YForm (M7) ─────────────────────────────────────────────────────────────
+$yform = YFormMBlockMigrator::available() ? new YFormMBlockMigrator($converter) : null;
+$yformTable = rex_request('yform_table', 'string', '');
+$yformField = rex_request('yform_field', 'string', '');
+$yformDry = null;
+$yformKeyMap = [];
+$yformKeyMapJson = rex_request('yform_key_map', 'string', '');
+if ('' !== trim($yformKeyMapJson)) {
+    $decodedMap = json_decode($yformKeyMapJson, true);
+    if (is_array($decodedMap)) {
+        $yformKeyMap = array_map('strval', $decodedMap);
+    } else {
+        $messages .= rex_view::warning($t('mapping_json_invalid'));
+    }
+}
+$yformValid = null !== $yform && YFormMBlockMigrator::validName($yformTable) && YFormMBlockMigrator::validName($yformField);
+
+if ('yform_dryrun' === $func && $yformValid) {
+    $yformDry = $yform->dryRun($yformTable, $yformField, $yformKeyMap, ['merge_columns' => $mergeColumns]);
+    $messages .= rex_view::success($t('batch_dryrun_done'));
+}
+if ('yform_apply' === $func && $yformValid) {
+    $ids = [];
+    foreach ((array) rex_request('yform_ids', 'array', []) as $id) {
+        if ((int) $id > 0) {
+            $ids[] = (int) $id;
+        }
+    }
+    if ([] === $ids) {
+        $messages .= rex_view::info($t('batch_nothing_selected'));
+    } else {
+        $result = $yform->apply($yformTable, $yformField, $yformKeyMap, ['merge_columns' => $mergeColumns], $ids);
+        foreach ($result['errors'] as $err) {
+            $messages .= rex_view::error(rex_escape($err));
+        }
+        if ($result['updated'] > 0) {
+            $messages .= rex_view::success($t('batch_applied_token', $result['updated'], $result['token']));
+        }
+        if (1 === rex_request('yform_switch_type', 'int', 0)) {
+            $switch = $yform->switchFieldToTextarea($yformTable, $yformField);
+            $messages .= $switch['changed'] ? rex_view::success(rex_escape($switch['message'])) : rex_view::info(rex_escape($switch['message']));
+        }
+    }
+    $yformDry = $yform->dryRun($yformTable, $yformField, $yformKeyMap, ['merge_columns' => $mergeColumns]);
+}
+
 // ── Intro ───────────────────────────────────────────────────────────────────
 $entries = $inventory->collect();
 $summary = MBlockInventory::summary($entries);
 
 $steps = '';
-foreach ([1 => 'inventory', 2 => 'code', 3 => 'module', 4 => 'data', 5 => 'reassign'] as $n => $key) {
+$stepKeys = [1 => 'inventory', 2 => 'code', 3 => 'module', 4 => 'data', 5 => 'reassign'];
+if (null !== $yform) {
+    $stepKeys[6] = 'yform';
+}
+foreach ($stepKeys as $n => $key) {
     $steps .= '<li><a href="#mform-migration-step' . $n . '"><span class="badge">' . $n . '</span> ' . $t('step_' . $key) . '</a></li>';
 }
 $introBody = '<p>' . $t('intro') . '</p>'
@@ -310,6 +361,72 @@ $fragment->setVar('title', $sectionTitle(1, $t('step_inventory')), false);
 $fragment->setVar('body', $inventoryBody, false);
 echo $fragment->parse('core/page/section.php');
 
+/**
+ * Schritt 6: YForm-Felder mit MBlock-Daten (M7), modulunabhaengig.
+ */
+$renderYFormSection = static function () use ($yform, $yformDry, $yformTable, $yformField, $yformKeyMapJson, $mergeColumns, $csrf, $pageUrl, $t, $sectionTitle): void {
+    if (null === $yform) {
+        return;
+    }
+    $body = '<div id="mform-migration-step6"></div><p>' . $t('yform_intro') . '</p>';
+    $candidates = $yform->findCandidates();
+    if ([] === $candidates) {
+        $body .= '<p class="text-muted rex-mb-0">' . $t('yform_empty') . '</p>';
+    } else {
+        $rows = '';
+        foreach ($candidates as $c) {
+            $active = $c['table'] === $yformTable && $c['field'] === $yformField;
+            $rows .= '<tr' . ($active ? ' class="info"' : '') . '><td><code>' . rex_escape($c['table'] . '.' . $c['field']) . '</code><br><small class="text-muted">' . rex_escape($c['label']) . '</small></td>'
+                . '<td>' . rex_escape($c['type_name']) . '</td><td class="text-right">' . $c['rows'] . '</td><td class="text-right">' . $c['with_markers'] . '</td>'
+                . '<td class="text-right"><form action="' . $pageUrl() . '#mform-migration-step6" method="post" style="display:inline">' . $csrf . '<input type="hidden" name="func" value="yform_dryrun"><input type="hidden" name="yform_table" value="' . rex_escape($c['table']) . '"><input type="hidden" name="yform_field" value="' . rex_escape($c['field']) . '"><input type="hidden" name="yform_key_map" value="' . rex_escape($yformKeyMapJson) . '"><button type="submit" class="btn btn-xs ' . ($active ? 'btn-primary' : 'btn-default') . '"><i class="rex-icon fa-search"></i> ' . $t('batch_dryrun') . '</button></form></td></tr>';
+        }
+        $body .= '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th>' . $t('yform_col_field') . '</th><th>' . $t('col_type') . '</th><th class="text-right">' . $t('yform_col_rows') . '</th><th class="text-right">' . $t('yform_col_markers') . '</th><th></th></tr></thead><tbody>' . $rows . '</tbody></table></div>';
+        $body .= '<div class="row"><div class="col-sm-8"><div class="form-group"><label class="control-label">' . $t('mapping_json') . '</label>'
+            . '<form action="' . $pageUrl() . '#mform-migration-step6" method="post">' . $csrf . '<input type="hidden" name="func" value="yform_dryrun"><input type="hidden" name="yform_table" value="' . rex_escape($yformTable) . '"><input type="hidden" name="yform_field" value="' . rex_escape($yformField) . '">'
+            . '<div class="input-group"><input type="text" class="form-control" name="yform_key_map" value="' . rex_escape($yformKeyMapJson) . '" placeholder="{&quot;REX_MEDIA_1&quot;:&quot;media&quot;}"><span class="input-group-btn"><button type="submit" class="btn btn-default"' . ('' === $yformTable ? ' disabled' : '') . '>' . $t('batch_dryrun') . '</button></span></div></form>'
+            . '<p class="help-block rex-note">' . $t('yform_mapping_note') . '</p></div></div></div>';
+    }
+
+    if (null !== $yformDry) {
+        $rowsHtml = '';
+        $selectable = 0;
+        foreach ($yformDry['rows'] as $row) {
+            $state = $row['skipped'] ? '<span class="label label-default">' . $t('batch_state_skip') . '</span>' : ($row['changed'] ? '<span class="label label-success">' . $t('batch_state_change') . '</span>' : '<span class="label label-default">' . $t('batch_state_nochange') . '</span>');
+            $warn = '';
+            if ([] !== $row['warnings']) {
+                $items = '';
+                foreach ($row['warnings'] as $w) {
+                    $items .= '<li>' . rex_escape($w) . '</li>';
+                }
+                $warn = '<ul class="text-warning rex-mb-0" style="font-size:11px;padding-left:1.2em;">' . $items . '</ul>';
+            }
+            $checkbox = '<span class="text-muted">&ndash;</span>';
+            if ($row['changed']) {
+                ++$selectable;
+                $checkbox = '<input type="checkbox" name="yform_ids[]" value="' . $row['id'] . '" checked>';
+            }
+            $rowsHtml .= '<tr><td>' . $checkbox . '</td><td>' . $row['id'] . '</td><td>' . $row['count'] . '</td><td>' . $state . $warn . '</td></tr>';
+        }
+        $table = '<h5>' . rex_escape($yformTable . '.' . $yformField) . '</h5><p class="rex-note">' . $t('yform_summary', $yformDry['total'], $yformDry['changed'], $yformDry['warnings']) . '</p>'
+            . '<div class="table-responsive"><table class="table table-striped table-hover"><thead><tr><th style="width:32px;"><i class="rex-icon fa-check"></i></th><th>' . $t('yform_col_id') . '</th><th>' . $t('batch_col_count') . '</th><th>' . $t('batch_col_state') . '</th></tr></thead><tbody>' . $rowsHtml . '</tbody></table></div>';
+        if ($selectable > 0) {
+            $body .= '<hr><form action="' . $pageUrl() . '#mform-migration-step6" method="post" onsubmit="return confirm(\'' . rex_escape($t('batch_confirm_backup')) . '\');">' . $csrf
+                . '<input type="hidden" name="func" value="yform_apply"><input type="hidden" name="yform_table" value="' . rex_escape($yformTable) . '"><input type="hidden" name="yform_field" value="' . rex_escape($yformField) . '"><input type="hidden" name="yform_key_map" value="' . rex_escape($yformKeyMapJson) . '"><input type="hidden" name="merge_columns" value="' . ($mergeColumns ? 1 : 0) . '">'
+                . $table
+                . '<div class="checkbox"><label><input type="checkbox" name="yform_switch_type" value="1"> ' . $t('yform_switch_type') . '</label><p class="help-block rex-note" style="margin-bottom:0;">' . $t('yform_switch_type_note') . '</p></div>'
+                . '<div class="alert alert-info"><i class="rex-icon fa-shield"></i> ' . $t('batch_backup_note') . '</div>'
+                . '<button type="submit" class="btn btn-save"><i class="rex-icon fa-database"></i> ' . $t('yform_apply') . '</button></form>';
+        } else {
+            $body .= '<hr>' . $table . '<div class="alert alert-info">' . $t('batch_nothing_selectable') . '</div>';
+        }
+    }
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('title', $sectionTitle(6, $t('step_yform')), false);
+    $fragment->setVar('body', $body, false);
+    echo $fragment->parse('core/page/section.php');
+};
+
 if (null === $module) {
     $analysis = null;
 }
@@ -318,6 +435,7 @@ if (null === $analysis) {
     $fragment->setVar('title', $sectionTitle(2, $t('step_code')), false);
     $fragment->setVar('body', '<div id="mform-migration-step2"></div><p class="text-muted rex-mb-0">' . $t('select_module_hint') . '</p>', false);
     echo $fragment->parse('core/page/section.php');
+    $renderYFormSection();
 
     return;
 }
@@ -576,3 +694,5 @@ $fragment = new rex_fragment();
 $fragment->setVar('title', $sectionTitle(5, $t('step_reassign')), false);
 $fragment->setVar('body', $reassignBody, false);
 echo $fragment->parse('core/page/section.php');
+
+$renderYFormSection();
