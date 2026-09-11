@@ -108,11 +108,11 @@
                 props: ['label', 'defaultValue', 'options', 'colorSwatchHelp', 'notice', 'cssClass'] },
             // REDAXO core widgets
             media:       { label: 'Media', method: 'addMediaField',
-                props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
+                props: ['label', 'category', 'mediaType', 'a11yAlt', 'notice', 'cssClass'] },
             medialist:   { label: 'Medialist', method: 'addMedialistField',
-                props: ['label', 'category', 'mediaType', 'notice', 'cssClass'] },
+                props: ['label', 'category', 'mediaType', 'a11yAlt', 'notice', 'cssClass'] },
             imagelist:   { label: 'Imagelist', method: 'addImagelistField',
-                props: ['label', 'category', 'notice', 'cssClass'] },
+                props: ['label', 'category', 'a11yAlt', 'notice', 'cssClass'] },
             link:        { label: 'Link', method: 'addLinkField',
                 props: ['label', 'category', 'notice', 'cssClass'] },
             linklist:    { label: 'Linklist', method: 'addLinklistField',
@@ -120,11 +120,21 @@
             customlink:  { label: 'Custom Link', method: 'addCustomLinkField',
                 props: ['label', 'notice', 'cssClass',
                         'clTypeIntern', 'clTypeExtern', 'clTypeMedia', 'clTypeMailto', 'clTypeTel',
-                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
+                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType', 'a11yAlt'] },
             customlinkmultiple: { label: 'Custom Link Multiple', method: 'addCustomLinkMultipleField',
                 props: ['label', 'notice', 'cssClass', 'btnAdd',
                         'clTypeIntern', 'clTypeExtern', 'clTypeMedia', 'clTypeMailto', 'clTypeTel',
-                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType'] },
+                        'linkCategory', 'mediaCategory', 'externPrefix', 'mediaType', 'a11yAlt'] },
+            textreadonly: { label: 'Text (readonly)', method: 'addTextReadOnlyField',
+                props: ['label', 'defaultValue', 'notice', 'cssClass', 'full'] },
+            textareareadonly: { label: 'Textarea (readonly)', method: 'addTextAreaReadOnlyField',
+                props: ['label', 'defaultValue', 'notice', 'rows', 'cssClass', 'full'] },
+            radioimg:    { label: 'Radio Image', method: 'addRadioImgField',
+                props: ['label', 'defaultValue', 'options', 'radioOptionsHelp', 'notice', 'cssClass'] },
+            radioicon:   { label: 'Radio Icon', method: 'addRadioIconField',
+                props: ['label', 'defaultValue', 'options', 'radioOptionsHelp', 'notice', 'cssClass'] },
+            radiocolor:  { label: 'Radio Color', method: 'addRadioColorField',
+                props: ['label', 'defaultValue', 'options', 'radioOptionsHelp', 'notice', 'cssClass'] },
             repeater:    { label: 'Flex Repeater', method: 'addFlexRepeaterElement',
                 props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
                         'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll', 'repeaterShowAddButton',
@@ -135,8 +145,22 @@
             fieldset:    { label: 'Fieldset', method: 'addFieldsetArea',
                 props: ['label'] },
             modal:       { label: 'Modal', method: 'addModalElement',
-                props: ['label', 'modalBtnClass', 'modalAlign'] }
+                props: ['label', 'modalBtnClass', 'modalAlign'] },
+            collapse:    { label: 'Collapse', method: 'addCollapseElement',
+                props: ['label', 'collapseOpen', 'collapseHideToggle'] },
+            accordion:   { label: 'Accordion', method: 'addAccordionElement',
+                props: ['label', 'collapseOpen', 'collapseHideToggle'] },
+            column:      { label: 'Column', method: 'addColumnElement',
+                props: ['columnSize'] },
+            inline:      { label: 'Inline', method: 'addInlineElement',
+                props: ['label'] }
         };
+
+        // Wrapper, die Kinder aufnehmen (Canvas, Emitter, Import).
+        var CONTAINER_TYPES = ['repeater', 'tab', 'fieldset', 'modal', 'collapse', 'accordion', 'column', 'inline'];
+        // Neue Wrapper mit generischem Emitter (label|size, MForm::factory()->..., extra args)
+        var SIMPLE_WRAPPER_TYPES = ['collapse', 'accordion', 'column', 'inline'];
+        var RICH_RADIO_KEYS = { radioimg: 'img', radioicon: 'icon', radiocolor: 'color' };
 
         var VISIBILITY_PROPS = ['visibilityEnabled', 'visibilitySourceUid', 'visibilityOperator', 'visibilityValue'];
 
@@ -182,7 +206,10 @@
                 cssClass: '',
                 rows: '',
                 category: '',
-                options: (type === 'select' || type === 'radio' || type === 'checkbox' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2" : '',
+                options: (type === 'select' || type === 'radio' || type === 'checkbox' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2"
+                    : (type === 'radioimg' ? "1=Layout A|/assets/addons/project/img/layout-a.svg\n2=Layout B|/assets/addons/project/img/layout-b.svg"
+                    : (type === 'radioicon' ? "left=Links|fa fa-align-left\ncenter=Zentriert|fa fa-align-center"
+                    : (type === 'radiocolor' ? "primary=Primaer|#2f6ea8\nlight=Hell|#f3f6fb\nnone=Transparent|transparent" : ''))),
                 required: false,
                 full: false,
                 tinymce: false,
@@ -228,11 +255,17 @@
                 // Modal
                 modalBtnClass: 'btn-default',
                 modalAlign: 'left',
+                // Collapse / Accordion / Column
+                collapseOpen: false,
+                collapseHideToggle: false,
+                columnSize: '6',
+                // A11y-Pruefung (med_alt) fuer Medien-Felder
+                a11yAlt: false,
                 visibilityEnabled: false,
                 visibilitySourceUid: '',
                 visibilityOperator: 'eq',
                 visibilityValue: '',
-                children: (type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal') ? [] : null
+                children: CONTAINER_TYPES.indexOf(type) !== -1 ? [] : null
             };
             return item;
         }
@@ -282,7 +315,11 @@
         }
 
         function isContainerType(type) {
-            return type === 'repeater' || type === 'tab' || type === 'fieldset' || type === 'modal';
+            return CONTAINER_TYPES.indexOf(type) !== -1;
+        }
+
+        function isSimpleWrapperType(type) {
+            return SIMPLE_WRAPPER_TYPES.indexOf(type) !== -1;
         }
 
         function isConditionSourceType(type) {
@@ -445,7 +482,7 @@
                     nested.style.display = 'none';
                 }
                 if (item.children.length === 0) {
-                    var hintWord = item.type === 'tab' ? 'Tab' : (item.type === 'fieldset' ? 'Fieldset' : (item.type === 'modal' ? 'Modal' : 'Repeater'));
+                    var hintWord = TYPES[item.type] ? TYPES[item.type].label : 'Wrapper';
                     nested.innerHTML = '<p class="mform-fb__nested-hint">Felder hierher ziehen oder ' + hintWord + ' oben anklicken und dann links ein Feld waehlen</p>';
                 } else {
                     item.children.forEach(function (c) { nested.appendChild(renderItem(c, nextDepth)); });
@@ -726,7 +763,16 @@
             repeater: 'repeat wiederholung liste',
             fieldset: 'gruppe bereich',
             tab: 'tabs reiter',
-            modal: 'dialog popup'
+            modal: 'dialog popup',
+            collapse: 'auf zu klappen einklappen toggle',
+            accordion: 'akkordeon collapse gruppe',
+            column: 'spalte spalten grid bootstrap row col',
+            inline: 'inline nebeneinander zeile',
+            textreadonly: 'readonly nur lesen text',
+            textareareadonly: 'readonly nur lesen textarea',
+            radioimg: 'radio bild image layout vorschau',
+            radioicon: 'radio icon fontawesome',
+            radiocolor: 'radio farbe color'
         };
 
         function paletteSearchText(li) {
@@ -872,7 +918,7 @@
 
             // If an active repeater/tab/fieldset is selected, attempt to insert as child.
             // Otherwise append at top level.
-            var canNestInto = activeItem && (activeItem.type === 'repeater' || activeItem.type === 'tab' || activeItem.type === 'fieldset' || activeItem.type === 'modal');
+            var canNestInto = activeItem && isContainerType(activeItem.type);
             if (canNestInto) {
                 // Determine builder-depth of the active container's children list.
                 var nestedEl = $canvas.querySelector('[data-fb-nested="' + activeItem.uid + '"]');
@@ -966,6 +1012,126 @@
                 language: 'php'
             });
         }
+
+        // ---- Export / Import (#406) --------------------------------------------
+        var BUILDER_STATE_VERSION = 1;
+        var $stateMsg = document.querySelector('[data-fb-state-msg]');
+
+        function migrateBuilderState(payload) {
+            // Alte localStorage-Form { state: [...] } akzeptieren.
+            if (payload && Array.isArray(payload.state) && !payload.fields) {
+                payload = { mformBuilderVersion: 1, fields: payload.state };
+            }
+            if (!payload || typeof payload !== 'object') throw new Error('Keine Builder-Datei.');
+            var version = parseInt(payload.mformBuilderVersion, 10);
+            if (!version) throw new Error('Versionsmarker mformBuilderVersion fehlt.');
+            if (version > BUILDER_STATE_VERSION) throw new Error('Datei stammt aus einer neueren MForm-Version (' + version + ').');
+            // Migrations-Hook: kuenftige Formatwechsel hier je Version anheben.
+            while (version < BUILDER_STATE_VERSION) {
+                version++;
+            }
+            if (!Array.isArray(payload.fields)) throw new Error('Feldliste fehlt.');
+            return payload;
+        }
+
+        function exportBuilderState() {
+            var payload = { mformBuilderVersion: BUILDER_STATE_VERSION, exportedAt: new Date().toISOString(), fields: state };
+            var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'mform-builder.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+            showCopyMessage($stateMsg, 'Exportiert', 2000);
+        }
+
+        function importBuilderState(text) {
+            var payload = migrateBuilderState(JSON.parse(text));
+            var fields = payload.fields.map(sanitizeItem).filter(function (i) { return i !== null; });
+            if (state.length && !confirm('Aktuellen Builder-Stand durch die importierte Datei ersetzen?')) return;
+            state = fields;
+            nextId = collectMaxIdFromState(state) + 1;
+            activeItem = null;
+            renderProps();
+            renderCanvas();
+            emitCode();
+            persistBuilderState();
+            showCopyMessage($stateMsg, fields.length + ' Feld(er) importiert', 2500);
+        }
+
+        var $exportBtn = document.querySelector('[data-fb-action="export"]');
+        var $importBtn = document.querySelector('[data-fb-action="import"]');
+        var $importFile = document.querySelector('[data-fb-import-file]');
+        if ($exportBtn) $exportBtn.addEventListener('click', function (e) { e.preventDefault(); exportBuilderState(); });
+        if ($importBtn && $importFile) {
+            $importBtn.addEventListener('click', function (e) { e.preventDefault(); $importFile.value = ''; $importFile.click(); });
+            $importFile.addEventListener('change', function () {
+                var file = $importFile.files && $importFile.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function () {
+                    try { importBuilderState(String(reader.result || '')); }
+                    catch (err) { alert('Import fehlgeschlagen: ' + err.message); }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // ---- Live-Vorschau (#407) ---------------------------------------------
+        var $previewBar = document.querySelector('[data-fb-preview-bar]');
+        var $preview = document.querySelector('[data-fb-preview]');
+        var $previewAuto = document.querySelector('[data-fb-preview-auto]');
+        var $previewMsg = document.querySelector('[data-fb-preview-msg]');
+        var previewTimer = null;
+        var previewRequest = null;
+
+        function previewTheme() {
+            if (document.body.classList.contains('rex-theme-dark')) return 'dark';
+            if (document.body.classList.contains('rex-theme-light')) return 'light';
+            return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+
+        function refreshPreview() {
+            if (!$preview || !$previewBar) return;
+            var code = getCodeText($code);
+            if (previewRequest) previewRequest.abort();
+            if ($previewMsg) $previewMsg.textContent = 'Rendere …';
+            var body = new URLSearchParams();
+            body.set('code', code);
+            body.set('theme', previewTheme());
+            body.set('_csrf_token', $previewBar.dataset.fbPreviewCsrf || '');
+            previewRequest = new XMLHttpRequest();
+            previewRequest.open('POST', $previewBar.dataset.fbPreviewUrl, true);
+            previewRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            previewRequest.onload = function () {
+                previewRequest = null;
+                if (this.status !== 200) {
+                    if ($previewMsg) $previewMsg.textContent = 'Vorschau fehlgeschlagen (' + this.status + ')';
+                    return;
+                }
+                $preview.srcdoc = this.responseText;
+                if ($previewMsg) $previewMsg.textContent = '';
+            };
+            previewRequest.onerror = function () { previewRequest = null; if ($previewMsg) $previewMsg.textContent = 'Vorschau fehlgeschlagen'; };
+            previewRequest.send(body.toString());
+        }
+
+        function schedulePreview() {
+            if (!$previewAuto || !$previewAuto.checked) return;
+            clearTimeout(previewTimer);
+            previewTimer = setTimeout(refreshPreview, 800);
+        }
+
+        window.addEventListener('message', function (e) {
+            if (!$preview || !e.data || typeof e.data.mformBuilderPreviewHeight !== 'number') return;
+            $preview.style.height = Math.max(160, Math.min(e.data.mformBuilderPreviewHeight + 24, 4000)) + 'px';
+        });
+        var $previewBtn = document.querySelector('[data-fb-action="preview"]');
+        if ($previewBtn) $previewBtn.addEventListener('click', refreshPreview);
+        if ($previewAuto) $previewAuto.addEventListener('change', function () { if ($previewAuto.checked) refreshPreview(); });
 
         document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
             copyToClipboard(getCodeText($code), document.querySelector('[data-fb-copy-msg]'));
@@ -1104,13 +1270,31 @@
             } else if ((item.type === 'media' || item.type === 'medialist') && item.mediaType) {
                 a['data-media-type'] = item.mediaType;
             }
+            // A11y-Metadaten-Pruefung (docs/16_a11y.md): ALT-Text im Medienpool
+            if (item.a11yAlt && ['media', 'medialist', 'imagelist', 'customlink', 'customlinkmultiple'].indexOf(item.type) !== -1) {
+                a.a11y = ['med_alt'];
+            }
             return a;
+        }
+
+        function phpValue(v) {
+            if (Array.isArray(v)) return '[' + v.map(phpValue).join(', ') + ']';
+            return phpStr(v);
         }
 
         function attrsToPhp(attrs) {
             var keys = Object.keys(attrs);
             if (!keys.length) return null;
-            return '[' + keys.map(function (k) { return phpStr(k) + ' => ' + phpStr(attrs[k]); }).join(', ') + ']';
+            return '[' + keys.map(function (k) { return phpStr(k) + ' => ' + phpValue(attrs[k]); }).join(', ') + ']';
+        }
+
+        // Radio Image/Icon/Color: "key=Label|wert" -> [key => ['label' => Label, 'img'|'icon'|'color' => wert]]
+        function richRadioArray(items, extraKey) {
+            var pairs = items.map(function (o) {
+                var k = /^\d+$/.test(o.key) ? o.key : phpStr(o.key);
+                return k + ' => [' + phpStr('label') + ' => ' + phpStr(o.label) + ', ' + phpStr(extraKey) + ' => ' + phpStr(o.preview || '') + ']';
+            });
+            return '[' + pairs.join(', ') + ']';
         }
 
         function hasVisibilityCondition(item) {
@@ -1248,6 +1432,22 @@
                 case 'hidden':
                     line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
                     break;
+                case 'textreadonly':
+                case 'textareareadonly':
+                    // Signature: addText(Area)ReadOnlyField(id, value?, attributes?)
+                    line += ', ' + (item.defaultValue ? phpStr(item.defaultValue) : 'null');
+                    if (attrPhp) line += ', ' + attrPhp;
+                    break;
+                case 'radioimg':
+                case 'radioicon':
+                case 'radiocolor': {
+                    // Signature: addRadioImg/Icon/ColorField(id, options?, attributes?, defaultValue?)
+                    line += ', ' + richRadioArray(parseColorSwatches(item.options), RICH_RADIO_KEYS[item.type]);
+                    var hasRichDefault = !!item.defaultValue;
+                    if (attrPhp || hasRichDefault) line += ', ' + (attrPhp || 'null');
+                    if (hasRichDefault) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
                 case 'media':
                 case 'medialist':
                 case 'imagelist':
@@ -1272,7 +1472,7 @@
         // Render top-level field as `$mform->call(...);` (with optional setFull chain)
         function renderField(item, idArg, indent) {
             var line = indent + '$mform->' + renderCall(item, idArg);
-            if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
+            if (item.full && ['text', 'textarea', 'select', 'textreadonly', 'textareareadonly'].indexOf(item.type) !== -1) {
                 line += '\n' + indent + '    ->setFull()';
             }
             return line;
@@ -1281,7 +1481,7 @@
         // Render inner field as `->call(...)` chained to MForm::factory()
         function renderInnerChainLink(item, idArg, indent) {
             var line = indent + '->' + renderCall(item, idArg);
-            if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
+            if (item.full && ['text', 'textarea', 'select', 'textreadonly', 'textareareadonly'].indexOf(item.type) !== -1) {
                 line += '\n' + indent + '->setFull()';
             }
             return line;
@@ -1317,9 +1517,27 @@
             return indent + '->addFieldsetArea(' + phpStr(legend) + ', MForm::factory()\n' + inner + ')';
         }
 
+        // Collapse / Accordion / Column / Inline: erstes Argument (Label bzw. Spaltenbreite),
+        // dann MForm::factory()->..., bei Collapse/Accordion optional open/hideToggle.
+        function renderSimpleWrapper(item, indent, chained) {
+            var inner = renderRepeaterInner(item, indent);
+            var head = chained ? indent + '->' : indent + '$mform->';
+            var first = item.type === 'column' ? String(parseInt(item.columnSize, 10) || 6) : phpStr(item.label || '');
+            var tail = '';
+            if (item.type === 'collapse' || item.type === 'accordion') {
+                if (item.collapseOpen || item.collapseHideToggle) {
+                    tail = ', ' + (item.collapseOpen ? 'true' : 'false') + (item.collapseHideToggle ? ', true' : '');
+                }
+            }
+            return head + TYPES[item.type].method + '(' + first + ', MForm::factory()\n' + inner + tail + ')' + (chained ? '' : ';');
+        }
+
         function renderInnerItemChainLink(item, indent, meta) {
             meta = meta || {};
 
+            if (isSimpleWrapperType(item.type)) {
+                return renderSimpleWrapper(item, indent, true);
+            }
             if (item.type === 'fieldset') {
                 return renderInnerFieldsetChainLink(item, indent);
             }
@@ -1362,6 +1580,9 @@
             }
             if (item.type === 'modal') {
                 return renderModalStmt(item, indent);
+            }
+            if (isSimpleWrapperType(item.type)) {
+                return renderSimpleWrapper(item, indent, false);
             }
 
             return renderField(item, item.id, indent) + ';';
@@ -1539,6 +1760,10 @@
                     prevWasTab = false;
                     return renderInnerModalChainLink(c, itemIndent);
                 }
+                if (isSimpleWrapperType(c.type)) {
+                    prevWasTab = false;
+                    return renderSimpleWrapper(c, itemIndent, true);
+                }
                 var key = slugify(c.label, 'field_' + c.id);
                 var base = key, n = 2;
                 while (keyPool[key]) { key = base + '_' + n++; }
@@ -1583,6 +1808,7 @@
             lines.push('');
             lines.push('echo $mform->show();');
             setCodeText($code, lines.join('\n'));
+            schedulePreview();
             // Warn once when any used id exceeds the conventional REX_VALUE/REX_MEDIA/... slot limit.
             var maxId = collectMaxId(state);
             var slotMsg = document.querySelector('[data-fb-slot-warning]');
@@ -1834,18 +2060,21 @@
             return type === 'headline' || type === 'description' || type === 'html' || isAlertType(type);
         }
 
+        // Layout-Wrapper ohne eigene Speicherung (Fieldset, Modal, Tab, Collapse, Accordion, Column, Inline)
+        function isLayoutWrapperType(type) {
+            return isContainerType(type) && type !== 'repeater';
+        }
+
+        function wrapperMarker(item) {
+            var label = TYPES[item.type] ? TYPES[item.type].label : item.type;
+            return '// ----- ' + label + (item.label ? ': ' + item.label : '') + ' -----';
+        }
+
         function flattenStructuralChildren(children) {
             var out = [];
             (children || []).forEach(function (c) {
-                if (c.type === 'fieldset') {
-                    var legend = c.label ? ': ' + c.label : '';
-                    out.push({ kind: 'fs-marker', text: '// ----- Fieldset' + legend + ' -----' });
-                    flattenStructuralChildren(c.children || []).forEach(function (e) { out.push(e); });
-                    return;
-                }
-                if (c.type === 'modal') {
-                    var modalLabel = c.label ? ': ' + c.label : '';
-                    out.push({ kind: 'fs-marker', text: '// ----- Modal' + modalLabel + ' -----' });
+                if (isLayoutWrapperType(c.type)) {
+                    out.push({ kind: 'fs-marker', text: wrapperMarker(c) });
                     flattenStructuralChildren(c.children || []).forEach(function (e) { out.push(e); });
                     return;
                 }
@@ -1873,12 +2102,8 @@
             body.push('// =============================================================');
             body.push('');
             state.forEach(function (item) {
-                if (item.type === 'tab') {
-                    if (item.label) {
-                        body.push('// ----- Tab: ' + item.label + ' -----');
-                    } else {
-                        body.push('// ----- Tab -----');
-                    }
+                if (isLayoutWrapperType(item.type)) {
+                    body.push(wrapperMarker(item));
                     flattenStructuralChildren(item.children || []).forEach(function (entry) {
                         if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
                         var c = entry.item;
@@ -1886,7 +2111,7 @@
                             body.push(renderRepeaterBlock(c, ''));
                             body.push('');
                         } else if (isStructureOnlyItem(c.type)) {
-                            // ueberspringen (sind reine Form-Strukturhinweise)
+                            // ueberspringen (reine Form-Strukturhinweise)
                         } else {
                             body.push(renderTopLevelVar(c));
                             body.push('');
@@ -1895,44 +2120,6 @@
                 } else if (item.type === 'repeater') {
                     body.push(renderRepeaterBlock(item, ''));
                     body.push('');
-                } else if (item.type === 'fieldset') {
-                    if (item.label) {
-                        body.push('// ----- Fieldset: ' + item.label + ' -----');
-                    } else {
-                        body.push('// ----- Fieldset -----');
-                    }
-                    flattenStructuralChildren(item.children || []).forEach(function (entry) {
-                        if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
-                        var c = entry.item;
-                        if (c.type === 'repeater') {
-                            body.push(renderRepeaterBlock(c, ''));
-                            body.push('');
-                        } else if (isStructureOnlyItem(c.type)) {
-                            // ueberspringen
-                        } else {
-                            body.push(renderTopLevelVar(c));
-                            body.push('');
-                        }
-                    });
-                } else if (item.type === 'modal') {
-                    if (item.label) {
-                        body.push('// ----- Modal: ' + item.label + ' -----');
-                    } else {
-                        body.push('// ----- Modal -----');
-                    }
-                    flattenStructuralChildren(item.children || []).forEach(function (entry) {
-                        if (entry.kind === 'fs-marker') { body.push(entry.text); return; }
-                        var c = entry.item;
-                        if (c.type === 'repeater') {
-                            body.push(renderRepeaterBlock(c, ''));
-                            body.push('');
-                        } else if (isStructureOnlyItem(c.type)) {
-                            // ueberspringen
-                        } else {
-                            body.push(renderTopLevelVar(c));
-                            body.push('');
-                        }
-                    });
                 } else if (isStructureOnlyItem(item.type)) {
                     // ueberspringen
                 } else {

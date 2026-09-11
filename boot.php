@@ -8,6 +8,7 @@
 
 rex_api_function::register('mform_resolve_link', \FriendsOfREDAXO\MForm\Api\ResolveLinkApi::class);
 rex_api_function::register('mform_a11y_check', \FriendsOfREDAXO\MForm\Api\A11yCheckApi::class);
+rex_api_function::register('mform_builder_preview', \FriendsOfREDAXO\MForm\Api\BuilderPreviewApi::class);
 
 $addon = rex_addon::get('mform');
 

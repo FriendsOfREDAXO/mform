@@ -39,11 +39,24 @@ test.describe('MForm Smoke', () => {
         await expect(page.locator('pre').last()).toContainText('data-mfr-field');
     });
 
-    test('Form Builder laedt Palette und Vorschau', async ({ page }) => {
+    test('Form Builder laedt Palette, erzeugt Code und rendert die Vorschau', async ({ page }) => {
         await page.goto(BASE + '?page=mform/formbuilder');
         await expectNoPhpErrors(page);
         await expect(page.locator('#mform-fb')).toBeVisible();
         await expect(page.locator('[data-fb-palette] li.mform-fb__pal-item').first()).toBeVisible();
+
+        await page.evaluate(() => localStorage.removeItem('mform.formbuilder.state.v1'));
+        await page.click('li.mform-fb__pal-item[data-type="collapse"]');
+        await page.click('li.mform-fb__pal-item[data-type="text"]');
+        const code = await page.evaluate(() => { const t = document.querySelector('[data-fb-code]'); return t.value || t.textContent; });
+        expect(code).toContain('addCollapseElement(');
+        expect(code).toContain('->addTextField(');
+
+        // Live-Vorschau: Iframe bekommt ein Dokument mit dem gerenderten Formular, ohne PHP-Fehler.
+        await page.waitForFunction(() => { const f = document.querySelector('[data-fb-preview]'); return !!(f && f.srcdoc && f.srcdoc.length > 500); }, null, { timeout: 15000 });
+        const srcdoc = await page.evaluate(() => document.querySelector('[data-fb-preview]').srcdoc);
+        expect(srcdoc).toContain('class="mform');
+        expect(srcdoc).not.toContain('alert-danger');
     });
 
     test('Migrationsseite zeigt Inventar', async ({ page }) => {

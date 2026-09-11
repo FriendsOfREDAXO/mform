@@ -87,6 +87,11 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="customlink">Custom Link</li>
             <li class="mform-fb__pal-item" data-type="customlinkmultiple">Custom Link Multiple</li>
             <li class="mform-fb__pal-item" data-type="colorswatch">Color Swatch</li>
+            <li class="mform-fb__pal-item" data-type="radioimg">Radio Image</li>
+            <li class="mform-fb__pal-item" data-type="radioicon">Radio Icon</li>
+            <li class="mform-fb__pal-item" data-type="radiocolor">Radio Color</li>
+            <li class="mform-fb__pal-item" data-type="textreadonly">Text (readonly)</li>
+            <li class="mform-fb__pal-item" data-type="textareareadonly">Textarea (readonly)</li>
         </ul>
         <h4 style="margin-top:1.5em">Wrapper</h4>
         <ul class="mform-fb__field-list" data-fb-palette-wrap>
@@ -94,11 +99,21 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="tab">Tab</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="modal">Modal</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="collapse">Collapse</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="accordion">Accordion</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="column">Column</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="inline">Inline</li>
         </ul>
         <p class="mform-fb__palette-empty" data-fb-palette-empty style="display:none">Keine Treffer in der Palette.</p>
         <div class="mform-fb__actions">
             <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#mform-fb-info"><i class="rex-icon fa-info-circle"></i> Hilfe &amp; Hinweise</button>
             <button type="button" class="btn btn-default btn-block" data-fb-action="clear" style="margin-top:6px">Alles loeschen</button>
+            <div class="btn-group btn-group-justified" style="margin-top:6px">
+                <a class="btn btn-default btn-sm" data-fb-action="export" title="Builder-Stand als JSON herunterladen"><i class="rex-icon fa-download"></i> Export</a>
+                <a class="btn btn-default btn-sm" data-fb-action="import" title="Builder-Stand aus JSON laden"><i class="rex-icon fa-upload"></i> Import</a>
+            </div>
+            <input type="file" accept=".json,application/json" data-fb-import-file style="display:none">
+            <p class="mform-fb__copy-msg" data-fb-state-msg style="margin:4px 0 0;min-height:1.2em"></p>
         </div>
     </div>
 
@@ -115,6 +130,14 @@ $body = <<<'HTML'
             <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
         </div>
         <textarea class="mform-fb__code" data-fb-code data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
+
+        <h4 style="margin-top:1.5em">Vorschau</h4>
+        <div class="mform-fb__code-bar" data-fb-preview-bar data-fb-preview-url="{{PREVIEW_URL}}" data-fb-preview-csrf="{{PREVIEW_CSRF}}">
+            <button type="button" class="btn btn-primary btn-xs" data-fb-action="preview"><i class="rex-icon fa-refresh"></i> Vorschau aktualisieren</button>
+            <label class="checkbox-inline" style="margin-left:8px;font-weight:normal"><input type="checkbox" data-fb-preview-auto checked> automatisch</label>
+            <span class="mform-fb__copy-msg" data-fb-preview-msg></span>
+        </div>
+        <iframe class="mform-fb__preview" data-fb-preview title="Vorschau" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" style="width:100%;min-height:160px;border:1px solid var(--mform-border, #dfe3e9);background:var(--mform-surface, #fff)"></iframe>
 
         <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
         <div class="mform-fb__code-bar">
@@ -180,6 +203,24 @@ $body = <<<'HTML'
                     <code>.text-primary = Primaer CSS | #2f77bc</code> <small>(mit Preview-Farbe)</small>
                 </div>
                 <button type="button" class="btn btn-default btn-xs" data-fb-action="colorswatch-example">Beispiel-Palette einfuegen</button>
+            </div>
+            <div class="form-group" data-fb-prop-group="radioOptionsHelp">
+                <p class="help-block rex-note">Format je Zeile: <code>wert=Label|extra</code>. Extra ist je nach Typ der Bildpfad (Radio Image), die Icon-Klasse (Radio Icon, z. B. <code>fa fa-star</code>) oder die Farbe (Radio Color, z. B. <code>#2f6ea8</code> oder <code>transparent</code>).</p>
+            </div>
+            <div class="form-group" data-fb-prop-group="a11yAlt">
+                <label class="checkbox">
+                    <input type="checkbox" data-fb-prop="a11yAlt"> ALT-Text im Medienpool pruefen <small>('a11y' =&gt; ['med_alt'], siehe Doku „Barrierefreiheit“)</small>
+                </label>
+            </div>
+            <div class="form-group" data-fb-prop-group="collapseOpen">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="collapseOpen"> Initial geoeffnet <small>(openCollapse)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="collapseHideToggle">
+                <label class="checkbox"><input type="checkbox" data-fb-prop="collapseHideToggle"> Toggle-Link ausblenden <small>(hideToggleLinks)</small></label>
+            </div>
+            <div class="form-group" data-fb-prop-group="columnSize">
+                <label>Spaltenbreite <small>(1 bis 12, Bootstrap-Grid; aufeinanderfolgende Columns bilden eine Row)</small></label>
+                <input type="number" class="form-control" data-fb-prop="columnSize" min="1" max="12" value="6">
             </div>
             <div class="form-group" data-fb-prop-group="alertText">
                 <label>Alert-Text</label>
@@ -388,7 +429,11 @@ $body = <<<'HTML'
 </div>
 HTML;
 
-$body = str_replace('{{TINY_PROFILE_FIELD}}', $tinyProfileHtml, $body);
+$body = str_replace(
+    ['{{TINY_PROFILE_FIELD}}', '{{PREVIEW_URL}}', '{{PREVIEW_CSRF}}'],
+    [$tinyProfileHtml, rex_escape(rex_url::backendController(['rex-api-call' => 'mform_builder_preview'], false)), rex_escape(rex_csrf_token::factory('mform_builder')->getValue())],
+    $body,
+);
 
 $fragment = new rex_fragment();
 $fragment->setVar('title', rex_i18n::msg('mform_formbuilder'), false);

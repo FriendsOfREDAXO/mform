@@ -10,6 +10,12 @@ MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen 
 - Berücksichtigt „dekorativ, kein ALT nötig“ (MediaPlace oder `med_alt_decorative`), mehrsprachige Felder aus metainfo_lang_fields je Online-Sprache und eigene MediaPlace-Metadaten (`mediaplace:<key>`).
 - Keine Änderung an gespeicherten Daten. Details: [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
 
+## Update 10.0: Form Builder
+
+- Alle Wrapper in der Palette: Collapse, Accordion, Column, Inline neben Tab, Fieldset, Modal und Repeater; dazu Radio Image/Icon/Color und Text/Textarea (readonly). Medien-Felder bringen die A11y-Prüfung per Checkbox mit.
+- Export und Import des Builder-Stands als JSON (`mform-builder.json` mit `mformBuilderVersion`), z. B. für Git oder zum Teilen.
+- Live-Vorschau unter dem Eingabe-Code: das Formular wird gerendert, wie es im Modul aussieht, im Backend-Theme, automatisch nach jeder Änderung.
+
 ## Update 10.0: Linkmap-Overlay für Link-Felder
 
 - Mit installiertem [Linkmap](https://github.com/FriendsOfREDAXO/linkmap) öffnen Custom-Link, Link- und Linklist-Felder das Overlay; `ylink`-Datensätze kommen aus dem Linkmap-Picker. Details: [Custom-Link-Widget](03_customlink.md#linkmap-integration-ab-100).
