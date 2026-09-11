@@ -177,3 +177,12 @@ jobs:
         run: |
           composer install --no-interaction --no-progress --prefer-dist --working-dir="redaxo_cms/redaxo/src/addons/${ADDON_KEY}"
           MFORM_REDAXO_PATH="$PWD/redaxo_cms" "redaxo_cms/redaxo/src/addons/${ADDON_KEY}/vendor/bin/phpunit" -c "redaxo_cms/redaxo/src/addons/${ADDON_KEY}/phpunit.xml.dist" --testsuite redaxo
+
+      - name: Playwright smoke (Repeater, Form Builder, Migration)
+        run: |
+          cd "redaxo_cms/redaxo/src/addons/${ADDON_KEY}"
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          (cd ../../../.. && php -S 127.0.0.1:8000 -t . > /tmp/php-server.log 2>&1 &)
+          sleep 2
+          MFORM_BASE_URL=http://127.0.0.1:8000/redaxo/index.php MFORM_USER=admin MFORM_PASSWORD=adminpassword npx playwright test --project=chromium || (cat /tmp/php-server.log; exit 1)

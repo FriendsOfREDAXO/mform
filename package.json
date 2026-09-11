@@ -1,0 +1,11 @@
+{
+  "name": "mform-e2e",
+  "private": true,
+  "description": "Playwright-Smoke-Tests fuer MForm (tests/e2e). Nicht Teil des Addon-Builds.",
+  "scripts": {
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0"
+  }
+}
