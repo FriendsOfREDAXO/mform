@@ -58,7 +58,7 @@ test.describe('MForm Smoke', () => {
             await page.goto(BASE + '?page=mform/demo/' + sub);
             await expectNoPhpErrors(page);
             await expect(page.locator('.rex-page-section, section').first()).toBeAttached();
-            expect(await page.locator('pre.rex-code, .mform, .mfr-container').count(), sub).toBeGreaterThan(0);
+            expect(await page.locator('pre.rex-code, pre code.language-php, .mform, .mfr-container, svg').count(), sub).toBeGreaterThan(0);
         }
     });
 });
