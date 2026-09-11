@@ -1,12 +1,12 @@
 # MForm 10 – Plan
 
-Stand: 11.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für den Branch `10.x`.
+Stand: 11.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`.
 
 ## 1. Rahmen
 
 | Thema | Entscheidung |
 |---|---|
-| Branches | `9.x` = Wartung für 9.5.x (nur Bugfixes, keine neuen Optionen). `10.x` = Entwicklung. `main` wechselt mit der ersten 10.0.0-beta auf den 10er-Stand. |
+| Branches | `main` = MForm 10 (seit 11.09.2026, vorher Branch `10.x`). `9.x` = Wartung für 9.5.x (nur Bugfixes, keine neuen Optionen). |
 | Version | `package.yml` auf `10.0.0-dev`, Releases als `10.0.0-beta.1` … `10.0.0`. Tags ohne „v“. |
 | PHP | Mindestversion `>=8.4` (bisher 8.0), damit `\Dom\HTMLDocument` ohne Fallback-Pfad eingesetzt wird. REDAXO `^5.17` bleibt. Wer PHP < 8.4 hat, bleibt auf 9.x. |
 | Kompatibilität | Keine Breaking Changes an der MForm-API: alle `add*()`-Signaturen, gespeicherten Datenformate, Templates und Fragmente bleiben. Einzige Ausnahme ist MBlock (siehe 2). |
@@ -20,7 +20,7 @@ Was „fällt weg“ konkret heißt:
 - `MBlock::show($id, $mform->show())` mit String funktioniert technisch weiter, weil MForm nur HTML liefert. Wer das Objekt übergibt, profitiert von den 9.5-Fixes, bekommt aber keine Garantie mehr.
 - `MForm::useCustomLinkForClassicWidgets()` bleibt als MForm-API erhalten (kein BC-Bruch), der Docblock und die Doku verlieren den MBlock-Bezug.
 
-Aufräumarbeiten in 10.x:
+Aufräumarbeiten für 10:
 
 - `docs/08_mblock_migration.md` wird zu „Migration von MBlock“: Kapitel 1 (Weiterverwendung, Compat-Modus) entfällt, Kapitel 2 und 3 werden um den neuen Assistenten erweitert.
 - Demo-Modul `pages/module/expert/mblock_medialist_linklist/` entfällt.
@@ -116,7 +116,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | 10.0.0 | Stabilisierung, Migrationsleitfaden 9 → 10. |
 | 10.1 | Undo/Redo (#411), weitere erweiterte Felder. |
 
-## 7. Regeln für Beiträge im 10.x-Branch
+## 7. Regeln für Beiträge auf `main` (MForm 10)
 
 1. Kein PR ändert Signaturen bestehender `add*()`-Methoden oder gespeicherte Datenformate.
 2. Neues Verhalten kommt über neue Optionen mit sicherem Standard.

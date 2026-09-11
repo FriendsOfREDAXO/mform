@@ -2,7 +2,7 @@
 
 ## 10.0.0-dev
 
-Entwicklungsstand für MForm 10, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
+Entwicklungsstand für MForm 10 auf `main`, siehe `docs/ROADMAP_10.md`. 9.5.x wird im Branch `9.x` gepflegt.
 
 ### Neu
 
