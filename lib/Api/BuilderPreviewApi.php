@@ -96,7 +96,7 @@ class BuilderPreviewApi extends rex_api_function
             . '</head><body class="' . $bodyClass . '"><div class="rex-page-main"><div class="rex-page-main-inner"><section class="rex-page-section"><div class="panel panel-edit"><div class="panel-body"><form method="post" onsubmit="return false"><div class="rex-slice-edit">'
             . $body
             . '</div></form></div></div></section></div></div>' . $js
-            . '<script>(function(){function h(){var el = document.querySelector(".rex-page-section"); var height = el ? Math.ceil(el.getBoundingClientRect().bottom + window.scrollY) : document.documentElement.scrollHeight; parent.postMessage({mformBuilderPreviewHeight: height}, "*");} if (window.jQuery) { jQuery(function(){ jQuery(document).trigger("rex:ready", [jQuery(document.body)]); setTimeout(h, 200); }); } window.addEventListener("load", h); window.addEventListener("resize", h); setInterval(h, 1500);})();</script>'
+            . '<script>(function(){function h(){var el = document.querySelector(".rex-page-section"); var height = el ? Math.ceil(el.getBoundingClientRect().bottom + window.scrollY) : document.documentElement.scrollHeight; parent.postMessage({mformBuilderPreviewHeight: height}, "*");} if (window.jQuery) { jQuery(function(){ jQuery(document).trigger("rex:ready", [jQuery(document.body)]); setTimeout(h, 200); }); } window.addEventListener("load", h); window.addEventListener("resize", h); window.addEventListener("message", function(e){ if (e.data && e.data.mformBuilderMeasure) { h(); setTimeout(h, 100); } }); setInterval(h, 1500);})();</script>'
             . '</body></html>';
     }
 }

@@ -609,3 +609,80 @@ body.rex-theme-dark .mform-fb {
     width: auto;
     flex: 0 1 auto;
 }
+
+/* Abschnitte: Vorschau | Eingabe | Ausgabe (unabhaengig auf-/zuklappbar) */
+.mform-fb__sections {
+    margin-top: 1.5em;
+}
+
+.mform-fb__sections-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.mform-fb__sections-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mform-fb__section {
+    border: 1px solid var(--mform-border, #dfe3e9);
+    border-radius: var(--mform-radius, 0);
+    background: var(--mform-surface, #fff);
+    margin-bottom: 8px;
+}
+
+.mform-fb__section-head {
+    margin: 0;
+}
+
+.mform-fb__section-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 0;
+    background: var(--mform-surface-alt, #f6f8fa);
+    color: var(--mform-text, #24292f);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mform-fb__section-toggle:hover,
+.mform-fb__section-toggle:focus {
+    background: var(--mform-hover, #eef1f5);
+    outline: none;
+}
+
+.mform-fb__section-toggle:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--mform-focus-ring, rgba(47, 110, 168, .35));
+}
+
+.mform-fb__section-chevron {
+    transition: transform 150ms ease;
+    color: var(--mform-muted, #6c757d);
+}
+
+.mform-fb__section:not(.is-open) .mform-fb__section-chevron {
+    transform: rotate(-90deg);
+}
+
+.mform-fb__section-body {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--mform-border, #dfe3e9);
+}
+
+.mform-fb__section-body[hidden] {
+    display: none;
+}

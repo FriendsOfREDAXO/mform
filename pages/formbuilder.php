@@ -124,28 +124,51 @@ $body = <<<'HTML'
             <p class="mform-fb__hint">Klick links auf ein Feld, um es hier einzufuegen</p>
         </div>
 
-        <h4 style="margin-top:1.5em">Eingabe (Modul-Input)</h4>
         <div class="alert alert-warning" style="display:none" data-fb-slot-warning></div>
-        <div class="mform-fb__code-bar">
-            <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy">Code kopieren</button>
-            <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
-        </div>
-        <textarea class="mform-fb__code" data-fb-code data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
 
-        <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
-        <div class="mform-fb__code-bar">
-            <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
-            <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
-        </div>
-        <textarea class="mform-fb__code" data-fb-output data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
-        <h4 style="margin-top:1.5em">Vorschau</h4>
-        <div class="mform-fb__code-bar" data-fb-preview-bar data-fb-preview-url="{{PREVIEW_URL}}" data-fb-preview-csrf="{{PREVIEW_CSRF}}">
-            <button type="button" class="btn btn-primary btn-xs" data-fb-action="preview"><i class="rex-icon fa-refresh"></i> Vorschau aktualisieren</button>
-            <label class="checkbox-inline" style="margin-left:8px;font-weight:normal"><input type="checkbox" data-fb-preview-auto checked> automatisch</label>
-            <span class="mform-fb__copy-msg" data-fb-preview-msg></span>
-        </div>
-        <iframe class="mform-fb__preview" data-fb-preview title="Vorschau" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" style="width:100%;min-height:160px;border:1px solid var(--mform-border, #dfe3e9);background:var(--mform-surface, #fff)"></iframe>
+        <div class="mform-fb__sections" data-fb-sections>
+            <div class="mform-fb__sections-bar">
+                <button type="button" class="btn btn-default btn-xs" data-fb-sections-toggle title="Alle Abschnitte auf- oder zuklappen"><i class="rex-icon fa-regular fa-window-minimize"></i> Alle auf / zu</button>
+                <div class="mform-fb__sections-actions">
+                    <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy" title="Eingabecode in die Zwischenablage kopieren"><i class="rex-icon fa-clipboard"></i> Eingabecode kopieren</button>
+                    <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
+                </div>
+            </div>
 
+            <section class="mform-fb__section" data-fb-section="preview">
+                <h4 class="mform-fb__section-head"><button type="button" class="mform-fb__section-toggle" data-fb-section-toggle aria-expanded="true"><i class="rex-icon fa-chevron-down mform-fb__section-chevron"></i> Vorschau</button></h4>
+                <div class="mform-fb__section-body" data-fb-section-body>
+                    <div class="mform-fb__code-bar" data-fb-preview-bar data-fb-preview-url="{{PREVIEW_URL}}" data-fb-preview-csrf="{{PREVIEW_CSRF}}">
+                        <button type="button" class="btn btn-default btn-xs" data-fb-action="preview"><i class="rex-icon fa-refresh"></i> Vorschau aktualisieren</button>
+                        <label class="checkbox-inline" style="margin-left:8px;font-weight:normal"><input type="checkbox" data-fb-preview-auto checked> automatisch</label>
+                        <span class="mform-fb__copy-msg" data-fb-preview-msg></span>
+                    </div>
+                    <iframe class="mform-fb__preview" data-fb-preview title="Vorschau" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" style="width:100%;min-height:160px;border:1px solid var(--mform-border, #dfe3e9);background:var(--mform-surface, #fff)"></iframe>
+                </div>
+            </section>
+
+            <section class="mform-fb__section" data-fb-section="input">
+                <h4 class="mform-fb__section-head"><button type="button" class="mform-fb__section-toggle" data-fb-section-toggle aria-expanded="false"><i class="rex-icon fa-chevron-down mform-fb__section-chevron"></i> Eingabe (Modul-Input)</button></h4>
+                <div class="mform-fb__section-body" data-fb-section-body hidden>
+                    <div class="mform-fb__code-bar">
+                        <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy">Code kopieren</button>
+                        <span class="mform-fb__copy-msg" data-fb-copy-msg></span>
+                    </div>
+                    <textarea class="mform-fb__code" data-fb-code data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
+                </div>
+            </section>
+
+            <section class="mform-fb__section" data-fb-section="output">
+                <h4 class="mform-fb__section-head"><button type="button" class="mform-fb__section-toggle" data-fb-section-toggle aria-expanded="false"><i class="rex-icon fa-chevron-down mform-fb__section-chevron"></i> Ausgabe (Modul-Output)</button></h4>
+                <div class="mform-fb__section-body" data-fb-section-body hidden>
+                    <div class="mform-fb__code-bar">
+                        <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
+                        <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
+                    </div>
+                    <textarea class="mform-fb__code" data-fb-output data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
+                </div>
+            </section>
+        </div>
     </div>
 
     <div class="mform-fb__props" data-fb-props>

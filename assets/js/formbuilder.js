@@ -1225,20 +1225,99 @@
             previewTimer = setTimeout(refreshPreview, 800);
         }
 
+        // Hoehe nur uebernehmen, solange der Vorschau-Reiter sichtbar ist (versteckter Iframe misst 0).
+        var lastPreviewHeight = 0;
+        function previewPaneHidden() {
+            var pane = $preview ? $preview.closest('[data-fb-section-body]') : null;
+            return !!(pane && pane.hidden);
+        }
         window.addEventListener('message', function (e) {
             if (!$preview || !e.data || typeof e.data.mformBuilderPreviewHeight !== 'number') return;
-            $preview.style.height = Math.max(160, Math.min(e.data.mformBuilderPreviewHeight + 24, 4000)) + 'px';
+            if (previewPaneHidden()) return;
+            lastPreviewHeight = Math.max(160, Math.min(e.data.mformBuilderPreviewHeight + 24, 4000));
+            $preview.style.height = lastPreviewHeight + 'px';
         });
         var $previewBtn = document.querySelector('[data-fb-action="preview"]');
         if ($previewBtn) $previewBtn.addEventListener('click', refreshPreview);
         if ($previewAuto) $previewAuto.addEventListener('change', function () { if ($previewAuto.checked) refreshPreview(); });
 
-        document.querySelector('[data-fb-action="copy"]').addEventListener('click', function () {
-            copyToClipboard(getCodeText($code), document.querySelector('[data-fb-copy-msg]'));
+        // Abschnitte Vorschau / Eingabe / Ausgabe: unabhaengig auf- und zuklappbar, Vorschau
+        // standardmaessig offen; die offenen Abschnitte werden im Browser gemerkt.
+        var SECTIONS_STORAGE_KEY = 'mform.formbuilder.sections';
+        var $sections = document.querySelector('[data-fb-sections]');
+        function sectionOpen(section) {
+            var body = section.querySelector('[data-fb-section-body]');
+            return !!(body && !body.hidden);
+        }
+        function setSectionOpen(section, open) {
+            var body = section.querySelector('[data-fb-section-body]');
+            var toggle = section.querySelector('[data-fb-section-toggle]');
+            if (!body) return;
+            body.hidden = !open;
+            section.classList.toggle('is-open', open);
+            if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open && section.dataset.fbSection === 'preview' && $preview) {
+                if (lastPreviewHeight) $preview.style.height = lastPreviewHeight + 'px';
+                if ($preview.contentWindow) {
+                    try { $preview.contentWindow.postMessage({ mformBuilderMeasure: true }, '*'); } catch (_e) { /* noop */ }
+                }
+                if (!$preview.srcdoc && state.length) refreshPreview();
+            }
+        }
+        function updateSectionsToggle() {
+            if (!$sections) return;
+            var all = Array.prototype.slice.call($sections.querySelectorAll('[data-fb-section]'));
+            var allOpen = all.every(sectionOpen);
+            var btn = $sections.querySelector('[data-fb-sections-toggle] i');
+            if (btn) {
+                btn.classList.toggle('fa-window-minimize', allOpen);
+                btn.classList.toggle('fa-window-maximize', !allOpen);
+            }
+        }
+        function rememberSections() {
+            if (!$sections) return;
+            var open = Array.prototype.slice.call($sections.querySelectorAll('[data-fb-section]')).filter(sectionOpen).map(function (s) { return s.dataset.fbSection; });
+            try { window.localStorage.setItem(SECTIONS_STORAGE_KEY, JSON.stringify(open)); } catch (_e) { /* noop */ }
+            updateSectionsToggle();
+        }
+        if ($sections) {
+            var storedOpen = null;
+            try { storedOpen = JSON.parse(window.localStorage.getItem(SECTIONS_STORAGE_KEY) || 'null'); } catch (_e) { storedOpen = null; }
+            if (!Array.isArray(storedOpen)) storedOpen = ['preview'];
+            $sections.querySelectorAll('[data-fb-section]').forEach(function (section) {
+                setSectionOpen(section, storedOpen.indexOf(section.dataset.fbSection) !== -1);
+            });
+            updateSectionsToggle();
+            $sections.addEventListener('click', function (e) {
+                var toggleAll = e.target.closest('[data-fb-sections-toggle]');
+                if (toggleAll) {
+                    e.preventDefault();
+                    var all = Array.prototype.slice.call($sections.querySelectorAll('[data-fb-section]'));
+                    var open = !all.every(sectionOpen);
+                    all.forEach(function (section) { setSectionOpen(section, open); });
+                    rememberSections();
+                    return;
+                }
+                var toggle = e.target.closest('[data-fb-section-toggle]');
+                if (!toggle) return;
+                e.preventDefault();
+                var section = toggle.closest('[data-fb-section]');
+                setSectionOpen(section, !sectionOpen(section));
+                rememberSections();
+            });
+        }
+
+        // Copy-Buttons gibt es mehrfach (Leiste und Eingabe-Abschnitt); Meldung neben dem geklickten Button.
+        document.querySelectorAll('[data-fb-action="copy"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                copyToClipboard(getCodeText($code), btn.parentElement.querySelector('[data-fb-copy-msg]'));
+            });
         });
 
-        document.querySelector('[data-fb-action="copy-output"]').addEventListener('click', function () {
-            copyToClipboard(getCodeText($output), document.querySelector('[data-fb-copy-output-msg]'));
+        document.querySelectorAll('[data-fb-action="copy-output"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                copyToClipboard(getCodeText($output), btn.parentElement.querySelector('[data-fb-copy-output-msg]'));
+            });
         });
 
         // ---- Code generation ------------------------------------------------
