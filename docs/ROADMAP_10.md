@@ -123,7 +123,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | 10.0.0-rc.1 (veröffentlicht 13.09.2026) | Conditional-Editor (#417), Tags-Feld (#412), Builder: Abschnitte, eigene Attribute, Editor-Auswahl, Ablage für alle Wrapper. Englische Doku entfällt (#456 geschlossen), Rating und weitere Felder aus #412 nach 10.1. |
 | 10.0.0-rc.2 (veröffentlicht 13.09.2026) | Repeater: Überschrift je Eintrag (`item_title`) und einleitender Text (`description`). |
 | 10.0.0 | Stabilisierung. Der Umstieg 9 → 10 ist eine Checkliste in `docs/00_whats_new.md`, keine Datenmigration. |
-| 10.1 | Undo/Redo (#411). Weitere Felder aus #412 sind nicht mehr geplant (Issue geschlossen), eigene Typen laufen über die Field-Type-Registry. |
+| 10.1 | Noch nichts geplant. Undo/Redo im Builder (#411) und weitere Felder (#412) sind gestrichen; eigene Feldtypen laufen über die Field-Type-Registry. |
 
 ## 7. Regeln für Beiträge auf `main` (MForm 10)
 
