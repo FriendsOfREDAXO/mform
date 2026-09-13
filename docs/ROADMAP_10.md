@@ -1,6 +1,6 @@
 # MForm 10 – Plan
 
-Stand: 13.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`.
+Stand: 13.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`. Die Checkliste mit erledigten und gestrichenen Punkten steht im Tracking-Issue #448.
 
 ## 1. Rahmen
 
@@ -110,7 +110,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 - Modul-Linter `mform:lint` (#454): erledigt in Beta 1.
 - Dark-Mode-Audit / Design-Tokens (#455): erledigt in Beta 1.
 - Englische Doku für die Kernkapitel (offen, #456). Doku-Seite „Was ist neu in 10“: erledigt in Beta 4.
-- Deprecation-Policy: Was in 10 als veraltet markiert wird, fliegt frühestens in 11.
+- Deprecation-Policy: Was in 10 als veraltet markiert wird, fliegt frühestens in 11. Stand rc.2: nichts markiert.
 
 ## 6. Reihenfolge
 
