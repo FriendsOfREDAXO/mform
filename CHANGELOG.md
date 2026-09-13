@@ -1,11 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 10.0.0-beta.4 (in Arbeit)
+## Version 10.0.0-beta.4
+
+**BETA, nicht für Produktion.** Vierte Beta von MForm 10 (13.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt. Update von beta.3 ohne Datenänderung.
 
 ### Geändert
 
 - **Form Builder:** Die Vorschau steht jetzt unter dem Ausgabecode, Eingabe- und Ausgabecode bleiben damit direkt untereinander.
-- **Doku:** Seite „Was ist neu in MForm 10“ (bisher MForm 9), MBlock-Bezüge aus den Kapiteln Widgets, Custom-Link, Repeater und CheckboxGroup entfernt bzw. auf die Migration verwiesen, HTML5-Feldmethoden in den Grundlagen, falsche Beispiele korrigiert (Spalten im Tutorial, `addSelectField`-Parameter, `addTextAreaField`, Repeater-`layout`), Optionstabellen des Repeaters vervollständigt, README.de mit Beta-Hinweis und PHP-8.4-Badge.
+- **Doku:** Seite „Was ist neu in MForm 10“ (bisher MForm 9), MBlock-Bezüge aus den Kapiteln Widgets, Custom-Link, Repeater und CheckboxGroup entfernt bzw. auf die Migration verwiesen, HTML5-Feldmethoden in den Grundlagen, falsche Beispiele korrigiert (Spalten im Tutorial, `addSelectField`-Parameter, `addTextAreaField`, Repeater-`layout`), Optionstabellen des Repeaters vervollständigt, README.de mit Beta-Hinweis und PHP-8.4-Badge. Neue Umstiegs-Checkliste 9.5 → 10 in „Was ist neu“. Der MBlock-Konverter bleibt Teil von MForm.
 
 ### Behoben
 

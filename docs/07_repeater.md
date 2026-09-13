@@ -382,7 +382,7 @@ $itemForm = MForm::factory()
 
 ## Media- und Link-Felder im Repeater
 
-Der Flex-Repeater speichert alle Werte in einem JSON-Objekt. Daher gelten hier **andere Key-Konventionen als in MBlock**.
+Der Flex-Repeater speichert alle Werte in einem JSON-Objekt. Die Feld-ID ist direkt der Schlüssel im Item.
 
 ### Key-Typen
 

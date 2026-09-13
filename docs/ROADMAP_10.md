@@ -1,6 +1,6 @@
 # MForm 10 – Plan
 
-Stand: 11.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`.
+Stand: 13.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`.
 
 ## 1. Rahmen
 
@@ -109,7 +109,7 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 ### 5.8 Kleinere Punkte
 - Modul-Linter `mform:lint` (#454): erledigt in Beta 1.
 - Dark-Mode-Audit / Design-Tokens (#455): erledigt in Beta 1.
-- Englische Doku für die Kernkapitel, Doku-Seite „Was ist neu in 10“.
+- Englische Doku für die Kernkapitel (offen, #456). Doku-Seite „Was ist neu in 10“: erledigt in Beta 4.
 - Deprecation-Policy: Was in 10 als veraltet markiert wird, fliegt frühestens in 11.
 
 ## 6. Reihenfolge
@@ -119,8 +119,9 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | 10.0.0-beta.1 | Branch-Setup, PHP 8.4, MBlock-Aufräumen (2), Migrationsassistent M1–M4 und M8–M10, Field-Type-Registry (5.1), HTML5-Felder (5.6), Test-Suite-Grundstock (5.7), DOM-Umstellung (#402), Rest von #437. |
 | 10.0.0-beta.2 (veröffentlicht 11.09.2026) | Rest von #437 (Duplikat-Abbau Renderpfade), A11y-Prüfung (#397) vorgezogen, Migration M5–M7, Repeater-Datenversion (5.3), Builder-Parität, Export/Import, Live-Preview (5.5), Linkmap-Bridge (5.2). |
 | 10.0.0-beta.3 (veröffentlicht 13.09.2026) | Repeater-Bedienung (Kopfzeile, Hinzufügen-Streifen). |
+| 10.0.0-beta.4 (veröffentlicht 13.09.2026) | Doku-Durchsicht, „Was ist neu in 10“ mit Umstiegs-Checkliste, Builder-Vorschau unter dem Ausgabecode, `MFormOutput::link()` mit `redaxo://`. Entscheidung: der MBlock-Konverter bleibt Teil von MForm. |
 | 10.0.0-rc.1 | Conditional-Editor (#417), Rating und Tags (#412), Dark-Mode-Audit, Doku. |
-| 10.0.0 | Stabilisierung, Migrationsleitfaden 9 → 10. |
+| 10.0.0 | Stabilisierung. Der Umstieg 9 → 10 ist eine Checkliste in `docs/00_whats_new.md`, keine Datenmigration. |
 | 10.1 | Undo/Redo (#411), weitere erweiterte Felder. |
 
 ## 7. Regeln für Beiträge auf `main` (MForm 10)

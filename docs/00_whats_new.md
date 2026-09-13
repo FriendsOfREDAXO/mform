@@ -8,6 +8,18 @@ MForm 10 setzt PHP 8.4 voraus, lässt MBlock hinter sich und bringt den Flex-Rep
 - **MBlock wird nicht mehr unterstützt.** Module mit `MBlock::show()` laufen technisch weiter, werden aber nicht mehr getestet. Der Weg ist der Flex-Repeater: [Migration von MBlock](08_mblock_migration.md) beschreibt Assistent, Konsole und die manuelle Migration.
 - Die stabile Linie 9.5.x wird im Branch `9.x` gepflegt. Gespeicherte Werte bleiben lesbar; das neue Repeater-Speicherformat ist Opt-in.
 
+### Umstieg von 9.5: Checkliste
+
+Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vorher prüfen:
+
+- **PHP 8.4** auf dem Server, sonst startet das Addon nicht.
+- **MediaPlace** mindestens 2.0.0, falls installiert (gilt seit 9.4).
+- **Gespeicherte Werte** bleiben unverändert: `REX_VALUE`, `REX_MEDIA`, Custom-Link-Strings, Listen und das Repeater-JSON sind identisch zu 9.5. Der Umschlag mit Versionsmarker kommt nur mit `'data_version' => 2` je Feld.
+- **API**: alle `add*`-Methoden, Optionen und Ausgabehelfer aus 9.5 funktionieren unverändert, nichts ist als veraltet markiert oder entfernt.
+- **MBlock**: Module mit `MBlock::show()` laufen technisch weiter, werden aber nicht mehr getestet. Umstellen mit dem Assistenten „MBlock zu Repeater“, wann es passt.
+- **Eigenes CSS / eigene Fragmente**: Widgets nutzen gemeinsame Tokens und sind eckig, das Repeater-Label trägt kein `control-label` mehr, Wrapper und Feldzeilen kommen in beiden Renderpfaden aus `mform_wrapper.php` und `mform_default.php`. Wer diese Fragmente im Projekt überschreibt oder Widgets per CSS anpasst, schaut einmal drauf.
+- **Tooltip-Klasse**: heißt jetzt `mform-info-tooltip`, `mblock-info-tooltip` bleibt als zweite Klasse am Element.
+
 ## Repeater
 
 - **Bedienung:** Kopfzeile mit Label, Zähler und Aktionen, „Hinzufügen“ als durchgehender Streifen unter der Liste, auch in verschachtelten Repeatern. Details: [Repeater](07_repeater.md#standardverhalten-und-optionen).
