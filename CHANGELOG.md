@@ -1,5 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-rc.3
+
+**Release Candidate, noch nicht für Produktion.** Dritter Release Candidate von MForm 10 (14.09.2026), eine Fehlerbehebung. Update von rc.2 ohne Datenänderung.
+
+### Behoben
+
+- **Klassen stapelten sich bei wiederholtem `show()`:** Der Parser hängte `active` an das geöffnete Tab-Pane, `in` an geöffnete Collapse-Bereiche und die Zeilenklasse an Spaltengruppen per String-Verkettung an die Item-Objekte. Bei mehrfachem Rendern desselben Formulars (Modul oder Addon ruft `show()` mehr als einmal auf) sammelten sich die Klassen an, etwa `class="tab-pane active active active"`. Klassen werden jetzt über `MFormLayoutCore::appendClass()` nur angehängt, wenn sie fehlen; `ShowIdempotencyTest` deckt Tabs, Collapse und Spaltengruppen mit ab.
+
 ## Version 10.0.0-rc.2
 
 **Release Candidate, noch nicht für Produktion.** Zweiter Release Candidate von MForm 10 (13.09.2026). Nur zum Testen, vorher Backup anlegen. Rückmeldungen im Tracking-Issue #448, 9.5.x wird im Branch `9.x` gepflegt. Update von rc.1 ohne Datenänderung.

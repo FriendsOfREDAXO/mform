@@ -329,7 +329,7 @@ class MFormParser
                 unset($buttonAttributes['data-collapse-open']);
             }
             if ('true' == $buttonAttributes['aria-expanded']) {
-                $item->setClass($item->getClass() . ' in');
+                $item->setClass(MFormLayoutCore::appendClass($item->getClass(), 'in'));
             }
             $collapseButton = new MFormElement();
             $collapseButton->setType('collapse-button')
@@ -347,7 +347,7 @@ class MFormParser
         if ('start-group-column' == $item->getType()) {
             $rowClass = MFormLayoutCore::consumeColumnGroupRowClass($attributes);
             if ('' !== $rowClass) {
-                $item->setClass(trim($item->getClass() . ' ' . $rowClass));
+                $item->setClass(MFormLayoutCore::appendClass($item->getClass(), $rowClass));
             }
         }
 
@@ -372,7 +372,7 @@ class MFormParser
         if ('tab' == $item->getType()) {
             $attributes['data-tab-group-nav-tab-id'] = $item->getGroup() . $item->getGroupCount() . '_' . $item->getGroupKey();
             if (MFormLayoutCore::isTabActive($attributes)) {
-                $item->setClass(trim($item->getClass() . ' active'));
+                $item->setClass(MFormLayoutCore::appendClass($item->getClass(), 'active'));
             }
 
             MFormLayoutCore::stripTabMetaAttributes($attributes);
@@ -1861,7 +1861,7 @@ class MFormParser
     {
         $formGroupClass = MFormFormGroupHelper::getExtraClass($item);
         if ('' !== $formGroupClass) {
-            $templateElement->setClass(trim($templateElement->class . ' ' . $formGroupClass));
+            $templateElement->setClass(MFormLayoutCore::appendClass((string) $templateElement->class, $formGroupClass));
         }
 
         $formGroupAttributes = MFormFormGroupHelper::getAttributes($item);

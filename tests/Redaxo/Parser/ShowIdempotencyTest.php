@@ -83,6 +83,24 @@ final class ShowIdempotencyTest extends TestCase
         self::assertSame(0, preg_match('/class="[^"]*form-control[^"]*form-control/', $html), 'Standardklasse darf nicht mehrfach anhaengen');
     }
 
+    public function testGroupClassesAreAppliedOnce(): void
+    {
+        $form = MForm::factory()
+            ->addTabElement('Tab A', MForm::factory()->addTextField('1.0.a', ['label' => 'A']), true)
+            ->addTabElement('Tab B', MForm::factory()->addTextField('1.0.b', ['label' => 'B']))
+            ->addCollapseElement('Auf', MForm::factory()->addTextField('1.0.c', ['label' => 'C']), true)
+            ->addColumnElement(6, MForm::factory()->addTextField('1.0.d', ['label' => 'D']), ['data-group-row-class' => 'meine-reihe']);
+        $first = $form->show();
+        $form->show();
+        $html = $form->show();
+
+        self::assertSame(0, preg_match('/class="[^"]*\bactive\b[^"]*\bactive\b/', $html), 'Tab-Klasse active darf nicht mehrfach anhaengen');
+        self::assertSame(0, preg_match('/class="[^"]*\bin\b[^"]*\bin\b/', $html), 'Collapse-Klasse in darf nicht mehrfach anhaengen');
+        self::assertSame(substr_count($first, 'meine-reihe'), substr_count($html, 'meine-reihe'), 'Zeilenklasse der Spaltengruppe stapelt sich nicht');
+        self::assertStringContainsString('class="row meine-reihe"', $html);
+        self::assertStringContainsString('class="tab-pane active"', $html);
+    }
+
     public function testValuesAreNotDoubleEscaped(): void
     {
         $form = self::form();
