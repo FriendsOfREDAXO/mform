@@ -45,6 +45,7 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 - Vollständige Palette: Collapse, Accordion, Column, Inline, Radio Image/Icon/Color, Text/Textarea (readonly) neben Tab, Fieldset, Modal und Repeater; Medien-Felder mit A11y-Checkbox.
 - Export und Import des Builder-Stands als JSON (`mform-builder.json`).
 - Vorschau, Eingabe- und Ausgabecode liegen als auf- und zuklappbare Abschnitte unter der Baufläche, nur die Vorschau ist anfangs offen: das Formular wird über die MForm-Engine gerendert, im Backend-Theme, automatisch nach jeder Änderung. Offene Abschnitte werden gemerkt, „Alle auf / zu“ und „Eingabecode kopieren“ sitzen in der Leiste darüber.
+- „Weitere Attribute“ je Feld (`name=wert`, eine je Zeile) und für Textareas die Wahl zwischen TinyMCE, CKEditor 5 und MarkdownEditor samt Profil; die Vorschau initialisiert die Editoren mit.
 - Bedingungs-Editor: unter „Sichtbarkeit an Bedingungen koppeln“ beliebig viele Regeln aus Quellfeld, Operator und Wert, Verknüpfung „alle“ oder „eine genügt“; der Builder erzeugt `setVisibleIf()`/`addVisibleIf()` bzw. `addConditionalFieldsetArea()` mit Liste.
 
 ## Werkzeuge

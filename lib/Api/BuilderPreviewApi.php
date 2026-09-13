@@ -73,15 +73,27 @@ class BuilderPreviewApi extends rex_api_function
      */
     private function document(string $body, string $theme): string
     {
+        // Core, be_style, MForm und die Editor-Addons (TinyMCE, CKEditor 5, MarkdownEditor), damit
+        // Editor-Textareas in der Vorschau initialisiert werden wie im Modul.
+        $wanted = ['/be_style/', '/mform/', '/core/', '/tinymce/', '/cke5/', '/markdowneditor/'];
+        $isWanted = static function (string $file) use ($wanted): bool {
+            foreach ($wanted as $needle) {
+                if (str_contains($file, $needle)) {
+                    return true;
+                }
+            }
+
+            return str_contains($file, 'jquery') || str_contains($file, 'bootstrap');
+        };
         $css = '';
         foreach (rex_view::getCssFiles()['all'] ?? [] as $file) {
-            if (str_contains($file, '/be_style/') || str_contains($file, '/mform/') || str_contains($file, '/core/')) {
+            if ($isWanted($file)) {
                 $css .= '<link rel="stylesheet" href="' . rex_escape($file) . '">' . "\n";
             }
         }
         $js = '';
         foreach (rex_view::getJsFiles() as $file) {
-            if (str_contains($file, '/be_style/') || str_contains($file, '/mform/') || str_contains($file, '/core/') || str_contains($file, 'jquery') || str_contains($file, 'bootstrap')) {
+            if ($isWanted($file)) {
                 $js .= '<script src="' . rex_escape($file) . '"></script>' . "\n";
             }
         }

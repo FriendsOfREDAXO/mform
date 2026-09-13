@@ -77,7 +77,7 @@
             color:       { label: 'Color (nativ)', method: 'addColorField',
                 props: ['label', 'defaultValue', 'notice', 'cssClass', 'full'] },
             textarea:    { label: 'Textarea', method: 'addTextAreaField',
-                props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'tinymce', 'tinymceProfile', 'required', 'full'] },
+                props: ['label', 'defaultValue', 'placeholder', 'notice', 'rows', 'cssClass', 'editor', 'editorProfile', 'required', 'full'] },
             select:      { label: 'Select', method: 'addSelectField',
                 props: ['label', 'defaultValue', 'options', 'isMulti', 'notice', 'cssClass', 'required', 'full'] },
             radio:       { label: 'Radio', method: 'addRadioField',
@@ -219,8 +219,11 @@
                     : (type === 'radiocolor' ? "primary=Primaer|#2f6ea8\nlight=Hell|#f3f6fb\nnone=Transparent|transparent" : '')))),
                 required: false,
                 full: false,
-                tinymce: false,
-                tinymceProfile: '',
+                // Editor an Textareas: '' | tinymce | cke5 | markdown
+                editor: '',
+                editorProfile: '',
+                // Weitere Attribute (eine je Zeile, name=wert)
+                customAttrs: '',
                 // Select multiple
                 isMulti: false,
                 // CheckboxGroup
@@ -364,6 +367,13 @@
                 .map(function (c) { return { sourceUid: String(c.sourceUid || ''), operator: String(c.operator || 'eq'), value: c.value == null ? '' : String(c.value) }; });
             item.visibilityLogic = item.visibilityLogic === 'any' ? 'any' : 'all';
             item.visibilityEnabled = !!item.visibilityEnabled;
+            if (item.editor === undefined) {
+                item.editor = item.tinymce ? 'tinymce' : '';
+                item.editorProfile = item.tinymceProfile || '';
+            }
+            if (typeof item.customAttrs !== 'string') item.customAttrs = '';
+            delete item.tinymce;
+            delete item.tinymceProfile;
             delete item.visibilitySourceUid;
             delete item.visibilityOperator;
             delete item.visibilityValue;
@@ -644,14 +654,18 @@
             if (supportsVisibility(activeItem.type)) {
                 Array.prototype.push.apply(available, VISIBILITY_PROPS);
             }
+            // Weitere Attribute fuer alle echten Felder (nicht fuer Wrapper und reine Struktur-Elemente)
+            if (isConditionSourceType(activeItem.type) && available.indexOf('customAttrs') === -1) {
+                available.push('customAttrs');
+            }
 
             $propsForm.querySelectorAll('[data-fb-prop-group]').forEach(function (g) {
                 g.style.display = available.indexOf(g.dataset.fbPropGroup) !== -1 ? '' : 'none';
             });
 
-            // tinymceProfile-Group nur sichtbar wenn TinyMCE aktiviert ist
-            var profileGroup = $propsForm.querySelector('[data-fb-prop-group="tinymceProfile"]');
-            if (profileGroup && !activeItem.tinymce) {
+            // Editor-Profil nur sichtbar, wenn ein Editor gewaehlt ist
+            var profileGroup = $propsForm.querySelector('[data-fb-prop-group="editorProfile"]');
+            if (profileGroup && !activeItem.editor) {
                 profileGroup.style.display = 'none';
             }
 
@@ -817,7 +831,7 @@
             if (!input) return;
             var key = input.dataset.fbProp;
             activeItem[key] = input.type === 'checkbox' ? input.checked : input.value;
-            if (key === 'tinymce') {
+            if (key === 'editor') {
                 renderProps();
             }
             if (key === 'visibilityEnabled') {
@@ -1428,18 +1442,28 @@
                 if (item.defaultValue) a['default-value'] = item.defaultValue;
             }
 
-            // CSS class merge: tiny-editor + user classes
+            // CSS class merge: Editor-Klasse + eigene Klassen (+ class aus "Weitere Attribute")
             var classes = [];
-            if (item.tinymce && item.type === 'textarea') {
-                classes.push('form-control', 'tiny-editor');
+            var editorClasses = { tinymce: ['form-control', 'tiny-editor'], cke5: ['cke5-editor'], markdown: ['markdowneditor-editor'] };
+            if (item.type === 'textarea' && editorClasses[item.editor]) {
+                Array.prototype.push.apply(classes, editorClasses[item.editor]);
             }
             if (item.cssClass) classes.push(item.cssClass);
-            if (classes.length) a['class'] = classes.join(' ');
 
-            // TinyMCE Profil
-            if (item.tinymce && item.tinymceProfile && item.type === 'textarea') {
-                a['data-profile'] = item.tinymceProfile;
+            // Editor-Profil
+            if (item.type === 'textarea' && item.editor && item.editorProfile) {
+                a[item.editor === 'markdown' ? 'data-markdowneditor-profile' : 'data-profile'] = item.editorProfile;
             }
+
+            // Weitere Attribute: eine je Zeile, name=wert (ohne "=" -> name=name, z. B. required)
+            parseCustomAttrs(item.customAttrs).forEach(function (pair) {
+                if (pair.key === 'class') {
+                    classes.push(pair.value);
+                    return;
+                }
+                a[pair.key] = pair.value;
+            });
+            if (classes.length) a['class'] = classes.join(' ');
 
             // CustomLink data-* toggles
             if (item.type === 'customlink' || item.type === 'customlinkmultiple') {
@@ -1467,6 +1491,20 @@
             if (v === true || v === false) return v ? 'true' : 'false';
             if (typeof v === 'number') return String(v);
             return phpStr(v);
+        }
+
+        // Weitere Attribute: "name=wert" je Zeile; ohne "=" wird name=name (z. B. required)
+        function parseCustomAttrs(raw) {
+            var out = [];
+            String(raw || '').split('\n').forEach(function (line) {
+                line = line.trim();
+                if (!line) return;
+                var eq = line.indexOf('=');
+                var key = (eq === -1 ? line : line.slice(0, eq)).trim();
+                if (!/^[a-zA-Z_:][\w:.-]*$/.test(key)) return;
+                out.push({ key: key, value: eq === -1 ? key : line.slice(eq + 1).trim() });
+            });
+            return out;
         }
 
         // Tags: eine Zeile je Vorschlag (ohne key=), leere Zeilen ignorieren
@@ -2202,7 +2240,7 @@
                     return item.isMulti ? 'Array der ausgewaehlten Werte (Multi-Select, kommasepariert gespeichert)' : 'einzelner ausgewaehlter Wert';
                 case 'radio':       return 'einzelner ausgewaehlter Wert';
                 case 'colorswatch': return 'gewaehlter Farbwertausdruck (z. B. #2f77bc oder .text-primary)';
-                case 'textarea':    return item.tinymce ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen';
+                case 'textarea':    return item.editor === 'markdown' ? 'Markdown-Text (im Frontend parsen)' : (item.editor ? 'HTML aus dem Editor' : 'roher Text mit Zeilenumbruechen');
                 case 'hidden':      return 'verstecktes Feld';
                 case 'number':      return 'Zahl als String (min/max/step ueber Attribute)';
                 case 'range':       return 'Zahl als String (Schieberegler, Live-Anzeige)';

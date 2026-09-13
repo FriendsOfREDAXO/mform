@@ -38,16 +38,23 @@ if (rex_addon::get('tinymce')->isAvailable() && class_exists(\FriendsOfRedaxo\Ti
     sort($tinyProfiles);
 }
 
-if ([] === $tinyProfiles) {
-    $tinyProfileHtml = '<input type="text" class="form-control" data-fb-prop="tinymceProfile" placeholder="default">'
-        . '<p class="help-block" style="margin-top:4px"><small>Hinweis: TinyMCE-Addon nicht installiert oder keine Profile vorhanden. Profilname kann manuell eingetragen werden.</small></p>';
-} else {
-    $tinyProfileHtml = '<select class="form-control" data-fb-prop="tinymceProfile"><option value="">(Standardprofil)</option>';
-    foreach ($tinyProfiles as $name) {
-        $tinyProfileHtml .= '<option value="' . rex_escape($name) . '">' . rex_escape($name) . '</option>';
+// CKEditor-5-Profile, falls das Addon installiert ist.
+$cke5Profiles = [];
+if (rex_addon::get('cke5')->isAvailable() && rex_sql_table::get(rex::getTable('cke5_profiles'))->exists()) {
+    foreach (rex_sql::factory()->getArray('SELECT name FROM ' . rex::getTable('cke5_profiles') . ' ORDER BY name') as $row) {
+        if ('' !== (string) ($row['name'] ?? '')) {
+            $cke5Profiles[] = (string) $row['name'];
+        }
     }
-    $tinyProfileHtml .= '</select>';
 }
+$editorProfileOptions = '';
+foreach (['tinymce' => $tinyProfiles, 'cke5' => $cke5Profiles] as $editor => $profiles) {
+    foreach ($profiles as $name) {
+        $editorProfileOptions .= '<option value="' . rex_escape($name) . '" data-editor="' . $editor . '"></option>';
+    }
+}
+$tinyProfileHtml = '<input type="text" class="form-control" data-fb-prop="editorProfile" placeholder="default" list="mform-fb-editor-profiles" autocomplete="off">'
+    . '<datalist id="mform-fb-editor-profiles">' . $editorProfileOptions . '</datalist>';
 
 $body = <<<'HTML'
 <div id="mform-fb" class="mform-fb">
@@ -290,14 +297,23 @@ $body = <<<'HTML'
                     <input type="checkbox" data-fb-prop="required"> Required
                 </label>
             </div>
-            <div class="form-group" data-fb-prop-group="tinymce">
-                <label class="checkbox">
-                    <input type="checkbox" data-fb-prop="tinymce"> TinyMCE-Editor
-                </label>
+            <div class="form-group" data-fb-prop-group="editor">
+                <label>Editor</label>
+                <select class="form-control" data-fb-prop="editor">
+                    <option value="">Kein Editor (Textarea)</option>
+                    <option value="tinymce">TinyMCE (tiny-editor)</option>
+                    <option value="cke5">CKEditor 5 (cke5-editor)</option>
+                    <option value="markdown">MarkdownEditor (markdowneditor-editor)</option>
+                </select>
             </div>
-            <div class="form-group" data-fb-prop-group="tinymceProfile">
-                <label>TinyMCE-Profil <small>(data-profile)</small></label>
+            <div class="form-group" data-fb-prop-group="editorProfile">
+                <label>Editor-Profil <small>(data-profile, leer = Standard)</small></label>
                 {{TINY_PROFILE_FIELD}}
+            </div>
+            <div class="form-group" data-fb-prop-group="customAttrs">
+                <label>Weitere Attribute <small>(eine je Zeile, <code>name=wert</code>)</small></label>
+                <textarea class="form-control" rows="3" data-fb-prop="customAttrs" placeholder="maxlength=120&#10;data-foo=bar"></textarea>
+                <p class="help-block" style="margin-top:4px"><small>Landen 1:1 im Attribut-Array des Feldes, z. B. <code>maxlength</code>, <code>data-*</code>, <code>autocomplete</code>. <code>class</code> wird mit den CSS-Klassen zusammengefuehrt.</small></p>
             </div>
             <div class="form-group" data-fb-prop-group="full">
                 <label class="checkbox">

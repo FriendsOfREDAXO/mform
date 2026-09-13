@@ -9,6 +9,7 @@
 
 ### Geändert
 
+- **Form Builder, Felder:** Jedes Feld hat „Weitere Attribute“ (eine je Zeile, `name=wert`), die 1:1 ins Attribut-Array wandern, etwa `maxlength`, `autocomplete` oder `data-*`; `class` wird mit den CSS-Klassen zusammengeführt. Textareas haben statt der TinyMCE-Checkbox eine Editor-Auswahl: TinyMCE, CKEditor 5 oder MarkdownEditor, jeweils mit Profil (Vorschläge aus den installierten Addons). Die Live-Vorschau lädt die Assets der Editor-Addons mit, TinyMCE und CKEditor 5 erscheinen dort also wie im Modul.
 - **Form Builder:** Vorschau, Eingabe- und Ausgabecode liegen jetzt als unabhängig auf- und zuklappbare Abschnitte unter der Baufläche, anfangs ist nur die Vorschau offen. Offene Abschnitte werden im Browser gemerkt, in der Leiste darüber gibt es „Alle auf / zu“ und „Eingabecode kopieren“. Die Slot-Warnung bleibt außerhalb sichtbar.
 
 ### Behoben
