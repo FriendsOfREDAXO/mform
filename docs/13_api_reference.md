@@ -604,6 +604,7 @@ Unterstützte `$attributes` (Repeater-Optionen):
 | `collapsed`, `first_open`, `show_toggle_all`, `show_add_button`, `copy_paste`, `open` | `bool` | Bedienung, siehe [Repeater-Optionen](07_repeater.md#vollständige-optionsübersicht) |
 | `confirm_delete_msg` | `string` | Angepasste Lösch-Bestätigungsmeldung |
 | `layout` | `string` | `horizontal`, `vertical` oder `inline` |
+| `item_title` | `string` | Überschrift je Eintrag, Vorlage mit `{n}` und `{feld}`, z. B. `'Abschnitt {n}: {title}'` (ab 10.0) |
 | `data_version` | `int` | `1` Liste (Standard) oder `2` Umschlag mit Versionsmarker |
 
 ---

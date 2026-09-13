@@ -268,6 +268,7 @@ Verfügbare Optionen im Repeater-Array:
 - `open` (bool, default: `true`): Toolbar / Aktionen sind nutzbar; bei `false` wird die Bedienoberflaeche eingefroren (read-only Anzeige).
 - `copy_paste` (bool, default: `true`): Pro Item ein Kopieren-Button und ein Einfuegen-Button in der Toolbar.
 - `confirm_delete` (bool, default: `true`): Loeschen eines Items mit Sicherheitsabfrage.
+- `item_title` (string, default: `''`): Überschrift im Kopf jedes Eintrags als Vorlage, `{n}` für die laufende Nummer und `{feld}` für Feldwerte (ohne HTML, gekürzt), z. B. `'Abschnitt {n}: {title}'`. Hängende Trennzeichen bei leerem Feld werden entfernt („Abschnitt 1“ statt „Abschnitt 1:“). Ohne Option zeigt der Kopf den ersten gefüllten Text des Eintrags, sonst `#n`. Gilt auch für verschachtelte Repeater.
 
 ### Sortable-Kompatibilität
 
@@ -494,6 +495,7 @@ echo $mform->show();
 | `show_add_button` | bool | `true` | „Hinzufügen" in der Kopfzeile und als Streifen unter der Liste; `false` = nur der Streifen, nur solange der Repeater leer ist |
 | `default_count` | int | `0` | Anzahl Items, die ein leerer Repeater beim Laden anlegt |
 | `layout` | string | `'horizontal'` | `horizontal` (Label links), `vertical` (gestapelt) oder `inline` (kompakt) |
+| `item_title` | string | `''` | Überschrift je Eintrag als Vorlage: `{n}` ist die laufende Nummer, `{feld}` der Wert eines Feldes, z. B. `'Abschnitt {n}: {title}'`. Leer = automatisch aus dem ersten Textfeld (ab 10.0) |
 | `min` | int | `0` | Mindestanzahl Items |
 | `max` | int | `0` | Maximalanzahl Items (0 = unbegrenzt) |
 | `confirm_delete` | bool | `true` | Loeschen mit Bestaetigung |

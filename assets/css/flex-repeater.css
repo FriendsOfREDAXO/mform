@@ -388,6 +388,12 @@ body.rex-theme-dark {
     white-space: nowrap;
 }
 
+/* Konfigurierte Ueberschrift (item_title): wie eine Reiter-Beschriftung, nicht ausgegraut */
+.mfr-item-title.mfr-title--custom,
+.mfr-nested-title.mfr-title--custom {
+    color: var(--mfr-color-text);
+}
+
 /* Aktions-Buttons */
 .mfr-item-actions {
     display: flex;

@@ -141,7 +141,7 @@
                 props: ['label', 'repeaterMin', 'repeaterMax', 'repeaterDefaultCount',
                         'repeaterCollapsed', 'repeaterFirstOpen', 'repeaterShowToggleAll', 'repeaterShowAddButton',
                         'repeaterOpen', 'repeaterCopyPaste', 'repeaterConfirmDelete',
-                        'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass'] },
+                        'repeaterConfirmDeleteMsg', 'repeaterBtnText', 'repeaterBtnClass', 'repeaterItemTitle'] },
             tab:         { label: 'Tab', method: 'addTabElement',
                 props: ['label', 'tabPullRight', 'tabIcon', 'tabStyle', 'tabLayout'] },
             fieldset:    { label: 'Fieldset', method: 'addFieldsetArea',
@@ -260,6 +260,7 @@
                 repeaterConfirmDeleteMsg: '',
                 repeaterBtnText: '',
                 repeaterBtnClass: '',
+                repeaterItemTitle: '',
                 // Tab
                 tabPullRight: false,
                 tabIcon: '',
@@ -2004,6 +2005,7 @@
             if (item.repeaterConfirmDeleteMsg) parts.push("'confirm_delete_msg' => " + phpStr(item.repeaterConfirmDeleteMsg));
             if (item.repeaterBtnText) parts.push("'btn_text' => " + phpStr(item.repeaterBtnText));
             if (item.repeaterBtnClass) parts.push("'btn_class' => " + phpStr(item.repeaterBtnClass));
+            if (item.repeaterItemTitle) parts.push("'item_title' => " + phpStr(item.repeaterItemTitle));
             return parts.length ? '[' + parts.join(', ') + ']' : '';
         }
 

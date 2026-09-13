@@ -37,7 +37,7 @@ final class MFormWrapperRenderer
         'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if',
         'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all',
         'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max',
-        'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'show_add_button', 'show_add_buttons',
+        'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'show_add_button', 'show_add_buttons', 'item_title',
     ];
 
     /**

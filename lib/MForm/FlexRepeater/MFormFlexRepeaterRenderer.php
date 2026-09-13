@@ -64,8 +64,9 @@ class MFormFlexRepeaterRenderer
                 $btnText = (string) ($attrs['btn_text'] ?? 'Hinzufügen');
                 $label = self::getLabelString($item->getLabel());
                 $showAddButton = (bool) ($attrs['show_add_button'] ?? $attrs['show_add_buttons'] ?? true);
+                $itemTitle = trim((string) ($attrs['item_title'] ?? ''));
 
-                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm, $showAddButton);
+                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm, $showAddButton, $itemTitle);
 
                 $skip = $i + 1;
                 while ($skip < count($items)) {
@@ -548,7 +549,7 @@ class MFormFlexRepeaterRenderer
         return $html;
     }
 
-    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true): string
+    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true, string $itemTitle = ''): string
     {
         $innerTemplate = '';
         if (null !== $innerForm) {
@@ -562,7 +563,7 @@ class MFormFlexRepeaterRenderer
         }
 
         return sprintf(
-            '<div class="mfr-nested-repeater" data-mfr-field="%s" data-mfr-level="2" data-mfr-show-add-button="%s">%s'
+            '<div class="mfr-nested-repeater" data-mfr-field="%s" data-mfr-level="2" data-mfr-show-add-button="%s" data-mfr-item-title="%s">%s'
             . '<div class="mfr-nested-items"></div>'
             . '<button type="button" class="btn btn-default btn-sm mfr-btn-add-nested"><i class="rex-icon fa-plus-circle"></i> %s</button>'
             . '<template class="mfr-nested-template">'
@@ -581,6 +582,7 @@ class MFormFlexRepeaterRenderer
             . '</div></template></div>',
             htmlspecialchars($fieldKey, ENT_QUOTES),
             $showAddButton ? 'true' : 'false',
+            htmlspecialchars($itemTitle, ENT_QUOTES),
             $labelHtml,
             htmlspecialchars($btnText, ENT_QUOTES),
             $innerTemplate,
@@ -789,7 +791,7 @@ class MFormFlexRepeaterRenderer
     private static function renderAttributes(array $attributes): string
     {
         // Steuerwerte von MForm (form-group-*, Bedingungen, a11y) gehoeren an die form-group, nicht ans Element
-        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if', 'a11y'];
+        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if', 'a11y', 'item_title', 'layout', 'data_version', 'copy_paste', 'show_add_buttons'];
 
         $html = '';
         foreach ($attributes as $key => $value) {

@@ -442,6 +442,32 @@
     /**
      * Extrahiert einen lesbaren Titel-String aus einem Datenobjekt.
      */
+    /**
+     * Ueberschrift aus einer Vorlage: {n} = laufende Nummer (ab 1), {feld} = Feldwert ohne HTML.
+     * Bleibt nach dem Einsetzen nichts Sinnvolles uebrig, greift die automatische Ueberschrift.
+     */
+    function renderItemTitle(template, data, index) {
+        let resolvedAny = false;
+        let usedField = false;
+        const text = String(template).replace(/\{([a-zA-Z0-9_.-]+)\}/g, function (match, key) {
+            if (key === 'n' || key === 'index') return String(index + 1);
+            usedField = true;
+            const raw = data && data[key] !== undefined && data[key] !== null ? data[key] : '';
+            const value = Array.isArray(raw) ? raw.join(', ') : String(raw);
+            if (!value.trim()) return '';
+            const tmp = document.createElement('div');
+            tmp.innerHTML = value;
+            const plain = (tmp.textContent || tmp.innerText || '').trim();
+            if (!plain) return '';
+            resolvedAny = true;
+            return plain.length > 55 ? plain.slice(0, 55) + '…' : plain;
+        });
+        // haengende Trennzeichen entfernen ("Abschnitt 1: " -> "Abschnitt 1")
+        const cleaned = text.replace(/\s+/g, ' ').replace(/^[\s:\-–|·,]+|[\s:\-–|·,]+$/g, '');
+        if (cleaned) return cleaned;
+        return usedField && !resolvedAny ? extractTitle(data, index) : '#' + (index + 1);
+    }
+
     function extractTitle(data, index) {
         for (const key of Object.keys(data)) {
             const val = data[key];
@@ -470,6 +496,7 @@
             this.template = container.querySelector('.mfr-nested-template');
             this.addBtn = container.querySelector('.mfr-btn-add-nested');
             this.showAddButton = container.dataset.mfrShowAddButton !== 'false';
+            this.itemTitle = container.dataset.mfrItemTitle || '';
 
             this._init();
         }
@@ -599,7 +626,9 @@
 
         _updateTitle(itemEl, data, index) {
             const titleEl = itemEl.querySelector('.mfr-nested-title');
-            if (titleEl) titleEl.textContent = extractTitle(data, index);
+            if (!titleEl) return;
+            titleEl.textContent = this.itemTitle ? renderItemTitle(this.itemTitle, data, index) : extractTitle(data, index);
+            titleEl.classList.toggle('mfr-title--custom', !!this.itemTitle);
         }
 
         _bindItemEvents(itemEl, body) {
@@ -738,6 +767,8 @@
             this.copyPaste = container.dataset.mfrCopyPaste === '1';
             // Speicherformat: 1 = Liste, 2 = Umschlag {__v, items} (Option data_version)
             this.dataVersion = parseInt(container.dataset.mfrDataVersion, 10) || 1;
+            // Ueberschrift je Eintrag (Option item_title), leer = automatisch aus dem ersten Textfeld
+            this.itemTitle = container.dataset.mfrItemTitle || '';
 
             this.itemsList = container.querySelector('.mfr-items-list');
             this.template = container.querySelector('template.mfr-item-template');
@@ -1074,11 +1105,12 @@
             const titleEl = itemEl.querySelector('.mfr-item-title');
             if (!titleEl) return;
 
-            const baseTitle = extractTitle(data, index);
+            const baseTitle = this.itemTitle ? renderItemTitle(this.itemTitle, data, index) : extractTitle(data, index);
             const isDisabled = itemEl && itemEl.dataset && itemEl.dataset.mfrDisabled === '1';
 
             // Titel-Text setzen (ohne "(deaktiviert)" – das übernimmt das Badge)
             titleEl.textContent = baseTitle;
+            titleEl.classList.toggle('mfr-title--custom', !!this.itemTitle);
 
             // Status-Punkt aktualisieren (immer sichtbar)
             let dot = titleEl.parentElement ? titleEl.parentElement.querySelector('.mfr-status-dot') : null;

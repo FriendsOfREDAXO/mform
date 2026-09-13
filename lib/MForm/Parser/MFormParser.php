@@ -160,6 +160,8 @@ class MFormParser
         if (!in_array($layout, ['horizontal', 'vertical', 'inline'], true)) {
             $layout = 'horizontal';
         }
+        // Ueberschrift je Eintrag: Vorlage mit {n} (laufende Nummer) und {feld} (Feldwert), z. B. "Abschnitt {n}: {title}"
+        $itemTitle = isset($attrs['item_title']) ? trim((string) $attrs['item_title']) : '';
 
         $innerForm = null;
         foreach ($items as $k => $itm) {
@@ -176,7 +178,7 @@ class MFormParser
         }
 
         $this->elements[] = sprintf(
-            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s" data-mfr-data-version="%d">',
+            '<div class="mfr-container" id="%s" data-mfr-field-name="%s" data-mfr-min="%d" data-mfr-max="%d" data-mfr-collapsed="%s" data-mfr-first-open="%s" data-mfr-show-toggle-all="%s" data-mfr-show-add-button="%s" data-mfr-open="%s" data-mfr-default-count="%d" data-mfr-confirm-delete="%d" data-mfr-confirm-delete-msg="%s" data-mfr-debug="%d" data-mfr-copy-paste="%d" data-mfr-layout="%s" data-mfr-data-version="%d" data-mfr-item-title="%s">',
             htmlspecialchars($repeaterId, ENT_QUOTES),
             htmlspecialchars($fieldName, ENT_QUOTES),
             $min,
@@ -193,6 +195,7 @@ class MFormParser
             $copyPaste ? 1 : 0,
             htmlspecialchars($layout, ENT_QUOTES),
             $dataVersion,
+            htmlspecialchars($itemTitle, ENT_QUOTES),
         );
 
         $copyPasteButtons = $copyPaste ? sprintf(
