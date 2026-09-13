@@ -1,6 +1,8 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 10.0.0-rc.2 (in Arbeit)
+## Version 10.0.0-rc.2
+
+**Release Candidate, noch nicht für Produktion.** Zweiter Release Candidate von MForm 10 (13.09.2026). Nur zum Testen, vorher Backup anlegen. Rückmeldungen im Tracking-Issue #448, 9.5.x wird im Branch `9.x` gepflegt. Update von rc.1 ohne Datenänderung.
 
 ### Neu
 
