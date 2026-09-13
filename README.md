@@ -23,6 +23,7 @@ Not just for modules: MForm also extends **YForm** and **rex_form** with custom 
 - Adds YForm value types: `custom_link`, `custom_link_multi`, `color_swatch`
 - Resolves readable labels for stored dataset links like `rex-<table>://<id>` in the custom link widget when possible
 - Opens the **Linkmap** overlay for link and dataset selection and the **MediaPlace** overlay for media when those addons are installed, with the classic popups as fallback
+- **Conditional visibility** with multiple rules (`setVisibleIf`, `addVisibleIf`, `setHiddenIf`, all or any) and a **tags field** (`addTagsField`) for keywords as pills
 - Optional **accessibility check** for media fields (`'a11y' => ['med_alt']`): warns right in the widget when ALT text or other media pool metadata is missing, honours decorative images, MediaPlace and multilingual metainfo fields
 - Offers a growing library of **installable demo modules** directly from the REDAXO backend
 

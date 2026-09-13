@@ -13,20 +13,23 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 class MFormAttributeHandler
 {
     /**
-     * @param array<string, mixed> $condition
+     * Bedingte Sichtbarkeit an der form-group des Feldes. Akzeptiert eine Bedingung
+     * ['field' => 1, 'op' => '=', 'value' => 'a'], eine Liste solcher Arrays bzw. Tripel [1, '=', 'a']
+     * oder ['conditions' => [...], 'logic' => 'all'|'any'].
+     *
+     * @param array<mixed> $value
      */
-    private static function applyVisibleIf(MFormItem $item, array $condition, string $action = 'show'): void
+    private static function applyVisibleIf(MFormItem $item, array $value, string $action = 'show'): void
     {
-        $sourceField = isset($condition['field']) ? trim((string) $condition['field']) : '';
-        if ('' === $sourceField) {
+        $normalized = self::normalizeConditions($value);
+        if ([] === $normalized['conditions']) {
             return;
         }
 
-        $operator = isset($condition['op']) ? trim((string) $condition['op']) : '=';
-        $compareValue = isset($condition['value']) ? (string) $condition['value'] : '';
-
         $formGroupClass = trim((string) ($item->getAttributes()['form-group-class'] ?? ''));
-        $formGroupClass = trim($formGroupClass . ' mform-conditional-target');
+        if (!str_contains(' ' . $formGroupClass . ' ', ' mform-conditional-target ')) {
+            $formGroupClass = trim($formGroupClass . ' mform-conditional-target');
+        }
         $item->addAttribute('form-group-class', $formGroupClass);
 
         $formGroupAttributes = $item->getAttributes()['form-group-attributes'] ?? [];
@@ -34,24 +37,71 @@ class MFormAttributeHandler
             $formGroupAttributes = [];
         }
 
-        $conditionJson = json_encode([
-            [
-                'field' => $sourceField,
-                'op' => $operator,
-                'value' => $compareValue,
-                'action' => $action,
-            ],
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        $formGroupAttributes['data-mform-conditional-source'] = $sourceField;
-        $formGroupAttributes['data-mform-conditional-operator'] = $operator;
-        $formGroupAttributes['data-mform-conditional-value'] = $compareValue;
+        $first = $normalized['conditions'][0];
+        $formGroupAttributes['data-mform-conditional-source'] = $first['field'];
+        $formGroupAttributes['data-mform-conditional-operator'] = $first['op'];
+        $formGroupAttributes['data-mform-conditional-value'] = $first['value'];
         $formGroupAttributes['data-mform-conditional-action'] = $action;
-        if (false !== $conditionJson) {
+        $conditionJson = self::conditionsJson($normalized['conditions'], $action);
+        if (null !== $conditionJson) {
             $formGroupAttributes['data-mform-condition'] = $conditionJson;
+        }
+        if ('any' === $normalized['logic']) {
+            $formGroupAttributes['data-mform-condition-logic'] = 'any';
+        } else {
+            unset($formGroupAttributes['data-mform-condition-logic']);
         }
 
         $item->addAttribute('form-group-attributes', $formGroupAttributes);
+    }
+
+    /**
+     * @param array<mixed> $value
+     * @return array{conditions: list<array{field: string, op: string, value: string}>, logic: string}
+     */
+    public static function normalizeConditions(array $value): array
+    {
+        $logic = 'all';
+        if (isset($value['conditions']) && is_array($value['conditions'])) {
+            $logic = 'any' === strtolower((string) ($value['logic'] ?? 'all')) ? 'any' : 'all';
+            $value = $value['conditions'];
+        }
+        if (array_key_exists('field', $value)) {
+            $value = [$value];
+        }
+
+        $conditions = [];
+        foreach ($value as $condition) {
+            if (!is_array($condition)) {
+                continue;
+            }
+            $field = $condition['field'] ?? $condition[0] ?? null;
+            if (!is_scalar($field) || '' === trim((string) $field)) {
+                continue;
+            }
+            $op = trim((string) ($condition['op'] ?? $condition[1] ?? '='));
+            $compare = $condition['value'] ?? $condition[2] ?? '';
+            $conditions[] = [
+                'field' => trim((string) $field),
+                'op' => '' === $op ? '=' : $op,
+                'value' => is_scalar($compare) ? (string) $compare : '',
+            ];
+        }
+
+        return ['conditions' => $conditions, 'logic' => $logic];
+    }
+
+    /**
+     * @param list<array{field: string, op: string, value: string}> $conditions
+     */
+    public static function conditionsJson(array $conditions, string $action = 'show'): ?string
+    {
+        $json = json_encode(
+            array_map(static fn (array $condition) => $condition + ['action' => $action], $conditions),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
+        );
+
+        return false === $json ? null : $json;
     }
 
     /**

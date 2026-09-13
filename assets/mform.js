@@ -18,6 +18,8 @@ function initMFormElements(mform) {
         initMFormRadioImgInlines(mform);
         // init checkbox groups
         initMFormCheckboxGroups(mform);
+        // init tags widgets
+        initMFormTags(mform);
         // init color swatches
         initMFormColorSwatches(mform);
         // init conditional fieldsets
@@ -47,6 +49,12 @@ function initMFormConditionals(mform) {
             'REX_INPUT_VALUE[' + sourceStr + ']',
             'REX_INPUT_VALUE[' + sourceStr + '][]'
         ];
+        // Mehrteilige Ids ("1.0.type") liegen im Namen als [1][0][type] und in der Id als _1_0_type
+        var bracketed = sourceStr.indexOf('.') !== -1 ? '[' + sourceStr.split('.').join('][') + ']' : '';
+        var idSuffix = sourceStr.indexOf('.') !== -1 ? '_' + sourceStr.split('.').join('_') : '';
+        if (bracketed) {
+            candidates.push('REX_INPUT_VALUE' + bracketed, 'REX_INPUT_VALUE' + bracketed + '[]');
+        }
 
         var localItem = target.closest('.mfr-item, .mfr-nested-item');
         var scopes = localItem.length ? [localItem, mform] : [mform];
@@ -66,6 +74,8 @@ function initMFormConditionals(mform) {
                 if (candidates.indexOf(name) !== -1) return true;
                 if (name.endsWith('[' + sourceStr + ']')) return true;
                 if (name.endsWith('[' + sourceStr + '][]')) return true;
+                if (bracketed && (name.endsWith(bracketed) || name.endsWith(bracketed + '[]'))) return true;
+                if (idSuffix && id.endsWith(idSuffix)) return true;
                 return false;
             });
         }
@@ -225,14 +235,18 @@ function initMFormConditionals(mform) {
         }
 
         var action = (target.data('mform-conditional-action') || conditions[0].action || 'show').toString().toLowerCase();
-        var matched = conditions.every(function (condition) {
+        var check = function (condition) {
             var fields = findSourceFields(target, condition.field);
             if (!fields.length) {
                 return false;
             }
 
             return compareValue(getFieldValue(fields), condition.value || '', condition.op || '=');
-        });
+        };
+        // data-mform-condition-logic="any": eine Bedingung genuegt, sonst muessen alle zutreffen
+        var matched = String(target.attr('data-mform-condition-logic') || 'all') === 'any'
+            ? conditions.some(check)
+            : conditions.every(check);
         var shouldShow = action === 'hide' ? !matched : matched;
 
         setConditionalVisibility(target, shouldShow, animate);
@@ -548,6 +562,103 @@ function initMFormCheckboxGroups(mform) {
             }).get();
             hiddenInput.val(selected.join(','));
         });
+    });
+}
+
+/**
+ * Tags-Widget (addTagsField): Pills aus dem Hidden-Input, Enter/Komma fuegt hinzu,
+ * Backspace im leeren Eingabefeld entfernt das letzte Tag. Idempotent (Repeater-Klone).
+ */
+function initMFormTags(mform) {
+    mform.find('.mform-tags').each(function () {
+        var widget = $(this);
+        var hidden = widget.find('.mform-tags-value').first();
+        var list = widget.find('.mform-tags-list').first();
+        var input = widget.find('.mform-tags-input').first();
+        var allowNew = String(widget.attr('data-allow-new') || '1') !== '0';
+        var max = parseInt(widget.attr('data-max'), 10) || 0;
+        var suggestions = widget.find('datalist option').map(function () { return String(this.value); }).get();
+        var removeLabel = widget.find('.mform-tags-remove').first().attr('aria-label') || 'Entfernen';
+
+        function current() {
+            var raw = String(hidden.val() || '');
+            return raw === '' ? [] : raw.split(',').map(function (t) { return t.trim(); }).filter(Boolean);
+        }
+
+        function render(tags) {
+            list.empty();
+            tags.forEach(function (tag) {
+                $('<span class="mform-tags-tag" role="listitem"></span>').text(tag)
+                    .append($('<button type="button" class="mform-tags-remove">&times;</button>').attr('data-tag', tag).attr('aria-label', removeLabel))
+                    .appendTo(list);
+            });
+            var full = max > 0 && tags.length >= max;
+            input.prop('disabled', full).toggleClass('is-hidden', full);
+            widget.toggleClass('mform-tags--full', full);
+        }
+
+        function write(tags) {
+            hidden.val(tags.join(','));
+            render(tags);
+            // input + change: der Flex-Repeater lauscht auf input, Bedingungen und Fremdcode auf change
+            if (hidden[0]) {
+                hidden[0].dispatchEvent(new Event('input', { bubbles: true }));
+                hidden[0].dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+
+        function add(raw) {
+            var tags = current();
+            String(raw || '').split(',').forEach(function (piece) {
+                var tag = piece.trim();
+                if (tag === '') return;
+                if (!allowNew) {
+                    var hit = suggestions.filter(function (s) { return s.toLowerCase() === tag.toLowerCase(); })[0];
+                    if (!hit) return;
+                    tag = hit;
+                }
+                if (tags.indexOf(tag) !== -1) return;
+                if (max > 0 && tags.length >= max) return;
+                tags.push(tag);
+            });
+            write(tags);
+        }
+
+        render(current());
+
+        input.off('.mformTags')
+            .on('keydown.mformTags', function (e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    add(input.val());
+                    input.val('');
+                } else if (e.key === 'Backspace' && String(input.val()) === '') {
+                    var tags = current();
+                    if (tags.length) {
+                        tags.pop();
+                        write(tags);
+                    }
+                }
+            })
+            .on('change.mformTags blur.mformTags', function () {
+                if (String(input.val()).trim() !== '') {
+                    add(input.val());
+                    input.val('');
+                }
+            });
+
+        widget.off('.mformTags')
+            .on('click.mformTags', '.mform-tags-remove', function (e) {
+                e.preventDefault();
+                var tag = String($(this).attr('data-tag'));
+                write(current().filter(function (t) { return t !== tag; }));
+                input.trigger('focus');
+            })
+            .on('click.mformTags', function (e) {
+                if (e.target === this || $(e.target).is('.mform-tags-list')) {
+                    input.trigger('focus');
+                }
+            });
     });
 }
 

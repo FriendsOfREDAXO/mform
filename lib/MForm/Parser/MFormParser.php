@@ -22,6 +22,7 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Template\MFormTagsWidget;
 use FriendsOfRedaxo\MForm\Template\MFormWrapperRenderer;
 use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
 use FriendsOfRedaxo\MForm\FieldType\FieldTypeRegistry;
@@ -834,6 +835,39 @@ class MFormParser
     }
 
     /**
+     * Tags-Widget: Hidden-Input mit kommaseparierten Tags, Markup aus MFormTagsWidget.
+     */
+    private function generateTagsElement(MFormItem $item): void
+    {
+        $this->executeDefaultManipulations($item);
+
+        $varIdParts = $item->getVarId();
+        $varIdStr = is_array($varIdParts)
+            ? '[' . implode('][', $varIdParts) . ']'
+            : (string) $varIdParts;
+        $currentValue = is_array($item->getValue()) ? '' : (string) ($item->getValue() ?? '');
+        $uid = 'mform-tags-' . preg_replace('/[^a-z0-9]/i', '-', $varIdStr);
+
+        $html = MFormTagsWidget::render(
+            $uid,
+            ' name="REX_INPUT_VALUE' . htmlspecialchars($varIdStr, ENT_QUOTES) . '"',
+            $currentValue,
+            MFormTagsWidget::suggestions($item->getOptions()),
+            $item->getAttributes(),
+        );
+
+        $templateElement = new MFormElement();
+        $templateElement->setLabel($this->parseElement($this->createLabelElement($item), 'base'))
+            ->setElement($html)
+            ->setNotice($item->getNotice())
+            ->setType($this->getDefaultTemplateType($item, $templateElement));
+
+        $this->applyFormGroupDecoration($item, $templateElement);
+
+        $this->elements[] = $this->parseElement($templateElement, 'default');
+    }
+
+    /**
      * @description Renders a color swatch picker – text input with preview square and predefined color/class popup.
      */
     private function generateColorSwatchElement(MFormItem $item): void
@@ -1628,6 +1662,9 @@ class MFormParser
                         case 'checkbox-group':
                             $this->generateCheckboxGroupElement($item);
                             break;
+                        case 'tags':
+                            $this->generateTagsElement($item);
+                            break;
                         case 'color-swatch':
                             $this->generateColorSwatchElement($item);
                             break;
@@ -1802,9 +1839,11 @@ class MFormParser
         $inlineAttributes = '';
         if (count($attributes) > 0) {
             foreach ($attributes as $key => $value) {
-                if (!in_array($key, ['id', 'name', 'type', 'value', 'checked', 'selected', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if'], true)) {
-                    $inlineAttributes .= ' ' . $key . '="' . $value . '"';
+                if (is_array($value) || in_array($key, ['id', 'name', 'type', 'value', 'checked', 'selected', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if'], true)) {
+                    continue;
                 }
+                // Werte escapen: JSON in data-mform-condition enthaelt Anfuehrungszeichen
+                $inlineAttributes .= ' ' . $key . '="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"';
             }
         }
         return $inlineAttributes;

@@ -178,6 +178,8 @@ mform_list_widget_view_grid = Rasteransicht
 mform_list_widget_view_list = Listenansicht
 
 mform_flex_repeater_add = Hinzufügen
+mform_tags_placeholder = Tag eingeben, mit Enter oder Komma bestätigen
+mform_tags_remove = Tag entfernen
 mform_flex_repeater_add_after = Danach hinzufügen
 mform_flex_repeater_toggle_all = Alle auf / zu
 mform_flex_repeater_move_up = Nach oben

@@ -23,6 +23,7 @@ Nicht nur für Module: MForm erweitert auch **YForm** und **rex_form** um zusät
 - YForm Value-Types: `custom_link`, `custom_link_multi`, `color_swatch`
 - Löst im Custom-Link-Widget gespeicherte Datensatz-Links wie `rex-<table>://<id>` nach Möglichkeit zu lesbaren Bezeichnungen auf
 - Öffnet bei installiertem **Linkmap** das Overlay für Link- und Datensatzauswahl und bei **MediaPlace** das Medien-Overlay, klassische Popups bleiben der Fallback
+- **Bedingte Sichtbarkeit** mit mehreren Regeln (`setVisibleIf`, `addVisibleIf`, `setHiddenIf`, „alle“ oder „eine genügt“) und ein **Tags-Feld** (`addTagsField`) für Schlagworte als Pills
 - Optionale **Barrierefreiheits-Prüfung** für Medien-Felder (`'a11y' => ['med_alt']`): warnt direkt im Widget, wenn ALT-Text oder andere Medienpool-Metadaten fehlen, berücksichtigt dekorative Bilder, MediaPlace und mehrsprachige Metainfo-Felder
 - Wachsende Bibliothek **installierbarer Demo-Module** direkt aus dem REDAXO-Backend
 

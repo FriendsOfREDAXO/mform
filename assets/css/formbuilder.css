@@ -561,3 +561,51 @@ body.rex-theme-dark .mform-fb {
     border-radius: 4px;
     overflow: hidden;
 }
+
+/* Bedingungs-Editor (Sichtbarkeit) */
+.mform-fb__cond {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px;
+    margin-bottom: 4px;
+    border: 1px solid var(--mform-border, #dfe3e9);
+    border-radius: var(--mform-radius, 0);
+    background: var(--mform-surface-alt, #f6f8fa);
+}
+
+.mform-fb__cond .mform-fb__cond-source {
+    flex: 1 1 100%;
+}
+
+.mform-fb__cond .mform-fb__cond-op,
+.mform-fb__cond .mform-fb__cond-value {
+    flex: 1 1 40%;
+    min-width: 0;
+}
+
+.mform-fb__cond .mform-fb__cond-remove {
+    flex: 0 0 auto;
+    align-self: center;
+}
+
+.mform-fb__cond-glue {
+    margin: 2px 0 4px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--mform-muted, #6c757d);
+}
+
+.mform-fb__cond-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.mform-fb__cond-actions .mform-fb__cond-logic {
+    width: auto;
+    flex: 0 1 auto;
+}

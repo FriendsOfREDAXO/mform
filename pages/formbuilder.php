@@ -71,6 +71,7 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item" data-type="checkbox">Checkbox</li>
             <li class="mform-fb__pal-item" data-type="togglecheckbox">Toggle Checkbox</li>
             <li class="mform-fb__pal-item" data-type="checkboxgroup">Checkbox Group</li>
+            <li class="mform-fb__pal-item" data-type="tags">Tags</li>
             <li class="mform-fb__pal-item" data-type="hidden">Hidden</li>
             <li class="mform-fb__pal-item" data-type="headline">Headline</li>
             <li class="mform-fb__pal-item" data-type="description">Description</li>
@@ -245,6 +246,18 @@ $body = <<<'HTML'
                     <option value="radio">Einfachauswahl (radio)</option>
                 </select>
             </div>
+            <div class="form-group" data-fb-prop-group="tagsHelp">
+                <p class="help-block" style="margin:0"><small>Tags: Die Optionen oben sind Vorschlaege, eine je Zeile ohne <code>key=</code>. Gespeichert wird kommasepariert (<code>news,blog</code>).</small></p>
+            </div>
+            <div class="form-group" data-fb-prop-group="tagsAllowNew">
+                <label class="checkbox">
+                    <input type="checkbox" data-fb-prop="tagsAllowNew"> Freie Eingabe erlauben <small>(allow_new; aus = nur Vorschlaege)</small>
+                </label>
+            </div>
+            <div class="form-group" data-fb-prop-group="tagsMax">
+                <label>Maximale Anzahl <small>(max, 0 = unbegrenzt)</small></label>
+                <input type="number" class="form-control" data-fb-prop="tagsMax" min="0">
+            </div>
             <div class="form-group" data-fb-prop-group="htmlContent">
                 <label>HTML <small>(wird 1:1 in das Formular eingefuegt)</small></label>
                 <textarea class="form-control" rows="6" data-fb-prop="htmlContent" placeholder="<hr><p class='text-muted'>Hinweis ...</p>"></textarea>
@@ -272,33 +285,19 @@ $body = <<<'HTML'
             <hr data-fb-prop-group="visibilityEnabled">
             <div class="form-group" data-fb-prop-group="visibilityEnabled">
                 <label class="checkbox">
-                    <input type="checkbox" data-fb-prop="visibilityEnabled"> Sichtbarkeit an Bedingung koppeln
+                    <input type="checkbox" data-fb-prop="visibilityEnabled"> Sichtbarkeit an Bedingungen koppeln
                 </label>
-                <p class="help-block" style="margin-top:4px"><small>Das Feld wird nur angezeigt, wenn das gewaehlte Quellfeld die Bedingung erfuellt.</small></p>
+                <p class="help-block" style="margin-top:4px"><small>Das Feld wird nur angezeigt, wenn die Bedingungen zutreffen. Bei "ist in Liste" mehrere Werte kommasepariert angeben.</small></p>
             </div>
-            <div class="form-group" data-fb-prop-group="visibilitySourceUid">
-                <label>Quellfeld</label>
-                <select class="form-control" data-fb-prop="visibilitySourceUid">
-                    <option value="">Bitte waehlen</option>
-                </select>
-            </div>
-            <div class="form-group" data-fb-prop-group="visibilityOperator">
-                <label>Operator</label>
-                <select class="form-control" data-fb-prop="visibilityOperator">
-                    <option value="eq">ist gleich</option>
-                    <option value="neq">ist ungleich</option>
-                    <option value="contains">enthaelt</option>
-                    <option value="in">ist in Liste</option>
-                    <option value="gt">ist groesser als</option>
-                    <option value="lt">ist kleiner als</option>
-                    <option value="empty">ist leer</option>
-                    <option value="not_empty">ist nicht leer</option>
-                </select>
-            </div>
-            <div class="form-group" data-fb-prop-group="visibilityValue">
-                <label>Vergleichswert</label>
-                <input type="text" class="form-control" data-fb-prop="visibilityValue" placeholder="z. B. 1 oder image">
-                <p class="help-block" style="margin-top:4px"><small>Bei "ist in Liste" mehrere Werte kommasepariert angeben.</small></p>
+            <div class="form-group" data-fb-prop-group="visibilityConditions">
+                <div class="mform-fb__conds" data-fb-conditions></div>
+                <div class="mform-fb__cond-actions">
+                    <button type="button" class="btn btn-default btn-xs" data-fb-cond-add><i class="rex-icon fa-plus"></i> Bedingung</button>
+                    <select class="form-control input-sm mform-fb__cond-logic" data-fb-cond-logic title="Verknuepfung">
+                        <option value="all">alle muessen zutreffen</option>
+                        <option value="any">eine genuegt</option>
+                    </select>
+                </div>
             </div>
 
             <!-- CustomLink: Linktypen -->

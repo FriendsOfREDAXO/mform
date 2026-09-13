@@ -172,6 +172,8 @@ mform_github = MForm FOR – go to github
 mform_repeater_remove_group_confirm_msg = Remove group?
 
 mform_flex_repeater_add = Add
+mform_tags_placeholder = Type a tag, confirm with Enter or comma
+mform_tags_remove = Remove tag
 mform_flex_repeater_add_after = Add after
 mform_flex_repeater_toggle_all = Toggle all
 mform_flex_repeater_move_up = Move up

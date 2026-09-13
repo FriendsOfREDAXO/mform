@@ -88,6 +88,8 @@
                 props: ['label', 'defaultValue', 'options', 'notice', 'cssClass'] },
             checkboxgroup: { label: 'Checkbox Group', method: 'addCheckboxGroupField',
                 props: ['label', 'defaultValue', 'options', 'cbgLayout', 'cbgMode', 'notice', 'cssClass'] },
+            tags:        { label: 'Tags', method: 'addTagsField',
+                props: ['label', 'defaultValue', 'options', 'tagsHelp', 'tagsAllowNew', 'tagsMax', 'placeholder', 'notice', 'cssClass'] },
             hidden:      { label: 'Hidden', method: 'addHiddenField',
                 props: ['defaultValue'] },
             headline:    { label: 'Headline', method: 'addHeadline',
@@ -162,7 +164,11 @@
         var SIMPLE_WRAPPER_TYPES = ['collapse', 'accordion', 'column', 'inline'];
         var RICH_RADIO_KEYS = { radioimg: 'img', radioicon: 'icon', radiocolor: 'color' };
 
-        var VISIBILITY_PROPS = ['visibilityEnabled', 'visibilitySourceUid', 'visibilityOperator', 'visibilityValue'];
+        var VISIBILITY_PROPS = ['visibilityEnabled', 'visibilityConditions'];
+        var CONDITION_OPERATORS = [
+            ['eq', 'ist gleich'], ['neq', 'ist ungleich'], ['contains', 'enthaelt'], ['in', 'ist in Liste'],
+            ['gt', 'ist groesser als'], ['lt', 'ist kleiner als'], ['empty', 'ist leer'], ['not_empty', 'ist nicht leer']
+        ];
 
         var state = [];
         var nextId = 1;
@@ -207,9 +213,10 @@
                 rows: '',
                 category: '',
                 options: (type === 'select' || type === 'radio' || type === 'checkbox' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2"
+                    : (type === 'tags' ? "News\nBlog\nEvent"
                     : (type === 'radioimg' ? "1=Layout A|/assets/addons/project/img/layout-a.svg\n2=Layout B|/assets/addons/project/img/layout-b.svg"
                     : (type === 'radioicon' ? "left=Links|fa fa-align-left\ncenter=Zentriert|fa fa-align-center"
-                    : (type === 'radiocolor' ? "primary=Primaer|#2f6ea8\nlight=Hell|#f3f6fb\nnone=Transparent|transparent" : ''))),
+                    : (type === 'radiocolor' ? "primary=Primaer|#2f6ea8\nlight=Hell|#f3f6fb\nnone=Transparent|transparent" : '')))),
                 required: false,
                 full: false,
                 tinymce: false,
@@ -219,6 +226,9 @@
                 // CheckboxGroup
                 cbgLayout: 'horizontal',
                 cbgMode: 'checkbox',
+                // Tags
+                tagsAllowNew: true,
+                tagsMax: '',
                 // HTML-Block
                 htmlContent: '',
                 alertText: (type === 'alertinfo' || type === 'alertwarning' || type === 'alertdanger' || type === 'alertsuccess') ? 'Hinweis' : '',
@@ -262,9 +272,8 @@
                 // A11y-Pruefung (med_alt) fuer Medien-Felder
                 a11yAlt: false,
                 visibilityEnabled: false,
-                visibilitySourceUid: '',
-                visibilityOperator: 'eq',
-                visibilityValue: '',
+                visibilityLogic: 'all',
+                visibilityConditions: [],
                 children: CONTAINER_TYPES.indexOf(type) !== -1 ? [] : null
             };
             return item;
@@ -342,6 +351,22 @@
 
             var parsedId = parseInt(item.id, 10);
             item.id = Number.isFinite(parsedId) && parsedId > 0 ? parsedId : 1;
+
+            // Bedingungen: Builder-Format 1 (eine Bedingung in drei Props) -> Liste
+            if (!Array.isArray(item.visibilityConditions)) {
+                item.visibilityConditions = [];
+                if (item.visibilitySourceUid) {
+                    item.visibilityConditions.push({ sourceUid: String(item.visibilitySourceUid), operator: String(item.visibilityOperator || 'eq'), value: item.visibilityValue == null ? '' : String(item.visibilityValue) });
+                }
+            }
+            item.visibilityConditions = item.visibilityConditions
+                .filter(function (c) { return c && typeof c === 'object'; })
+                .map(function (c) { return { sourceUid: String(c.sourceUid || ''), operator: String(c.operator || 'eq'), value: c.value == null ? '' : String(c.value) }; });
+            item.visibilityLogic = item.visibilityLogic === 'any' ? 'any' : 'all';
+            item.visibilityEnabled = !!item.visibilityEnabled;
+            delete item.visibilitySourceUid;
+            delete item.visibilityOperator;
+            delete item.visibilityValue;
 
             if (isContainerType(item.type)) {
                 var children = Array.isArray(item.children) ? item.children : [];
@@ -630,9 +655,6 @@
                 profileGroup.style.display = 'none';
             }
 
-            updateVisibilitySourceOptions();
-            updateVisibilityPropUI();
-
             $propsForm.querySelectorAll('[data-fb-prop]').forEach(function (input) {
                 var key = input.dataset.fbProp;
                 var val = activeItem[key];
@@ -640,8 +662,7 @@
                 else input.value = val == null ? '' : val;
             });
 
-            updateVisibilitySourceOptions();
-            updateVisibilityPropUI();
+            renderVisibilityConditions();
         }
 
         function collectConditionSourceOptions(list, nested, options, excludeUid) {
@@ -675,44 +696,120 @@
             });
         }
 
-        function updateVisibilitySourceOptions() {
-            var select = $propsForm.querySelector('[data-fb-prop="visibilitySourceUid"]');
-            if (!select || !activeItem) return;
+        function newCondition() {
+            return { sourceUid: '', operator: 'eq', value: '' };
+        }
 
-            var previous = activeItem.visibilitySourceUid || '';
-            var options = [];
-            collectConditionSourceOptions(state, false, options, activeItem.uid);
+        // Bedingungs-Editor (#417): je Zeile Quellfeld, Operator, Vergleichswert; Verknuepfung alle/eine.
+        function renderVisibilityConditions() {
+            var group = $propsForm.querySelector('[data-fb-prop-group="visibilityConditions"]');
+            if (!group || !activeItem) return;
+            var enabled = !!activeItem.visibilityEnabled && supportsVisibility(activeItem.type);
+            group.style.display = enabled ? '' : 'none';
+            var host = group.querySelector('[data-fb-conditions]');
+            var logicSelect = group.querySelector('[data-fb-cond-logic]');
+            if (!host) return;
+            host.innerHTML = '';
+            if (!enabled) return;
 
-            select.innerHTML = '<option value="">Bitte waehlen</option>';
-            options.forEach(function (option) {
-                var opt = document.createElement('option');
-                opt.value = option.uid;
-                opt.textContent = option.label + ' [' + option.type + ': ' + option.ref + ']';
-                select.appendChild(opt);
+            var sources = [];
+            collectConditionSourceOptions(state, false, sources, activeItem.uid);
+            if (!Array.isArray(activeItem.visibilityConditions)) activeItem.visibilityConditions = [];
+            var conditions = activeItem.visibilityConditions;
+            conditions.forEach(function (c) {
+                if (c.sourceUid && !sources.some(function (s) { return s.uid === c.sourceUid; })) c.sourceUid = '';
             });
 
-            select.value = previous;
-            if (select.value !== previous) {
-                activeItem.visibilitySourceUid = '';
+            conditions.forEach(function (c, index) {
+                if (index > 0) {
+                    var glue = document.createElement('div');
+                    glue.className = 'mform-fb__cond-glue';
+                    glue.textContent = activeItem.visibilityLogic === 'any' ? 'oder' : 'und';
+                    host.appendChild(glue);
+                }
+                var row = document.createElement('div');
+                row.className = 'mform-fb__cond';
+                row.dataset.fbCondIndex = String(index);
+
+                var source = document.createElement('select');
+                source.className = 'form-control input-sm mform-fb__cond-source';
+                source.dataset.fbCondKey = 'sourceUid';
+                source.appendChild(new Option('Quellfeld waehlen', ''));
+                sources.forEach(function (s) { source.appendChild(new Option(s.label + ' [' + s.type + ': ' + s.ref + ']', s.uid)); });
+                source.value = c.sourceUid;
+
+                var operator = document.createElement('select');
+                operator.className = 'form-control input-sm mform-fb__cond-op';
+                operator.dataset.fbCondKey = 'operator';
+                CONDITION_OPERATORS.forEach(function (o) { operator.appendChild(new Option(o[1], o[0])); });
+                operator.value = c.operator;
+
+                var value = document.createElement('input');
+                value.type = 'text';
+                value.className = 'form-control input-sm mform-fb__cond-value';
+                value.dataset.fbCondKey = 'value';
+                value.placeholder = c.operator === 'in' ? 'a,b,c' : 'Vergleichswert';
+                value.value = c.value;
+                if (c.operator === 'empty' || c.operator === 'not_empty') value.style.display = 'none';
+
+                var remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'btn btn-default btn-xs mform-fb__cond-remove';
+                remove.dataset.fbCondRemove = '1';
+                remove.title = 'Bedingung entfernen';
+                remove.innerHTML = '<i class="rex-icon fa-times"></i>';
+
+                row.appendChild(source);
+                row.appendChild(operator);
+                row.appendChild(value);
+                row.appendChild(remove);
+                host.appendChild(row);
+            });
+
+            if (logicSelect) {
+                logicSelect.value = activeItem.visibilityLogic === 'any' ? 'any' : 'all';
+                logicSelect.style.display = conditions.length > 1 ? '' : 'none';
             }
         }
 
-        function updateVisibilityPropUI() {
+        function onConditionEvent(e) {
             if (!activeItem) return;
-
-            var enabled = !!activeItem.visibilityEnabled;
-            ['visibilitySourceUid', 'visibilityOperator', 'visibilityValue'].forEach(function (name) {
-                var group = $propsForm.querySelector('[data-fb-prop-group="' + name + '"]');
-                if (!group) return;
-                group.style.display = enabled ? '' : 'none';
-            });
-
-            var valueGroup = $propsForm.querySelector('[data-fb-prop-group="visibilityValue"]');
-            if (valueGroup && enabled) {
-                var operator = String(activeItem.visibilityOperator || 'eq');
-                valueGroup.style.display = (operator === 'empty' || operator === 'not_empty') ? 'none' : '';
+            var logic = e.target.closest('[data-fb-cond-logic]');
+            if (logic) {
+                activeItem.visibilityLogic = logic.value === 'any' ? 'any' : 'all';
+                renderVisibilityConditions();
+                emitCode();
+                return;
             }
+            var field = e.target.closest('[data-fb-cond-key]');
+            if (!field) return;
+            var row = field.closest('[data-fb-cond-index]');
+            var condition = row ? activeItem.visibilityConditions[parseInt(row.dataset.fbCondIndex, 10)] : null;
+            if (!condition) return;
+            condition[field.dataset.fbCondKey] = field.value;
+            if (field.dataset.fbCondKey === 'operator') renderVisibilityConditions();
+            emitCode();
         }
+
+        $propsForm.addEventListener('input', onConditionEvent);
+        $propsForm.addEventListener('change', onConditionEvent);
+        $propsForm.addEventListener('click', function (e) {
+            if (!activeItem) return;
+            if (e.target.closest('[data-fb-cond-add]')) {
+                e.preventDefault();
+                activeItem.visibilityConditions.push(newCondition());
+                renderVisibilityConditions();
+                return;
+            }
+            var remove = e.target.closest('[data-fb-cond-remove]');
+            if (remove) {
+                e.preventDefault();
+                var row = remove.closest('[data-fb-cond-index]');
+                activeItem.visibilityConditions.splice(parseInt(row.dataset.fbCondIndex, 10), 1);
+                renderVisibilityConditions();
+                emitCode();
+            }
+        });
 
         $propsForm.addEventListener('input', function (e) {
             if (!activeItem) return;
@@ -723,7 +820,10 @@
             if (key === 'tinymce') {
                 renderProps();
             }
-            if (key === 'visibilityEnabled' || key === 'visibilityOperator') {
+            if (key === 'visibilityEnabled') {
+                if (activeItem.visibilityEnabled && !(activeItem.visibilityConditions || []).length) {
+                    activeItem.visibilityConditions = [newCondition()];
+                }
                 renderProps();
             }
             if (key === 'label') {
@@ -1014,7 +1114,7 @@
         }
 
         // ---- Export / Import (#406) --------------------------------------------
-        var BUILDER_STATE_VERSION = 1;
+        var BUILDER_STATE_VERSION = 2; // 2: Sichtbarkeit als Liste von Bedingungen (visibilityConditions, visibilityLogic)
         var $stateMsg = document.querySelector('[data-fb-state-msg]');
 
         function migrateBuilderState(payload) {
@@ -1236,6 +1336,12 @@
             }
             if (item.btnAdd && item.type === 'customlinkmultiple') a.btn_add = item.btnAdd;
 
+            // Tags: allow_new / max
+            if (item.type === 'tags') {
+                if (item.tagsAllowNew === false) a.allow_new = false;
+                var tagsMax = parseInt(item.tagsMax, 10);
+                if (tagsMax > 0) a.max = tagsMax;
+            }
             // CheckboxGroup: layout / mode / default-value laut docs/12_checkbox_group.md
             if (item.type === 'checkboxgroup') {
                 if (item.cbgLayout && item.cbgLayout !== 'horizontal') a.layout = item.cbgLayout;
@@ -1279,7 +1385,14 @@
 
         function phpValue(v) {
             if (Array.isArray(v)) return '[' + v.map(phpValue).join(', ') + ']';
+            if (v === true || v === false) return v ? 'true' : 'false';
+            if (typeof v === 'number') return String(v);
             return phpStr(v);
+        }
+
+        // Tags: eine Zeile je Vorschlag (ohne key=), leere Zeilen ignorieren
+        function parseSuggestions(raw) {
+            return String(raw || '').split('\n').map(function (line) { return line.trim(); }).filter(Boolean);
         }
 
         function attrsToPhp(attrs) {
@@ -1297,17 +1410,43 @@
             return '[' + pairs.join(', ') + ']';
         }
 
+        // Aufgeloeste Bedingungen eines Items: nur die mit gueltigem Quellfeld.
+        function resolvedConditions(item) {
+            if (!item || !item.visibilityEnabled || !Array.isArray(item.visibilityConditions)) return [];
+            var out = [];
+            item.visibilityConditions.forEach(function (c) {
+                if (!c || !c.sourceUid) return;
+                var ref = resolveGeneratedConditionSource(c.sourceUid, state, false);
+                if (!ref) return;
+                out.push({ ref: ref, op: normalizeVisibilityOperator(c.operator), value: c.value || '' });
+            });
+            return out;
+        }
+
         function hasVisibilityCondition(item) {
-            return !!(item && item.visibilityEnabled && item.visibilitySourceUid);
+            return resolvedConditions(item).length > 0;
         }
 
         function normalizeVisibilityOperator(operator) {
             switch (String(operator || 'eq')) {
                 case 'eq': return '=';
                 case 'neq': return '!=';
+                case 'gt': return '>';
+                case 'lt': return '<';
                 case 'not_empty': return '!empty';
                 default: return String(operator || '=');
             }
+        }
+
+        function conditionArgs(c) {
+            return conditionSourceLiteral(c.ref) + ', ' + phpStr(c.op) + ', ' + phpStr(c.value);
+        }
+
+        // Argumente fuer addConditionalFieldsetArea(): eine Bedingung klassisch, mehrere als Liste + Logik.
+        function conditionalFieldsetArgs(item) {
+            var conds = resolvedConditions(item);
+            if (conds.length === 1) return conditionArgs(conds[0]);
+            return '[' + conds.map(function (c) { return '[' + conditionArgs(c) + ']'; }).join(', ') + '], ' + phpStr(item.visibilityLogic === 'any' ? 'any' : 'all') + ", ''";
         }
 
         function conditionalWrapperAttrsPhp() {
@@ -1414,6 +1553,14 @@
                     line += ', ' + optionsArray(parseOptions(item.options));
                     if (attrPhp) line += ', ' + attrPhp;
                     break;
+                case 'tags': {
+                    // Signature: addTagsField(id, suggestions?, attributes?, defaultValue?)
+                    var hasTagsDefault = !!item.defaultValue;
+                    line += ', ' + phpValue(parseSuggestions(item.options));
+                    if (attrPhp || hasTagsDefault) line += ', ' + (attrPhp || 'null');
+                    if (hasTagsDefault) line += ', ' + phpStr(item.defaultValue);
+                    break;
+                }
                 case 'text':
                 case 'number':
                 case 'range':
@@ -1555,16 +1702,18 @@
         }
 
         function visibleIfChain(item, indent) {
-            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
-            if (!sourceRef) {
+            var conds = resolvedConditions(item);
+            if (!conds.length) {
                 return '';
             }
-
-            return '\n' + indent + '->setVisibleIf('
-                + conditionSourceLiteral(sourceRef)
-                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
-                + ', ' + phpStr(item.visibilityValue || '')
-                + ')';
+            var out = '';
+            conds.forEach(function (c, index) {
+                out += '\n' + indent + (index === 0 ? '->setVisibleIf(' : '->addVisibleIf(') + conditionArgs(c) + ')';
+            });
+            if (conds.length > 1 && item.visibilityLogic === 'any') {
+                out += '\n' + indent + '->setVisibleIfLogic(' + phpStr('any') + ')';
+            }
+            return out;
         }
 
         function renderTopLevelItemStmt(item, idx, indent) {
@@ -1589,17 +1738,14 @@
         }
 
         function renderConditionalFieldsetStmt(item, idx, indent) {
-            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
-            if (!sourceRef) {
+            if (!hasVisibilityCondition(item)) {
                 return renderTopLevelItemStmt(item, idx, indent);
             }
 
             var inner = renderRepeaterInner(item, indent);
 
             return indent + '$mform->addConditionalFieldsetArea('
-                + conditionSourceLiteral(sourceRef)
-                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
-                + ', ' + phpStr(item.visibilityValue || '')
+                + conditionalFieldsetArgs(item)
                 + ', ' + phpStr(item.label || '')
                 + ', MForm::factory()\n'
                 + inner
@@ -1617,16 +1763,13 @@
         }
 
         function renderConditionalInnerFieldsetChainLink(item, indent) {
-            var sourceRef = resolveGeneratedConditionSource(item.visibilitySourceUid, state, false);
-            if (!sourceRef) {
+            if (!hasVisibilityCondition(item)) {
                 return renderInnerFieldsetChainLink(item, indent);
             }
 
             var inner = renderRepeaterInner(item, indent);
             return indent + '->addConditionalFieldsetArea('
-                + conditionSourceLiteral(sourceRef)
-                + ', ' + phpStr(normalizeVisibilityOperator(item.visibilityOperator))
-                + ', ' + phpStr(item.visibilityValue || '')
+                + conditionalFieldsetArgs(item)
                 + ', ' + phpStr(item.label || '')
                 + ', MForm::factory()\n'
                 + inner
@@ -1874,6 +2017,7 @@
                 case 'imagelist':
                 case 'checkbox':
                 case 'checkboxgroup':
+                case 'tags':
                 case 'togglecheckbox':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
@@ -1908,6 +2052,7 @@
                 case 'imagelist':
                 case 'checkbox':
                 case 'checkboxgroup':
+                case 'tags':
                 case 'togglecheckbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
                 case 'select':
@@ -1973,6 +2118,7 @@
                 case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'togglecheckbox': return 'Array der ausgewaehlten Werte (Toggle-Checkbox; meist ["1"] bei aktiv)';
                 case 'checkboxgroup': return item.cbgMode === 'radio' ? 'einzelner ausgewaehlter Wert (CheckboxGroup im Radio-Mode)' : 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
+                case 'tags':        return 'Array der Tags (kommasepariert gespeichert)';
                 case 'select':
                     return item.isMulti ? 'Array der ausgewaehlten Werte (Multi-Select, kommasepariert gespeichert)' : 'einzelner ausgewaehlter Wert';
                 case 'radio':       return 'einzelner ausgewaehlter Wert';

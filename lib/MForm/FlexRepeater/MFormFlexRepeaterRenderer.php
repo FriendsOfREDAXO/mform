@@ -10,6 +10,7 @@ use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Template\MFormFieldTypeCore;
 use FriendsOfRedaxo\MForm\Template\MFormLabelRenderer;
 use FriendsOfRedaxo\MForm\Template\MFormLayoutCore;
+use FriendsOfRedaxo\MForm\Template\MFormTagsWidget;
 use FriendsOfRedaxo\MForm\Template\MFormWrapperRenderer;
 use FriendsOfRedaxo\MForm\Utils\MFormFormGroupHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormGroupExtensionHelper;
@@ -449,6 +450,15 @@ class MFormFlexRepeaterRenderer
             case 'checkbox-group':
                 return self::wrapFormGroup($label, self::renderCheckboxGroupWidget($item, $fieldKey), $item);
 
+            case 'tags':
+                return self::wrapFormGroup($label, MFormTagsWidget::render(
+                    'mfr-tags-' . preg_replace('/[^a-z0-9]/i', '-', $fieldKey) . '-' . substr(md5($fieldKey), 0, 6),
+                    ' data-mfr-field="' . htmlspecialchars($fieldKey, ENT_QUOTES) . '"',
+                    '',
+                    MFormTagsWidget::suggestions($item->getOptions()),
+                    $item->getAttributes(),
+                ), $item);
+
             case 'color-swatch':
                 return self::wrapFormGroup($label, self::renderColorSwatchWidget($item, $fieldKey), $item);
 
@@ -778,7 +788,8 @@ class MFormFlexRepeaterRenderer
      */
     private static function renderAttributes(array $attributes): string
     {
-        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id'];
+        // Steuerwerte von MForm (form-group-*, Bedingungen, a11y) gehoeren an die form-group, nicht ans Element
+        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if', 'a11y'];
 
         $html = '';
         foreach ($attributes as $key => $value) {

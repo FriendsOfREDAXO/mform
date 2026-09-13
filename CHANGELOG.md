@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-rc.1 (in Arbeit)
+
+### Neu
+
+- **Bedingungen mit mehreren Regeln** (#417): `setVisibleIf()` nimmt eine Liste von Tripeln, `addVisibleIf()` hängt eine Bedingung an, `setVisibleIfLogic('any')` lässt eine zutreffende genügen (Standard: alle), `setHiddenIf()` blendet aus statt ein. `addConditionalFieldsetArea()` akzeptiert ebenfalls eine Liste, der zweite Parameter ist dann die Verknüpfung. Die Bedingungen liegen wie bisher als JSON in `data-mform-condition`, neu dazu `data-mform-condition-logic="any"`; `assets/mform.js` wertet beides aus. Im Form Builder ersetzt ein Editor die bisherige Einzelbedingung: beliebig viele Zeilen aus Quellfeld, Operator und Wert plus Verknüpfung, Export/Import-Format `mformBuilderVersion` 2 (alte Dateien werden übernommen). Nebenbei behoben: die Builder-Operatoren „größer/kleiner als“ landeten als `gt`/`lt` im Code.
+- **Tags-Feld** (#412): `addTagsField($id, $suggestions, $attributes, $default)` für Schlagworte als Pills, gespeichert kommasepariert. Vorschläge über die Browser-Autovervollständigung, `allow_new => false` beschränkt auf die Vorschläge, `max` begrenzt die Anzahl. Enter oder Komma bestätigt, Backspace entfernt das letzte Tag. Klassisches Formular, Flex-Repeater und Form Builder (Typ „Tags“, Ausgabecode als Array). Markup in `FriendsOfRedaxo\MForm\Template\MFormTagsWidget`, Logik in `assets/mform.js`.
+
+### Behoben
+
+- **Bedingungen mit mehrteiligen Ids:** `setVisibleIf('1.0.type', …)` fand das Quellfeld im klassischen Modul nicht (Name `REX_INPUT_VALUE[1][0][type]`), die Bedingung blieb wirkungslos. `assets/mform.js` löst gepunktete Ids jetzt auf Namen und Id-Suffix auf.
+- **Wrapper-Attribute nicht escaped:** Attributwerte an Fieldset, Tabs, Collapse und Modal wurden roh ausgegeben; das JSON in `data-mform-condition` eines bedingten Fieldsets war damit ungültig und fiel auf die erste Bedingung zurück. Der Parser escaped Wrapper-Attribute jetzt wie die form-group-Attribute.
+- **Flex-Repeater:** Steuerwerte (`form-group-class`, `form-group-attributes`, `visible_if`, `hidden_if`, `a11y`) landeten als Attribute am Eingabeelement statt nur an der form-group.
+
 ## Version 10.0.0-beta.4
 
 **BETA, nicht für Produktion.** Vierte Beta von MForm 10 (13.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt. Update von beta.3 ohne Datenänderung.

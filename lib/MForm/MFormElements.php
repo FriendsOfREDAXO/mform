@@ -240,10 +240,14 @@ abstract class MFormElements
     }
 
     /**
+     * Fieldset, das per JavaScript ein- oder ausgeblendet wird. Mehrere Bedingungen als Liste
+     * von Tripeln in `$sourceField`, `$operator` ist dann die Verknuepfung ('all'|'any').
+     *
+     * @param float|int|string|array<mixed> $sourceField
      * @param array<string, mixed> $attributes
      */
     public function addConditionalFieldsetArea(
-        float|int|string $sourceField,
+        float|int|string|array $sourceField,
         string $operator = '=',
         string $compareValue = '',
         string $legend = '',
@@ -253,23 +257,25 @@ abstract class MFormElements
         bool $showWrapper = false,
         string $action = 'show',
     ): static {
-        $class = trim(($attributes['class'] ?? '') . ' mform-conditional-target');
-        $attributes['class'] = $class;
-        $attributes['data-mform-conditional-source'] = (string) $sourceField;
-        $attributes['data-mform-conditional-operator'] = $operator;
-        $attributes['data-mform-conditional-value'] = $compareValue;
-        $attributes['data-mform-conditional-action'] = $action;
+        $normalized = is_array($sourceField)
+            ? MFormAttributeHandler::normalizeConditions(['conditions' => $sourceField, 'logic' => $operator])
+            : MFormAttributeHandler::normalizeConditions(['field' => (string) $sourceField, 'op' => $operator, 'value' => $compareValue]);
+        if ([] === $normalized['conditions']) {
+            return $this->addFieldsetArea($legend, $form, $attributes, $parse, $showWrapper);
+        }
 
-        $conditionJson = json_encode([
-            [
-                'field' => (string) $sourceField,
-                'op' => $operator,
-                'value' => $compareValue,
-                'action' => $action,
-            ],
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        if (false !== $conditionJson) {
+        $first = $normalized['conditions'][0];
+        $attributes['class'] = trim(($attributes['class'] ?? '') . ' mform-conditional-target');
+        $attributes['data-mform-conditional-source'] = $first['field'];
+        $attributes['data-mform-conditional-operator'] = $first['op'];
+        $attributes['data-mform-conditional-value'] = $first['value'];
+        $attributes['data-mform-conditional-action'] = $action;
+        $conditionJson = MFormAttributeHandler::conditionsJson($normalized['conditions'], $action);
+        if (null !== $conditionJson) {
             $attributes['data-mform-condition'] = $conditionJson;
+        }
+        if ('any' === $normalized['logic']) {
+            $attributes['data-mform-condition-logic'] = 'any';
         }
 
         return $this->addFieldsetArea($legend, $form, $attributes, $parse, $showWrapper);
@@ -593,6 +599,25 @@ abstract class MFormElements
     }
 
     /**
+     * Tags-Feld: freie Schlagworte als Pills, gespeichert kommasepariert (`news,blog`).
+     * `$suggestions` sind Vorschlaege (Liste von Strings); Attribute: `allow_new` (Standard true,
+     * false = nur Vorschlaege), `max` (0 = unbegrenzt), `placeholder`, `label`, `notice`.
+     *
+     * @param array<int|string, mixed>|null $suggestions
+     * @param array<string, mixed>|null $attributes
+     *
+     * @example
+     * $mform->addTagsField("$id.0.tags", ['News', 'Blog', 'Event'], ['label' => 'Schlagworte', 'max' => 5]);
+     * Output: $tags = array_filter(explode(',', $item['tags'] ?? ''));
+     */
+    public function addTagsField(float|int|string $id, ?array $suggestions = null, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        $attributes ??= [];
+        $attributes['form-group-class'] = trim(($attributes['form-group-class'] ?? '') . ' mform-tags-wrapper');
+        return $this->addElement('tags', $id, null, $attributes, $suggestions ?? [], null, null, $defaultValue);
+    }
+
+    /**
      * Renders a color swatch picker – a text input with a preview square and a popup of predefined colors/classes.
      * The stored value is the raw color value (e.g. "#ff0000") or a CSS class name (e.g. ".bg-primary").
      *
@@ -778,15 +803,94 @@ abstract class MFormElements
         return $this;
     }
 
-    public function setVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): static
+    /**
+     * Sichtbarkeit an ein Quellfeld koppeln. Mehrere Bedingungen als Liste von Tripeln
+     * `[[1, '=', 'text'], [2, '!empty']]`; `$logic` 'all' (alle muessen zutreffen) oder 'any' (eine genuegt).
+     *
+     * @param float|int|string|array<mixed> $sourceField
+     */
+    public function setVisibleIf(float|int|string|array $sourceField, string $operator = '=', string $compareValue = '', string $logic = 'all'): static
     {
-        MFormAttributeHandler::addAttribute($this->item, 'visible_if', [
-            'field' => (string) $sourceField,
-            'op' => $operator,
-            'value' => $compareValue,
-        ]);
+        return $this->applyConditions('visible_if', $sourceField, $operator, $compareValue, $logic);
+    }
+
+    /**
+     * Weitere Bedingung an die bestehende Sichtbarkeitsregel anhaengen.
+     */
+    public function addVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): static
+    {
+        $current = $this->currentConditions();
+        $current['conditions'][] = ['field' => (string) $sourceField, 'op' => $operator, 'value' => $compareValue];
+        MFormAttributeHandler::addAttribute($this->item, 'hide' === $current['action'] ? 'hidden_if' : 'visible_if', $current);
 
         return $this;
+    }
+
+    /**
+     * Verknuepfung mehrerer Bedingungen: 'all' (Standard) oder 'any'.
+     */
+    public function setVisibleIfLogic(string $logic): static
+    {
+        $current = $this->currentConditions();
+        if ([] === $current['conditions']) {
+            return $this;
+        }
+        $current['logic'] = 'any' === strtolower($logic) ? 'any' : 'all';
+        MFormAttributeHandler::addAttribute($this->item, 'hide' === $current['action'] ? 'hidden_if' : 'visible_if', $current);
+
+        return $this;
+    }
+
+    /**
+     * Gegenstueck zu setVisibleIf(): Feld ausblenden, wenn die Bedingung(en) zutreffen.
+     *
+     * @param float|int|string|array<mixed> $sourceField
+     */
+    public function setHiddenIf(float|int|string|array $sourceField, string $operator = '=', string $compareValue = '', string $logic = 'all'): static
+    {
+        return $this->applyConditions('hidden_if', $sourceField, $operator, $compareValue, $logic);
+    }
+
+    /** @param float|int|string|array<mixed> $sourceField */
+    private function applyConditions(string $attribute, float|int|string|array $sourceField, string $operator, string $compareValue, string $logic): static
+    {
+        $value = is_array($sourceField)
+            ? ['conditions' => $sourceField, 'logic' => $logic]
+            : ['field' => (string) $sourceField, 'op' => $operator, 'value' => $compareValue];
+        MFormAttributeHandler::addAttribute($this->item, $attribute, $value);
+
+        return $this;
+    }
+
+    /**
+     * Bedingungen des aktuellen Feldes aus den form-group-Attributen lesen (dort liegen sie als JSON).
+     *
+     * @return array{conditions: list<array{field: string, op: string, value: string}>, logic: string, action: string}
+     */
+    private function currentConditions(): array
+    {
+        $formGroupAttributes = $this->item->getAttributes()['form-group-attributes'] ?? [];
+        $formGroupAttributes = is_array($formGroupAttributes) ? $formGroupAttributes : [];
+        $json = $formGroupAttributes['data-mform-condition'] ?? null;
+        $decoded = is_string($json) ? json_decode($json, true) : null;
+
+        $conditions = [];
+        $action = 'show';
+        if (is_array($decoded)) {
+            foreach ($decoded as $condition) {
+                if (!is_array($condition) || !isset($condition['field'])) {
+                    continue;
+                }
+                $action = 'hide' === ($condition['action'] ?? 'show') ? 'hide' : 'show';
+                $conditions[] = ['field' => (string) $condition['field'], 'op' => (string) ($condition['op'] ?? '='), 'value' => (string) ($condition['value'] ?? '')];
+            }
+        }
+
+        return [
+            'conditions' => $conditions,
+            'logic' => 'any' === ($formGroupAttributes['data-mform-condition-logic'] ?? 'all') ? 'any' : 'all',
+            'action' => $action,
+        ];
     }
 
     public function setAttribute(string $name, mixed $value): static

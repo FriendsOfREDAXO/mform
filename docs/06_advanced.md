@@ -12,6 +12,7 @@ Kniffe und Praxisbeispiele, wie MForm-Elemente an die jeweiligen Anforderungen a
 | `addRadioIconField` | ja | – | – |
 | `addRadioColorField` | ja | – | – |
 | `addColorSwatchField` | ja | – | ja |
+| `addTagsField` | ja | – | – |
 
 ## Alle Methoden im Überblick
 
@@ -46,6 +47,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `addRadioColorField`
   - `addColorSwatchField`
   - `addCheckboxGroupField`
+  - `addTagsField` (ab 10.0)
 - Informelle-Elemente
   - `addHtml`
   - `addHeadline`
@@ -94,7 +96,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `setTabIcon`
   - `setToggleOptions`
   - `setTooltipInfo`
-  - `setVisibleIf`
+  - `setVisibleIf`, `addVisibleIf`, `setVisibleIfLogic`, `setHiddenIf`
 
 ## Beispiele: Attribute
 
@@ -310,6 +312,14 @@ Optionale Aktion:
 - Standard ist `show` (Bereich zeigen, wenn Bedingung erfüllt ist)
 - Mit dem letzten Parameter `action = 'hide'` wird das Verhalten invertiert
 
+Mehrere Bedingungen (ab 10.0): als Liste von Tripeln im ersten Parameter, der zweite Parameter ist dann die Verknüpfung `'all'` (alle müssen zutreffen) oder `'any'` (eine genügt):
+
+```php
+->addConditionalFieldsetArea([[1, '=', 'image'], [2, '!empty']], 'any', '', 'Bild-Optionen', MForm::factory()
+    ->addTextField(6, ['label' => 'Alt-Text'])
+)
+```
+
 ## Beispiel: visible_if (ohne Wrapper)
 
 Mit `setVisibleIf()` kannst du einzelne Felder direkt an ein Quellfeld koppeln.
@@ -334,11 +344,29 @@ $mform = MForm::factory()
 echo $mform->show();
 ```
 
+Mehrere Bedingungen an einem Feld (ab 10.0): entweder als Liste im ersten Parameter oder mit `addVisibleIf()` angehängt. `setVisibleIfLogic('any')` lässt eine zutreffende Bedingung genügen, Standard ist `'all'`. `setHiddenIf()` ist das Gegenstück und blendet das Feld aus, wenn die Bedingungen zutreffen.
+
+```php
+->addTextField(2, ['label' => 'Headline'])
+    ->setVisibleIf(1, '=', 'text')
+    ->addVisibleIf(3, '!empty')
+    ->setVisibleIfLogic('any')
+
+// gleichwertig:
+->addTextField(2, ['label' => 'Headline'])
+    ->setVisibleIf([[1, '=', 'text'], [3, '!empty']], logic: 'any')
+
+->addTextField(4, ['label' => 'Nur ohne Bild'])
+    ->setHiddenIf(1, '=', 'image')
+```
+
 Hinweise:
 
 - `setVisibleIf()` arbeitet auf Feldebene (kein zusätzliches Wrapper-Fieldset).
 - Für mehrere Felder mit derselben Regel ist `addConditionalFieldsetArea()` weiterhin die bessere Wahl.
 - Beide Varianten funktionieren im klassischen Parser-Pfad und im Flex-Repeater.
+- Die Bedingungen liegen als JSON in `data-mform-condition` an der `form-group`, die Verknüpfung in `data-mform-condition-logic`; `assets/mform.js` wertet sie bei jeder Änderung aus.
+- Im Form Builder gibt es dafür unter „Sichtbarkeit an Bedingungen koppeln“ einen Editor: beliebig viele Zeilen aus Quellfeld, Operator und Vergleichswert, Verknüpfung „alle“ oder „eine genügt“. Der Builder erzeugt daraus die passenden Aufrufe.
 
 ## Beispiel: LayoutPreviewBuilder mit addRadioImgField
 
@@ -584,6 +612,33 @@ echo MForm::factory()
 ```
 
 ---
+
+## Beispiel: addTagsField – Schlagworte als Pills (ab 10.0)
+
+`addTagsField()` nimmt freie Schlagworte entgegen und speichert sie kommasepariert (`news,blog`). Enter oder Komma bestätigt ein Tag, Backspace im leeren Eingabefeld entfernt das letzte, jedes Tag hat einen Entfernen-Button. Der zweite Parameter sind Vorschläge (Browser-Autovervollständigung), die Attribute steuern das Verhalten:
+
+- `allow_new` (Standard `true`): bei `false` sind nur die Vorschläge erlaubt, Groß-/Kleinschreibung wird dabei an den Vorschlag angeglichen.
+- `max` (Standard `0` = unbegrenzt): maximale Anzahl Tags; ist sie erreicht, verschwindet das Eingabefeld.
+- `placeholder`, `label`, `notice` wie bei anderen Feldern.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addTagsField(1, ['News', 'Blog', 'Event'], ['label' => 'Schlagworte', 'max' => 5])
+    ->addTagsField(2, ['Rot', 'Grün', 'Blau'], ['label' => 'Nur aus der Liste', 'allow_new' => false])
+    ->show();
+```
+
+Ausgabe:
+
+```php
+$tags = array_filter(explode(',', 'REX_VALUE[id=1]'));
+// im Repeater: $item['tags'] bzw. $item->list('tags') über MFormOutput::items()
+```
+
+Das Feld funktioniert im klassischen Formular und im Flex-Repeater; im Form Builder heißt es „Tags“.
 
 ## Beispiel: Templates / Defaults per Key
 

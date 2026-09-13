@@ -268,8 +268,8 @@ Fieldset, das per JavaScript ein- oder ausgeblendet wird, basierend auf dem Wert
 
 | Parameter | Typ | Beschreibung |
 |-----------|-----|--------------|
-| `$sourceField` | `float\|int\|string` | Feld-ID des steuernden Feldes |
-| `$operator` | `string` | Vergleichsoperator: `=`/`==`, `!=`, `>`, `<`, `contains`, `in` (kommagetrennt), `empty`, `!empty` |
+| `$sourceField` | `float\|int\|string\|array` | Feld-ID des steuernden Feldes oder Liste von Tripeln `[[1, '=', 'a'], [2, '!empty']]` (ab 10.0) |
+| `$operator` | `string` | Vergleichsoperator: `=`/`==`, `!=`, `>`, `<`, `contains`, `in` (kommagetrennt), `empty`, `!empty`; bei einer Liste die Verknüpfung `'all'` oder `'any'` |
 | `$compareValue` | `string` | Vergleichswert |
 | `$action` | `string` | `'show'` oder `'hide'` |
 
@@ -467,6 +467,18 @@ Radio-Gruppe mit Farb-Swatches.
 ```php
 $options[$value] = ['color' => '#ff0000', 'label' => 'Rot'];
 $options['none'] = ['color' => 'transparent', 'label' => 'Kein'];
+```
+
+---
+
+```php
+addTagsField(float|int|string $id, ?array $suggestions = null, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+Schlagworte als Pills (ab 10.0). Gespeicherter Wert: kommaseparierter String. `$suggestions` sind Vorschläge; Attribute `allow_new` (Standard `true`), `max` (0 = unbegrenzt), `placeholder`.
+
+```php
+$mform->addTagsField('tags', ['News', 'Blog'], ['label' => 'Schlagworte', 'max' => 5]);
+// Ausgabe: array_filter(explode(',', $item['tags'] ?? ''))
 ```
 
 ---
@@ -758,15 +770,19 @@ Setzt einen einzelnen Parameter.
 ---
 
 ```php
-setVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): MForm
+setVisibleIf(float|int|string|array $sourceField, string $operator = '=', string $compareValue = '', string $logic = 'all'): MForm
+addVisibleIf(float|int|string $sourceField, string $operator = '=', string $compareValue = ''): MForm
+setVisibleIfLogic(string $logic): MForm
+setHiddenIf(float|int|string|array $sourceField, string $operator = '=', string $compareValue = '', string $logic = 'all'): MForm
 ```
-Koppelt die Sichtbarkeit eines einzelnen Feldes an ein Quellfeld (ohne Wrapper).
+Koppelt die Sichtbarkeit eines einzelnen Feldes an ein oder mehrere Quellfelder (ohne Wrapper). `addVisibleIf()` hängt eine weitere Bedingung an, `setVisibleIfLogic('any')` lässt eine zutreffende genügen (Standard `'all'`), `setHiddenIf()` blendet aus statt ein (ab 10.0).
 
 | Parameter | Typ | Beschreibung |
 |-----------|-----|--------------|
-| `$sourceField` | `float\|int\|string` | Feld-ID oder Feld-Key des steuernden Feldes |
+| `$sourceField` | `float\|int\|string\|array` | Feld-ID oder Feld-Key des steuernden Feldes, oder Liste von Tripeln `[[1, '=', 'a'], [2, '!empty']]` |
 | `$operator` | `string` | Vergleichsoperator (`=`, `!=`, `>`, `<`, `contains`, `in`, `empty`, `!empty`) |
 | `$compareValue` | `string` | Vergleichswert |
+| `$logic` | `string` | `'all'` oder `'any'`, nur bei mehreren Bedingungen |
 
 ---
 
@@ -1179,6 +1195,7 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 | `multiselect` | `addMultiSelectField()` | Mehrfach-Auswahl |
 | `checkbox` | `addCheckboxField()` | Checkbox-Gruppe |
 | `checkbox-group` | `addCheckboxGroupField()` | Visuell gestaltete Checkbox-Gruppe |
+| `tags` | `addTagsField()` | Schlagworte als Pills, kommasepariert |
 | `radio` | `addRadioField()` | Radio-Buttons |
 | `color-swatch` | `addColorSwatchField()` | Farb-Swatch-Picker |
 | `link` | `addLinkField()` | REDAXO-internen Link-Picker |

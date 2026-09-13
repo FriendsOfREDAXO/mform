@@ -909,6 +909,74 @@ section.repeater .repeater-group header + .mform > .mform-tabs .tab-content {
     gap: 4px;
 }
 
+/* Tags-Widget (addTagsField) */
+.mform-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    min-height: 34px;
+    padding: 3px 6px;
+    background: var(--mform-input-bg);
+    border: 1px solid var(--mform-input-border);
+    border-radius: var(--mform-radius);
+    cursor: text;
+}
+
+.mform-tags:focus-within {
+    border-color: var(--mform-focus);
+    box-shadow: 0 0 0 2px var(--mform-focus-ring);
+}
+
+.mform-tags-list {
+    display: contents;
+}
+
+.mform-tags-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px 2px 8px;
+    border: 1px solid var(--mform-accent);
+    border-radius: var(--mform-radius);
+    background: var(--mform-accent-bg);
+    color: var(--mform-active-text);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.mform-tags-remove {
+    padding: 0 2px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: .7;
+}
+
+.mform-tags-remove:hover,
+.mform-tags-remove:focus {
+    opacity: 1;
+    outline: none;
+}
+
+.mform-tags-input {
+    flex: 1 1 120px;
+    min-width: 120px;
+    padding: 3px 4px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--mform-text);
+    font-size: 13px;
+}
+
+.mform-tags-input.is-hidden {
+    display: none;
+}
+
 .mform-cbg-option {
     display: inline-flex;
     align-items: center;

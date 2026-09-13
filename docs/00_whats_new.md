@@ -30,6 +30,8 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 ## Felder
 
 - **HTML5-Felder:** `addNumberField()`, `addRangeField()` (mit Live-Wert), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Details: [Grundlagen](01_basics.md#weitere-html5-elemente).
+- **Tags-Feld:** `addTagsField()` für Schlagworte als Pills mit Vorschlägen, `allow_new` und `max`, gespeichert kommasepariert. Details: [Erweiterte Beispiele](06_advanced.md#beispiel-addtagsfield--schlagworte-als-pills-ab-100).
+- **Mehrere Bedingungen:** `setVisibleIf()` nimmt eine Liste, `addVisibleIf()` hängt an, `setVisibleIfLogic('any')` lässt eine genügen, `setHiddenIf()` blendet aus; `addConditionalFieldsetArea()` ebenfalls mit Liste. Details: [Erweiterte Beispiele](06_advanced.md#beispiel-visible_if-ohne-wrapper).
 - **Eigene Feldtypen:** `MForm::registerFieldType($type, $renderer)` registriert Typen aus Fremd-Addons, `addCustomField()` setzt sie ins Formular, derselbe Renderer läuft im Formular und im Repeater. Details: [API-Referenz](13_api_reference.md#eigene-feldtypen-registry-ab-100).
 - **Barrierefreiheits-Prüfung für Medien-Felder:** Option `a11y` prüft ALT-Text und weitere Metainfo-Felder gegen den Medienpool und zeigt Befunde direkt unter dem Widget; global und je Feld abschaltbar, optional als Standardprüfung. Details: [Barrierefreiheit](16_a11y.md).
 
@@ -43,6 +45,7 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 - Vollständige Palette: Collapse, Accordion, Column, Inline, Radio Image/Icon/Color, Text/Textarea (readonly) neben Tab, Fieldset, Modal und Repeater; Medien-Felder mit A11y-Checkbox.
 - Export und Import des Builder-Stands als JSON (`mform-builder.json`).
 - Live-Vorschau unter dem Ausgabecode: das Formular wird über die MForm-Engine gerendert, im Backend-Theme, automatisch nach jeder Änderung.
+- Bedingungs-Editor: unter „Sichtbarkeit an Bedingungen koppeln“ beliebig viele Regeln aus Quellfeld, Operator und Wert, Verknüpfung „alle“ oder „eine genügt“; der Builder erzeugt `setVisibleIf()`/`addVisibleIf()` bzw. `addConditionalFieldsetArea()` mit Liste.
 
 ## Werkzeuge
 

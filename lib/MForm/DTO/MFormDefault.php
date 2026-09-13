@@ -43,6 +43,7 @@ class MFormDefault
         'checkbox' => '',
         'radio' => '',
         'checkbox-group' => '',
+        'tags' => '',
         'color-swatch' => '',
     ];
 }
