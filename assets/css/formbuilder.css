@@ -686,3 +686,88 @@ body.rex-theme-dark .mform-fb {
 .mform-fb__section-body[hidden] {
     display: none;
 }
+
+/* ---- Container-Ablagen fuer Collapse, Accordion, Spalte, Inline ----------- */
+.mform-fb__item--collapse,
+.mform-fb__item--accordion,
+.mform-fb__item--column,
+.mform-fb__item--inline {
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--fb-tab-bg);
+    border-color: var(--fb-tab-border);
+    padding: 8px;
+}
+
+.mform-fb__item--collapse > .mform-fb__item-head,
+.mform-fb__item--accordion > .mform-fb__item-head,
+.mform-fb__item--column > .mform-fb__item-head,
+.mform-fb__item--inline > .mform-fb__item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.mform-fb__item--collapse .mform-fb__nested,
+.mform-fb__item--accordion .mform-fb__nested,
+.mform-fb__item--column .mform-fb__nested,
+.mform-fb__item--inline .mform-fb__nested {
+    border: 2px dashed var(--fb-tab-nested-bd);
+    border-radius: 4px;
+    padding: 6px;
+    min-height: 60px;
+    background: var(--fb-tab-nested);
+}
+
+.mform-fb__item--collapse .mform-fb__nested.is-drop,
+.mform-fb__item--accordion .mform-fb__nested.is-drop,
+.mform-fb__item--column .mform-fb__nested.is-drop,
+.mform-fb__item--inline .mform-fb__nested.is-drop {
+    border-color: var(--fb-tab-border);
+    background: var(--fb-tab-nested-drop);
+}
+
+.mform-fb__item--collapse .mform-fb__nested-hint,
+.mform-fb__item--accordion .mform-fb__nested-hint,
+.mform-fb__item--column .mform-fb__nested-hint,
+.mform-fb__item--inline .mform-fb__nested-hint {
+    color: var(--fb-text-faint);
+    text-align: center;
+    margin: 14px 0;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Spalten nebeneinander in ihrer Breite (12er-Raster); alle anderen Items volle Breite */
+.mform-fb__canvas,
+.mform-fb__nested {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+}
+
+.mform-fb__canvas > .mform-fb__item,
+.mform-fb__nested > .mform-fb__item,
+.mform-fb__canvas > .mform-fb__hint,
+.mform-fb__nested > .mform-fb__nested-hint {
+    flex: 0 0 100%;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+.mform-fb__canvas > .mform-fb__item--column,
+.mform-fb__nested > .mform-fb__item--column {
+    flex: 0 0 calc(var(--fb-col, 6) / 12 * 100% - 6px + var(--fb-col, 6) / 12 * 6px);
+}
+
+.mform-fb__item--column .mform-fb__item-head {
+    flex-wrap: wrap;
+}
+
+/* Spaltenkopf: "Spalte 6/12" reicht, das Typ-Badge ist dort redundant und kostet Platz */
+.mform-fb__item--column > .mform-fb__item-head .mform-fb__item-type {
+    display: none;
+}

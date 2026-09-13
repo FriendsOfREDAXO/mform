@@ -481,7 +481,11 @@
 
             var head = document.createElement('div');
             head.className = 'mform-fb__item-head';
-            var hasChildren = item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset' || item.type === 'modal';
+            // Alle Container (auch Collapse, Accordion, Spalte, Inline) bekommen eine Ablageflaeche fuer Kinder.
+            var hasChildren = isContainerType(item.type);
+            if (item.type === 'column') {
+                el.style.setProperty('--fb-col', String(Math.min(12, Math.max(1, parseInt(item.columnSize, 10) || 6))));
+            }
             var collapseBtn = hasChildren
                 ? '<button type="button" class="mform-fb__item-btn" data-fb-collapse title="Ein-/Ausklappen"><i class="rex-icon fa-chevron-' + (builderCollapsed[item.uid] ? 'right' : 'down') + '"></i></button>'
                 : '';
@@ -497,14 +501,16 @@
                     '<button type="button" class="mform-fb__item-btn" data-fb-paste-after title="Aus Zwischenablage einfuegen"><i class="rex-icon fa-paste"></i></button>' +
                 '</span>' +
                 '<button type="button" class="mform-fb__item-remove" data-fb-remove title="Loeschen"><i class="rex-icon fa-trash"></i></button>';
-            head.querySelector('.mform-fb__item-label').textContent = item.label || item.type;
+            head.querySelector('.mform-fb__item-label').textContent = item.type === 'column'
+                ? (item.label && item.label !== 'Column' ? item.label + ' · ' : '') + 'Spalte ' + (parseInt(item.columnSize, 10) || 6) + '/12'
+                : (item.label || item.type);
             head.addEventListener('click', function (e) {
                 if (e.target.closest('button')) return;
                 selectItem(item);
             });
             el.appendChild(head);
 
-            if (item.type === 'repeater' || item.type === 'tab' || item.type === 'fieldset' || item.type === 'modal') {
+            if (hasChildren) {
                 var nested = document.createElement('div');
                 nested.className = 'mform-fb__nested';
                 nested.dataset.fbNested = item.uid;
@@ -834,6 +840,9 @@
             if (key === 'editor') {
                 renderProps();
             }
+            if (key === 'columnSize') {
+                renderCanvas();
+            }
             if (key === 'visibilityEnabled') {
                 if (activeItem.visibilityEnabled && !(activeItem.visibilityConditions || []).length) {
                     activeItem.visibilityConditions = [newCondition()];
@@ -1028,7 +1037,12 @@
             if (!$palette.contains(li) && !$paletteWrap.contains(li)) return;
             var type = li.dataset.type;
             if (!type) return;
-            var newItem = makeItem(type);
+            // Vorlagen: mehrere Spalten auf einmal (6+6, 4+4+4)
+            var presetSizes = li.dataset.preset ? String(li.dataset.preset).split('+').map(function (n) { return parseInt(n, 10); }).filter(function (n) { return n > 0; }) : [];
+            var newItems = presetSizes.length
+                ? presetSizes.map(function (size) { var col = makeItem('column'); col.columnSize = String(size); return col; })
+                : [makeItem(type)];
+            var newItem = newItems[0];
 
             // If an active repeater/tab/fieldset is selected, attempt to insert as child.
             // Otherwise append at top level.
@@ -1041,9 +1055,9 @@
                     alert('Mehr als ' + (MAX_REPEATER_DEPTH + 1) + ' Repeater-Ebenen werden nicht unterstuetzt.');
                     return;
                 }
-                activeItem.children.push(newItem);
+                Array.prototype.push.apply(activeItem.children, newItems);
             } else {
-                state.push(newItem);
+                Array.prototype.push.apply(state, newItems);
             }
             renderCanvas();
             emitCode();

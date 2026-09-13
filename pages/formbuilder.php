@@ -107,10 +107,12 @@ $body = <<<'HTML'
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="tab">Tab</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="fieldset">Fieldset</li>
             <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="modal">Modal</li>
-            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="collapse">Collapse</li>
-            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="accordion">Accordion</li>
-            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="column">Column</li>
-            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="inline">Inline</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="collapse" title="Aufklappbarer Bereich mit Toggle-Link">Collapse</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="accordion" title="Mehrere aufklappbare Bereiche, nur einer offen: mehrere Accordion-Elemente hintereinander anlegen">Accordion</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="column" title="Eine Spalte im 12er-Raster; nebeneinander liegende Spalten bilden eine Zeile">Spalte (Column)</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="column" data-preset="6+6" title="Zwei Spalten je halbe Breite">2 Spalten (6 + 6)</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="column" data-preset="4+4+4" title="Drei Spalten je ein Drittel">3 Spalten (4 + 4 + 4)</li>
+            <li class="mform-fb__pal-item mform-fb__pal-item--wrap" data-type="inline" title="Felder nebeneinander in einer Zeile (form-inline)">Inline</li>
         </ul>
         <p class="mform-fb__palette-empty" data-fb-palette-empty style="display:none">Keine Treffer in der Palette.</p>
         <div class="mform-fb__actions">
@@ -250,8 +252,9 @@ $body = <<<'HTML'
                 <label class="checkbox"><input type="checkbox" data-fb-prop="collapseHideToggle"> Toggle-Link ausblenden <small>(hideToggleLinks)</small></label>
             </div>
             <div class="form-group" data-fb-prop-group="columnSize">
-                <label>Spaltenbreite <small>(1 bis 12, Bootstrap-Grid; aufeinanderfolgende Columns bilden eine Row)</small></label>
+                <label>Spaltenbreite <small>(1 bis 12 von 12)</small></label>
                 <input type="number" class="form-control" data-fb-prop="columnSize" min="1" max="12" value="6">
+                <p class="help-block" style="margin-top:4px"><small>Nebeneinander liegende Spalten bilden eine Zeile, z. B. 6 + 6 oder 4 + 4 + 4. Spalte anklicken und dann links ein Feld waehlen, oder Felder hineinziehen.</small></p>
             </div>
             <div class="form-group" data-fb-prop-group="alertText">
                 <label>Alert-Text</label>

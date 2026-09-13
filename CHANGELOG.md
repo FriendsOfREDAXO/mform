@@ -14,6 +14,7 @@
 
 ### Behoben
 
+- **Form Builder, Wrapper ohne Ablagefläche:** Collapse, Accordion, Spalte und Inline hatten in der Baufläche keinen Bereich für Kinder, man konnte nichts hineinlegen. Jetzt haben alle Container eine Ablage; Spalten liegen in ihrer Breite nebeneinander (12er-Raster) und zeigen „Spalte 6/12“ im Kopf, die Palette hat die Vorlagen „2 Spalten (6 + 6)“ und „3 Spalten (4 + 4 + 4)“, die Wrapper-Einträge tragen Tooltips.
 - **Bedingungen mit mehrteiligen Ids:** `setVisibleIf('1.0.type', …)` fand das Quellfeld im klassischen Modul nicht (Name `REX_INPUT_VALUE[1][0][type]`), die Bedingung blieb wirkungslos. `assets/mform.js` löst gepunktete Ids jetzt auf Namen und Id-Suffix auf.
 - **Wrapper-Attribute nicht escaped:** Attributwerte an Fieldset, Tabs, Collapse und Modal wurden roh ausgegeben; das JSON in `data-mform-condition` eines bedingten Fieldsets war damit ungültig und fiel auf die erste Bedingung zurück. Der Parser escaped Wrapper-Attribute jetzt wie die form-group-Attribute.
 - **Flex-Repeater:** Steuerwerte (`form-group-class`, `form-group-attributes`, `visible_if`, `hidden_if`, `a11y`) landeten als Attribute am Eingabeelement statt nur an der form-group.
