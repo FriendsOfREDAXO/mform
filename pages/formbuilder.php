@@ -131,6 +131,12 @@ $body = <<<'HTML'
         </div>
         <textarea class="mform-fb__code" data-fb-code data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
 
+        <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
+        <div class="mform-fb__code-bar">
+            <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
+            <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
+        </div>
+        <textarea class="mform-fb__code" data-fb-output data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
         <h4 style="margin-top:1.5em">Vorschau</h4>
         <div class="mform-fb__code-bar" data-fb-preview-bar data-fb-preview-url="{{PREVIEW_URL}}" data-fb-preview-csrf="{{PREVIEW_CSRF}}">
             <button type="button" class="btn btn-primary btn-xs" data-fb-action="preview"><i class="rex-icon fa-refresh"></i> Vorschau aktualisieren</button>
@@ -139,12 +145,6 @@ $body = <<<'HTML'
         </div>
         <iframe class="mform-fb__preview" data-fb-preview title="Vorschau" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" style="width:100%;min-height:160px;border:1px solid var(--mform-border, #dfe3e9);background:var(--mform-surface, #fff)"></iframe>
 
-        <h4 style="margin-top:1.5em">Ausgabe (Modul-Output)</h4>
-        <div class="mform-fb__code-bar">
-            <button type="button" class="btn btn-primary btn-xs" data-fb-action="copy-output">Code kopieren</button>
-            <span class="mform-fb__copy-msg" data-fb-copy-output-msg></span>
-        </div>
-        <textarea class="mform-fb__code" data-fb-output data-mform-code-language="php" readonly spellcheck="false">// Noch keine Felder hinzugefuegt.</textarea>
     </div>
 
     <div class="mform-fb__props" data-fb-props>

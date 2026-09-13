@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-beta.4 (in Arbeit)
+
+### Geändert
+
+- **Form Builder:** Die Vorschau steht jetzt unter dem Ausgabecode, Eingabe- und Ausgabecode bleiben damit direkt untereinander.
+
 ## Version 10.0.0-beta.3
 
 **BETA, nicht für Produktion.** Dritte Beta von MForm 10 (13.09.2026): nur zum Testen, vorher Backup anlegen. Plan und Stand in `docs/ROADMAP_10.md`, Rückmeldungen im Tracking-Issue #448. 9.5.x wird im Branch `9.x` gepflegt. Update von beta.2 ohne Datenänderung.
