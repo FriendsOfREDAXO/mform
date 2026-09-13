@@ -437,6 +437,10 @@ $body = <<<'HTML'
                 <input type="text" class="form-control" data-fb-prop="repeaterItemTitle" placeholder="Abschnitt {n}: {title}">
                 <p class="help-block" style="margin-top:4px"><small><code>{n}</code> = laufende Nummer, <code>{feldname}</code> = Wert des Feldes (Schluessel wie im Repeater, z. B. <code>{title}</code>). Leer = automatisch aus dem ersten Textfeld.</small></p>
             </div>
+            <div class="form-group" data-fb-prop-group="repeaterDescription">
+                <label>Einleitender Text <small>(description, unter der Kopfzeile)</small></label>
+                <textarea class="form-control" rows="2" data-fb-prop="repeaterDescription" placeholder="z. B. Hier die Abschnitte der Seite anlegen."></textarea>
+            </div>
             <div class="form-group" data-fb-prop-group="tabPullRight">
                 <label class="checkbox"><input type="checkbox" data-fb-prop="tabPullRight"> Tab rechts ausrichten <small>(pull right)</small></label>
             </div>

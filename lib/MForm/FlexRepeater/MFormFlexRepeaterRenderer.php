@@ -65,8 +65,9 @@ class MFormFlexRepeaterRenderer
                 $label = self::getLabelString($item->getLabel());
                 $showAddButton = (bool) ($attrs['show_add_button'] ?? $attrs['show_add_buttons'] ?? true);
                 $itemTitle = trim((string) ($attrs['item_title'] ?? ''));
+                $description = trim((string) ($attrs['description'] ?? ''));
 
-                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm, $showAddButton, $itemTitle);
+                $html .= self::renderNestedRepeaterContainer($fieldKey, $label, $btnText, $innerForm, $showAddButton, $itemTitle, $description);
 
                 $skip = $i + 1;
                 while ($skip < count($items)) {
@@ -549,7 +550,7 @@ class MFormFlexRepeaterRenderer
         return $html;
     }
 
-    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true, string $itemTitle = ''): string
+    private static function renderNestedRepeaterContainer(string $fieldKey, string $label, string $btnText, ?MForm $innerForm, bool $showAddButton = true, string $itemTitle = '', string $description = ''): string
     {
         $innerTemplate = '';
         if (null !== $innerForm) {
@@ -560,6 +561,9 @@ class MFormFlexRepeaterRenderer
         if ('' !== $label) {
             // Labels sind Entwickler-kontrolliert und duerfen HTML enthalten (z. B. Icons).
             $labelHtml = sprintf('<div class="mfr-nested-label">%s</div>', $label);
+        }
+        if ('' !== $description) {
+            $labelHtml .= sprintf('<p class="mfr-description mfr-nested-description">%s</p>', $description);
         }
 
         return sprintf(
@@ -791,7 +795,7 @@ class MFormFlexRepeaterRenderer
     private static function renderAttributes(array $attributes): string
     {
         // Steuerwerte von MForm (form-group-*, Bedingungen, a11y) gehoeren an die form-group, nicht ans Element
-        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if', 'a11y', 'item_title', 'layout', 'data_version', 'copy_paste', 'show_add_buttons'];
+        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if', 'a11y', 'item_title', 'description', 'layout', 'data_version', 'copy_paste', 'show_add_buttons'];
 
         $html = '';
         foreach ($attributes as $key => $value) {

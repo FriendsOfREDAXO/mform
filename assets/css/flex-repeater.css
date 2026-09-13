@@ -495,6 +495,19 @@ body.rex-theme-dark {
     margin-top: .65rem;
 }
 
+/* Einleitender Text (Option description) */
+.mfr-description {
+    margin: -.2rem 0 .65rem;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--mfr-color-muted);
+}
+
+.mfr-description.mfr-nested-description {
+    margin: -.25rem 0 .5rem;
+    font-size: 12px;
+}
+
 .mfr-nested-label {
     font-size: 12px;
     font-weight: 600;

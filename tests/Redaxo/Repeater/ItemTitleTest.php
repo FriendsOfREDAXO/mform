@@ -25,7 +25,10 @@ final class ItemTitleTest extends TestCase
         $inner = MForm::factory()
             ->addTextField('title', ['label' => 'Titel'])
             ->addRepeaterElement('tags', MForm::factory()->addTextField('name'), true, true, ['item_title' => 'Tag {n}: {name}']);
-        $html = MForm::factory()->addRepeaterElement(1, $inner, true, true, ['item_title' => 'Abschnitt {n}: {title} "x"'])->show();
+        $html = MForm::factory()->addRepeaterElement(1, $inner, true, true, ['item_title' => 'Abschnitt {n}: {title} "x"', 'description' => 'Hier <b>Abschnitte</b> anlegen.'])->show();
+
+        self::assertStringContainsString('<p class="mfr-description">Hier <b>Abschnitte</b> anlegen.</p>', $html);
+        self::assertStringNotContainsString('description="', $html);
 
         self::assertStringContainsString('data-mfr-item-title="Abschnitt {n}: {title} &quot;x&quot;"', $html);
         self::assertStringContainsString('data-mfr-item-title="Tag {n}: {name}"', $html);

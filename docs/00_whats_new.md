@@ -22,7 +22,7 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 
 ## Repeater
 
-- **Bedienung:** Kopfzeile mit Label, Zähler und Aktionen, „Hinzufügen“ als durchgehender Streifen unter der Liste, auch in verschachtelten Repeatern. Optionale Überschrift je Eintrag über `'item_title' => 'Abschnitt {n}: {title}'`. Details: [Repeater](07_repeater.md#standardverhalten-und-optionen).
+- **Bedienung:** Kopfzeile mit Label, Zähler und Aktionen, „Hinzufügen“ als durchgehender Streifen unter der Liste, auch in verschachtelten Repeatern. Optionale Überschrift je Eintrag über `'item_title' => 'Abschnitt {n}: {title}'` und ein einleitender Text über `'description'`. Details: [Repeater](07_repeater.md#standardverhalten-und-optionen).
 - **Speicherformat mit Version:** `'data_version' => 2` schreibt einen Umschlag `{"__v":2,"items":[...]}`, Standard bleibt die reine Liste, alle Ausgabehelfer lesen beide Formate. Details: [Repeater](07_repeater.md#speicherformat-und-version-ab-100).
 - **Typisierte Items:** `MFormOutput::from(1)->items()` liefert `MFormRepeaterItem`-Objekte mit `media()`, `article()`, `dataset()`, `url()` und `items()` für verschachtelte Repeater. Details: [MFormOutput](15_mform_output.md#typisierte-items).
 - **Gemeinsame Renderpfade:** Wrapper und Feldzeilen kommen im klassischen Formular und im Repeater aus denselben Theme-Fragmenten (`mform_wrapper.php`, `mform_default.php`). Details: [Templates](09_templates.md#wrapper-fragment-ab-100).

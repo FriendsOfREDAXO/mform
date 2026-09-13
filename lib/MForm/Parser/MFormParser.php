@@ -239,6 +239,11 @@ class MFormParser
         $toolbarGroupBottom = $toolbarAdd . $pasteButtonBottom . $clearClipboardButton;
 
         $this->elements[] = '<div class="mfr-header">' . $label . '<div class="mfr-toolbar mfr-toolbar-top">' . $toolbarGroupTop . '</div></div>';
+        // Einleitender Text unter der Kopfzeile (Option description, darf HTML enthalten)
+        $description = trim((string) ($attrs['description'] ?? ''));
+        if ('' !== $description) {
+            $this->elements[] = '<p class="mfr-description">' . $description . '</p>';
+        }
 
         $this->elements[] = '<div class="mfr-items-list"></div>';
 

@@ -5,6 +5,7 @@
 ### Neu
 
 - **Repeater, Überschrift je Eintrag:** Option `item_title` als Vorlage mit `{n}` (laufende Nummer) und `{feld}` (Feldwert ohne HTML), z. B. `'Abschnitt {n}: {title}'`. Erscheint im Kopf jedes Eintrags, auch in verschachtelten Repeatern, und aktualisiert sich beim Tippen; hängende Trennzeichen bei leeren Feldern werden entfernt. Im Form Builder als „Überschrift je Eintrag“ am Repeater.
+- **Repeater, einleitender Text:** Option `description` zeigt einen Text unter der Kopfzeile, etwa eine kurze Anleitung; HTML erlaubt, auch in verschachtelten Repeatern, im Builder als „Einleitender Text“.
 
 ## Version 10.0.0-rc.1
 
