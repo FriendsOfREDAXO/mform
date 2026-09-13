@@ -10,9 +10,6 @@
 | Flex-Repeater (`addRepeaterElement`) | ✅ ja |
 | `rex_form` | ✅ ja |
 | YForm | ✅ ja |
-| **MBlock (klassisches HTML-Widget)** | ❌ **nein** |
-
-> **MBlock-Hinweis:** `addCheckboxGroupField()` funktioniert **nicht** im klassischen MBlock-HTML-Modus (`MBlock::show($id, $htmlString)`). MBlock speichert und liest Feldwerte ausschließlich über native Input-Elemente mit korrektem `name`-Attribut. Das CheckboxGroup-Widget arbeitet mit einem Hidden-Input und JS-gesteuerten Labels – das ist mit MBlocks Reindex-Mechanismus nicht kompatibel. Wer in MBlock eine Mehrfachauswahl braucht, sollte `addMultiSelectField()` oder mehrere `addCheckboxField()` verwenden.
 
 ## Signatur
 
@@ -51,7 +48,7 @@ news,blog,event
 Auslesen im Output-Code:
 
 ```php
-$tags = rex_var::toArray('REX_VALUE[id=1&output=json]')['tags'] ?? '';
+$tags = 'REX_VALUE[id=1]';
 $selected = array_filter(explode(',', $tags));
 
 if (in_array('news', $selected)) {
@@ -168,14 +165,16 @@ echo MForm::factory()
 ### Auslesen im Repeater-Output
 
 ```php
-$items = rex_var::toArray('REX_VALUE[id=1&output=json]') ?? [];
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+
+$items = MFormRepeaterHelper::decode(1);
 
 foreach ($items as $item) {
-    $tags  = array_filter(explode(',', $item['tags']  ?? ''));
-    $types = array_filter(explode(',', $item['types'] ?? ''));
+    $tags     = array_filter(explode(',', $item['tags'] ?? ''));
+    $priority = $item['priority'] ?? '';
 
     echo '<div>';
-    echo '<h3>' . rex_escape($item['title']) . '</h3>';
+    echo '<h3>' . rex_escape($item['title'] ?? '') . '</h3>';
 
     if ($tags) {
         echo '<ul>';
@@ -186,30 +185,4 @@ foreach ($items as $item) {
     }
     echo '</div>';
 }
-```
-
-## MBlock-Alternative
-
-Wer in **MBlock** eine Mehrfachauswahl benötigt, verwendet stattdessen:
-
-```php
-// Option A: Multi-Select (speichert kommasepariert)
-$mform = MForm::factory()
-    ->addMultiSelectField(1, [
-        'news'  => 'News',
-        'blog'  => 'Blog',
-        'event' => 'Events',
-    ], ['label' => 'Kategorien']);
-
-echo MBlock::show(1, $mform->show());
-```
-
-```php
-// Option B: Einzelne Checkboxen
-$mform = MForm::factory()
-    ->addCheckboxField('1.0.cat_news',  [1 => 'News'],   ['label' => ''])
-    ->addCheckboxField('1.0.cat_blog',  [1 => 'Blog'],   ['label' => ''])
-    ->addCheckboxField('1.0.cat_event', [1 => 'Events'], ['label' => 'Kategorien']);
-
-echo MBlock::show(1, $mform->show());
 ```

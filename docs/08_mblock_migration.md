@@ -7,9 +7,9 @@ MForm 10 unterstützt MBlock nicht mehr. Bestehende Module mit `MBlock::show($id
 
 ## 1) Migrationsassistent
 
-Im Backend unter `MForm -> MBlock zu Repeater` führt ein Assistent in fünf Schritten durch die Migration. Dasselbe gibt es für große Installationen auf der Konsole (`mform:migrate`), dazu einen Linter (`mform:lint`).
+Im Backend unter `MForm -> MBlock zu Repeater` führt ein Assistent in sechs Schritten durch die Migration (Schritt 6 für YForm-Tabellen). Dasselbe gibt es für große Installationen auf der Konsole (`mform:migrate`), dazu einen Linter (`mform:lint`).
 
-### Die fünf Schritte
+### Die Schritte
 
 1. **Inventar.** Alle Module mit `MBlock::show()`: Anzahl Slices, erkannte Slots (`REX_VALUE[n]`), Feldtypen, ob die gespeicherten Werte wirklich MBlock-Marker tragen, und ein Risiko-Badge (grün: nur Umbenennungen, gelb: Legacy-Keys oder Optionen ohne Entsprechung, rot: HTML-/Heredoc-Formular, Verschachtelung oder Gridblock). „Analysieren“ lädt das Modul in Schritt 2.
 2. **Code analysieren und konvertieren.** Der Analyzer liest jeden `MBlock::show()`-Aufruf, seinen Slot, die Formular-Variable, die Optionen und die Felder des Block-Formulars. Aus numerischen Widgets leitet er die **Legacy-Key-Map** ab: `addMediaField(1)` → `REX_MEDIA_1 => media`, `addMediaField(2)` → `media_2`, `addLinkField(3)` → `REX_LINK_3 => link_3`, Medialist/Linklist analog, `addCustomLinkField("$id.0.1")` → `1 => link`. Die Zielnamen sind in der Tabelle editierbar und gelten für den Eingabe-Code, die Ausgabe-Fallbacks und die Datenmigration. „Konvertieren“ liefert Eingabe- und Ausgabe-Code mit Hinweisen; beide Felder sind vorher editierbar.
@@ -82,7 +82,7 @@ Weitere Optionen von `mform:migrate`: `--slot=1,3` (nur diese Slots), `--map='{"
 
 Wenn der Konverter nicht alle Besonderheiten deines Moduls abdecken kann, ist die manuelle Migration der zuverlässige Weg.
 
-## Zielbild in MForm 9
+## Zielbild in MForm 10
 
 - Wiederholende Inhalte laufen über `addRepeaterElement(...)`.
 - Speicherung erfolgt als JSON in `REX_VALUE`.

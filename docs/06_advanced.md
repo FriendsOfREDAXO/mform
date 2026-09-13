@@ -25,12 +25,15 @@ MForm stellt folgende Element-Methoden bereit:
   - `addTabElement`
   - `addColumnElement`
   - `addInlineElement`
+  - `addModalElement`
 - Text-Input- und Hidden-Elemente
   - `addTextField`
   - `addHiddenField`
   - `addTextAreaField`
   - `addTextReadOnlyField`
   - `addTextAreaReadOnlyField`
+  - `addInputField`
+  - `addNumberField`, `addRangeField`, `addDateField`, `addDateTimeField`, `addTimeField`, `addEmailField`, `addColorField` (ab 10.0)
 - Select-Elemente
   - `addSelectField`
   - `addMultiSelectField`
@@ -42,6 +45,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `addRadioIconField`
   - `addRadioColorField`
   - `addColorSwatchField`
+  - `addCheckboxGroupField`
 - Informelle-Elemente
   - `addHtml`
   - `addHeadline`
@@ -56,11 +60,13 @@ MForm stellt folgende Element-Methoden bereit:
   - `addLinklistField`
   - `addMediaField`
   - `addMedialistField`
+  - `addMFormMediaField`
+  - `addMFormLinkField`
 - Custom-Elemente
   - `addCustomLinkField`
   - `addCustomLinkMultipleField`
   - `addImagelistField`
-  - `addInputField`
+  - `addCustomField` (eigene Feldtypen über `MForm::registerFieldType()`, ab 10.0)
 - Repeater
   - `addRepeaterElement`
   - `addFlexRepeaterElement`
@@ -88,6 +94,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `setTabIcon`
   - `setToggleOptions`
   - `setTooltipInfo`
+  - `setVisibleIf`
 
 ## Beispiele: Attribute
 

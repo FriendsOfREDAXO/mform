@@ -461,6 +461,7 @@ final class MFormOutput
      * Accepts the formats produced by REDAXO core, the mform `custom_link`
      * widget and YForm `custom_link`:
      *   - numeric article ID            → `rex_getUrl($id)`
+     *   - `redaxo://<id>[-<clang>]`     → what the custom_link widget stores, resolved via `rex_getUrl()`
      *   - `rex-article://<id>`          → resolved via `rex_getUrl()`
      *   - `rex-media://<filename>`      → resolved via `rex_url::media()`
      *   - `tel:`, `mailto:` prefixes    → returned as-is
@@ -475,7 +476,7 @@ final class MFormOutput
             return '';
         }
 
-        if (1 === preg_match('#^rex-article://(\d+)(?:-(\d+))?$#', $value, $m)) {
+        if (1 === preg_match('#^(?:rex-article|redaxo)://(\d+)(?:-(\d+))?$#', $value, $m)) {
             $clangId = isset($m[2]) ? (int) $m[2] : null;
             return null === $clangId ? \rex_getUrl((int) $m[1]) : \rex_getUrl((int) $m[1], $clangId);
         }
@@ -511,8 +512,9 @@ final class MFormOutput
 
         if (null === $text) {
             $text = '';
-            if (1 === preg_match('#^rex-article://(\d+)#', $value, $m)) {
-                $article = \rex_article::get((int) $m[1]);
+            $articleId = ctype_digit($value) ? (int) $value : (1 === preg_match('#^(?:rex-article|redaxo)://(\d+)#', $value, $m) ? (int) $m[1] : 0);
+            if ($articleId > 0) {
+                $article = \rex_article::get($articleId);
                 $text = null !== $article ? $article->getName() : '';
             }
             if ('' === $text) {

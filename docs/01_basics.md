@@ -58,7 +58,7 @@ dump(rex_var::toArray('REX_VALUE[id=1]'));
 dump(rex_var::toArray('REX_VALUE[id=2]'));
 ```
 
-## Checkbox und Radio-Elmente
+## Checkbox und Radio-Elemente
 
 Rendert `<input type="checkbox">` oder `input type="radio">`-Elemente.
 
@@ -252,9 +252,26 @@ dump(rex_var::toArray('REX_VALUE[id=2]'));
 
 ## Weitere HTML5-Elemente
 
-Erweitert MForm-Elemente um weitere HTML5-Elemente wie `type="email"`, `type="url"` oder `type="tel"`.
+Seit MForm 10 gibt es für die gängigen HTML5-Typen eigene Methoden. `min`, `max`, `step` und `pattern` kommen über die Attribute, `addRangeField()` zeigt den aktuellen Wert neben dem Regler an:
 
-### Zusätzliche Feldtypen
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+echo MForm::factory()
+    ->addNumberField(1, ['label' => 'Menge', 'min' => 1, 'max' => 99, 'step' => 1], '1')
+    ->addRangeField(2, ['label' => 'Deckkraft', 'min' => 0, 'max' => 100], '80')
+    ->addDateField(3, ['label' => 'Beginn'])
+    ->addDateTimeField(4, ['label' => 'Termin'])
+    ->addTimeField(5, ['label' => 'Uhrzeit'])
+    ->addEmailField(6, ['label' => 'E-Mail'])
+    ->addColorField(7, ['label' => 'Farbe'], '#2f77bc')
+    ->show();
+```
+
+Alle anderen Typen (`url`, `tel`, `search`, `month`, `week`, …) laufen weiter über `addInputField($type, $id, …)`.
+
+### Zusätzliche Feldtypen über `addInputField()`
 
 ```php
 <?php
@@ -279,8 +296,6 @@ echo MForm::factory() // init mform
         // input range
         ->addInputField("range", 1.7, ['label'=>'Range field with datalist'])
             ->setOptions(array(1,"-20", 30, "-30"))
-        // input datetime
-        ->addInputField("datetime", 1.8, ['label'=>'Datetime field']) // Datum und Uhrzeit (mit Zeitzone)
         // input datetime-local
         ->addInputField("datetime-local", 1.9, ['label'=>'Datetime-local field']) // Datum und Uhrzeit (ohne Zeitzone)
         // input date

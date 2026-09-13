@@ -287,8 +287,8 @@ Auflösung gespeicherter Link-Werte aus `addCustomLinkField` / `addLinkField` / 
 
 | Eingabe | Verhalten |
 |---|---|
-| `rex-article://12` | `rex_getUrl(12)` |
-| `rex-article://12-2` | `rex_getUrl(12, 2)` (mit clang) |
+| `redaxo://12` (Custom-Link-Widget) | `rex_getUrl(12)` |
+| `redaxo://12-2`, `rex-article://12-2` | `rex_getUrl(12, 2)` (mit clang) |
 | `rex-media://foo.jpg` | `rex_url::media('foo.jpg')` |
 | `tel:`, `mailto:` | unverändert |
 | `https://…` | unverändert, externer Link bekommt automatisch `target="_blank"` + `rel="noopener"` |

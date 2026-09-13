@@ -64,7 +64,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 > **Wann ist `decode()` nötig?**  
 > `decode()` ist erforderlich, sobald der Repeater einen **Online/Offline-Toggle** (`__disabled`-Flag) verwendet – es filtert deaktivierte Items automatisch heraus.  
-> Für einfache Repeater ohne Toggle-Funktion und bei der Migration bestehender Module ist `decode()` nicht zwingend erforderlich – `json_decode()` + `html_entity_decode()` reicht dort aus.
+> Für einfache Repeater ohne Toggle-Funktion reicht technisch auch `json_decode()` + `html_entity_decode()`. Sobald `data_version => 2` im Spiel ist, liegen die Items unter `['items']`; `decode()` nimmt dir das ab und ist deshalb immer der empfohlene Weg.
 
 | Methode | Verwendung |
 |---------|-----------|
@@ -246,7 +246,7 @@ Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repe
 
 ### Standardverhalten und Optionen
 
-- Repeater-Items sind standardmäßig reduziert, das erste Item bleibt geöffnet.
+- Repeater-Items sind standardmäßig geöffnet; mit `collapsed => true` starten sie reduziert, `first_open => true` lässt dann das erste Item offen.
 - Im Header jedes Items gibt es einen "Danach hinzufügen"-Button.
 - Im Header jedes Items gibt es ein Auge-Icon zum Aktivieren/Deaktivieren für die Ausgabe.
 - Ist ein Item deaktiviert, bleibt es im Backend editierbar, wird aber in der Ausgabe über `MFormRepeaterHelper::decode()` (oder alternativ `prepareItemsForOutput()`) entfernt.
@@ -325,7 +325,7 @@ $itemForm = MForm::factory()
         ->addCloseTab()
         ->addTab('itemTabs')
             ->setLabel('Erweitert')
-            ->addTextareaField('text', ['label' => 'Text'])
+            ->addTextAreaField('text', ['label' => 'Text'])
         ->addCloseTab()
     ->addCloseGroupTab();
 
@@ -338,10 +338,10 @@ Selects mit `setToggleOptions()` togglen auch im Repeater zuverlaessig. Der Rend
 
 ```php
 $itemForm = MForm::factory()
-    ->addSelectField('mode', ['label' => 'Modus'], [1 => 'Text', 2 => 'Bild'])
+    ->addSelectField('mode', [1 => 'Text', 2 => 'Bild'], ['label' => 'Modus'])
         ->setToggleOptions([1 => 'modeText', 2 => 'modeImage'])
     ->addCollapseElement('', MForm::factory()
-        ->addTextareaField('text', ['label' => 'Text'])
+        ->addTextAreaField('text', ['label' => 'Text'])
         ->show(),
         false, true, ['data-group-collapse-id' => 'modeText']
     )
@@ -376,7 +376,7 @@ $itemForm = MForm::factory()
     ->addCloseGroupColumn();
 ```
 
-> **Hinweis Bootstrap-3:** Der Repeater nutzt durchgaengig `form-horizontal` mit `col-sm-3`/`col-sm-9`-Spalten und `row` + `col-*`-Grids. Kein Flex/Grid-CSS, kein `:has()`. Die Layout-Variante des Repeaters laesst sich ueber `addRepeaterElement($id, $form, [...], ['layout' => 'horizontal'|'vertical'|'inline'])` umschalten.
+> **Hinweis Bootstrap-3:** Der Repeater nutzt durchgaengig `form-horizontal` mit `col-sm-3`/`col-sm-9`-Spalten und `row` + `col-*`-Grids. Kein Flex/Grid-CSS, kein `:has()`. Die Layout-Variante des Repeaters laesst sich ueber die Option `'layout' => 'horizontal'|'vertical'|'inline'` umschalten, z. B. `addRepeaterElement($id, $form, true, true, ['layout' => 'vertical'])`.
 
 ---
 
@@ -485,12 +485,15 @@ echo $mform->show();
 
 | Option | Typ | Standard | Beschreibung |
 |--------|-----|---------|--------------|
-| `label` | string | `''` | Bezeichnung über dem Repeater |
-| `btn_text` | string | `'Add'` | Text des Hinzufügen-Buttons |
+| `label` | string | `''` | Bezeichnung in der Kopfzeile (mit Zähler der Einträge) |
+| `btn_text` | string | `'Hinzufügen'` | Text des Hinzufügen-Buttons (Standard aus der Sprachdatei) |
+| `btn_class` | string | `'btn-primary'` | Klasse des Hinzufügen-Buttons in der Kopfzeile |
 | `collapsed` | bool | `false` | Items initial zugeklappt |
 | `first_open` | bool | `false` | Erstes Item trotz `collapsed` offen |
-| `show_toggle_all` | bool | `true` | „Alle auf/zu"-Button in Toolbar |
-| `show_add_button` | bool | `true` | Toolbar-„Hinzufügen" oben und unten; `false` = nur ein Button oben, nur solange der Repeater leer ist |
+| `show_toggle_all` | bool | `true` | „Alle auf/zu"-Button in der Kopfzeile |
+| `show_add_button` | bool | `true` | „Hinzufügen" in der Kopfzeile und als Streifen unter der Liste; `false` = nur der Streifen, nur solange der Repeater leer ist |
+| `default_count` | int | `0` | Anzahl Items, die ein leerer Repeater beim Laden anlegt |
+| `layout` | string | `'horizontal'` | `horizontal` (Label links), `vertical` (gestapelt) oder `inline` (kompakt) |
 | `min` | int | `0` | Mindestanzahl Items |
 | `max` | int | `0` | Maximalanzahl Items (0 = unbegrenzt) |
 | `confirm_delete` | bool | `true` | Loeschen mit Bestaetigung |
@@ -533,22 +536,11 @@ Details zu `MFormRepeaterItem` in der [MFormOutput-Doku](15_mform_output.md#typi
 | **Drag & Drop** | SortableJS (im Addon mitgeliefert) | Eigene Sortable-Implementierung (im Addon mitgeliefert) |
 | **Wartbarkeit** | Hoch – PHP-Rendering klar getrennt von JS | Niedrig – JS muss HTML-Struktur kennen und selbst erzeugen |
 | **Block-Typen** | Eine Struktur pro Repeater-Instanz | Mehrere Block-Typen pro Instanz möglich |
-| **MBlock-Migration** | ✅ Migrationsleitfaden vorhanden | – |
+| **Migration** | ✅ Assistent „MBlock zu Repeater“ und `mform:migrate` | – |
 | **Template-API** | ✅ `MForm::registerTemplate()` für projektweite Vorlagen | – |
 | **Frontend-Ausgabe** | `MFormRepeaterHelper` mit `decode()`, `filterByField()`, `sortByField()`, `groupByField()`, `limitItems()` | `MBlock::filterByField()`, `sortByField()`, `groupByField()`, `limitItems()` – MForm hat diese API von MBlock übernommen und in `MFormRepeaterHelper` integriert |
 
-### Wann MForm Flex-Repeater bevorzugen
-
-- Neue Module – der Flex-Repeater ist der empfohlene Standard
-- Verschachtelte Repeater (Repeater im Repeater)
-- TinyMCE oder MarkdownEditor in Repeater-Zeilen
-- Kein jQuery im Projekt gewünscht
-- Wartbarkeit und langfristige Pflege wichtig
-
-### Wann MBlock behalten
-
-- Bestehende Module mit mehreren **verschiedenen Block-Typen** pro Instanz (das einzige MBlock-Feature ohne direktes Äquivalent im Flex-Repeater)
-- Wenn keine Migration gewünscht ist
+Seit MForm 10 wird MBlock nicht mehr unterstützt. Das einzige MBlock-Feature ohne direktes Äquivalent sind mehrere **verschiedene Block-Typen** pro Instanz; dafür bieten sich ein Select im Item plus `setVisibleIf()` oder `addConditionalFieldsetArea()` an.
 
 > Migration von bestehenden MBlock-Modulen: siehe [08_mblock_migration.md](08_mblock_migration.md).
 

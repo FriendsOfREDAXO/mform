@@ -1,6 +1,6 @@
 # MForm API-Referenz
 
-Vollständige Referenz aller öffentlichen Klassen, Methoden und Felder von MForm v9.
+Referenz der öffentlichen Klassen, Methoden und Felder von MForm 10. Die Ausgabeklasse `MFormOutput` hat ein eigenes Kapitel: [MFormOutput](15_mform_output.md).
 
 ---
 
@@ -247,7 +247,7 @@ Modal-Dialog. Felder innerhalb des Modals werden zusammen mit dem Haupt-Formular
 |-----------|-----|----------|--------------|
 | `$label` | `string` | `''` | Button-Label und Modal-Titel |
 | `$btnClass` | `string` | `'btn-default'` | CSS-Klasse(n) für den Trigger-Button |
-| `$align` | `string` | `'left'` | Ausrichtung: `'left'` \| `'right'` |
+| `$align` | `string` | `'left'` | Ausrichtung: `'left'` \| `'center'` \| `'right'` |
 
 ---
 
@@ -269,7 +269,7 @@ Fieldset, das per JavaScript ein- oder ausgeblendet wird, basierend auf dem Wert
 | Parameter | Typ | Beschreibung |
 |-----------|-----|--------------|
 | `$sourceField` | `float\|int\|string` | Feld-ID des steuernden Feldes |
-| `$operator` | `string` | Vergleichsoperator: `=`, `!=`, `>`, `<`, `>=`, `<=` |
+| `$operator` | `string` | Vergleichsoperator: `=`/`==`, `!=`, `>`, `<`, `contains`, `in` (kommagetrennt), `empty`, `!empty` |
 | `$compareValue` | `string` | Vergleichswert |
 | `$action` | `string` | `'show'` oder `'hide'` |
 
@@ -564,7 +564,7 @@ MForm-eigener Link-Wrapper auf Basis von custom_link (interne Links fokussiert).
 ```php
 addMFormMediaField(float|int|string $id, ?array $parameter = null, mixed $catId = null, ?array $attributes = null): MForm
 ```
-MForm-eigener Media-Wrapper auf Basis von custom_link (Datei-Fokus, kein Reindex-Problem in MBlock).
+MForm-eigener Media-Wrapper auf Basis von custom_link (Datei-Fokus, speichert in `REX_VALUE`).
 
 ---
 
@@ -573,7 +573,7 @@ MForm-eigener Media-Wrapper auf Basis von custom_link (Datei-Fokus, kein Reindex
 ```php
 addRepeaterElement(float|int|string $id, MForm $form, bool $open = true, bool $confirmDelete = true, array $attributes = [], bool $debug = false, bool $showWrapper = false): MForm
 ```
-Flex-Repeater (Legacy-API, intern identisch mit `addFlexRepeaterElement`).
+Flex-Repeater (Kurzform, intern identisch mit `addFlexRepeaterElement`).
 
 | Parameter | Typ | Standard | Beschreibung |
 |-----------|-----|----------|--------------|
@@ -587,12 +587,12 @@ Unterstützte `$attributes` (Repeater-Optionen):
 
 | Schlüssel | Typ | Beschreibung |
 |-----------|-----|--------------|
-| `min` | `int` | Mindestanzahl Items |
-| `max` | `int` | Maximalanzahl Items |
-| `default_count` | `int` | Anfangs-Items bei leerem Wert |
-| `btn_text` | `string` | Text des "Item hinzufügen"-Buttons |
-| `btn_class` | `string` | CSS-Klasse des Add-Buttons |
+| `label`, `btn_text`, `btn_class` | `string` | Beschriftung, Text und Klasse des Hinzufügen-Buttons |
+| `min`, `max`, `default_count` | `int` | Mindest-, Maximal- und Startanzahl der Items |
+| `collapsed`, `first_open`, `show_toggle_all`, `show_add_button`, `copy_paste`, `open` | `bool` | Bedienung, siehe [Repeater-Optionen](07_repeater.md#vollständige-optionsübersicht) |
 | `confirm_delete_msg` | `string` | Angepasste Lösch-Bestätigungsmeldung |
+| `layout` | `string` | `horizontal`, `vertical` oder `inline` |
+| `data_version` | `int` | `1` Liste (Standard) oder `2` Umschlag mit Versionsmarker |
 
 ---
 
@@ -1238,8 +1238,8 @@ $mform->addTabElement('Einstellungen', function() use ($config) {
     ], ['label' => 'Layout']);
 
     $repeaterForm = MForm::factory();
-    $repeaterForm->addTextField('1.title', ['label' => 'Titel']);
-    $repeaterForm->addCustomLinkField('1.link', ['label' => 'Link']);
+    $repeaterForm->addTextField('title', ['label' => 'Titel']);
+    $repeaterForm->addCustomLinkField('link', ['label' => 'Link']);
     $form->addRepeaterElement(5, $repeaterForm, true, true, [
         'max' => $config['max_items'],
         'btn_text' => 'Element hinzufügen',

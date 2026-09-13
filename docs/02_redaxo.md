@@ -41,9 +41,7 @@ MForm stellt Widgets fuer Medien und Links in mehreren REDAXO-Kontexten bereit:
 > Diese bieten ein modernes Listen-UI mit Drag-and-Drop-Sortierung und sind voll repeater-kompatibel.
 > Das Speicherformat bleibt identisch zum nativen REDAXO-Format.
 >
-> **MBlock-Praxis:** Die klassischen REDAXO-Varianten von `linklist`/`medialist` waren im MBlock-Kontext historisch nie stabil.
-> Wenn du die Funktion in MBlock brauchst, sollten die MForm-Custom-Widgets verwendet werden.
-> Bonus mit MForm 9+: `MForm::useCustomLinkForClassicWidgets(true)` kann auch klassische Felder intern auf die stabileren MForm-Widgets legen.
+> `MForm::useCustomLinkForClassicWidgets(true)` lässt `addMediaField()` / `addLinkField()` intern das Custom-Link-Widget rendern; das Speicherformat (`REX_MEDIA_n` / `REX_LINK_n`) bleibt gleich.
 
 ## Modul-Eingabe
 
@@ -236,7 +234,7 @@ Gegenüber `addMediaField()` (Core-Widget) bietet es:
 
 - Typ-Einschränkung per `types`-Parameter
 - optionaler Vorschau-Button für Bild- und Videodateien
-- vollständige MBlock/Repeater-Kompatibilität (korrektes Reindex und Clone-Reset)
+- volle Repeater-Kompatibilität
 
 ```php
 ->addMFormMediaField("$id.0.image", [
@@ -286,25 +284,18 @@ $url = MFormOutputHelper::getCustomUrl('REX_VALUE[id=1]');
 - YForm: nur die vorhandenen Value-Types einsetzen.
 - `REX_VAR`: weiter unterstuetzt, aber primaer fuer modulnahe REDAXO-Syntax gedacht.
 
-## Key-Konventionen fuer MBlock und Repeater
+## Key-Konventionen im Repeater
 
-Media- und Link-Felder verhalten sich in MBlock und im Flex-Repeater **unterschiedlich**, je nachdem ob eine numerische oder String-basierte ID verwendet wird.
+Im Flex-Repeater landen alle Werte in einem JSON-Objekt. Die ID eines Feldes ist direkt der Schlüssel im `$item`-Array, ein `REX_MEDIA_n`-Konzept gibt es dort nicht.
 
-| Kontext | Methode | ID-Typ | Ausgabe-Schlüssel im `$item`-Array |
-|---------|---------|--------|-------------------------------------|
-| MBlock | `addMediaField(1)` | numerisch (Pflicht!) | `$item['REX_MEDIA_1']` |
-| MBlock | `addLinkField(2)` | numerisch (Pflicht!) | `$item['REX_LINK_2']` |
-| MBlock | `addMedialistField(3)` | numerisch (Pflicht!) | `$item['REX_MEDIALIST_3']` |
-| MBlock | `addLinklistField(4)` | numerisch (Pflicht!) | `$item['REX_LINKLIST_4']` |
-| MBlock | `addCustomLinkField("$id.0.link")` | String-Pfad (empfohlen) | `$item['link']` |
-| MBlock | `addMFormMediaField("$id.0.bild")` | String-Pfad (empfohlen) | `$item['bild']` |
-| Repeater | `addMediaField("bild")` | String (Pflicht!) | `$item['bild']` |
-| Repeater | `addLinkField("link")` | String (Pflicht!) | `$item['link']` |
-| Repeater | `addCustomLinkField("link")` | String (empfohlen) | `$item['link']` |
+| Methode | ID-Typ | Ausgabe-Schlüssel im `$item`-Array |
+|---------|--------|-------------------------------------|
+| `addMediaField("bild")` | String (Pflicht) | `$item['bild']` |
+| `addLinkField("link")` | String (Pflicht) | `$item['link']` |
+| `addCustomLinkField("link")` | String (empfohlen) | `$item['link']` |
+| `addMFormMediaField("bild")` | String (empfohlen) | `$item['bild']` |
 
-> **Wichtig:** `addMediaField()` und `addLinkField()` im **MBlock**-Kontext erfordern eine **numerische** ID.
-> MBlock leitet daraus intern den REDAXO-Variablenname `REX_MEDIA_n` oder `REX_LINK_n` ab.
-> Im **Flex-Repeater**-Kontext gibt es kein `REX_MEDIA_n`-Konzept – hier muss die ID ein lesbarer **String-Key** sein, der direkt als JSON-Schlüssel verwendet wird.
+> Numerische IDs ergeben Schlüssel wie `$item['1']`. Wer aus MBlock kommt (dort waren `REX_MEDIA_1` & Co. üblich), findet die Umbenennung im [Migrationskapitel](08_mblock_migration.md).
 
 ## Verweise auf die Detaildokumentation
 

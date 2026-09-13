@@ -1,31 +1,47 @@
-# MForm 9 – Was ist neu?
+# MForm 10 – Was ist neu?
 
-MForm 9 ist ein umfassendes Upgrade mit neuen Feldern, einem vollständig neuen Repeater-System und einer verbesserten Link-API. Diese Seite gibt einen Überblick und verweist auf die jeweiligen Details.
+MForm 10 setzt PHP 8.4 voraus, lässt MBlock hinter sich und bringt den Flex-Repeater, den Form Builder und die Widgets auf einen gemeinsamen Stand. Diese Seite fasst zusammen, was sich gegenüber 9.5 ändert, und verweist auf die Details. Die Historie von MForm 9 steht weiter unten.
+
+## Voraussetzungen und Umstieg
+
+- **PHP 8.4** ist Pflicht. Der Parser arbeitet mit `\Dom\HTMLDocument`, die libxml-Umwege sind weg.
+- **MBlock wird nicht mehr unterstützt.** Module mit `MBlock::show()` laufen technisch weiter, werden aber nicht mehr getestet. Der Weg ist der Flex-Repeater: [Migration von MBlock](08_mblock_migration.md) beschreibt Assistent, Konsole und die manuelle Migration.
+- Die stabile Linie 9.5.x wird im Branch `9.x` gepflegt. Gespeicherte Werte bleiben lesbar; das neue Repeater-Speicherformat ist Opt-in.
+
+## Repeater
+
+- **Bedienung:** Kopfzeile mit Label, Zähler und Aktionen, „Hinzufügen“ als durchgehender Streifen unter der Liste, auch in verschachtelten Repeatern. Details: [Repeater](07_repeater.md#standardverhalten-und-optionen).
+- **Speicherformat mit Version:** `'data_version' => 2` schreibt einen Umschlag `{"__v":2,"items":[...]}`, Standard bleibt die reine Liste, alle Ausgabehelfer lesen beide Formate. Details: [Repeater](07_repeater.md#speicherformat-und-version-ab-100).
+- **Typisierte Items:** `MFormOutput::from(1)->items()` liefert `MFormRepeaterItem`-Objekte mit `media()`, `article()`, `dataset()`, `url()` und `items()` für verschachtelte Repeater. Details: [MFormOutput](15_mform_output.md#typisierte-items).
+- **Gemeinsame Renderpfade:** Wrapper und Feldzeilen kommen im klassischen Formular und im Repeater aus denselben Theme-Fragmenten (`mform_wrapper.php`, `mform_default.php`). Details: [Templates](09_templates.md#wrapper-fragment-ab-100).
+
+## Felder
+
+- **HTML5-Felder:** `addNumberField()`, `addRangeField()` (mit Live-Wert), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Details: [Grundlagen](01_basics.md#weitere-html5-elemente).
+- **Eigene Feldtypen:** `MForm::registerFieldType($type, $renderer)` registriert Typen aus Fremd-Addons, `addCustomField()` setzt sie ins Formular, derselbe Renderer läuft im Formular und im Repeater. Details: [API-Referenz](13_api_reference.md#eigene-feldtypen-registry-ab-100).
+- **Barrierefreiheits-Prüfung für Medien-Felder:** Option `a11y` prüft ALT-Text und weitere Metainfo-Felder gegen den Medienpool und zeigt Befunde direkt unter dem Widget; global und je Feld abschaltbar, optional als Standardprüfung. Details: [Barrierefreiheit](16_a11y.md).
+
+## Widgets und Integrationen
+
+- **Linkmap:** Mit installiertem [Linkmap](https://github.com/FriendsOfREDAXO/linkmap) öffnen Custom-Link, Link- und Linklist-Felder das Overlay, `ylink`-Datensätze kommen aus dem Linkmap-Picker. Details: [Custom-Link-Widget](03_customlink.md#linkmap-integration-ab-100).
+- **Ein Design für alle Widgets:** gemeinsame Tokens in `assets/css/mform-tokens.css`, Light und Dark, abgestimmt auf Linkmap und MediaPlace, Felder eckig wie im Backend. Details: [Templates](09_templates.md#design-tokens-ab-100).
+
+## Form Builder
+
+- Vollständige Palette: Collapse, Accordion, Column, Inline, Radio Image/Icon/Color, Text/Textarea (readonly) neben Tab, Fieldset, Modal und Repeater; Medien-Felder mit A11y-Checkbox.
+- Export und Import des Builder-Stands als JSON (`mform-builder.json`).
+- Live-Vorschau unter dem Ausgabecode: das Formular wird über die MForm-Engine gerendert, im Backend-Theme, automatisch nach jeder Änderung.
+
+## Werkzeuge
+
+- **Migrationsassistent „MBlock zu Repeater“** in sechs Schritten (Inventar, Code, Modul-Kopie, Daten mit Backup und Rollback, Slices umhängen, YForm-Felder), auf der Konsole `mform:migrate`.
+- **Linter** `mform:lint` findet MBlock-Reste, numerische Widget-Ids und Präfix-Feldnamen in Repeater-Formularen.
+- **Einstellungen:** neue Backend-Seite für die A11y-Prüfung.
+- **Test-Suite:** PHPUnit (`unit` ohne REDAXO, `redaxo` gegen eine Installation, Render-Snapshots für beide Pfade) und ein Playwright-Smoke-Test, alles in CI.
 
 ---
 
-## Update 10.0: Barrierefreiheits-Prüfung für Medien-Felder
-
-- Medien-Felder bekommen mit der Option `a11y` eine Laufzeit-Prüfung gegen den Medienpool: `['a11y' => ['med_alt']]` meldet direkt unter dem Widget, wenn der ALT-Text fehlt, mit Link zum Bearbeiten. Jedes `med_*`-Metainfo-Feld ist prüfbar, eigene Meldung je Feld, `strict` blockiert das Speichern.
-- Berücksichtigt „dekorativ, kein ALT nötig“ (MediaPlace oder `med_alt_decorative`), mehrsprachige Felder aus metainfo_lang_fields je Online-Sprache und eigene MediaPlace-Metadaten (`mediaplace:<key>`).
-- Keine Änderung an gespeicherten Daten. Details: [Barrierefreiheit: Medien-Metadaten](16_a11y.md).
-
-## Update 10.0: Form Builder
-
-- Alle Wrapper in der Palette: Collapse, Accordion, Column, Inline neben Tab, Fieldset, Modal und Repeater; dazu Radio Image/Icon/Color und Text/Textarea (readonly). Medien-Felder bringen die A11y-Prüfung per Checkbox mit.
-- Export und Import des Builder-Stands als JSON (`mform-builder.json` mit `mformBuilderVersion`), z. B. für Git oder zum Teilen.
-- Live-Vorschau unter dem Eingabe-Code: das Formular wird gerendert, wie es im Modul aussieht, im Backend-Theme, automatisch nach jeder Änderung.
-
-## Update 10.0: Linkmap-Overlay für Link-Felder
-
-- Mit installiertem [Linkmap](https://github.com/FriendsOfREDAXO/linkmap) öffnen Custom-Link, Link- und Linklist-Felder das Overlay; `ylink`-Datensätze kommen aus dem Linkmap-Picker. Details: [Custom-Link-Widget](03_customlink.md#linkmap-integration-ab-100).
-
-## Update 10.0: Typisierte Repeater-Items und Versionsmarker
-
-- `MFormOutput::from(1)->items()` liefert `MFormRepeaterItem`-Objekte mit `media()`, `article()`, `dataset()`, `url()`, `items()` für verschachtelte Repeater.
-- Optionales Speicherformat mit Versionsmarker (`'data_version' => 2`), alle Ausgabehelfer lesen beide Formate. Details: [Repeater](07_repeater.md#speicherformat-und-version-ab-100), [MFormOutput](15_mform_output.md#typisierte-items).
-
----
+# Historie: MForm 9
 
 ## Update 9.4.0: MediaPlace-Unterstützung für Medien-Widgets
 
@@ -235,13 +251,9 @@ Hinweis: Die jeweilige Editor-Initialisierung erfolgt weiterhin durch das entspr
 
 ---
 
-## MBlock-Kompatibilität
+## MBlock-Kompatibilität (bis MForm 9)
 
-MForm 9 ist vollständig rückwärtskompatibel mit bestehenden MBlock-Modulen. Für eine schrittweise Migration gibt es einen dedizierten Leitfaden.
-
-Praxis-Hinweis: Die klassischen `linklist`/`medialist`-Widgets waren im MBlock-Kontext historisch nie stabil. Wenn diese Funktion benötigt wird, sollten die MForm-Custom-Widgets genutzt werden. Bonus in MForm 9+: `MForm::useCustomLinkForClassicWidgets(true)` schaltet auch klassische Link-/Media-Felder intern auf die robusteren MForm-Widgets um (Speicherformat bleibt kompatibel).
-
-→ [08_mblock_migration.md](08_mblock_migration.md)
+MForm 9 war mit bestehenden MBlock-Modulen kompatibel. Seit MForm 10 wird MBlock nicht mehr unterstützt, siehe oben und [08_mblock_migration.md](08_mblock_migration.md).
 
 ---
 
@@ -249,18 +261,19 @@ Praxis-Hinweis: Die klassischen `linklist`/`medialist`-Widgets waren im MBlock-K
 
 | Datei | Inhalt |
 |-------|--------|
-| [01_basics.md](01_basics.md) | Grundlagen, Text- und Eingabefelder |
+| [01_basics.md](01_basics.md) | Grundlagen, Text- und Eingabefelder, HTML5-Felder |
 | [02_redaxo.md](02_redaxo.md) | Media- & Link-Elemente, REX_VALUE-Keys |
-| [03_customlink.md](03_customlink.md) | Custom-Link-Widget, Mehrfach-Links, Ausgabe-API |
-| [04_imagelist.md](04_imagelist.md) | Bildlisten-Feld |
-| [05_wrapper.md](05_wrapper.md) | Fieldset, Tabs, Accordion, Columns, Modal |
-| [06_advanced.md](06_advanced.md) | Neue Feldtypen, ConditionalFieldset, RadioImg |
-| [07_repeater.md](07_repeater.md) | Repeater, FlexRepeater, Frontend-Hilfsmethoden |
-| [08_mblock_migration.md](08_mblock_migration.md) | Migration von MBlock-Modulen |
-| [09_templates.md](09_templates.md) | Fragment-Templates, Custom-Templates |
+| [03_customlink.md](03_customlink.md) | Custom-Link-Widget, Mehrfach-Links, Ausgabe-API, Linkmap |
+| [04_imagelist.md](04_imagelist.md) | Bildliste, Medialist, Linklist |
+| [05_wrapper.md](05_wrapper.md) | Fieldset, Collapse, Accordion, Tabs, Columns, Inline, Modal |
+| [06_advanced.md](06_advanced.md) | Attribute, Optionen, ConditionalFieldset, visible_if, RadioImg, ColorSwatch, Templates |
+| [07_repeater.md](07_repeater.md) | Flex-Repeater, Optionen, Speicherformat, Frontend-Hilfsmethoden |
+| [08_mblock_migration.md](08_mblock_migration.md) | Migration von MBlock: Assistent, Konsole, manuell |
+| [09_templates.md](09_templates.md) | Template-API, Design-Tokens, Wrapper-Fragment |
 | [10_outside_modules.md](10_outside_modules.md) | MForm außerhalb von Modulen verwenden |
 | [11_tutorial_modul.md](11_tutorial_modul.md) | Komplettes Modul-Tutorial |
 | [12_checkbox_group.md](12_checkbox_group.md) | CheckboxGroup-Widget inkl. Radio-Mode |
-| [13_api_reference.md](13_api_reference.md) | Vollständige API-Referenz öffentlicher Klassen und Methoden |
+| [13_api_reference.md](13_api_reference.md) | API-Referenz öffentlicher Klassen und Methoden |
 | [14_fragments_output.md](14_fragments_output.md) | Ausgabe über REDAXO-Fragmente und mfragment-Komponenten |
-| [06_advanced.md](06_advanced.md) | ColorSwatch-Feld, RadioColorField, RadioImgField, ConditionalFieldset |
+| [15_mform_output.md](15_mform_output.md) | MFormOutput: fluente Ausgabe, typisierte Items |
+| [16_a11y.md](16_a11y.md) | Barrierefreiheit: Metadaten-Prüfung für Medien |

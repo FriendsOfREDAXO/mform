@@ -189,14 +189,15 @@ Dazu wird das Formular für **einen Block** zuerst als Vorlage gebaut (`$rowForm
 use FriendsOfRedaxo\MForm;
 
 // Vorlage für einen einzigen Block (Bild links, Titel + Text rechts).
-// addColumnElement(6, ...) teilt die Zeile in zwei gleichbreite Spalten auf (Bootstrap-Prinzip).
+// Jedes addColumnElement(6, ...) ist eine Spalte mit 6 von 12 Einheiten (Bootstrap-Prinzip),
+// aufeinanderfolgende Spalten fasst MForm automatisch zu einer Zeile zusammen.
 $rowForm = MForm::factory()
-    ->addColumnElement(6,
-        MForm::factory()
-            ->addMediaField('image', ['label' => 'Bild']),
-        MForm::factory()
-            ->addTextField('title', ['label' => 'Titel'])
-            ->addTextAreaField('text', ['label' => 'Inhalt', 'class' => 'tiny-editor', 'data-profile' => 'default'])
+    ->addColumnElement(6, MForm::factory()
+        ->addMediaField('image', ['label' => 'Bild'])
+    )
+    ->addColumnElement(6, MForm::factory()
+        ->addTextField('title', ['label' => 'Titel'])
+        ->addTextAreaField('text', ['label' => 'Inhalt', 'class' => 'tiny-editor', 'data-profile' => 'default'])
     );
 
 echo MForm::factory()
