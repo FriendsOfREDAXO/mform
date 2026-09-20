@@ -1,5 +1,15 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.0-dev
+
+### Behoben
+
+- **`addCustomLinkMultipleField()` im Repeater, externer Link ließ sich nicht abschalten** (#459): Der Flex-Repeater gab `data-extern` als `extern` an das Multi-Widget weiter, das innere Link-Widget kennt aber nur `external`. Der Button für externe Links blieb deshalb trotz `'data-extern' => 'disable'` sichtbar; im klassischen Formular war das nicht betroffen. Der Repeater reicht jetzt `external` durch, `rex_var_custom_link_multi` nimmt `extern` weiter als Alias an (auch in `REX_CUSTOM_LINK_MULTI[... extern=0]`). `CustomLinkMultiTypesTest` deckt Repeater, klassisches Formular und Alias ab.
+
+## Version 10.0.0-rc.4
+
+**Release Candidate, noch nicht für Produktion.** Vierter Release Candidate von MForm 10 (19.09.2026), erster öffentlicher. Inhaltlich identisch mit rc.3, nur die Versionsnummer.
+
 ## Version 10.0.0-rc.3
 
 **Release Candidate, noch nicht für Produktion.** Dritter Release Candidate von MForm 10 (14.09.2026), eine Fehlerbehebung. Update von rc.2 ohne Datenänderung.

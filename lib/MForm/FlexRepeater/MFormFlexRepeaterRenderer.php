@@ -1035,7 +1035,7 @@ class MFormFlexRepeaterRenderer
 
         $map = [
             'intern' => ['intern', 'data-intern'],
-            'extern' => ['extern', 'external', 'data-extern'],
+            'external' => ['external', 'extern', 'data-extern'],
             'media' => ['media', 'data-media'],
             'mailto' => ['mailto', 'data-mailto'],
             'phone' => ['phone', 'data-tel'],
