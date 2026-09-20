@@ -1,0 +1,32 @@
+name: Idee oder Wunsch
+description: Neue Funktion oder Verbesserung vorschlagen
+labels: ["enhancement"]
+body:
+  - type: input
+    id: mform_version
+    attributes:
+      label: MForm-Version
+      description: Auf welche Version bezieht sich der Vorschlag?
+      placeholder: z. B. 10.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Was fehlt oder stört?
+      description: Der Anwendungsfall hilft mehr als die fertige Lösung.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Vorschlag
+      description: Wie könnte es aussehen? Gern mit Code-Beispiel für die gewünschte API.
+    validations:
+      required: false
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Mitarbeit
+      options:
+        - label: Ich würde das selbst als Pull Request umsetzen.

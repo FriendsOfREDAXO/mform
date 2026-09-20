@@ -6,9 +6,9 @@ Sicherheitsupdates erhalten ausschließlich die folgenden Versionsstränge:
 
 | Version  | Unterstützt        |
 | -------- | ------------------ |
-| 9.0.x    | :white_check_mark: |
-| 8.x      | :white_check_mark: (nur kritische Fixes) |
-| < 8.0    | :x:                |
+| 10.x     | :white_check_mark: |
+| 9.5.x    | :white_check_mark: (Branch `9.x`, nur Fehlerbehebungen) |
+| < 9.5    | :x:                |
 
 ## Sicherheitslücke melden
 

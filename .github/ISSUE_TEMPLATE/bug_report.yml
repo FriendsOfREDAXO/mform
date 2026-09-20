@@ -1,0 +1,82 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für die Meldung! Bitte die Versionen angeben, ohne sie lässt sich ein Fehler meist nicht nachvollziehen.
+        Die MForm-Version steht im Backend unter **AddOns** oder in der `package.yml` des Addons.
+  - type: input
+    id: mform_version
+    attributes:
+      label: MForm-Version
+      description: Genaue Version, nicht „aktuell“ oder „latest“.
+      placeholder: z. B. 10.0.0 oder 9.5.2
+    validations:
+      required: true
+  - type: input
+    id: redaxo_version
+    attributes:
+      label: REDAXO-Version
+      placeholder: z. B. 5.20.1
+    validations:
+      required: true
+  - type: input
+    id: php_version
+    attributes:
+      label: PHP-Version
+      placeholder: z. B. 8.4.12
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Bereich
+      multiple: true
+      options:
+        - Klassisches Modul-Formular
+        - Flex-Repeater
+        - Custom-Link / Link-Widgets
+        - Medien-Widgets / Imagelist
+        - Wrapper (Tabs, Collapse, Spalten, Modal)
+        - Bedingungen (setVisibleIf)
+        - Form Builder
+        - Ausgabe (MFormOutput / Helper)
+        - YForm-Felder
+        - MBlock-Migration
+        - Doku
+        - Sonstiges
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Was passiert, was sollte passieren?
+      description: Kurz beschreiben, gern mit Screenshot. Fehlermeldungen aus dem REDAXO-Systemlog oder der Browser-Konsole helfen.
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Modul-Eingabe (Code)
+      description: Möglichst kleines Beispiel, mit dem sich der Fehler nachstellen lässt.
+      render: php
+    validations:
+      required: false
+  - type: input
+    id: addons
+    attributes:
+      label: Beteiligte Addons mit Version
+      description: Falls relevant, z. B. MBlock, YForm, MediaPlace, Linkmap, TinyMCE, CKEditor 5.
+      placeholder: z. B. yform 5.0.2, mediaplace 2.1.0
+    validations:
+      required: false
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Nur bei Problemen in der Oberfläche.
+      placeholder: z. B. Firefox 143, Safari 26
+    validations:
+      required: false

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Fragen zur Verwendung
+    url: https://www.redaxo.org/slack/
+    about: Für Fragen zum Einsatz von MForm ist der REDAXO-Slack meist der schnellere Weg.
+  - name: Sicherheitslücke melden
+    url: https://github.com/FriendsOfREDAXO/mform/security/policy
+    about: Bitte nicht als öffentliches Issue, siehe SECURITY.md.
