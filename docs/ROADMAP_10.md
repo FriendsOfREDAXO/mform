@@ -1,13 +1,13 @@
 # MForm 10 – Plan
 
-Stand: 13.09.2026, Basis 9.5.0. Dieser Plan ist die Arbeitsgrundlage für MForm 10 auf `main`. Die Checkliste mit erledigten und gestrichenen Punkten steht im Tracking-Issue #448.
+Stand: 20.09.2026, MForm 10.0.0 ist veröffentlicht. Dieser Plan war die Arbeitsgrundlage für MForm 10 auf `main` (Basis 9.5.0). Die Checkliste mit erledigten und gestrichenen Punkten steht im Tracking-Issue #448.
 
 ## 1. Rahmen
 
 | Thema | Entscheidung |
 |---|---|
 | Branches | `main` = MForm 10 (seit 11.09.2026, vorher Branch `10.x`). `9.x` = Wartung für 9.5.x (nur Bugfixes, keine neuen Optionen). |
-| Version | `package.yml` auf `10.0.0-dev`, Releases als `10.0.0-beta.1` … `10.0.0`. Tags ohne „v“. |
+| Version | 10.0.0 ist seit 20.09.2026 final. Tags ohne „v“. |
 | PHP | Mindestversion `>=8.4` (bisher 8.0), damit `\Dom\HTMLDocument` ohne Fallback-Pfad eingesetzt wird. REDAXO `^5.17` bleibt. Wer PHP < 8.4 hat, bleibt auf 9.x. |
 | Kompatibilität | Keine Breaking Changes an der MForm-API: alle `add*()`-Signaturen, gespeicherten Datenformate, Templates und Fragmente bleiben. Einzige Ausnahme ist MBlock (siehe 2). |
 | Qualität | Jeder PR läuft gegen rexstan, php-cs-fixer und die neue Test-Suite (siehe 5.7). |
@@ -124,12 +124,12 @@ PHPUnit für Parser, Flex-Repeater-Renderer, Konverter und Migrator. Golden-HTML
 | 10.0.0-rc.2 (veröffentlicht 13.09.2026) | Repeater: Überschrift je Eintrag (`item_title`) und einleitender Text (`description`). |
 | 10.0.0-rc.3 (veröffentlicht 14.09.2026) | Fehlerbehebung: Klassen (`active`, `in`, Zeilenklasse) stapelten sich bei wiederholtem `show()`. |
 | 10.0.0-rc.4 (veröffentlicht 19.09.2026) | Erster öffentlicher Release Candidate, inhaltlich rc.3. Danach behoben: externer Link im `addCustomLinkMultipleField()` des Repeaters nicht abschaltbar (#459). |
-| 10.0.0 | Stabilisierung. Der Umstieg 9 → 10 ist eine Checkliste in `docs/00_whats_new.md`, keine Datenmigration. |
-| 10.1 | Noch nichts geplant. Undo/Redo im Builder (#411) und weitere Felder (#412) sind gestrichen; eigene Feldtypen laufen über die Field-Type-Registry. |
+| 10.0.0 (veröffentlicht 20.09.2026) | Finales Release, für den produktiven Einsatz freigegeben. Hinweise auf den Vorabstatus entfernt; MBlock wird nicht mehr aktiv getestet, sollte aber weiter funktionieren, empfohlen ist der Flex-Repeater. Der Umstieg 9 → 10 ist eine Checkliste in `docs/00_whats_new.md`, keine Datenmigration. |
+| 10.1 | Builder-Palette für registrierte Feldtypen (#458) als Kandidat. Undo/Redo im Builder (#411) und weitere Felder (#412) sind gestrichen; eigene Feldtypen laufen über die Field-Type-Registry. |
 
 ## 7. Regeln für Beiträge auf `main` (MForm 10)
 
 1. Kein PR ändert Signaturen bestehender `add*()`-Methoden oder gespeicherte Datenformate.
 2. Neues Verhalten kommt über neue Optionen mit sicherem Standard.
-3. Jeder PR referenziert ein Issue und ergänzt CHANGELOG (Abschnitt „10.0.0-dev“) und Doku.
+3. Jeder PR referenziert ein Issue und ergänzt CHANGELOG (Abschnitt der nächsten Version) und Doku.
 4. Migrationswerkzeuge ändern Daten nur nach Dry-Run und mit Backup.

@@ -1,6 +1,6 @@
 # Migration von MBlock
 
-MForm 10 unterstützt MBlock nicht mehr. Bestehende Module mit `MBlock::show($id, $mform->show())` laufen technisch weiter, weil MForm nur HTML liefert, sie werden aber nicht mehr getestet und in Issues nicht mehr supportet. Der Weg nach vorn ist der MForm-Repeater. Diese Seite beschreibt den Migrationsassistenten und die manuelle Migration.
+Für wiederholbare Inhalte empfehlen wir den Flex-Repeater. MBlock wird in MForm 10 nicht mehr aktiv getestet und bei der Weiterentwicklung nicht mehr berücksichtigt. Bestehende Module mit `MBlock::show($id, $mform->show())` sollten weiter funktionieren, weil MForm nur HTML liefert; umstellen kann man, wann es passt. Diese Seite beschreibt den Migrationsassistenten und die manuelle Migration.
 
 1. Migrationsassistent (Backend und Konsole)
 2. Manuelle Migration auf den MForm-Repeater

@@ -1,6 +1,14 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
-## Version 10.0.0-dev
+## Version 10.0.0
+
+MForm 10 ist final (20.09.2026) und darf produktiv eingesetzt werden. Update von 9.5.x und von den Vorabversionen ohne Datenmigration; wie immer vorher ein Backup anlegen. Voraussetzung ist PHP 8.4. Was gegenüber 9.5 neu ist, steht gesammelt in `docs/00_whats_new.md` samt Umstiegs-Checkliste, die Einzelheiten in den Einträgen der Vorabversionen unten.
+
+Für wiederholbare Inhalte empfehlen wir den Flex-Repeater. MBlock wird nicht mehr aktiv getestet und bei der Weiterentwicklung nicht mehr berücksichtigt, bestehende MBlock-Module sollten aber weiter funktionieren. Wer umstellen möchte, findet unter „MBlock zu Repeater“ einen Assistenten mit Probelauf, Backup und Rollback. 9.5.x wird im Branch `9.x` weiter gepflegt.
+
+### Geändert
+
+- Hinweise auf den Beta- und RC-Status in README und Doku entfernt, Formulierungen zu MBlock angepasst.
 
 ### Behoben
 

@@ -4,8 +4,8 @@
 [![PHP](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](https://github.com/FriendsOfREDAXO/mform/actions/workflows/static-analysis.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> [!WARNING]
-> **MForm 10 ist noch nicht final.** Der Branch `main` und die Releases `10.0.0-beta.*` und `10.0.0-rc.*` sind Vorabversionen: nur zum Testen, nicht für produktive Installationen, vorher Backup anlegen. PHP 8.4 ist Pflicht, MBlock wird nicht mehr unterstützt (Migrationsassistent unter „MBlock zu Repeater“). Rückmeldungen bitte in [#448](https://github.com/FriendsOfREDAXO/mform/issues/448). Die stabile Linie 9.5.x liegt im Branch [`9.x`](https://github.com/FriendsOfREDAXO/mform/tree/9.x).
+> [!NOTE]
+> **MForm 10 ist stabil.** Voraussetzung ist PHP 8.4. Für wiederholbare Inhalte empfehlen wir den Flex-Repeater. MBlock wird nicht mehr aktiv getestet und bei der Weiterentwicklung nicht mehr berücksichtigt, bestehende MBlock-Module sollten aber weiter funktionieren; der Assistent unter „MBlock zu Repeater“ hilft beim Umstieg, wann es passt. Die Linie 9.5.x liegt weiter im Branch [`9.x`](https://github.com/FriendsOfREDAXO/mform/tree/9.x).
 
 ![Poster](https://github.com/FriendsOfREDAXO/mform/blob/assets/screen_mform8.png?raw=true)
 

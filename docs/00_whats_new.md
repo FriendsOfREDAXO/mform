@@ -1,12 +1,12 @@
 # MForm 10 – Was ist neu?
 
-MForm 10 setzt PHP 8.4 voraus, lässt MBlock hinter sich und bringt den Flex-Repeater, den Form Builder und die Widgets auf einen gemeinsamen Stand. Diese Seite fasst zusammen, was sich gegenüber 9.5 ändert, und verweist auf die Details. Die Historie von MForm 9 steht weiter unten.
+MForm 10 setzt PHP 8.4 voraus, setzt für wiederholbare Inhalte auf den Flex-Repeater und bringt den Flex-Repeater, den Form Builder und die Widgets auf einen gemeinsamen Stand. Diese Seite fasst zusammen, was sich gegenüber 9.5 ändert, und verweist auf die Details. Die Historie von MForm 9 steht weiter unten.
 
 ## Voraussetzungen und Umstieg
 
 - **PHP 8.4** ist Pflicht. Der Parser arbeitet mit `\Dom\HTMLDocument`, die libxml-Umwege sind weg.
-- **MBlock wird nicht mehr unterstützt.** Module mit `MBlock::show()` laufen technisch weiter, werden aber nicht mehr getestet. Der Weg ist der Flex-Repeater: [Migration von MBlock](08_mblock_migration.md) beschreibt Assistent, Konsole und die manuelle Migration.
-- Die stabile Linie 9.5.x wird im Branch `9.x` gepflegt. Gespeicherte Werte bleiben lesbar; das neue Repeater-Speicherformat ist Opt-in.
+- **Wir empfehlen den Flex-Repeater.** MBlock wird nicht mehr aktiv getestet und bei der Weiterentwicklung nicht mehr berücksichtigt, Module mit `MBlock::show()` sollten aber weiter funktionieren. Niemand muss sofort umstellen: [Migration von MBlock](08_mblock_migration.md) beschreibt Assistent, Konsole und die manuelle Migration.
+- Die Linie 9.5.x wird im Branch `9.x` weiter gepflegt. Gespeicherte Werte bleiben lesbar; das neue Repeater-Speicherformat ist Opt-in.
 
 ### Umstieg von 9.5: Checkliste
 
@@ -16,7 +16,7 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 - **MediaPlace** mindestens 2.0.0, falls installiert (gilt seit 9.4).
 - **Gespeicherte Werte** bleiben unverändert: `REX_VALUE`, `REX_MEDIA`, Custom-Link-Strings, Listen und das Repeater-JSON sind identisch zu 9.5. Der Umschlag mit Versionsmarker kommt nur mit `'data_version' => 2` je Feld.
 - **API**: alle `add*`-Methoden, Optionen und Ausgabehelfer aus 9.5 funktionieren unverändert, nichts ist als veraltet markiert oder entfernt.
-- **MBlock**: Module mit `MBlock::show()` laufen technisch weiter, werden aber nicht mehr getestet. Umstellen mit dem Assistenten „MBlock zu Repeater“, wann es passt.
+- **MBlock**: Module mit `MBlock::show()` sollten weiter funktionieren, werden aber nicht mehr aktiv getestet. Wir empfehlen den Flex-Repeater; umstellen mit dem Assistenten „MBlock zu Repeater“, wann es passt.
 - **Eigenes CSS / eigene Fragmente**: Widgets nutzen gemeinsame Tokens und sind eckig, das Repeater-Label trägt kein `control-label` mehr, Wrapper und Feldzeilen kommen in beiden Renderpfaden aus `mform_wrapper.php` und `mform_default.php`. Wer diese Fragmente im Projekt überschreibt oder Widgets per CSS anpasst, schaut einmal drauf.
 - **Tooltip-Klasse**: heißt jetzt `mform-info-tooltip`, `mblock-info-tooltip` bleibt als zweite Klasse am Element.
 
@@ -102,7 +102,7 @@ Wichtig: Der Konverter deckt viele Standardfaelle ab, aber nicht alle Sonderfael
 
 ---
 
-## Fixes & Verbesserungen in beta4
+## Fixes & Verbesserungen in 9.0
 
 ### Flex-Repeater: Alle Link- und Media-Widgets vollständig unterstützt
 
@@ -269,7 +269,7 @@ Hinweis: Die jeweilige Editor-Initialisierung erfolgt weiterhin durch das entspr
 
 ## MBlock-Kompatibilität (bis MForm 9)
 
-MForm 9 war mit bestehenden MBlock-Modulen kompatibel. Seit MForm 10 wird MBlock nicht mehr unterstützt, siehe oben und [08_mblock_migration.md](08_mblock_migration.md).
+MForm 9 war mit bestehenden MBlock-Modulen kompatibel. Seit MForm 10 wird MBlock nicht mehr aktiv getestet und bei der Weiterentwicklung nicht mehr berücksichtigt, bestehende Module sollten aber weiter funktionieren; siehe oben und [08_mblock_migration.md](08_mblock_migration.md).
 
 ---
 
