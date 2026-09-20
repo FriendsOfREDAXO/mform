@@ -34,7 +34,7 @@ class rex_var_custom_link_multi extends rex_var
                 return false;
             }
             $args = [];
-            foreach (['intern', 'extern', 'media', 'mailto', 'phone', 'anchor', 'btn_add', 'category', 'media_category', 'types', 'external_prefix', 'ylink'] as $key) {
+            foreach (['intern', 'extern', 'external', 'media', 'mailto', 'phone', 'anchor', 'btn_add', 'category', 'media_category', 'types', 'external_prefix', 'ylink'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
@@ -63,6 +63,12 @@ class rex_var_custom_link_multi extends rex_var
             } else {
                 $links = [$rawValue];
             }
+        }
+
+        // rex_var_custom_link kennt nur "external"; "extern" bleibt als Alias gültig.
+        if (array_key_exists('extern', $args)) {
+            $args['external'] ??= $args['extern'];
+            unset($args['extern']);
         }
 
         // Build template HTML (empty item) using placeholder ID and empty name

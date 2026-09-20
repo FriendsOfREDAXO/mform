@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.5.2
+
+Fehlerbehebungen, die bei der Arbeit an MForm 10 gefunden wurden, für die 9.5-Linie übernommen. Keine neuen Optionen, keine Datenänderung.
+
+### Behoben
+
+- **`addCustomLinkMultipleField()` im Repeater, externer Link ließ sich nicht abschalten** (#459): Der Flex-Repeater gab `data-extern` als `extern` an das Multi-Widget weiter, das innere Link-Widget kennt aber nur `external`. Der Button für externe Links blieb trotz `'data-extern' => 'disable'` sichtbar. Der Repeater reicht jetzt `external` durch, `rex_var_custom_link_multi` nimmt `extern` weiter als Alias an (auch in `REX_CUSTOM_LINK_MULTI[... extern=0]`).
+- **`show()` mehrfach aufrufbar, Teil 4:** Der Parser hängte `active` an das geöffnete Tab-Pane, `in` an geöffnete Collapse-Bereiche, die Zeilenklasse an Spaltengruppen und die `form-group-class` per String-Verkettung an. Bei wiederholtem `show()` (MBlock mit übergebenem MForm-Objekt) stapelten sich die Klassen, etwa `class="tab-pane active active active"`. Klassen werden jetzt über `MFormLayoutCore::appendClass()` nur angehängt, wenn sie fehlen.
+- **Bedingungen mit mehrteiligen Ids:** `setVisibleIf('1.0.type', …)` fand das Quellfeld im klassischen Modul nicht (Name `REX_INPUT_VALUE[1][0][type]`), die Bedingung blieb wirkungslos. `assets/mform.js` löst gepunktete Ids jetzt auf Namen und Id-Suffix auf.
+- **Form Builder, Operatoren „größer als“ / „kleiner als“:** landeten als `gt`/`lt` im erzeugten Code, `assets/mform.js` kennt aber nur `>` und `<`. Der Builder schreibt jetzt `>` und `<`.
+- **Flex-Repeater:** Die Steuerwerte `form-group-class`, `form-group-attributes`, `visible_if` und `hidden_if` landeten zusätzlich als Attribute am Eingabeelement.
+- **`MFormOutput::link()` / `linkUrl()`:** lösen jetzt auch `redaxo://ID` auf, das Format, das das Custom-Link-Widget speichert (bisher nur `rex-article://ID` und numerische Ids).
+
 ## Version 9.5.1
 
 ### Behoben

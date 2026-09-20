@@ -47,6 +47,12 @@ function initMFormConditionals(mform) {
             'REX_INPUT_VALUE[' + sourceStr + ']',
             'REX_INPUT_VALUE[' + sourceStr + '][]'
         ];
+        // Mehrteilige Ids ("1.0.type") liegen im Namen als [1][0][type] und in der Id als _1_0_type
+        var bracketed = sourceStr.indexOf('.') !== -1 ? '[' + sourceStr.split('.').join('][') + ']' : '';
+        var idSuffix = sourceStr.indexOf('.') !== -1 ? '_' + sourceStr.split('.').join('_') : '';
+        if (bracketed) {
+            candidates.push('REX_INPUT_VALUE' + bracketed, 'REX_INPUT_VALUE' + bracketed + '[]');
+        }
 
         var localItem = target.closest('.mfr-item, .mfr-nested-item');
         var scopes = localItem.length ? [localItem, mform] : [mform];
@@ -66,6 +72,8 @@ function initMFormConditionals(mform) {
                 if (candidates.indexOf(name) !== -1) return true;
                 if (name.endsWith('[' + sourceStr + ']')) return true;
                 if (name.endsWith('[' + sourceStr + '][]')) return true;
+                if (bracketed && (name.endsWith(bracketed) || name.endsWith(bracketed + '[]'))) return true;
+                if (idSuffix && id.endsWith(idSuffix)) return true;
                 return false;
             });
         }

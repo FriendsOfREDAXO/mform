@@ -1092,6 +1092,8 @@
                 case 'eq': return '=';
                 case 'neq': return '!=';
                 case 'not_empty': return '!empty';
+                case 'gt': return '>';
+                case 'lt': return '<';
                 default: return String(operator || '=');
             }
         }

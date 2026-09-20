@@ -95,6 +95,22 @@ class MFormLayoutCore
     }
 
     /**
+     * Klassen anhaengen, ohne bereits vorhandene zu wiederholen. show() darf mehrfach laufen,
+     * die Items werden dabei erneut durch den Parser geschickt.
+     */
+    public static function appendClass(string $class, string $add): string
+    {
+        $existing = preg_split('/\s+/', trim($class)) ?: [];
+        foreach (preg_split('/\s+/', trim($add)) ?: [] as $token) {
+            if ('' !== $token && !in_array($token, $existing, true)) {
+                $existing[] = $token;
+            }
+        }
+
+        return trim(implode(' ', array_filter($existing, static fn (string $t) => '' !== $t)));
+    }
+
+    /**
      * @param array<string, mixed> $attributes
      */
     public static function isTabActive(array $attributes): bool

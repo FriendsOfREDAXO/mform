@@ -872,7 +872,7 @@ class MFormFlexRepeaterRenderer
      */
     private static function renderAttributes(array $attributes): string
     {
-        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id'];
+        static $skipKeys = ['id', 'name', 'type', 'value', 'checked', 'selected', 'data-mfr-field', 'label', 'open', 'collapsed', 'first_open', 'show_toggle_all', 'btn_text', 'btn_class', 'confirm_delete', 'confirm_delete_msg', 'min', 'max', 'default_count', 'groups', 'group', 'repeater_id', 'parent_id', 'form-group-class', 'form-group-attributes', 'visible_if', 'hidden_if'];
 
         $html = '';
         foreach ($attributes as $key => $value) {
@@ -1112,7 +1112,7 @@ class MFormFlexRepeaterRenderer
 
         $map = [
             'intern' => ['intern', 'data-intern'],
-            'extern' => ['extern', 'external', 'data-extern'],
+            'external' => ['external', 'extern', 'data-extern'],
             'media' => ['media', 'data-media'],
             'mailto' => ['mailto', 'data-mailto'],
             'phone' => ['phone', 'data-tel'],
