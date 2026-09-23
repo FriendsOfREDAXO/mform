@@ -624,7 +624,7 @@ class MFormFlexRepeaterRenderer
         }
         // setFull() wie in den Parser-Templates: beide Spalten volle Breite.
         if ($item->isFull()) {
-            $labelColClass = 'control-label col-sm-12 mfr-field-label';
+            $labelColClass = 'col-sm-12 mfr-field-label';
             $fieldColClass = 'col-sm-12 mfr-field-col';
         }
 
