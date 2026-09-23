@@ -862,6 +862,8 @@ foreach ($rows as $row) {
 }
 ```
 
+> Nur für Repeater-Slots. Felder mit Punkt-Notation (`1.1`, `1.2`, …) liefern hier `[]` – die liest `MFormOutputHelper::values()`. Dieselben Methoden (`values()`, `value()`, `isRepeater()`) gibt es als Alias auch auf `MFormRepeaterHelper`.
+
 ---
 
 ```php
@@ -952,9 +954,41 @@ MFormRepeaterHelper::items(int|string|array $source): MFormOutput   // typisiert
 **Namespace:** `FriendsOfRedaxo\MForm\Utils`  
 **Datei:** `lib/MForm/Utils/MFormOutputHelper.php`
 
-Statische Helfer für die Aufbereitung von Link- und Mediendaten im Modul-Output.
+Statische Helfer für die Aufbereitung von Slot-, Link- und Mediendaten im Modul-Output.
 
 ### Methoden
+
+```php
+MFormOutputHelper::values(int|string $source): array
+```
+**Slots, die kein Repeater sind.** Liest einen Slot mit Punkt-Notation (`1.1`, `1.2`, …) als Map `['1' => …, '2' => …]`. Nimmt eine Slot-Id oder einen Roh-Wert, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück. Repeater-Daten werden ausgeschlossen – dafür ist `MFormRepeaterHelper::decode()` zuständig.
+
+```php
+// Modul-Output:
+$werte = MFormOutputHelper::values(1);
+echo $werte['1'] ?? '';
+```
+
+---
+
+```php
+MFormOutputHelper::value(int|string $source, ?string $field = null, mixed $default = null): mixed
+```
+Einzelnes Feld aus einem Nicht-Repeater-Slot. Ohne `$field` wird der Slot als einfacher Wert gelesen, mit `$field` der Schlüssel aus der Punkt-Notation – auch verschachtelt per Punkt-Pfad (`'a.b'`).
+
+```php
+$titel = MFormOutputHelper::value(1, '1', '');
+$text  = MFormOutputHelper::value(3);           // einfacher Slot
+```
+
+---
+
+```php
+MFormOutputHelper::isRepeater(int|string $source): bool
+```
+Prüft, ob ein Slot Repeater-Daten enthält. Praktisch, wenn ein Modul von einem einfachen Feld auf einen Repeater migriert wurde und der Ausgabecode beide Datenstände lesen muss.
+
+---
 
 ```php
 MFormOutputHelper::createLinkData(mixed $input, array $options = []): array

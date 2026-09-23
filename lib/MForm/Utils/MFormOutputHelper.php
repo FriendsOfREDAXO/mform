@@ -19,6 +19,214 @@ use rex_media_manager;
 class MFormOutputHelper
 {
     /**
+     * Liest einen Slot, der KEIN Repeater ist (Punkt-Notation oder einfacher Wert).
+     *
+     * MForm legt Felder mit Punkt-Notation (1.1, 1.2, ...) gemeinsam als JSON in einem
+     * Slot ab. MFormRepeaterHelper::decode() ist dafür nicht zuständig - es liefert bei
+     * solchen Werten []. values() nimmt dieselbe Roh-Aufbereitung (Entities, <br>-Reparatur,
+     * Slot-Id statt Roh-String) und gibt die Feldwerte als Map zurück.
+     *
+     * Beispiel:
+     *   $tab1 = MFormOutputHelper::values(1);   // ['1' => 'Titel', '2' => 'Text']
+     *
+     * Ein skalarer Slot (einfaches Textfeld ohne Punkt-Notation) ergibt [];
+     * dafür gibt es value().
+     *
+     * @param int|string $source Slot-Id (z. B. 1) oder Roh-Wert
+     * @return array<string, mixed> Feldwerte, bei nicht dekodierbaren Werten []
+     */
+    public static function values(int|string $source): array
+    {
+        $decoded = self::decodeRaw($source);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        // Punkt-Notation ab .0 ("1.0", "1.1") landet als JSON-Liste (["a","b"]) im Slot und muss
+        // hier durch. Repeater-Listen und das Umschlag-Format faengt isRepeaterPayload() ab.
+        if (self::isRepeaterPayload(self::unwrapEnvelope($decoded))) {
+            return [];
+        }
+
+        /** @var array<string, mixed> $result */
+        $result = [];
+        foreach ($decoded as $key => $value) {
+            $result[(string) $key] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Liest ein einzelnes Feld aus einem Nicht-Repeater-Slot.
+     *
+     * Ohne $field wird der Slot als einfacher Wert gelesen (Textfeld ohne Punkt-Notation),
+     * mit $field der Schlüssel aus der Punkt-Notation - auch verschachtelt per Punkt-Pfad.
+     *
+     * Beispiel:
+     *   MFormOutputHelper::value(1)          // 'einfacher Text'
+     *   MFormOutputHelper::value(1, '2')     // Feld 1.2
+     *   MFormOutputHelper::value(2, 'a.b')   // verschachtelt
+     *
+     * @param int|string  $source  Slot-Id oder Roh-Wert
+     * @param string|null $field   Feldschlüssel bzw. Punkt-Pfad, null = ganzer Slot
+     * @param mixed       $default Rückgabe, wenn nichts gefunden wurde
+     */
+    public static function value(int|string $source, ?string $field = null, mixed $default = null): mixed
+    {
+        if (null === $field) {
+            // Punkt-Notation ohne Feldangabe hat keinen sinnvollen Einzelwert.
+            if (is_array(self::decodeRaw($source))) {
+                return $default;
+            }
+
+            $raw = self::rawValue($source);
+
+            return '' === $raw ? $default : $raw;
+        }
+
+        $current = self::values($source);
+        foreach (explode('.', $field) as $segment) {
+            if (!is_array($current) || !array_key_exists($segment, $current)) {
+                return $default;
+            }
+            $current = $current[$segment];
+        }
+
+        return $current;
+    }
+
+    /**
+     * Prüft, ob ein Slot Repeater-Daten enthält.
+     *
+     * Praktisch, wenn ein Modul von einem einfachen Feld auf einen Repeater migriert
+     * wurde und der Ausgabecode beide Datenstände lesen können muss.
+     *
+     * @param int|string $source Slot-Id oder Roh-Wert
+     */
+    public static function isRepeater(int|string $source): bool
+    {
+        $decoded = self::decodeRaw($source);
+
+        return is_array($decoded) && [] !== $decoded && self::isRepeaterPayload(self::unwrapEnvelope($decoded));
+    }
+
+    /**
+     * Gemeinsame Roh-Aufbereitung: Slot-Id auflösen, Entities dekodieren und den
+     * <br>-Fallback anwenden. MFormRepeaterHelper::decode() nutzt dieselbe Logik.
+     *
+     * @param int|string $source Slot-Id oder Roh-Wert
+     * @return array<mixed>|null Dekodiertes Array, sonst null
+     */
+    public static function decodeRaw(int|string $source): ?array
+    {
+        $raw = self::rawValue($source);
+        if ('' === $raw) {
+            return null;
+        }
+
+        $normalizedValue = html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $decoded = json_decode($normalizedValue, true);
+
+        // Fallback: nl2br() kann JSON ausserhalb von Strings mit <br>-Tags anreichern.
+        // Erst nach einem fehlgeschlagenen Decode ersetzen, damit legitime <br>-Tags bleiben.
+        if (!is_array($decoded)) {
+            $fallbackValue = preg_replace('/<br\s*\/?>/i', "\n", $normalizedValue) ?? $normalizedValue;
+            $decoded = json_decode($fallbackValue, true);
+        }
+
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * Löst eine Slot-Id in den Roh-String auf; Strings werden unverändert zurückgegeben.
+     *
+     * @param int|string $source Slot-Id oder Roh-Wert
+     */
+    public static function rawValue(int|string $source): string
+    {
+        if (!is_int($source)) {
+            return $source;
+        }
+
+        if ($source <= 0 || $source > 20 || !class_exists(rex_article_slice::class)) {
+            return '';
+        }
+
+        $slice = self::findCurrentSlice();
+        if (!$slice instanceof rex_article_slice) {
+            return '';
+        }
+
+        $raw = $slice->getValue($source);
+
+        return is_string($raw) ? $raw : '';
+    }
+
+    /**
+     * Entfernt den Versions-Umschlag {"__v": n, "items": [...]}.
+     *
+     * @param array<mixed> $decoded
+     * @return array<int|string, mixed>
+     */
+    private static function unwrapEnvelope(array $decoded): array
+    {
+        if (isset($decoded['__v'], $decoded['items']) && is_array($decoded['items'])) {
+            return array_values($decoded['items']);
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Prüft, ob ein dekodierter Slot-Wert eine Repeater-Liste ist.
+     *
+     * @param array<mixed> $value
+     */
+    private static function isRepeaterPayload(array $value): bool
+    {
+        if ([] === $value) {
+            return true;
+        }
+
+        if (!array_is_list($value)) {
+            return false;
+        }
+
+        foreach ($value as $item) {
+            if (!is_array($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** Sucht den aktuell gerenderten Slice im Backtrace (fuer Slot-Id-Zugriff). */
+    private static function findCurrentSlice(): ?rex_article_slice
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+            $object = $frame['object'] ?? null;
+            if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
+                continue;
+            }
+
+            try {
+                $slice = $object->getCurrentSlice();
+            } catch (\Throwable) {
+                continue;
+            }
+
+            if ($slice instanceof rex_article_slice) {
+                return $slice;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Unified entry point for link normalization.
      *
      * Accepts legacy single-link values, repeater values (array with `id`/`name`),

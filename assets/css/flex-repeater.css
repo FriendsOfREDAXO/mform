@@ -780,15 +780,17 @@ body.rex-theme-dark .mfr-container .mfr-btn-clipboard-clear {
     margin-bottom: .75rem;
 }
 
-.mfr-item-body.form-horizontal .mfr-field-group .control-label,
-.mfr-nested-body.form-horizontal .mfr-field-group .control-label {
+/* Label-Spalte ueber .mfr-field-label ansprechen, nicht ueber .control-label:
+   setFull()-Felder haben (wie im klassischen Parser) kein .control-label, siehe #460. */
+.mfr-item-body.form-horizontal .mfr-field-group .mfr-field-label,
+.mfr-nested-body.form-horizontal .mfr-field-group .mfr-field-label {
     overflow-wrap: anywhere;
 }
 
 /* Vertical / Inline Layout: Label oben, Feld darunter, volle Breite. */
-.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .control-label,
+.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .mfr-field-label,
 .mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .mfr-field-col,
-.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label,
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .mfr-field-label,
 .mfr-container[data-mfr-layout="inline"] .mfr-field-group > .mfr-field-col {
     float: none;
     width: 100%;
@@ -796,8 +798,8 @@ body.rex-theme-dark .mfr-container .mfr-btn-clipboard-clear {
     padding-top: 0;
 }
 
-.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .control-label,
-.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label {
+.mfr-container[data-mfr-layout="vertical"] .mfr-field-group > .mfr-field-label,
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .mfr-field-label {
     margin-bottom: 4px;
     font-weight: 700;
 }
@@ -805,7 +807,7 @@ body.rex-theme-dark .mfr-container .mfr-btn-clipboard-clear {
 .mfr-container[data-mfr-layout="inline"] .mfr-field-group {
     margin-bottom: .4rem;
 }
-.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .control-label {
+.mfr-container[data-mfr-layout="inline"] .mfr-field-group > .mfr-field-label {
     font-size: 12px;
     font-weight: 600;
     color: var(--mfr-color-muted);

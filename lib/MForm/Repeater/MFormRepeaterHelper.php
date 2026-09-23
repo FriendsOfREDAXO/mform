@@ -11,6 +11,7 @@ namespace FriendsOfRedaxo\MForm\Repeater;
 use FriendsOfRedaxo\MForm;
 use FriendsOfRedaxo\MForm\DTO\MFormItem;
 use FriendsOfRedaxo\MForm\Output\MFormOutput;
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
 class MFormRepeaterHelper
 {
@@ -259,14 +260,23 @@ class MFormRepeaterHelper
     }
 
     /**
-     * @param array<int, array<string, mixed>> $items
+     * Filtert deaktivierte Items heraus.
+     *
+     * Nimmt bewusst auch gemischte Arrays entgegen: Wird versehentlich ein
+     * Nicht-Repeater-Wert hereingereicht, fallen die Nicht-Item-Eintraege raus,
+     * statt einen TypeError auszuloesen.
+     *
+     * @param array<int|string, mixed> $items
      * @return array<int, array<string, mixed>>
      */
     public static function filterEnabledItems(array $items): array
     {
-        return array_values(array_filter($items, static function (array $item): bool {
-            return self::isItemEnabled($item);
+        /** @var array<int, array<string, mixed>> $filtered */
+        $filtered = array_values(array_filter($items, static function (mixed $item): bool {
+            return is_array($item) && self::isItemEnabled($item);
         }));
+
+        return $filtered;
     }
 
     /**
@@ -283,30 +293,58 @@ class MFormRepeaterHelper
      */
     public static function decode(int|string $source): array
     {
-        if (is_int($source)) {
-            return self::decodeById($source);
-        }
+        // Roh-Aufbereitung (Slot-Id, Entities, <br>-Fallback) teilt sich decode() mit values().
+        $decoded = MFormOutputHelper::decodeRaw($source);
 
-        $rexValue = $source;
-        if ('' === $rexValue) {
+        if (null === $decoded) {
             return [];
         }
 
-        $normalizedValue = html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $decoded = json_decode($normalizedValue, true);
+        $decoded = self::unwrap($decoded);
 
-        // Fallback fuer Default-Rex-Output: nl2br() kann JSON ausserhalb von Strings mit <br>-Tags anreichern.
-        // Wichtig: Erst nach einem fehlgeschlagenen Decode ersetzen, damit legitime <br>-Tags im Feldinhalt erhalten bleiben.
-        if (!is_array($decoded)) {
-            $fallbackValue = preg_replace('/<br\s*\/?>/i', "\n", $normalizedValue) ?? $normalizedValue;
-            $decoded = json_decode($fallbackValue, true);
-        }
-
-        if (!is_array($decoded)) {
+        // Nur echte Repeater-Listen weiterreichen. Punkt-Notation ("{\"1\":\"...\"}") und
+        // skalare Slots sind keine Item-Listen; fuer die ist value()/values() zustaendig.
+        if (!self::isRepeaterPayload($decoded)) {
             return [];
         }
 
-        return self::prepareItemsForOutput(self::unwrap($decoded));
+        return self::prepareItemsForOutput($decoded);
+    }
+
+    /**
+     * Alias auf MFormOutputHelper::values().
+     *
+     * Nicht-Repeater-Slots gehoeren fachlich zu MFormOutputHelper; der Alias steht hier,
+     * weil decode() der uebliche Einstieg ist und der Wechsel so nicht auffaellt.
+     *
+     * @param int|string $source Slot-Id oder Roh-Wert
+     * @return array<string, mixed>
+     */
+    public static function values(int|string $source): array
+    {
+        return MFormOutputHelper::values($source);
+    }
+
+    /**
+     * Alias auf MFormOutputHelper::value().
+     *
+     * @param int|string  $source  Slot-Id oder Roh-Wert
+     * @param string|null $field   Feldschluessel bzw. Punkt-Pfad
+     * @param mixed       $default Rueckgabe, wenn nichts gefunden wurde
+     */
+    public static function value(int|string $source, ?string $field = null, mixed $default = null): mixed
+    {
+        return MFormOutputHelper::value($source, $field, $default);
+    }
+
+    /**
+     * Alias auf MFormOutputHelper::isRepeater().
+     *
+     * @param int|string $source Slot-Id oder Roh-Wert
+     */
+    public static function isRepeater(int|string $source): bool
+    {
+        return MFormOutputHelper::isRepeater($source);
     }
 
     /**
@@ -370,43 +408,9 @@ class MFormRepeaterHelper
      */
     public static function decodeById(int $valueId): array
     {
-        if ($valueId <= 0 || $valueId > 20 || !class_exists('rex_article_slice')) {
-            return [];
-        }
+        $raw = MFormOutputHelper::rawValue($valueId);
 
-        $slice = self::findCurrentSlice();
-        if (!$slice instanceof \rex_article_slice) {
-            return [];
-        }
-
-        $raw = $slice->getValue($valueId);
-        if (!is_string($raw) || '' === $raw) {
-            return [];
-        }
-
-        return self::decode($raw);
-    }
-
-    private static function findCurrentSlice(): ?\rex_article_slice
-    {
-        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
-            $object = $frame['object'] ?? null;
-            if (!is_object($object) || !method_exists($object, 'getCurrentSlice')) {
-                continue;
-            }
-
-            try {
-                $slice = $object->getCurrentSlice();
-            } catch (\Throwable) {
-                continue;
-            }
-
-            if ($slice instanceof \rex_article_slice) {
-                return $slice;
-            }
-        }
-
-        return null;
+        return '' === $raw ? [] : self::decode($raw);
     }
 
     /**
@@ -433,6 +437,28 @@ class MFormRepeaterHelper
         }
 
         return $result;
+    }
+
+    /**
+     * Prueft, ob ein dekodierter Slot-Wert wirklich eine Repeater-Liste ist.
+     *
+     * Repeater speichern eine Liste ([0,1,2,...]) von Feld-Arrays. Punkt-Notation
+     * ("{\"1\":\"Text\"}") und Multiselect-Gruppen ("{\"key\":[...]}") haben dagegen
+     * String-Keys auf oberster Ebene und gehoeren nicht hierher.
+     *
+     * @param array<mixed> $value
+     */
+    private static function isRepeaterPayload(array $value): bool
+    {
+        if ([] === $value) {
+            return true;
+        }
+
+        if (!array_is_list($value)) {
+            return false;
+        }
+
+        return self::isRepeaterItemList($value);
     }
 
     /** @param array<mixed> $value */

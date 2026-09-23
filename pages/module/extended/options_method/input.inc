@@ -1,4 +1,5 @@
 <?php
+
 use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
@@ -21,7 +22,7 @@ $mform = MForm::factory()
         // multiselect use add method options parameter
         ->addMultiSelectField("2.0", [1 => 'option 1', 2 => 'option 2'], ['label'=>'Multiselect Label'])
         ->addSelectField("3.0", ['optgroup 1' => [1 => 'option 1', 2 => 'option 2'], 'optgroup 2' => [3 => 'option 3', 4 => 'option 4']], ['label'=>'Multiselect Label'])
-            ->setSize('full') // do it full
+            ->setSize(5) // Anzahl sichtbarer Zeilen
             ->setMultiple()
         // select use set options method
         ->addSelectField(3.1)

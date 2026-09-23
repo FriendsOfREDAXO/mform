@@ -1,5 +1,5 @@
 package: mform
-version: '10.0.0'
+version: '10.0.1'
 name: MForm
 author: Friends Of REDAXO
 supportpage: https://github.com/FriendsOfREDAXO/mform
@@ -56,3 +56,20 @@ requires:
 conflicts:
     packages:
         ui_tools: '<1.0.0'
+
+# Nicht mit ausliefern: Entwicklungs- und Test-Artefakte.
+# docs/ bleibt drin, die Doku-Seite im Backend liest daraus.
+installer_ignore:
+    - .claude
+    - .github
+    - .gitignore
+    - .php-cs-fixer.dist.php
+    - .phpunit.cache
+    - composer.json
+    - composer.lock
+    - node_modules
+    - package.json
+    - package-lock.json
+    - phpunit.xml.dist
+    - playwright.config.js
+    - tests

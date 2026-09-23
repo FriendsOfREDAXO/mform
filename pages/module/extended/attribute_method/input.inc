@@ -1,4 +1,5 @@
 <?php
+
 use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
@@ -61,7 +62,7 @@ $mform->addSelectField(2.2)
     ->setAttribute('style', 'width: 260px') // for style use only set attribute method
     ->setDefaultValue(2) // for default value use set default value method
     ->setMultiple()
-    ->setSize('full');
+    ->setSize(5);
 
 // parse mform
 echo MForm::factory()
