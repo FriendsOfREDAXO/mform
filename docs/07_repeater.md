@@ -286,7 +286,7 @@ if (MFormOutputHelper::isRepeater(1)) {
 }
 ```
 
-Der Vorteil gegenüber `rex_var::toArray()`: `values()` nimmt eine Slot-Id statt eines `REX_VALUE`-Strings, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück (kein `null`). Repeater-Daten werden ausgeschlossen, sodass `decode()` und `values()` sich sauber ergänzen.
+Der Vorteil gegenüber `rex_var::toArray()`: `values()` nimmt eine Slot-Id statt eines `REX_VALUE`-Strings, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück (kein `null`). `value()` liefert dagegen den angefragten Wert selbst oder den übergebenen Default. Repeater-Daten werden ausgeschlossen, sodass `decode()` und `values()` sich sauber ergänzen.
 
 Dieselben drei Methoden gibt es als Alias auch auf `MFormRepeaterHelper`, damit bestehender Code und der gewohnte Einstieg über `decode()` weiter funktionieren. Fachlich gehören sie zu `MFormOutputHelper`.
 

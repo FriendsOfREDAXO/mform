@@ -4,12 +4,13 @@ use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
 // Slot 1 ist ein normales Textfeld, Slot 2 der Repeater.
 // decode() liefert die Items bereits ohne deaktivierte Einträge.
+// REX_VALUE[1] ist bereits per rex_escape() + nl2br() aufbereitet - nicht erneut maskieren.
 $headline = 'REX_VALUE[1]';
 $items = MFormRepeaterHelper::decode(2);
 ?>
 <section class="single-repeater">
     <?php if ('' !== $headline): ?>
-        <h2><?= rex_escape($headline) ?></h2>
+        <h2><?= $headline ?></h2>
     <?php endif; ?>
 
     <?php if ([] !== $items): ?>

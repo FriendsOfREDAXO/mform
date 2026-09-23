@@ -12,7 +12,7 @@ Wartungsrelease (23.09.2026). Update von 10.0.0 ohne Datenmigration, keine Break
 
 ### Neu
 
-- **`MFormOutputHelper::values()`, `value()` und `isRepeater()`** für Slots, die kein Repeater sind: `values()` liest Felder mit Punkt-Notation (`1.1`, `1.2`, …) als Map, `value()` ein einzelnes Feld (optional mit Default und Punkt-Pfad für verschachtelte Werte), `isRepeater()` unterscheidet beide Slot-Arten – praktisch, wenn ein Modul von einem einfachen Feld auf einen Repeater migriert wurde. Gegenüber `rex_var::toArray()` nehmen die Methoden eine Slot-Id statt eines `REX_VALUE`-Strings, dekodieren HTML-Entities, reparieren durch `nl2br()` eingefügte `<br>`-Tags und geben immer ein Array zurück. Dieselben drei Methoden gibt es als Alias auf `MFormRepeaterHelper`, damit der gewohnte Einstieg über `decode()` weiter funktioniert.
+- **`MFormOutputHelper::values()`, `value()` und `isRepeater()`** für Slots, die kein Repeater sind: `values()` liest Felder mit Punkt-Notation (`1.1`, `1.2`, …) als Map, `value()` ein einzelnes Feld (optional mit Default und Punkt-Pfad für verschachtelte Werte), `isRepeater()` unterscheidet beide Slot-Arten – praktisch, wenn ein Modul von einem einfachen Feld auf einen Repeater migriert wurde. Gegenüber `rex_var::toArray()` nehmen die Methoden eine Slot-Id statt eines `REX_VALUE`-Strings, dekodieren HTML-Entities und reparieren durch `nl2br()` eingefügte `<br>`-Tags. `values()` gibt dabei immer ein Array zurück (nie `null`); `value()` liefert den angefragten Slot- bzw. Pfadwert oder den übergebenen Default. Dieselben drei Methoden gibt es als Alias auf `MFormRepeaterHelper`, damit der gewohnte Einstieg über `decode()` weiter funktioniert.
 
 ### Geändert
 

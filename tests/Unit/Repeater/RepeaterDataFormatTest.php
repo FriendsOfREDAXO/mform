@@ -94,6 +94,11 @@ final class RepeaterDataFormatTest extends TestCase
         self::assertSame(['1' => 'Hallo', '2' => 'Welt'], MFormRepeaterHelper::values('{"1":"Hallo","2":"Welt"}'));
         self::assertSame(['multiselect' => ['a', 'b']], MFormRepeaterHelper::values('{"multiselect":["a","b"]}'));
 
+        // Punkt-Notation ab .0 ("1.0", "1.1") landet als JSON-Liste im Slot und muss durchkommen.
+        self::assertSame(['0' => 'a', '1' => 'b'], MFormRepeaterHelper::values('["a","b"]'));
+        self::assertSame('a', MFormRepeaterHelper::value('["a","b"]', '0'));
+        self::assertSame(['0' => 'A'], MFormRepeaterHelper::values('["A"]'));
+
         // Entities und der <br>-Fallback gelten wie bei decode().
         self::assertSame(['1' => 'A&B'], MFormRepeaterHelper::values('{&quot;1&quot;:&quot;A&amp;B&quot;}'));
         self::assertSame(['1' => 'A'], MFormRepeaterHelper::values('{"1":"A"}<br />'));

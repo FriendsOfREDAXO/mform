@@ -39,11 +39,12 @@ class MFormOutputHelper
     {
         $decoded = self::decodeRaw($source);
 
-        if (!is_array($decoded) || array_is_list($decoded)) {
+        if (!is_array($decoded)) {
             return [];
         }
 
-        // Repeater im Umschlag-Format ({"__v":2,"items":[...]}) ist kein Feld-Wert-Slot.
+        // Punkt-Notation ab .0 ("1.0", "1.1") landet als JSON-Liste (["a","b"]) im Slot und muss
+        // hier durch. Repeater-Listen und das Umschlag-Format faengt isRepeaterPayload() ab.
         if (self::isRepeaterPayload(self::unwrapEnvelope($decoded))) {
             return [];
         }
