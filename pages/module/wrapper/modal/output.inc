@@ -1,9 +1,10 @@
 <?php
-$headline = rex_var::toStr('REX_VALUE[1]');
-$text = rex_var::toStr('REX_VALUE[2]');
-$bgClass = rex_var::toStr('REX_VALUE[10]');
-$paddingClass = rex_var::toStr('REX_VALUE[11]');
-$fullwidth = rex_var::toStr('REX_VALUE[12]');
+// REX_VALUE[n] wird vom REDAXO-Parser vor der Ausführung durch den Slot-Wert ersetzt.
+$headline = 'REX_VALUE[1]';
+$text = 'REX_VALUE[2]';
+$bgClass = 'REX_VALUE[10]';
+$paddingClass = 'REX_VALUE[11]';
+$fullwidth = 'REX_VALUE[12]';
 
 $containerClass = 'container';
 if ($fullwidth === '1') {

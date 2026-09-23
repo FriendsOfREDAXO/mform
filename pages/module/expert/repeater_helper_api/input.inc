@@ -20,7 +20,7 @@ $categoryOptions = [
 
 $rowForm = MForm::factory()
     ->addTextField('title', ['label' => 'Titel'])
-    ->addSelectField('status', $statusOptions, ['label' => 'Status'], 'published')
+    ->addSelectField('status', $statusOptions, ['label' => 'Status'], 1, 'published')
     ->addSelectField('category', $categoryOptions, ['label' => 'Kategorie'])
     ->addInputField('number', 'priority', ['label' => 'Priorität (1–10)', 'min' => '1', 'max' => '10'], '5')
     ->addTextField('author', ['label' => 'Autor'])

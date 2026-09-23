@@ -1,5 +1,24 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.1
+
+Wartungsrelease (23.09.2026). Update von 10.0.0 ohne Datenmigration, keine Breaking Changes.
+
+### Behoben
+
+- **Beispielmodule liefen teilweise auf einen Fatal Error** (Demo-Seiten unter „Beispiele“): Fünf der mitgelieferten Module brachen beim Ausführen ab, ließen sich aber per Button als echte Module installieren. `expert/repeater_helper_api` übergab den Default-Wert als 4. Argument an `addSelectField()`, wo ein `int $size` erwartet wird (Default ist Argument 5); `extended/attribute_method` und `extended/options_method` riefen `setSize('full')` statt `setSize(int)`; `expert/html_form_elements` fehlte das `use`-Statement für `MForm`; `wrapper/modal` nutzte das nicht existierende `rex_var::toStr()`. Alle 42 Demo-Module werden jetzt gegen eine laufende REDAXO-Instanz gerendert und sind fehlerfrei.
+- **`MFormRepeaterHelper::decode()` warf einen TypeError bei Nicht-Repeater-Slots**: Wurde ein Slot mit Punkt-Notation (`{"1":"…","2":"…"}`) übergeben – auch versehentlich –, lief `filterEnabledItems()` in einen `TypeError`, weil die Werte keine Item-Arrays sind. `decode()` prüft jetzt, ob der Slot überhaupt eine Repeater-Liste enthält, und liefert sonst `[]`. Alle Datenformate, die 10.0.0 bereits verarbeitet hat, liefern unverändert dasselbe Ergebnis (durch Tests abgesichert).
+- **Ausgabe-Beispiele von 14 Demo-Modulen waren nur ein Debug-Stub**: Die `output.inc` bestand aus `dump(MFormRepeaterHelper::decode(…))` – bei Nicht-Repeater-Demos (Tabs, Accordion, Collapse, Columns, Inline, Text, Select …) zusätzlich mit der falschen Methode, die dort nur `[]` liefern kann. Alle 14 haben jetzt einen echten, lauffähigen Ausgabe-Code.
+
+### Neu
+
+- **`MFormOutputHelper::values()`, `value()` und `isRepeater()`** für Slots, die kein Repeater sind: `values()` liest Felder mit Punkt-Notation (`1.1`, `1.2`, …) als Map, `value()` ein einzelnes Feld (optional mit Default und Punkt-Pfad für verschachtelte Werte), `isRepeater()` unterscheidet beide Slot-Arten – praktisch, wenn ein Modul von einem einfachen Feld auf einen Repeater migriert wurde. Gegenüber `rex_var::toArray()` nehmen die Methoden eine Slot-Id statt eines `REX_VALUE`-Strings, dekodieren HTML-Entities, reparieren durch `nl2br()` eingefügte `<br>`-Tags und geben immer ein Array zurück. Dieselben drei Methoden gibt es als Alias auf `MFormRepeaterHelper`, damit der gewohnte Einstieg über `decode()` weiter funktioniert.
+
+### Geändert
+
+- **Label-Spalte im Flex-Repeater bei `setFull()`** (#460, danke @JulianSchnaars): Die Label-Spalte bekam zusätzlich `control-label`, obwohl der klassische Parser-Pfad bei `setFull()` nur `col-sm-12` setzt. Da `.form-horizontal .control-label` rechtsbündig ausrichtet, stand das Label rechts über einem linksbündigen Feld voller Breite.
+- **CSS des Flex-Repeaters spricht die Label-Spalte über `.mfr-field-label` an** statt über `.control-label`. Sonst hätten `setFull()`-Felder nach #460 in den Layouts `vertical` und `inline` ihre Label-Formatierung (`margin-bottom`, `font-weight`, `overflow-wrap`) verloren.
+
 ## Version 10.0.0
 
 MForm 10 ist final (20.09.2026) und darf produktiv eingesetzt werden. Update von 9.5.x und von den Vorabversionen ohne Datenmigration; wie immer vorher ein Backup anlegen. Voraussetzung ist PHP 8.4. Was gegenüber 9.5 neu ist, steht gesammelt in `docs/00_whats_new.md` samt Umstiegs-Checkliste, die Einzelheiten in den Einträgen der Vorabversionen unten.

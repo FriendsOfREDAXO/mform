@@ -259,6 +259,37 @@ Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repe
 - Für die Ausgabe sollte der Repeater-Wert bevorzugt über `MFormRepeaterHelper::decode()` laufen.
 - Die Methode entfernt inaktive Items rekursiv (auch in nested Repeatern) und entfernt den Metaschlüssel aus der Ausgabe.
 
+### Slots, die kein Repeater sind: `MFormOutputHelper`
+
+`decode()` ist ausschließlich für Repeater-Slots zuständig. Felder mit Punkt-Notation (`1.1`, `1.2`, …) legt MForm zwar ebenfalls als JSON in einem Slot ab, sie sind aber keine Item-Liste – `decode()` liefert dafür `[]`.
+
+Für diese Slots ist `MFormOutputHelper` zuständig:
+
+```php
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+// Alle Felder eines Slots als Map (Punkt-Notation 1.1, 1.2, ...)
+$werte = MFormOutputHelper::values(1);   // ['1' => 'Titel', '2' => 'Text']
+
+// Einzelnes Feld, optional mit Default und Punkt-Pfad für verschachtelte Werte
+$titel = MFormOutputHelper::value(1, '1', '');
+$tief  = MFormOutputHelper::value(2, 'a.b');
+
+// Einfacher Slot ohne Punkt-Notation
+$text  = MFormOutputHelper::value(3);
+
+// Unterscheiden, falls ein Modul von einem einfachen Feld auf einen Repeater migriert wurde
+if (MFormOutputHelper::isRepeater(1)) {
+    $items = MFormRepeaterHelper::decode(1);
+} else {
+    $items = [MFormOutputHelper::values(1)];
+}
+```
+
+Der Vorteil gegenüber `rex_var::toArray()`: `values()` nimmt eine Slot-Id statt eines `REX_VALUE`-Strings, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück (kein `null`). Repeater-Daten werden ausgeschlossen, sodass `decode()` und `values()` sich sauber ergänzen.
+
+Dieselben drei Methoden gibt es als Alias auch auf `MFormRepeaterHelper`, damit bestehender Code und der gewohnte Einstieg über `decode()` weiter funktionieren. Fachlich gehören sie zu `MFormOutputHelper`.
+
 Verfügbare Optionen im Repeater-Array:
 
 - `collapsed` (bool, default: `false`): Initial alle Items reduziert anzeigen.

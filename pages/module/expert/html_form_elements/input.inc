@@ -1,4 +1,7 @@
 <?php
+
+use FriendsOfRedaxo\MForm;
+
 // show form elements
 echo MForm::factory() // init mform
     // add fieldset area
