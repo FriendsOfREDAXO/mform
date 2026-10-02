@@ -456,7 +456,7 @@ class MFormParser
 
             $optionElements = '';
             foreach ($item->getOptions() as $key => $value) {
-                $optionElements .= $this->createOptionElement($item, $value, (!is_int($key)) ? "label=\"$key\"" : '', 'datalist-option', false);
+                $optionElements .= $this->createOptionElement($item, $value, (!is_int($key)) ? 'label="' . htmlspecialchars((string) $key, ENT_QUOTES) . '"' : '', 'datalist-option', false);
             }
             $element = new MFormElement();
             $element->setOptions($optionElements)
@@ -580,7 +580,7 @@ class MFormParser
                     // create opt group element
                     $groupElement = new MFormElement();
                     $groupElement->setOptions($optElements)
-                        ->setLabel($optGroupLabel)
+                        ->setLabel(self::escapeOptionLabel($optGroupLabel))
                         ->setType('optgroup');
 
                     $optionElements .= $this->parseElement($groupElement, 'select');
@@ -639,10 +639,12 @@ class MFormParser
      */
     private function createOptionElement(MFormItem $item, int|string $key, mixed $value, string $templateType = 'option', bool $selected = true, bool $disabled = false, string|array $toggle = ''): string
     {
-        // create element
+        // create element - Schluessel und Beschriftung sind Text, kein HTML - sie stammen oft aus Redaktionsdaten
+        // (setSqlOptions, Optionen aus Slices/YForm). Bei datalist-option ist $value bereits ein
+        // fertiges Attribut (label="…"), das der Aufrufer escaped.
         $element = new MFormElement();
-        $element->setValue((string) $key)// set option key
-        ->setLabel($value) // set option label
+        $element->setValue(htmlspecialchars((string) $key, ENT_QUOTES))// set option key
+        ->setLabel('datalist-option' === $templateType ? (string) $value : self::escapeOptionLabel($value)) // set option label
         ->setType($templateType);
 
         if ('' !== $toggle && [] !== $toggle) {
@@ -705,6 +707,17 @@ class MFormParser
 
         // parse element
         return $this->parseElement($element, ('datalist-option' == $templateType) ? 'input' : 'select');
+    }
+
+    /**
+     * Escaped die Beschriftung einer Option bzw. Optionsgruppe fuer die Ausgabe als Text
+     * und als Attributwert. Vorhandene Entities (&nbsp; zum Einruecken, &amp; aus Modulen,
+     * die schon selbst escapen) bleiben stehen und werden nicht doppelt kodiert; Markup
+     * laesst sich damit nicht einschleusen.
+     */
+    private static function escapeOptionLabel(mixed $label): string
+    {
+        return htmlspecialchars(is_scalar($label) ? (string) $label : '', ENT_QUOTES, 'UTF-8', false);
     }
 
     /**
