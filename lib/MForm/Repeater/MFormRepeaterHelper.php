@@ -369,7 +369,7 @@ class MFormRepeaterHelper
      */
     public static function dataVersion(string|array $source): int
     {
-        $decoded = is_string($source) ? json_decode(html_entity_decode($source, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true) : $source;
+        $decoded = is_string($source) ? MFormOutputHelper::decodeRaw($source) : $source;
         if (is_array($decoded) && isset($decoded[self::DATA_VERSION_KEY]) && is_numeric($decoded[self::DATA_VERSION_KEY])) {
             return (int) $decoded[self::DATA_VERSION_KEY];
         }
