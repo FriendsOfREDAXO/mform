@@ -68,7 +68,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 | Methode | Verwendung |
 |---------|-----------|
-| `decode(int\|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-/Entity-Dekodierung und Item-Filterung in einem Schritt. |
+| `decode(int\|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-Dekodierung und Item-Filterung in einem Schritt. Werte per Slot-Id kommen so, wie sie gespeichert sind (Entities wie `&quot;` aus TinyMCE bleiben erhalten); nur der escapte Platzhalter (`'REX_VALUE[1]'`) wird vorher entity-dekodiert. |
 | `prepareItemsForOutput(array $items)` | Wenn der Array bereits dekodiert vorliegt (z. B. aus einer DB-Abfrage). |
 
 ```php

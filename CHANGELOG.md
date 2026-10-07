@@ -1,5 +1,14 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 9.5.3
+
+Wartungsrelease (07.10.2026). Backport aus MForm 10.0.2, keine Datenmigration.
+
+### Behoben
+
+- **Entities in Repeater-Werten machten Module leer oder verfälschten Inhalte** (Backport von #463, danke @anveno): Beim Lesen eines Slots wurden Entities umgewandelt, bevor das JSON gelesen wurde. Das ist nur für den escapten Platzhalter (`decode('REX_VALUE[1]')`) richtig. Per Slot-Id (`decode(1)`) kommt der Wert roh aus der Datenbank. Ein `&quot;` aus TinyMCE (etwa in einem Linktitel `Sagt "Hallo"`) machte das JSON ungültig, `decode()` lieferte `[]` und das Modul blieb im Frontend leer. Als Text getippte Tags (`&lt;h2&gt;`) kamen als Markup zurück und wurden in der Eingabemaske beim nächsten Speichern als Markup übernommen. `MFormRepeaterHelper::decode()` liest jetzt zuerst das rohe JSON und wandelt Entities nur noch als Rückfall um, `MFormValueHandler` liest die Werte für die Eingabemaske ohne `htmlspecialchars_decode()`. Der escapte Platzhalter liefert dasselbe wie bisher. Wer sich darauf verlassen hat, dass `decode(1)` Entities in den Werten umwandelt, bekommt die Werte jetzt so, wie sie gespeichert sind.
+- **MBlock-Konverter scheiterte an Entities im Inhalt**: `MBlockToRepeaterConverter::convertData()` hatte denselben Fehler. Ein Slice mit `&quot;` im Editor-Inhalt brach mit „Daten sind kein gültiges JSON“ ab, `&lt;h2&gt;` wurde zu Markup. Der Konverter liest jetzt ebenfalls zuerst roh.
+
 ## Version 9.5.2
 
 Fehlerbehebungen, die bei der Arbeit an MForm 10 gefunden wurden, für die 9.5-Linie übernommen. Keine neuen Optionen, keine Datenänderung.

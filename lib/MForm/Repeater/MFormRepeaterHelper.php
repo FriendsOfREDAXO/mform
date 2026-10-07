@@ -286,6 +286,14 @@ class MFormRepeaterHelper
             return [];
         }
 
+        // Erst roh lesen: per Slot-Id kommt der Wert unescaped aus der Datenbank, Entities in den
+        // Feldwerten (&quot; in einem Linktitel, &lt;h2&gt; als Text) gehoeren zum Inhalt. Nur wenn
+        // das scheitert, liegt der escapte Platzhalter vor ('REX_VALUE[1]' ohne output=html).
+        $decoded = json_decode($rexValue, true);
+        if (is_array($decoded)) {
+            return self::prepareItemsForOutput($decoded);
+        }
+
         $normalizedValue = html_entity_decode($rexValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $decoded = json_decode($normalizedValue, true);
 
