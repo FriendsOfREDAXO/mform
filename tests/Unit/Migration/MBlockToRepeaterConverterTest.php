@@ -154,6 +154,24 @@ final class MBlockToRepeaterConverterTest extends TestCase
         self::assertNotSame([], $result['warnings']);
     }
 
+    public function testConvertDataKeepsEntitiesInValues(): void
+    {
+        $html = '<a href="/x?a=1&amp;b=2" title="Sagt &quot;Hallo&quot;">&lt;h2&gt; als Text</a>';
+        $raw = json_encode([['checkbox_block_hold' => 'x', 'text' => $html]]);
+        $result = $this->converter->convertData((string) $raw, '1', [], ['check_existence' => false]);
+
+        self::assertSame([], $result['warnings']);
+        self::assertSame($html, json_decode($result['json'], true)[0]['text']);
+    }
+
+    public function testConvertDataAcceptsEscapedValue(): void
+    {
+        $raw = htmlspecialchars((string) json_encode([['checkbox_block_hold' => 'x', 'text' => 'a']]));
+        $result = $this->converter->convertData($raw, '1');
+
+        self::assertSame([['text' => 'a']], json_decode($result['json'], true));
+    }
+
     public function testConvertDataNormalizesListFields(): void
     {
         $raw = json_encode([['checkbox_block_hold' => 'x', 'REX_MEDIALIST_1' => ' a.jpg, b.jpg,,a.jpg ', 'links' => ['5', ' 7', '']]]);

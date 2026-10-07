@@ -281,6 +281,16 @@ body.rex-theme-dark .mfr-container {
     float: none;
 }
 
+/* pullNaviItemRight: Flex-Ersatz für .pull-right. Rechte Reiter wandern hinter
+   die linken, der erste davon schiebt die Gruppe an den Rand. */
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li.pull-right {
+    order: 1;
+}
+
+.mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li.pull-right:nth-child(1 of .pull-right) {
+    margin-left: auto;
+}
+
 .mform .mform-tabs:not(.mform-tabs--vertical) > .nav-tabs > li > a {
     color: var(--mform-tab-link-color);
 }

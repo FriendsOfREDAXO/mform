@@ -237,8 +237,11 @@ final class MBlockToRepeaterConverter
             return $this->dataResult('', 0);
         }
 
-        $normalized = html_entity_decode($rawValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $decoded = json_decode($normalized, true);
+        // Erst roh lesen: Entities in den Feldwerten gehören zum Inhalt (wie MFormOutputHelper::decodeRaw()).
+        $decoded = json_decode($rawValue, true);
+        if (!is_array($decoded)) {
+            $decoded = json_decode(html_entity_decode($rawValue, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+        }
 
         if (!is_array($decoded)) {
             $this->warn('Daten sind kein gueltiges JSON. Pruefe den Slice-Wert.');

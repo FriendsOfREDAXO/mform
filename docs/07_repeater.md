@@ -68,7 +68,7 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 
 | Methode | Verwendung |
 |---------|-----------|
-| `decode(int\|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-/Entity-Dekodierung und Item-Filterung in einem Schritt. |
+| `decode(int\|string $source)` | **Empfohlen** – übernimmt Slot-Auflösung (bei `int`) sowie JSON-Dekodierung und Item-Filterung in einem Schritt. Werte per Slot-Id kommen so, wie sie gespeichert sind (Entities wie `&quot;` aus TinyMCE bleiben erhalten); nur der escapte Platzhalter (`'REX_VALUE[1]'`) wird vorher entity-dekodiert. |
 | `prepareItemsForOutput(array $items)` | Wenn der Array bereits dekodiert vorliegt (z. B. aus einer DB-Abfrage). |
 
 ```php
@@ -286,7 +286,7 @@ if (MFormOutputHelper::isRepeater(1)) {
 }
 ```
 
-Der Vorteil gegenüber `rex_var::toArray()`: `values()` nimmt eine Slot-Id statt eines `REX_VALUE`-Strings, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück (kein `null`). `value()` liefert dagegen den angefragten Wert selbst oder den übergebenen Default. Repeater-Daten werden ausgeschlossen, sodass `decode()` und `values()` sich sauber ergänzen.
+Der Vorteil gegenüber `rex_var::toArray()`: `values()` nimmt eine Slot-Id statt eines `REX_VALUE`-Strings, dekodiert beim escapten Platzhalter HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück (kein `null`). `value()` liefert dagegen den angefragten Wert selbst oder den übergebenen Default. Repeater-Daten werden ausgeschlossen, sodass `decode()` und `values()` sich sauber ergänzen.
 
 Dieselben drei Methoden gibt es als Alias auch auf `MFormRepeaterHelper`, damit bestehender Code und der gewohnte Einstieg über `decode()` weiter funktionieren. Fachlich gehören sie zu `MFormOutputHelper`.
 

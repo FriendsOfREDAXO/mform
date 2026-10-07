@@ -1,5 +1,15 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.2
+
+Wartungsrelease (07.10.2026). Update von 10.0.1 ohne Datenmigration, keine Breaking Changes.
+
+### Behoben
+
+- **Entities in Repeater-Werten machten Module leer oder verfälschten Inhalte** (#463, danke @anveno): Beim Lesen eines Slots wurden Entities umgewandelt, bevor das JSON gelesen wurde. Das ist nur für den escapten Platzhalter (`decode('REX_VALUE[1]')`) richtig. Per Slot-Id kommt der Wert roh aus der Datenbank. Ein `&quot;` aus TinyMCE (etwa in einem Linktitel `Sagt "Hallo"`) machte das JSON ungültig, `decode()` lieferte `[]` und das Modul blieb im Frontend leer. Als Text getippte Tags (`&lt;h2&gt;`) kamen als Markup zurück und wurden in der Eingabemaske beim nächsten Speichern als Markup übernommen. `MFormOutputHelper::decodeRaw()` (und damit `decode()`, `values()`, `value()`, `isRepeater()`, `dataVersion()`) liest jetzt zuerst das rohe JSON und wandelt Entities nur noch als Rückfall um. `MFormValueHandler` liest die Werte für die Eingabemaske ohne `htmlspecialchars_decode()`. Der escapte Platzhalter liefert dasselbe wie bisher. Wer sich darauf verlassen hat, dass `decode(1)` Entities in den Werten umwandelt, bekommt die Werte jetzt so, wie sie gespeichert sind.
+- **MBlock-Konverter scheiterte an Entities im Inhalt**: `MBlockToRepeaterConverter::convertData()` hatte denselben Fehler. Ein Slice mit `&quot;` im Editor-Inhalt brach mit „Daten sind kein gültiges JSON“ ab, `&lt;h2&gt;` wurde zu Markup. Der Konverter liest jetzt ebenfalls zuerst roh.
+- **`addTabElement()` ignorierte `pullNaviItemRight: true`** (#462, danke @dpf-dd): Seit die horizontale Tab-Leiste in MForm 10 auf Flexbox umgestellt ist, wirkte Bootstraps `float: right` der Klasse `pull-right` nicht mehr, rechte Reiter blieben links. Sie werden jetzt per Flex an den rechten Rand geschoben, auch wenn sie nicht am Ende der Reiterliste stehen. Mehrere rechte Reiter erscheinen in Quelltext-Reihenfolge, nicht mehr gespiegelt wie beim Float.
+
 ## Version 10.0.1
 
 Wartungsrelease (23.09.2026). Update von 10.0.0 ohne Datenmigration, keine Breaking Changes.
