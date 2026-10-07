@@ -61,9 +61,12 @@ class MFormValueHandler
                         }
 
                         // thanks @dtpop
+                        // Den Wert lesen, wie er gespeichert ist: Entities in den Feldwerten gehoeren
+                        // zum Inhalt (&lt;h2&gt; als Text im Editor). Ein htmlspecialchars_decode() davor
+                        // aendert nie, ob das JSON lesbar ist, sondern nur die Werte.
                         $rawValue = $result['value'][$i];
                         $rawStringValue = (is_scalar($rawValue) || null === $rawValue) ? (string) $rawValue : '';
-                        $jsonResult = json_decode(htmlspecialchars_decode($rawStringValue, ENT_NOQUOTES), true); // wb
+                        $jsonResult = json_decode($rawStringValue, true);
 
                         if (is_array($jsonResult)) {
                             $result['value_string'][$i] = $result['value'][$i];
