@@ -961,7 +961,7 @@ Statische Helfer für die Aufbereitung von Slot-, Link- und Mediendaten im Modul
 ```php
 MFormOutputHelper::values(int|string $source): array
 ```
-**Slots, die kein Repeater sind.** Liest einen Slot mit Punkt-Notation (`1.1`, `1.2`, …) als Map `['1' => …, '2' => …]`. Nimmt eine Slot-Id oder einen Roh-Wert, dekodiert HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück. Repeater-Daten werden ausgeschlossen – dafür ist `MFormRepeaterHelper::decode()` zuständig.
+**Slots, die kein Repeater sind.** Liest einen Slot mit Punkt-Notation (`1.1`, `1.2`, …) als Map `['1' => …, '2' => …]`. Nimmt eine Slot-Id oder einen Roh-Wert, dekodiert beim escapten Platzhalter (`'REX_VALUE[1]'`) HTML-Entities, repariert durch `nl2br()` eingefügte `<br>`-Tags und gibt immer ein Array zurück. Repeater-Daten werden ausgeschlossen – dafür ist `MFormRepeaterHelper::decode()` zuständig.
 
 ```php
 // Modul-Output:
