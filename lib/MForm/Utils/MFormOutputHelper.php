@@ -113,8 +113,13 @@ class MFormOutputHelper
     }
 
     /**
-     * Gemeinsame Roh-Aufbereitung: Slot-Id auflösen, Entities dekodieren und den
-     * <br>-Fallback anwenden. MFormRepeaterHelper::decode() nutzt dieselbe Logik.
+     * Gemeinsame Roh-Aufbereitung: Slot-Id auflösen und das JSON lesen.
+     * MFormRepeaterHelper::decode() nutzt dieselbe Logik.
+     *
+     * Der Wert wird zuerst so gelesen, wie er gespeichert ist: Entities in den Feldwerten
+     * (&quot; in einem Linktitel, &lt;h2&gt; als Text) gehören zum Inhalt. Nur wenn das
+     * scheitert, liegt der escapte Platzhalter vor ('REX_VALUE[1]' ohne output=html); dann
+     * werden Entities dekodiert und der <br>-Fallback angewendet.
      *
      * @param int|string $source Slot-Id oder Roh-Wert
      * @return array<mixed>|null Dekodiertes Array, sonst null
@@ -124,6 +129,11 @@ class MFormOutputHelper
         $raw = self::rawValue($source);
         if ('' === $raw) {
             return null;
+        }
+
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) {
+            return $decoded;
         }
 
         $normalizedValue = html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
