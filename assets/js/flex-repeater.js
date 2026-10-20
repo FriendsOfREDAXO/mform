@@ -351,6 +351,22 @@
     }
 
     /**
+     * Gibt den Radios eines Items je Feld einen eigenen name, damit sie eine echte
+     * Radio-Gruppe bilden. Ohne name blieb beim Umschalten das zuvor gewählte Radio
+     * ebenfalls checked und collectItemData() speicherte den letzten checked-Wert.
+     * Radios aus Nested Repeatern (bzw. aus anderen Nested-Items) bleiben unberührt.
+     */
+    function groupItemRadios(itemEl, isOwnField) {
+        const names = {};
+        itemEl.querySelectorAll('input[type="radio"][data-mfr-field]').forEach(function (radio) {
+            if (!isOwnField(radio)) return;
+            const key = radio.dataset.mfrField;
+            if (!names[key]) names[key] = uid('mfr-radio');
+            radio.name = names[key];
+        });
+    }
+
+    /**
      * Liest alle [data-mfr-field]-Werte aus einem Item-Element
      * (direkte Felder, keine nested Repeater).
      */
@@ -598,6 +614,8 @@
                     return tabMap[n];
                 });
             }
+
+            groupItemRadios(itemEl, function (radio) { return radio.closest('.mfr-nested-item') === itemEl; });
 
             // Felder befüllen
             itemEl.querySelectorAll('[data-mfr-field]').forEach(function (field) {
@@ -1035,6 +1053,8 @@
                     return tabMap[n];
                 });
             }
+
+            groupItemRadios(itemEl, function (radio) { return !radio.closest('.mfr-nested-repeater'); });
 
             // Felder befüllen (Textareas vor TinyMCE-Init)
             this._fillFields(itemEl, data);

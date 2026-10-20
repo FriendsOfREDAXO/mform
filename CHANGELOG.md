@@ -1,5 +1,11 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Unreleased
+
+### Behoben
+
+- **Radio-Felder im Flex-Repeater speicherten beim Umschalten den alten Wert**: Die Radios eines Repeater-Items hatten kein `name`-Attribut und bildeten deshalb keine Radio-Gruppe. Beim Anklicken eines anderen Radios blieb das zuvor gewählte ebenfalls angehakt, und beim Speichern gewann das letzte angehakte Radio in der Liste. Wer etwa bei `addRadioColorField()` von „Gelb“ auf das weiter oben stehende „Weiß“ umschaltete, behielt nach dem Speichern „Gelb“. Betroffen waren auch Radios in Nested Repeatern. Jedes Item (auch Nested-Items, neu hinzugefügte, kopierte und eingefügte) gibt seinen Radios jetzt je Feld einen eigenen `name`, die Gruppen bleiben beim Verschieben erhalten und mischen sich nicht zwischen Items oder mit Nested Repeatern. Das Speicherformat ändert sich nicht.
+
 ## Version 10.0.2
 
 Wartungsrelease (07.10.2026). Update von 10.0.1 ohne Datenmigration, keine Breaking Changes.
