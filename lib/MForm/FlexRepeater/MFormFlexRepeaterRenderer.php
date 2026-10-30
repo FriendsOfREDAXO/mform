@@ -877,11 +877,15 @@ class MFormFlexRepeaterRenderer
             'toolbar' => 'vertical',
         ];
 
-        if (isset($attrs['data-media-category']) && '' !== (string) $attrs['data-media-category']) {
-            $args['category'] = (string) $attrs['data-media-category'];
+        // Attribute (data-*) oder Parameter wie im klassischen Formular (category/media_category, types)
+        $itemParams = $item->getParameter();
+        $category = $attrs['data-media-category'] ?? $itemParams['media_category'] ?? $itemParams['category'] ?? null;
+        if (null !== $category && '' !== (string) $category) {
+            $args['category'] = (string) $category;
         }
-        if (isset($attrs['data-media-type']) && '' !== (string) $attrs['data-media-type']) {
-            $args['types'] = (string) $attrs['data-media-type'];
+        $mediaTypes = isset($attrs['data-media-type']) && '' !== (string) $attrs['data-media-type'] ? (string) $attrs['data-media-type'] : self::normalizeMediaTypes($itemParams['types'] ?? null);
+        if (null !== $mediaTypes) {
+            $args['types'] = $mediaTypes;
         }
 
         $html = rex_var_custom_medialist::getWidget(
@@ -1001,7 +1005,7 @@ class MFormFlexRepeaterRenderer
         } elseif (isset($attrs['data-types'])) {
             $args['types'] = $attrs['data-types'];
         }
-        // Medienfelder: Parameter wie im klassischen Formular (types, media_category/category), #466
+        // Medienfelder: Parameter wie im klassischen Formular (types, media_category/category, preview), #466
         if ('media' === $type || 'mform-media' === $type) {
             $mediaTypes = self::normalizeMediaTypes($params['types'] ?? null);
             if (!isset($args['types']) && null !== $mediaTypes) {
@@ -1013,6 +1017,9 @@ class MFormFlexRepeaterRenderer
                 } elseif (isset($params['category']) && '' !== (string) $params['category']) {
                     $args['media_category'] = $params['category'];
                 }
+            }
+            if (isset($params['preview'])) {
+                $args['preview'] = $params['preview'];
             }
         }
         if (isset($attrs['data-extern-link-prefix'])) {

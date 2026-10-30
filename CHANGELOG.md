@@ -1,5 +1,17 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.5
+
+Wartungsrelease (30.10.2026), Nachtrag zum Review von #468. Update von 10.0.4 ohne Datenmigration, keine Breaking Changes.
+
+### Behoben
+
+- **Bildliste im Flex-Repeater ignorierte Dateityp- und Kategoriefilter**: `addImagelistField('bilder', ['types' => 'jpg,png', 'category' => 2])` öffnete den Medienpool im Repeater ohne Filter, weil nur `data-*`-Attribute gelesen wurden. Die Bildliste übernimmt jetzt wie Medienfeld und Medienliste die Parameter `types` (normalisiert) und `media_category`/`category`.
+
+### Neu
+
+- **Custom-Link/Medienfeld: Vorschau-Schaltfläche abschaltbar**: Mit dem Parameter bzw. Argument `preview` = `0`/`false` blendet das Custom-Link-Widget die Vorschau-Schaltfläche aus (z. B. `addMediaField('datei', ['preview' => 0])` im Repeater oder bei `useCustomLinkForClassicWidgets(true)`). Ohne Angabe bleibt sie wie bisher sichtbar, sobald die gewählte Datei eine Vorschau erlaubt.
+
 ## Version 10.0.4
 
 Wartungsrelease (30.10.2026). Update von 10.0.3 ohne Datenmigration, keine Breaking Changes.
