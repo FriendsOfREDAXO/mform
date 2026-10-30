@@ -215,7 +215,7 @@ REX_CUSTOM_LINK_MULTI[id=6 widget=1 external=1 intern=1 mailto=1 phone=0 media=1
 
 Das Custom-Link-Widget enthält einen **Anker-Button**, mit dem Redakteure direkt auf einen Slice/Artikel-Abschnitt verlinken können (setzt einen `#`-Fragment-Anker).
 
-Standardmäßig ist der Button sichtbar. Er kann über das `anchor`-Attribut (Wert `0`) ausgeblendet werden:
+Standardmäßig ist der Button sichtbar. Er kann über das Attribut `data-anchor` (Wert `disable`) ausgeblendet werden:
 
 ```php
 <?php
@@ -227,7 +227,7 @@ echo MForm::factory()
         ->addCustomLinkField(1, ['label' => 'Link mit Anker'])
 
         // Anker-Button ausblenden
-        ->addCustomLinkField(2, ['label' => 'Link ohne Anker', 'anchor' => 0])
+        ->addCustomLinkField(2, ['label' => 'Link ohne Anker', 'data-anchor' => 'disable'])
     )
     ->show();
 ```
@@ -310,11 +310,11 @@ $linkdata = MFormOutputHelper::prepareCustomLink(['link' => $value], true);
 Ergebnis:
 ```php
 [
-    "link" => "10"
-    "customlink_text" => "Artikelname"
-    "customlink_url" => "/artikelname"
-    "customlink_target" => ""
-    "customlink_class" => " internal"
+    "link" => "10",
+    "customlink_text" => "Artikelname",
+    "customlink_url" => "/artikelname",
+    "customlink_target" => "",
+    "customlink_class" => " internal",
 ]
 ```
 
@@ -401,28 +401,28 @@ Ein vollständiges Link-Array kann folgende Werte enthalten:
 
 ### YForm Custom-Link-Value
 
-Um die  generierten Urls wie `rex_news://1` zu ersetzen, muss das folgende Skript in die `boot.php` des `project` AddOns eingefügt werden.
+Um die  generierten Urls wie `rex-news://1` zu ersetzen, muss das folgende Skript in die `boot.php` des `project` AddOns eingefügt werden.
 Der Code für die Urls muss modifiziert werden.
 
 ```php
 rex_extension::register('OUTPUT_FILTER', function(\rex_extension_point $ep) {
     return preg_replace_callback(
-        '@((rex_news|rex_person))://(\d+)(?:-(\d+))?/?@i',
+        '@(rex-news|rex-person)://(\d+)@i',
         function ($matches) {
-            // table = $matches[1]
-            // id = $matches[3]
+            // table = $matches[1] (Tabellenname mit "-" statt "_", z. B. rex-news für rex_news)
+            // id = $matches[2]
             $url = '';
-            switch ($matches[1]) {
-                case 'news':
+            switch (strtolower($matches[1])) {
+                case 'rex-news':
                     // Example, if the Urls are generated via Url-AddOn  
-                    $id = $matches[3];
+                    $id = $matches[2];
                     if ($id) {
                        return rex_getUrl('', '', ['news' => $id]); 
                     }
                     break;
-                case 'person':
+                case 'rex-person':
                     // ein anderes Beispiel 
-                    $url = '/index.php?person='.$matches[3];
+                    $url = '/index.php?person='.$matches[2];
                     break;
             }
             return $url;

@@ -100,14 +100,19 @@ MForm::registerTemplate('seo_defaults', SeoDefaultsTemplate::class);
 
 ## 5) Verwendung in Modulen
 
+Das Template oben verwendet String-Keys (`card.style`, `card.linkdiv`, `card.shadow`). String-Keys funktionieren nur innerhalb eines Repeaters; außerhalb eines Repeaters brauchen Felder numerische Slot-IDs (`REX_VALUE[1]` bis `REX_VALUE[20]`). Die mit dem Template gebauten Formulare werden deshalb als Item-Formular an einen Repeater übergeben.
+
 ```php
 <?php
 
 use FriendsOfRedaxo\MForm;
 
-echo MForm::fromTemplate('card_defaults')
+$itemForm = MForm::fromTemplate('card_defaults')
     ->addTextField('title', ['label' => 'Titel'])
-    ->addTextAreaField('text', ['label' => 'Text'])
+    ->addTextAreaField('text', ['label' => 'Text']);
+
+echo MForm::factory()
+    ->addRepeaterElement(1, $itemForm)
     ->show();
 ```
 
@@ -116,12 +121,14 @@ echo MForm::fromTemplate('card_defaults')
 
 use FriendsOfRedaxo\MForm;
 
-$mform = MForm::factory()
+$itemForm = MForm::factory()
     ->addTextField('headline', ['label' => 'Headline'])
     ->applyTemplate('card_defaults', ['module' => 'team_cards', 'variant' => 'dark'])
     ->addTextAreaField('body', ['label' => 'Beschreibung']);
 
-echo $mform->show();
+echo MForm::factory()
+    ->addRepeaterElement(1, $itemForm)
+    ->show();
 ```
 
 ```php

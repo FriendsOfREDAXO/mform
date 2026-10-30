@@ -101,6 +101,8 @@ MForm stellt folgende Element-Methoden bereit:
 ## Beispiele: Attribute
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // text input use set attribute method
@@ -150,13 +152,13 @@ $mform->addSelectField(2.1, [1 => 'option 1', 2 => 'option 2'])
 // select use any setters
 $mform->addSelectField(2.2)
     ->setOptions([1 => 'option 1', 2 => 'option 2', 3 => 'option 3', 4 => 'option 4']) // for options set options method
-    ->setOption('option 5', 5)
+    ->setOption(5, 'option 5')
     ->setLabel('Select Label') // for label use set label method
     ->setAttribute('class', 'mynewclass') // for class use only set attribute method
     ->setAttribute('style', 'width: 260px') // for style use only set attribute method
-    ->setDefaultValue(2) // for default value use set default value method
+    ->setDefaultValue('2') // for default value use set default value method
     ->setMultiple()
-    ->setSize('full');
+    ->setSize(5); // number of visible rows
 // parse mform
 echo MForm::factory()
     // add fieldset areas
@@ -168,6 +170,8 @@ echo MForm::factory()
 ## Beispiele: JSON-Value-Support
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
 // instanziieren
 $mform = MForm::factory()
     // add fieldset area
@@ -187,12 +191,17 @@ echo $mform->show();
 ```
 
 ```php
-dump('REX_VALUE[id=1]');
+<?php
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+dump(MFormOutputHelper::values(1)); // ['0' => ['title' => …], '1' => ['0' => …, …]]
 ```
 
 ## Beispiele: Optionen
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
 // init mform
 $mform = MForm::factory()
     // add fieldset area
@@ -214,7 +223,7 @@ $mform = MForm::factory()
         // multiselect use add method options parameter
         ->addMultiSelectField("2.0", [1 => 'option 1', 2 => 'option 2'], ['label'=>'Multiselect Label'])
         ->addSelectField("3.0", ['optgroup 1' => [1 => 'option 1', 2 => 'option 2'], 'optgroup 2' => [3 => 'option 3', 4 => 'option 4']], ['label'=>'Multiselect Label'])
-            ->setSize('full') // do it full
+            ->setFull() // full width
             ->setMultiple()
         // select use set options method
         ->addSelectField(3.1)
@@ -252,12 +261,14 @@ MForm unterstützt Mehrsprachigkeit der Formularbeschriftung auf verschidenen Eb
 
 ```php
 <?php
-$repeater = MForm::factory();
+use FriendsOfRedaxo\MForm;
 
-$repeater->addTextField('test1', ['label' => ['en'=>'Label EN', 'de' => 'Label DE']]);
-$repeater->addTextField('test2', ['label' => rex_i18n::msg("test")]);
+$mform = MForm::factory();
 
-echo $repeater->show();
+$mform->addTextField(1, ['label' => ['en_gb' => 'Label EN', 'de_de' => 'Label DE']]);
+$mform->addTextField(2, ['label' => rex_i18n::msg('test')]);
+
+echo $mform->show();
 ?>
 ```
 
@@ -578,7 +589,8 @@ Der optionale `preview`-Schlüssel bestimmt die Farbe, die im Popup-Swatch und i
 **Ausgabe im Template:**
 
 ```php
-$color = rex_escape(REX_VALUE[1]);   // z. B. "#2f77bc" oder ".bg-primary"
+<?php
+$color = rex_escape('REX_VALUE[id=1]');   // z. B. "#2f77bc" oder ".bg-primary"
 
 if (str_starts_with($color, '.')) {
     // CSS-Klasse
@@ -660,14 +672,19 @@ MForm::registerTemplate('card_defaults', CardDefaultsTemplate::class);
 
 ### 2) Template im Modul verwenden
 
+Die Beispiel-Templates arbeiten mit String-Keys (`card.style`, ...). Solche Keys funktionieren nur innerhalb eines Repeaters; außerhalb eines Repeaters brauchen Felder numerische Slot-IDs (`REX_VALUE[1]` bis `REX_VALUE[20]`). Die Item-Formulare unten werden deshalb an einen Repeater übergeben.
+
 Neue Form direkt aus einem Key:
 
 ```php
 <?php
 use FriendsOfRedaxo\MForm;
 
-echo MForm::fromTemplate('card_defaults')
-    ->addTextField('title', ['label' => 'Titel'])
+$itemForm = MForm::fromTemplate('card_defaults')
+    ->addTextField('title', ['label' => 'Titel']);
+
+echo MForm::factory()
+    ->addRepeaterElement(1, $itemForm)
     ->show();
 ```
 
@@ -677,12 +694,14 @@ Oder auf eine bestehende Form anwenden:
 <?php
 use FriendsOfRedaxo\MForm;
 
-$mform = MForm::factory()
+$itemForm = MForm::factory()
     ->addTextField('headline', ['label' => 'Headline'])
     ->applyTemplate('card_defaults', ['module' => 'team_cards'])
     ->addTextAreaField('text', ['label' => 'Text']);
 
-echo $mform->show();
+echo MForm::factory()
+    ->addRepeaterElement(1, $itemForm)
+    ->show();
 ```
 
 Hinweise:

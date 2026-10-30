@@ -116,7 +116,7 @@ Folgende Widgets rendern jetzt korrekt im Flex-Repeater – zuvor wurde fälschl
 | Medium | `addMediaField()`, `addMFormMediaField()` |
 | Bilderliste | `addImagelistField()` |
 
-Readonly-Felder (`addTextReadonlyField()`, `addTextareaReadonlyField()`) werden ebenfalls korrekt gerendert.
+Readonly-Felder (`addTextReadOnlyField()`, `addTextAreaReadOnlyField()`) werden ebenfalls korrekt gerendert.
 
 ### Custom-Link: Artikelname bei Vorab-Wert
 
@@ -181,6 +181,7 @@ Der Flex-Repeater deckt nun die bekannten Funktionen von MBlock vollständig ab.
 - Vollständig im Flex-Repeater unterstützt
 
 ```php
+// im Repeater-Item-Formular
 ->addModalElement('Einstellungen', MForm::factory()
     ->addSelectField('bg', ['' => 'Standard', 'bg-dark' => 'Dunkel'], ['label' => 'Hintergrund'])
     ->addCheckboxField('fullwidth', [1 => 'Volle Breite'], ['label' => 'Layout'])
@@ -202,6 +203,7 @@ Der Flex-Repeater deckt nun die bekannten Funktionen von MBlock vollständig ab.
 - CSS-Klassen-Swatches können mit optionaler `preview`-Farbe dargestellt werden
 
 ```php
+// im Repeater-Item-Formular; außerhalb eines Repeaters numerische Slot-ID, z. B. 1
 ->addColorSwatchField('color', [
     '#ffffff'     => 'Weiß',
     '#111111'     => 'Schwarz',

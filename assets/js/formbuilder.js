@@ -175,7 +175,6 @@
         var STORAGE_KEY = 'mform.formbuilder.state.v1';
         // Klassische REDAXO-Module haben pro Slot-Typ ein Limit von 20 (REX_VALUE / REX_MEDIA / REX_LINK / ...).
         // Der Builder vergibt fortlaufende IDs; ueber 20 hinaus werden Werte ggf. nicht mehr persistiert.
-        var MAX_FIELD_ID = 20;
         var slotWarningShown = false;
         var activeItem = null;
         var clipboard = null; // shallow item clone in memory for paste
@@ -212,7 +211,8 @@
                 cssClass: '',
                 rows: '',
                 category: '',
-                options: (type === 'select' || type === 'radio' || type === 'checkbox' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2"
+                options: (type === 'select' || type === 'radio' || type === 'checkboxgroup') ? "1=Option 1\n2=Option 2"
+                    : (type === 'checkbox' || type === 'togglecheckbox') ? '1=Ja'
                     : (type === 'tags' ? "News\nBlog\nEvent"
                     : (type === 'radioimg' ? "1=Layout A|/assets/addons/project/img/layout-a.svg\n2=Layout B|/assets/addons/project/img/layout-b.svg"
                     : (type === 'radioicon' ? "left=Links|fa fa-align-left\ncenter=Zentriert|fa fa-align-center"
@@ -338,6 +338,106 @@
 
         function isConditionSourceType(type) {
             return !isContainerType(type) && !isStructureOnlyItem(type);
+        }
+
+        // ---- Slots und Schluessel fuer den erzeugten Code --------------------
+        //
+        // Eine Vergabe fuer Eingabe-Code, Ausgabe-Code, Sichtbarkeitsbedingungen und
+        // die Anzeige im Canvas, damit alles zusammenpasst:
+        // - ausserhalb eines Repeaters (auch in Spalte, Fieldset, Tab, Collapse, Accordion,
+        //   Inline, Modal): Slot-Nummer je REDAXO-Slot-Typ, lueckenlos in Reihenfolge
+        //   (REX_VALUE 1-20, REX_MEDIA/REX_MEDIALIST/REX_LINK/REX_LINKLIST je 1-10)
+        // - innerhalb eines Repeaters: Schluessel aus dem Label, eindeutig ueber alle
+        //   Layout-Container dieses Repeaters (verschachtelte Repeater haben eigene Schluessel)
+        // - Ueberschrift, Beschreibung, HTML, Hinweise speichern nichts und bekommen nichts.
+        var SLOT_LIMITS = { value: 20, media: 10, medialist: 10, link: 10, linklist: 10 };
+        var SLOT_LABELS = { value: 'REX_VALUE', media: 'REX_MEDIA', medialist: 'REX_MEDIALIST', link: 'REX_LINK', linklist: 'REX_LINKLIST' };
+
+        function slotTypeFor(type) {
+            if (type === 'media') return 'media';
+            if (type === 'medialist' || type === 'imagelist') return 'medialist';
+            if (type === 'link') return 'link';
+            if (type === 'linklist') return 'linklist';
+            return 'value';
+        }
+
+        function computeNames(list) {
+            var byUid = {};
+            var counters = { value: 0, media: 0, medialist: 0, link: 0, linklist: 0 };
+            var overflow = [];
+
+            function walk(items, pool) {
+                (items || []).forEach(function (item) {
+                    if (isStructureOnlyItem(item.type)) {
+                        return;
+                    }
+                    if (isContainerType(item.type) && item.type !== 'repeater') {
+                        walk(item.children, pool);
+                        return;
+                    }
+                    var entry;
+                    if (pool) {
+                        var key = slugify(item.label, 'field_' + item.id);
+                        if (/^\d/.test(key)) {
+                            key = 'field_' + key;
+                        }
+                        var base = key, n = 2;
+                        while (pool[key]) { key = base + '_' + n++; }
+                        pool[key] = true;
+                        entry = { kind: 'key', key: key };
+                    } else {
+                        var slotType = slotTypeFor(item.type);
+                        var nr = ++counters[slotType];
+                        entry = { kind: 'slot', slotType: slotType, n: nr };
+                        if (nr > SLOT_LIMITS[slotType]) {
+                            overflow.push(SLOT_LABELS[slotType] + ' ' + nr + ' (' + (item.label || item.type) + ')');
+                        }
+                    }
+                    byUid[item.uid] = entry;
+                    if (item.type === 'repeater') {
+                        walk(item.children, {});
+                    }
+                });
+            }
+
+            walk(list, null);
+            return { byUid: byUid, counters: counters, overflow: overflow };
+        }
+
+        function collectMultiOptionCheckboxes(list) {
+            var out = [];
+            (list || []).forEach(function (item) {
+                if ((item.type === 'checkbox' || item.type === 'togglecheckbox') && parseOptions(item.options || '').length > 1) {
+                    out.push(item.label || item.type);
+                }
+                if (Array.isArray(item.children)) {
+                    out = out.concat(collectMultiOptionCheckboxes(item.children));
+                }
+            });
+            return out;
+        }
+
+        // Slot-Nummer (int) oder Repeater-Schluessel (string) eines Elements
+        function codeIdFor(item) {
+            var entry = computeNames(state).byUid[item.uid];
+            if (!entry) {
+                return item.id;
+            }
+            return entry.kind === 'slot' ? entry.n : entry.key;
+        }
+
+        function escapeHtmlText(value) {
+            return String(value).replace(/[&<>"']/g, function (ch) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+            });
+        }
+
+        function codeIdLabel(item) {
+            var entry = computeNames(state).byUid[item.uid];
+            if (!entry) {
+                return '';
+            }
+            return entry.kind === 'slot' ? SLOT_LABELS[entry.slotType] + ' ' + entry.n : '\u2192 ' + entry.key;
         }
 
         function supportsVisibility(type) {
@@ -496,7 +596,7 @@
                 collapseBtn +
                 '<span class="mform-fb__item-type">' + item.type + '</span>' +
                 '<span class="mform-fb__item-label"></span>' +
-                '<span class="mform-fb__item-id">id ' + item.id + '</span>' +
+                '<span class="mform-fb__item-id">' + escapeHtmlText(codeIdLabel(item)) + '</span>' +
                 '<span class="mform-fb__item-actions">' +
                     '<button type="button" class="mform-fb__item-btn" data-fb-duplicate title="Duplizieren"><i class="rex-icon fa-clone"></i></button>' +
                     '<button type="button" class="mform-fb__item-btn" data-fb-copy-item title="Kopieren"><i class="rex-icon fa-copy"></i></button>' +
@@ -688,27 +788,16 @@
         }
 
         function collectConditionSourceOptions(list, nested, options, excludeUid) {
-            var keyPool = {};
+            var names = computeNames(state).byUid;
 
             (list || []).forEach(function (item) {
-                var generatedKey = null;
-
-                if (nested && item.type !== 'fieldset' && item.type !== 'modal' && item.type !== 'tab') {
-                    var baseKey = slugify(item.label, 'field_' + item.id);
-                    generatedKey = baseKey;
-                    var suffix = 2;
-                    while (keyPool[generatedKey]) {
-                        generatedKey = baseKey + '_' + suffix++;
-                    }
-                    keyPool[generatedKey] = true;
-                }
-
-                if (item.uid !== excludeUid && isConditionSourceType(item.type)) {
+                var entry = names[item.uid];
+                if (item.uid !== excludeUid && isConditionSourceType(item.type) && entry) {
                     options.push({
                         uid: item.uid,
                         label: item.label || item.type,
                         type: item.type,
-                        ref: nested ? generatedKey : String(item.id)
+                        ref: entry.kind === 'slot' ? String(entry.n) : entry.key
                     });
                 }
 
@@ -1549,7 +1638,7 @@
             var out = [];
             item.visibilityConditions.forEach(function (c) {
                 if (!c || !c.sourceUid) return;
-                var ref = resolveGeneratedConditionSource(c.sourceUid, state, false);
+                var ref = resolveGeneratedConditionSource(c.sourceUid);
                 if (!ref) return;
                 out.push({ ref: ref, op: normalizeVisibilityOperator(c.operator), value: c.value || '' });
             });
@@ -1586,36 +1675,16 @@
             return '[' + phpStr('class') + ' => ' + phpStr('mform-conditional-wrapper') + ']';
         }
 
-        function resolveGeneratedConditionSource(uid, list, nested) {
-            var keyPool = {};
-
-            for (var index = 0; index < (list || []).length; index++) {
-                var item = list[index];
-                var generatedKey = null;
-
-                if (nested && item.type !== 'fieldset' && item.type !== 'modal' && item.type !== 'tab') {
-                    var baseKey = slugify(item.label, 'field_' + item.id);
-                    generatedKey = baseKey;
-                    var suffix = 2;
-                    while (keyPool[generatedKey]) {
-                        generatedKey = baseKey + '_' + suffix++;
-                    }
-                    keyPool[generatedKey] = true;
-                }
-
-                if (item.uid === uid && isConditionSourceType(item.type)) {
-                    return nested ? generatedKey : String(item.id);
-                }
-
-                if (Array.isArray(item.children) && item.children.length) {
-                    var nestedHit = resolveGeneratedConditionSource(uid, item.children, true);
-                    if (nestedHit) {
-                        return nestedHit;
-                    }
-                }
+        function resolveGeneratedConditionSource(uid) {
+            var source = findItem(uid, state);
+            if (!source || !isConditionSourceType(source.type)) {
+                return '';
             }
-
-            return '';
+            var entry = computeNames(state).byUid[uid];
+            if (!entry) {
+                return '';
+            }
+            return entry.kind === 'slot' ? String(entry.n) : entry.key;
         }
 
         function conditionSourceLiteral(sourceRef) {
@@ -1659,13 +1728,13 @@
                 case 'radio':
                 case 'checkbox': {
                     // Signature: addRadio/CheckboxField(id, options?, attributes?, defaultValue?)
-                    line += ', ' + optionsArray(parseOptions(item.options));
+                    // Eine Checkbox ist ein Einzelschalter: MForm rendert nur die erste Option.
+                    line += ', ' + optionsArray(item.type === 'checkbox' ? parseOptions(item.options).slice(0, 1) : parseOptions(item.options));
                     var hasDef = !!item.defaultValue;
                     if (attrPhp || hasDef) line += ', ' + (attrPhp || 'null');
                     if (hasDef) line += ', ' + phpStr(item.defaultValue);
                     break;
                 }
-                case 'togglecheckbox':
                 case 'colorswatch': {
                     line += ', ' + colorSwatchArray(parseColorSwatches(item.options));
                     var hasDefaultColorValue = !!item.defaultValue;
@@ -1674,7 +1743,7 @@
                     break;
                 }
                 case 'togglecheckbox': {
-                    line += ', ' + optionsArray(parseOptions(item.options));
+                    line += ', ' + optionsArray(parseOptions(item.options).slice(0, 1));
                     var hasDefaultValue = !!item.defaultValue;
                     if (attrPhp || hasDefaultValue) line += ', ' + (attrPhp || 'null');
                     if (hasDefaultValue) line += ', ' + phpStr(item.defaultValue);
@@ -1851,7 +1920,7 @@
 
         function renderTopLevelItemStmt(item, idx, indent) {
             if (item.type === 'repeater') {
-                return renderRepeaterStmt(item, item.id, indent);
+                return renderRepeaterStmt(item, codeIdFor(item), indent);
             }
             if (item.type === 'tab') {
                 var isFirstTab = idx === 0 || state[idx - 1].type !== 'tab';
@@ -1867,7 +1936,7 @@
                 return renderSimpleWrapper(item, indent, false);
             }
 
-            return renderField(item, item.id, indent) + ';';
+            return renderField(item, codeIdFor(item), indent) + ';';
         }
 
         function renderConditionalFieldsetStmt(item, idx, indent) {
@@ -1887,7 +1956,7 @@
         }
 
         function renderTopLevelVisibleFieldStmt(item, indent) {
-            var line = indent + '$mform->' + renderCall(item, item.id);
+            var line = indent + '$mform->' + renderCall(item, codeIdFor(item));
             if (item.full && (item.type === 'text' || item.type === 'textarea' || item.type === 'select')) {
                 line += '\n' + indent + '    ->setFull()';
             }
@@ -2016,7 +2085,6 @@
             if (children.length === 0) {
                 return indent + '        // Felder hier ablegen\n';
             }
-            var keyPool = {};
             var prevWasTab = false;
             var lines = children.map(function (c) {
                 var itemIndent = indent + '        ';
@@ -2042,12 +2110,8 @@
                     prevWasTab = false;
                     return renderSimpleWrapper(c, itemIndent, true);
                 }
-                var key = slugify(c.label, 'field_' + c.id);
-                var base = key, n = 2;
-                while (keyPool[key]) { key = base + '_' + n++; }
-                keyPool[key] = true;
                 prevWasTab = false;
-                meta.idArg = key;
+                meta.idArg = codeIdFor(c);
                 return renderInnerItemChainLink(c, itemIndent, meta) + (hasVisibilityCondition(c) ? visibleIfChain(c, itemIndent) : '');
             });
             return lines.join('\n') + '\n';
@@ -2088,12 +2152,20 @@
             setCodeText($code, lines.join('\n'));
             schedulePreview();
             // Warn once when any used id exceeds the conventional REX_VALUE/REX_MEDIA/... slot limit.
-            var maxId = collectMaxId(state);
+            var overflow = computeNames(state).overflow;
+            var warnings = [];
+            if (overflow.length) {
+                warnings.push('Zu viele Felder fuer die REDAXO-Slots (REX_VALUE 1\u201320, REX_MEDIA/REX_MEDIALIST/REX_LINK/REX_LINKLIST je 1\u201310). Diese Felder werden nicht gespeichert: ' + overflow.join(', ') + '. Felder in einen Repeater verschieben oder auf mehrere Module aufteilen.');
+            }
+            var multiCheckboxes = collectMultiOptionCheckboxes(state);
+            if (multiCheckboxes.length) {
+                warnings.push('Eine Checkbox ist ein Einzelschalter und speichert nur die erste Option: ' + multiCheckboxes.join(', ') + '. Fuer eine Mehrfachauswahl die Checkbox-Gruppe verwenden.');
+            }
             var slotMsg = document.querySelector('[data-fb-slot-warning]');
             if (slotMsg) {
-                if (maxId > MAX_FIELD_ID) {
+                if (warnings.length) {
                     slotMsg.style.display = '';
-                    slotMsg.textContent = 'Warnung: hoechste verwendete Slot-ID ist ' + maxId + '. Klassische REDAXO-Module unterstuetzen pro Typ nur die Slots 1\u201320 (REX_VALUE/REX_MEDIA/REX_LINK/...). IDs darueber werden ggf. nicht persistiert.';
+                    slotMsg.textContent = 'Warnung: ' + warnings.join(' ');
                 } else {
                     slotMsg.style.display = 'none';
                     slotMsg.textContent = '';
@@ -2102,17 +2174,6 @@
             emitOutputCode();
         }
 
-        function collectMaxId(list) {
-            var max = 0;
-            (list || []).forEach(function (it) {
-                if (typeof it.id === 'number' && it.id > max) max = it.id;
-                if (it.children) {
-                    var sub = collectMaxId(it.children);
-                    if (sub > max) max = sub;
-                }
-            });
-            return max;
-        }
 
         // ---- Output-Code (Modul-Output) -------------------------------------
         //
@@ -2128,32 +2189,44 @@
             return 'REX_VALUE[' + id + ']';
         }
 
-        function childKeyFor(child, usedKeys) {
-            var key = slugify(child.label, 'field_' + child.id);
-            var base = key, n = 2;
-            while (usedKeys[key]) { key = base + '_' + n++; }
-            usedKeys[key] = true;
-            return key;
+
+        // Variablennamen im Ausgabe-Code: eindeutig ueber den ganzen Code (auch in den
+        // Repeater-Schleifen), damit gleiche Labels sich nicht gegenseitig ueberschreiben.
+        // Schleifen- und Systemvariablen sind reserviert.
+        var outputVarPool = {};
+
+        function resetOutputVarPool() {
+            outputVarPool = { row: true, row2: true, row3: true, l: true, this: true, globals: true, rex: true, mform: true };
+        }
+
+        function uniqueVarName(base) {
+            var name = String(base || 'feld').replace(/[^a-z0-9_]/gi, '_');
+            if (/^\d/.test(name)) {
+                name = 'feld_' + name;
+            }
+            var candidate = name, n = 2;
+            while (outputVarPool[candidate.toLowerCase()]) {
+                candidate = name + '_' + n++;
+            }
+            outputVarPool[candidate.toLowerCase()] = true;
+            return candidate;
         }
 
         function varNameFor(item) {
-            var slug = slugify(item.label, item.type + '_' + item.id);
-            return slug.replace(/[^a-z0-9_]/gi, '_');
+            return uniqueVarName(slugify(item.label, item.type + '_' + item.id));
         }
 
         // Liefert die rechte Seite einer Variablen-Zuweisung fuer Top-Level-Felder.
         function topLevelExpr(item) {
-            var rv = '"' + rexVarFor(item.type, item.id) + '"';
+            var rv = '"' + rexVarFor(item.type, codeIdFor(item)) + '"';
             switch (item.type) {
                 case 'linklist':
                     // Liste von Artikel-IDs (kommagetrennt gespeichert)
                     return 'array_map("intval", array_filter(explode(",", ' + rv + ')))';
                 case 'medialist':
                 case 'imagelist':
-                case 'checkbox':
                 case 'checkboxgroup':
                 case 'tags':
-                case 'togglecheckbox':
                     // kommagetrennte Listen -> Array (laut Doku: array_filter(explode(...)))
                     return 'array_filter(explode(",", ' + rv + '))';
                 case 'select':
@@ -2185,10 +2258,8 @@
                     return 'array_map("intval", array_filter(explode(",", (string) (' + access + '))))';
                 case 'medialist':
                 case 'imagelist':
-                case 'checkbox':
                 case 'checkboxgroup':
                 case 'tags':
-                case 'togglecheckbox':
                     return 'array_filter(explode(",", (string) (' + access + ')))';
                 case 'select':
                     if (child.isMulti) {
@@ -2250,8 +2321,8 @@
                 case 'linklist':    return 'Array von Artikel-IDs (int[])';
                 case 'customlink':  return 'normalisiertes Array mit customlink_url, customlink_text, customlink_target, customlink_class';
                 case 'customlinkmultiple': return 'Array normalisierter Custom-Links (je Eintrag customlink_url/_text/_target/_class)';
-                case 'checkbox':    return 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
-                case 'togglecheckbox': return 'Array der ausgewaehlten Werte (Toggle-Checkbox; meist ["1"] bei aktiv)';
+                case 'checkbox':    return 'Einzelschalter: Wert der Option (z. B. "1") wenn angehakt, sonst leer';
+                case 'togglecheckbox': return 'Einzelschalter: Wert der Option (z. B. "1") wenn aktiv, sonst leer';
                 case 'checkboxgroup': return item.cbgMode === 'radio' ? 'einzelner ausgewaehlter Wert (CheckboxGroup im Radio-Mode)' : 'Array der ausgewaehlten Werte (kommasepariert gespeichert)';
                 case 'tags':        return 'Array der Tags (kommasepariert gespeichert)';
                 case 'select':
@@ -2286,15 +2357,14 @@
             if (rowVar === 'row') {
                 lines.push(indent + '// Repeater' + lbl + ' \u2013 dekodierte Items als Array von Zeilen');
                 outputUses.repeaterHelper = true;
-                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode(' + item.id + ');');
+                lines.push(indent + '$' + name + ' = MFormRepeaterHelper::decode(' + codeIdFor(item) + ');');
                 lines.push(indent + 'foreach ($' + name + ' as $' + rowVar + ') {');
             } else {
                 lines.push(indent + '// verschachtelter Repeater' + lbl);
-                lines.push(indent + 'foreach ((array) ($row[' + phpStr(item.__childKey) + '] ?? []) as $' + rowVar + ') {');
+                lines.push(indent + 'foreach ((array) ($row[' + phpStr(codeIdFor(item)) + '] ?? []) as $' + rowVar + ') {');
             }
 
             var inner = indent + '    ';
-            var usedKeys = {};
             // Fieldsets innerhalb des Repeaters sind reine UI-Wrapper -> Kinder hochziehen.
             flattenStructuralChildren(item.children || []).forEach(function (entry) {
                 if (entry.kind === 'fs-marker') {
@@ -2302,15 +2372,16 @@
                     return;
                 }
                 var c = entry.item;
-                var key = childKeyFor(c, usedKeys);
+                if (isStructureOnlyItem(c.type)) {
+                    return;
+                }
+                var key = codeIdFor(c);
                 if (c.type === 'repeater') {
-                    c.__childKey = key;
                     var sub = renderRepeaterBlock(c, inner, rowVar === 'row' ? 'row2' : 'row3');
                     if (rowVar !== 'row') {
                         sub = sub.replace(/\$row\[/g, '$' + rowVar + '[');
                     }
                     lines.push(sub);
-                    delete c.__childKey;
                 } else if (isStructureOnlyItem(c.type)) {
                     // ueberspringen
                 } else {
@@ -2318,7 +2389,7 @@
                     var ch = childHint(c);
                     lines.push(inner + '// ' + c.type + clbl + (ch ? ' \u2013 ' + ch : ''));
                     optionValuesComment(c).forEach(function (v) { lines.push(inner + '//   ' + v); });
-                    var line = inner + '$' + key + ' = ' + childExpr(c, key) + ';';
+                    var line = inner + '$' + uniqueVarName(key) + ' = ' + childExpr(c, key) + ';';
                     if (rowVar !== 'row') {
                         line = line.replace(/\$row\[/g, '$' + rowVar + '[');
                     }
@@ -2372,6 +2443,7 @@
             // Tracking, welche use-Statements wir brauchen.
             outputUses.outputHelper = false;
             outputUses.repeaterHelper = false;
+            resetOutputVarPool();
             var body = [];
             body.push('// =============================================================');
             body.push('// Modul-Output: Variablen aus den Eingabefeldern befuellen.');

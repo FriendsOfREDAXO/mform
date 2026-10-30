@@ -61,6 +61,9 @@ if (in_array('news', $selected)) {
 ### Einfache horizontale Auswahl
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
+
 echo MForm::factory()
     ->addCheckboxGroupField(1, [
         'news'     => 'News',
@@ -74,6 +77,9 @@ echo MForm::factory()
 ### Mit Default-Wert
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
+
 echo MForm::factory()
     ->addCheckboxGroupField(1, [
         'news'  => 'News',
@@ -86,6 +92,9 @@ echo MForm::factory()
 ### Vertikales Layout
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
+
 echo MForm::factory()
     ->addCheckboxGroupField(1, [
         'high'   => 'Hoch',
@@ -100,6 +109,9 @@ echo MForm::factory()
 Durch `'mode' => 'radio'` wird aus der CheckboxGroup eine Einfachauswahl mit runden Indikatoren. Das Ergebnis ist ein einzelner String-Wert ohne Komma.
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
+
 echo MForm::factory()
     ->addCheckboxGroupField(1, [
         'low'    => 'Niedrig',
@@ -128,7 +140,7 @@ Radio-Mode und Layout lassen sich kombinieren:
 **Auslesen im Output:**
 
 ```php
-$priority = REX_VALUE[id=1];
+$priority = 'REX_VALUE[id=1]';
 // oder aus einem Repeater-Item:
 $priority = $item['priority'] ?? '';
 
@@ -140,6 +152,9 @@ if ($priority === 'high') {
 ### Im Flex-Repeater
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm;
+
 $rowForm = MForm::factory()
     ->addTextField('title', ['label' => 'Titel'])
     ->addCheckboxGroupField('tags', [
@@ -165,6 +180,7 @@ echo MForm::factory()
 ### Auslesen im Repeater-Output
 
 ```php
+<?php
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 
 $items = MFormRepeaterHelper::decode(1);

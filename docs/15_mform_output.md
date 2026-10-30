@@ -105,9 +105,9 @@ echo MFormOutput::from('REX_VALUE[1]')
 listAttrs: ['class' => ['uk-list', 'uk-list-divider']]
 ```
 
-### `renderGrid(int $cols, callable $template, string $framework = 'bootstrap', array $rowAttrs = [], array $colAttrs = [], string $rowTag = 'div', string $colTag = 'div'): string`
+### `renderGrid(int $cols, callable $template, string $framework = '', array $rowAttrs = [], array $colAttrs = [], string $rowTag = 'div', string $colTag = 'div'): string`
 
-Framework-aware Grid-Output. Unterstützt **Bootstrap**, **Tailwind**, **UIKit** und **none** (ohne Preset). Eigene Klassen/Attribute werden in das Preset hineingemerged — bei `class` wird konkateniert, alle anderen Attribute überschreiben.
+Framework-aware Grid-Output (leerer `$framework` = projektweiter Default, siehe `setDefaultGridFramework()`, sonst `bootstrap`). Unterstützt **Bootstrap**, **Tailwind**, **UIKit** und **none** (ohne Preset). Eigene Klassen/Attribute werden in das Preset hineingemerged — bei `class` wird konkateniert, alle anderen Attribute überschreiben.
 
 | Framework | Row-Klassen | Spalten-Klassen | Extra |
 |---|---|---|---|
@@ -324,7 +324,7 @@ Der `<img>`-Fallback nutzt den letzten Type als `src`. Das `alt`-Attribut wird a
 Splittet einen CSV-Wert von `addMedialistField` / `addImagelistField` und liefert nur tatsächlich existierende `rex_media`-Instanzen:
 
 ```php
-foreach (MFormOutput::mediaList('REX_VALUE[5]') as $media) {
+foreach (MFormOutput::mediaList('REX_MEDIALIST[5]') as $media) {
     echo MFormOutput::tag('img', [
         'src' => rex_url::media($media->getFileName()),
         'alt' => $media->getValue('title') ?? '',
@@ -337,9 +337,10 @@ foreach (MFormOutput::mediaList('REX_VALUE[5]') as $media) {
 Markiert TinyMCE/WYSIWYG-Output als bereits-HTML (kein doppeltes Escape) und filtert optional die erlaubten Tags:
 
 ```php
-echo MFormOutput::richtext('REX_VALUE[2]');
+// output=html: REDAXO liefert das HTML unescaped
+echo MFormOutput::richtext('REX_VALUE[id=2 output=html]');
 // optional: nur bestimmte Tags zulassen
-echo MFormOutput::richtext('REX_VALUE[2]', ['p', 'br', 'strong', 'em', 'a', 'ul', 'li']);
+echo MFormOutput::richtext('REX_VALUE[id=2 output=html]', ['p', 'br', 'strong', 'em', 'a', 'ul', 'li']);
 ```
 
 ### `excerpt()`

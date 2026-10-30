@@ -30,7 +30,7 @@ $mform = MForm::factory()
     // add fieldset area
     ->addFieldsetArea('Input Text elements', MForm::factory() // init new mform
         // add some text fields
-        ->addTextField(1.0, ['label' => 'Input Text'])
+        ->addTextField("1.0", ['label' => 'Input Text']) // use string for x.0 json values
         ->addTextField(1.2, ['label' => 'With options and Full width', 'full' => true])
             ->setOptions([1=>'option1',2=>'option2'])
     )
@@ -38,7 +38,7 @@ $mform = MForm::factory()
     ->addFieldsetArea('Textarea elements', MForm::factory() // init new mform
         ->addTextAreaField(1.3, ['label' => 'Textarea'])
         ->addTextAreaField(1.4, ['label' => 'Full width'])
-            ->setFull() // or ->addTextAreaField(1.2,['full' => true])
+            ->setFull() // or ->addTextAreaField(1.4, ['label' => 'Full width', 'full' => true])
     )
     // add third fieldset area
     ->addFieldsetArea('Readonly text elements', MForm::factory() // use mform factory
@@ -54,8 +54,10 @@ echo $mform->show();
 
 ```php
 <?php
-dump(rex_var::toArray('REX_VALUE[id=1]'));
-dump(rex_var::toArray('REX_VALUE[id=2]'));
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+dump(MFormOutputHelper::values(1));
+dump(MFormOutputHelper::values(2));
 ```
 
 ## Checkbox und Radio-Elemente
@@ -204,7 +206,7 @@ Wenn bei `setTooltipInfo()` kein Icon gesetzt wird, nutzt MForm standardmäßig 
 use FriendsOfRedaxo\MForm;
 
 $mform = MForm::factory()
-    ->addTextField(1.0, ['label' => 'Titel'])
+    ->addTextField("1.0", ['label' => 'Titel'])
         // Default-Icon: fa-info-circle
         ->setTooltipInfo('Standard-Hinweis ohne Icon-Override')
 
@@ -246,8 +248,10 @@ echo $mform->show();
 
 ```php
 <?php
-dump(rex_var::toArray('REX_VALUE[id=1]'));
-dump(rex_var::toArray('REX_VALUE[id=2]'));
+use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
+
+dump(MFormOutputHelper::values(1));
+dump(MFormOutputHelper::values(2));
 ```
 
 ## Weitere HTML5-Elemente
@@ -299,7 +303,7 @@ echo MForm::factory() // init mform
         // input datetime-local
         ->addInputField("datetime-local", 1.9, ['label'=>'Datetime-local field']) // Datum und Uhrzeit (ohne Zeitzone)
         // input date
-        ->addInputField("date", 1.10, ['label'=>'Date field']) // Datum
+        ->addInputField("date", "1.10", ['label'=>'Date field']) // Datum
         // input time
         ->addInputField("time", 1.11, ['label'=>'Time field']) // Uhrzeit
         // input month
@@ -376,10 +380,10 @@ $mform = MForm::factory()
             ->setAttribute("min",20)
             ->setOptions([10,20,30,40,50]) // to add datalist use set options
         // input datetime locale with datalist
-        ->addInputField("datetime-local", 2, ['label'=>'Datetime-local field'])
+        ->addInputField("datetime-local", 3, ['label'=>'Datetime-local field'])
             ->setOptions(["Santa Visit"=>"2012-12-24T23:59", "Chrismas party"=>"2012-12-25T18:00", "Happy New Year"=>"2013-01-01T00:00", "2012-12-30T00:00"]) // to add datalist use set options
         // input time with datalist
-        ->addInputField("time", 3, ['label'=>'Time field'])
+        ->addInputField("time", 4, ['label'=>'Time field'])
             ->setOption("00:00", "Midnight")
             ->setOption("06:00", 2)
             ->setOption("12:00", "Noon")
