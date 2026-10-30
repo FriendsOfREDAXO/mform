@@ -181,7 +181,7 @@ function customlink_init_widget(element) {
                     window.rex5LinkmapBridge.pickDataset(String(table), function (link, name) {
                         const datasetId = mformLinkmapDatasetId(link);
                         if (!datasetId) return;
-                        setLinkValue('rex-' + String(table).split('_').join('-') + '://' + datasetId, name || (String(table) + ' [' + datasetId + ']'));
+                        setLinkValue(String(table).split('_').join('-') + '://' + datasetId, name || (String(table) + ' [' + datasetId + ']'));
                     }, { clang: clang });
                     return false;
                 }

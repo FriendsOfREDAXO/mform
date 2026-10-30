@@ -81,17 +81,17 @@ $mform = MForm::factory()
             MForm::factory()
                 ->addCollapseElement('',
                     MForm::factory()->addTextAreaField('4.0.2', ['label' => 'Text-Area 1']),
-                    false, true, ['data-group-collapse-id' => 'collapse1'] // open that collapse initial and hide the toggle link
+                    false, true, ['data-group-collapse-id' => 'collapse1'] // hide the toggle link
                 )
                 ->addCollapseElement('',
                     MForm::factory()->addTextAreaField('4.0.3', ['label' => 'Text-Area 2']),
-                    true, true, ['data-group-collapse-id' => 'collapse2'] // hide the toggle link
+                    true, true, ['data-group-collapse-id' => 'collapse2'] // open that collapse initial and hide the toggle link
                 )
         )
     )
     // toggle checkbox
     ->addFieldsetArea('Checkbox collapse element', MForm::factory()
-        ->addCheckboxField('5.0.1', [1 => 'Open Collapse-area'], ['label' => 'Collapse checkbox', 'data-toggle-item' => 'collapse1'])
+        ->addCheckboxField('5.0.1', [1 => 'Open Collapse-area'], ['label' => 'Collapse checkbox', 'data-toggle-item' => 'collapse3'])
         ->addForm(MForm::factory()
             ->addCollapseElement('', MForm::factory()
                 ->addTextField('5.0.2', ['label' => 'Button-Text (optional)'])
@@ -101,11 +101,11 @@ $mform = MForm::factory()
     )
     // checkbox
     ->addFieldsetArea('Toggle checkbox collapse element', MForm::factory()
-        ->addToggleCheckboxField('6.0.4', [1 => 'Open Collapse-area'], ['label' => 'Collapse checkbox', 'data-toggle-item' => 'collapse3'])
+        ->addToggleCheckboxField('6.0.4', [1 => 'Open Collapse-area'], ['label' => 'Collapse checkbox', 'data-toggle-item' => 'collapse4'])
         ->addForm(MForm::factory()
             ->addCollapseElement('', MForm::factory()
                 ->addTextField('6.0.5', ['label' => 'Button-Text (optional)'])
-                ->addCustomLinkField('6.0.6', ['label' => 'Link-Ziel'])->show(), false, true, ['data-group-collapse-id' => 'collapse3']
+                ->addCustomLinkField('6.0.6', ['label' => 'Link-Ziel'])->show(), false, true, ['data-group-collapse-id' => 'collapse4']
             )
         )
     );
@@ -119,6 +119,7 @@ Stellt ein Collapse-Element dar, das sich in Abhängigkeit einer Select-Auswahll
 
 ```php
 <?php
+use FriendsOfRedaxo\MForm;
 // select collapse
 $mform = MForm::factory()
     ->addFieldsetArea('Select collapse element',

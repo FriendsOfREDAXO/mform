@@ -106,6 +106,75 @@ final class MBlockModuleAnalyzerTest extends TestCase
         self::assertEquals(['medialist' => 'media', 'links' => 'link', 'gallery' => 'media'], $analysis['list_fields']['1']);
     }
 
+    /** Modul aus #466: zwei Medienfelder im Block-Formular. */
+    private const ISSUE_466 = '<?php $id = 1; $mform = MForm::factory(); $mform->addFieldsetArea("Video"); $mform->addMediaField(1, ["label" => "Poster"]); $mform->addMediaField(2, ["label" => "Video", "types" => "mp4,mov,webm"]); echo MBlock::show($id, $mform->show(), []);';
+
+    public function testApplyKeyMapsUsesEditedTargets(): void
+    {
+        $analysis = $this->analyzer->analyze(self::ISSUE_466);
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'media_2'], $analysis['key_maps']['1']);
+
+        $edited = $this->analyzer->applyKeyMaps($analysis, ['1' => ['REX_MEDIA_1' => 'poster', 'REX_MEDIA_2' => 'video']]);
+
+        self::assertSame(['REX_MEDIA_1' => 'poster', 'REX_MEDIA_2' => 'video'], $edited['key_maps']['1']);
+        self::assertSame(['REX_MEDIA_1' => 'poster', 'REX_MEDIA_2' => 'video'], $edited['calls'][0]['key_map']);
+        $targets = array_column($edited['calls'][0]['fields'], 'target', 'legacy_key');
+        self::assertSame('poster', $targets['REX_MEDIA_1']);
+        self::assertSame('video', $targets['REX_MEDIA_2']);
+        self::assertStringContainsString('REX_MEDIA_1 -> poster', implode("\n", $edited['risk_reasons']));
+    }
+
+    public function testApplyKeyMapsWildcardSlotForConsole(): void
+    {
+        $edited = $this->analyzer->applyKeyMaps($this->analyzer->analyze(self::ISSUE_466), ['*' => ['REX_MEDIA_2' => 'video']]);
+
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'video'], $edited['key_maps']['1']);
+    }
+
+    public function testApplyKeyMapsRejectsInvalidAndDuplicateNames(): void
+    {
+        $analysis = $this->analyzer->analyze(self::ISSUE_466);
+
+        $invalid = $this->analyzer->applyKeyMaps($analysis, ['1' => ['REX_MEDIA_1' => 'mein Bild', 'REX_MEDIA_2' => '2video']]);
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'media_2'], $invalid['key_maps']['1']);
+        self::assertCount(2, array_filter($invalid['warnings'], static fn (string $w): bool => str_contains($w, 'ungueltig')));
+
+        $duplicate = $this->analyzer->applyKeyMaps($analysis, ['1' => ['REX_MEDIA_1' => 'clip', 'REX_MEDIA_2' => 'clip']]);
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'media_2'], $duplicate['key_maps']['1']);
+        self::assertNotEmpty(array_filter($duplicate['warnings'], static fn (string $w): bool => str_contains($w, 'doppelt')));
+
+        // Tausch der Namen ist erlaubt.
+        $swap = $this->analyzer->applyKeyMaps($analysis, ['1' => ['REX_MEDIA_1' => 'media_2', 'REX_MEDIA_2' => 'media']]);
+        self::assertSame(['REX_MEDIA_1' => 'media_2', 'REX_MEDIA_2' => 'media'], $swap['key_maps']['1']);
+    }
+
+    public function testApplyKeyMapsResolvesFollowUpCollisions(): void
+    {
+        // REX_MEDIA_1/2 kollidieren auf "clip" und fallen auf media/media_2 zurueck;
+        // REX_MEDIA_3 -> "media" kollidiert danach mit dem zurueckgesetzten REX_MEDIA_1.
+        $code = '<?php $id = 1; $f = MForm::factory()->addMediaField(1)->addMediaField(2)->addMediaField(3); echo MBlock::show($id, $f->show());';
+        $edited = $this->analyzer->applyKeyMaps($this->analyzer->analyze($code), ['1' => ['REX_MEDIA_1' => 'clip', 'REX_MEDIA_2' => 'clip', 'REX_MEDIA_3' => 'media']]);
+
+        $targets = array_values($edited['key_maps']['1']);
+        self::assertSame($targets, array_values(array_unique($targets)), 'Zielnamen muessen eindeutig bleiben');
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'media_2', 'REX_MEDIA_3' => 'media_3'], $edited['key_maps']['1']);
+    }
+
+    public function testApplyKeyMapsRenamesListFields(): void
+    {
+        $code = '<?php $id = 1; $f = MForm::factory()->addMedialistField(1)->addTextField("$id.0.t"); echo MBlock::show($id, $f->show());';
+        $edited = $this->analyzer->applyKeyMaps($this->analyzer->analyze($code), ['1' => ['REX_MEDIALIST_1' => 'downloads']]);
+
+        self::assertEquals(['downloads' => 'media'], $edited['list_fields']['1']);
+    }
+
+    public function testApplyKeyMapsWithoutOverridesKeepsAnalysis(): void
+    {
+        $analysis = $this->analyzer->analyze(self::ISSUE_466);
+
+        self::assertSame($analysis, $this->analyzer->applyKeyMaps($analysis, []));
+    }
+
     public function testNoMBlock(): void
     {
         $analysis = $this->analyzer->analyze('<?php echo MForm::factory()->addTextField(1)->show();');

@@ -31,14 +31,13 @@ MForm stellt Widgets fuer Medien und Links in mehreren REDAXO-Kontexten bereit:
 | `addLinkField()` | REDAXO Core (`rex_var_link`) | Artikel-ID (`REX_LINK`) |
 | `addMFormMediaField()` | MForm-Widget (`rex_var_custom_link`) | Dateiname (`REX_VALUE`) |
 | `addMFormLinkField()` | MForm-Widget (`rex_var_custom_link`) | Link-String (`REX_VALUE`) |
-| `addMedialistField()` | MForm-Widget (`rex_var_custom_medialist`) | kommagetrennte Dateinamen (`REX_MEDIALIST`) |
-| `addLinklistField()` | MForm-Widget (`rex_var_custom_linklist`) | kommagetrennte Artikel-IDs (`REX_LINKLIST`) |
+| `addMedialistField()` | REDAXO Core (`rex_var_medialist`), mit `useCustomLinkForClassicWidgets(true)` MForm-Widget (`rex_var_custom_medialist`) | kommagetrennte Dateinamen (`REX_MEDIALIST`) |
+| `addLinklistField()` | REDAXO Core (`rex_var_linklist`), mit `useCustomLinkForClassicWidgets(true)` MForm-Widget (`rex_var_custom_linklist`) | kommagetrennte Artikel-IDs (`REX_LINKLIST`) |
 | `addImagelistField()` | MForm-Widget (`rex_var_imglist`) | kommagetrennte Dateinamen |
 | `addCustomLinkField()` | MForm-Widget (`rex_var_custom_link`) | Link-String (`REX_VALUE`) |
 | `addCustomLinkMultipleField()` | MForm-Widget (`rex_var_custom_link_multi`) | JSON-Array von Link-Strings (`REX_VALUE`) |
 
-> **Hinweis:** `addMedialistField()` und `addLinklistField()` wurden in Version 9 durch eigene MForm-Widgets ersetzt.
-> Diese bieten ein modernes Listen-UI mit Drag-and-Drop-Sortierung und sind voll repeater-kompatibel.
+> **Hinweis:** Für `addMedialistField()` und `addLinklistField()` gibt es eigene MForm-Widgets mit modernem Listen-UI und Drag-and-Drop-Sortierung. Im klassischen Formular sind sie aktiv, wenn `MForm::useCustomLinkForClassicWidgets(true)` gesetzt ist (z. B. in der `boot.php` des Projekts); ohne diese Einstellung rendert MForm die REDAXO-Core-Widgets. Im Flex-Repeater nutzt MForm immer die eigenen Listen.
 > Das Speicherformat bleibt identisch zum nativen REDAXO-Format.
 >
 > `MForm::useCustomLinkForClassicWidgets(true)` lässt `addMediaField()` / `addLinkField()` intern das Custom-Link-Widget rendern; das Speicherformat (`REX_MEDIA_n` / `REX_LINK_n`) bleibt gleich.
@@ -58,7 +57,7 @@ echo MForm::factory()
         // wie addMedialistField, optimiert für reine Bildlisten
         ->addImagelistField(3, ['label' => 'Imagelist'])
         // Unified Media-Wrapper (MForm v9+): speichert in REX_VALUE, mit Typ-Filter und Media-Vorschau
-        ->addMFormMediaField(4, ['types' => 'jpg,png,webp', 'preview' => '1'], null, ['label' => 'MForm Media'])
+        ->addMFormMediaField(6, ['types' => 'jpg,png,webp', 'preview' => '1'], null, ['label' => 'MForm Media'])
     )
     ->addFieldsetArea('Links', MForm::factory()
         // natives REDAXO Core-Widget
@@ -104,7 +103,7 @@ foreach ($links as $link) {
 
 // MFormLink / MFormMedia – Wert liegt in REX_VALUE (wie custom_link)
 $mformLinkUrl = MFormOutputHelper::getCustomUrl('REX_VALUE[id=5]');
-$mformMediaFilename = 'REX_VALUE[id=4]'; // direkt als Dateiname verwendbar
+$mformMediaFilename = 'REX_VALUE[id=6]'; // direkt als Dateiname verwendbar
 $media = rex_media::get($mformMediaFilename);
 ```
 
@@ -132,7 +131,7 @@ $media = rex_media::get($mformMediaFilename);
 
 #### View-Switch beim `addMedialistField`
 
-Der View-Switch gilt nur für das MForm-Medialist-Widget (`addMedialistField`).
+Der View-Switch gilt nur für das MForm-Medialist-Widget (`addMedialistField` mit `useCustomLinkForClassicWidgets(true)`).
 
 - `view`: Startansicht des Widgets (`list`, `grid` oder `gallery`, Standard: `list`)
 - `view_switch`: Schaltet den Toggle-Button in der Toolbar ein/aus (Standard: `1`)
@@ -196,7 +195,7 @@ Alternativ über `setParameter()`:
     'data-media'   => 'enable',
     'data-mailto'  => 'enable',
     'data-tel'     => 'enable',
-    'anchor'       => 0,   // Anker-Button ausblenden
+    'data-anchor'  => 'disable', // Anker-Button ausblenden
 ])
 ```
 
@@ -204,7 +203,7 @@ Ylink (eigene Tabellen als Link-Quelle):
 
 ```php
 $ylink = [['name' => 'Länder', 'table' => 'rex_ycountries', 'column' => 'de_de']];
-->addCustomLinkField(1, ['label' => 'Custom', 'data-intern' => 'disable', 'data-extern' => 'enable', 'ylink' => $ylink])
+$mform->addCustomLinkField(1, ['label' => 'Custom', 'data-intern' => 'disable', 'data-extern' => 'enable', 'ylink' => $ylink]);
 ```
 
 Mit eigener Label-Auflösung für gespeicherte Datensätze:
@@ -217,12 +216,12 @@ $ylink = [[
     'label_columns' => ['name', 'surname'],
 ]];
 
-->addCustomLinkField(1, [
+$mform->addCustomLinkField(1, [
     'label' => 'Custom',
     'data-intern' => 'disable',
     'data-extern' => 'enable',
     'ylink' => $ylink,
-])
+]);
 ```
 
 `column` steuert weiterhin die Anzeige im Dropdown. `label_columns` steuert dagegen die sichtbare Bezeichnung bereits gespeicherter Werte wie `rex-team-members://15`.
@@ -237,14 +236,18 @@ Gegenüber `addMediaField()` (Core-Widget) bietet es:
 - volle Repeater-Kompatibilität
 
 ```php
-->addMFormMediaField("$id.0.image", [
+->addMFormMediaField(1, [
     'preview' => '1',            // Vorschau-Button für Bilder/Videos anzeigen
     'types'   => 'jpg,png,webp', // nur diese Dateitypen auswählbar
 ], null, [
     'label' => 'Bild',
 ])
+```
 
-// Modul-Ausgabe (Wert liegt in REX_VALUE, nicht REX_MEDIA):
+Modul-Ausgabe (Wert liegt in REX_VALUE, nicht REX_MEDIA):
+
+```php
+<?php
 $filename = 'REX_VALUE[id=1]';
 $media = rex_media::get($filename);
 ```
@@ -258,7 +261,7 @@ Basiert intern auf `custom_link` und speichert den Linkwert in `REX_VALUE[n]`.
 Gegenüber `addLinkField()` (Core-Widget) unterstützt es alle Link-Typen des Custom-Link-Widgets.
 
 ```php
-->addMFormLinkField("$id.0.link", [
+->addMFormLinkField(1, [
     'data-intern'  => 'enable',
     'data-extern'  => 'enable',
     'data-media'   => 'disable',
@@ -267,8 +270,12 @@ Gegenüber `addLinkField()` (Core-Widget) unterstützt es alle Link-Typen des Cu
 ], null, [
     'label' => 'Link',
 ])
+```
 
-// Modul-Ausgabe (Wert ist ein custom_link-kompatibler Link-String):
+Modul-Ausgabe (Wert ist ein custom_link-kompatibler Link-String):
+
+```php
+<?php
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 $url = MFormOutputHelper::getCustomUrl('REX_VALUE[id=1]');
 ```

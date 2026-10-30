@@ -193,7 +193,7 @@ abstract class MFormElements
         $attributes = array_merge($attributes, ['data-group-open-tab' => $openTab, 'pull-right' => $pullNaviItemRight]);
         return $this->addElement('tab', null, null, $attributes)
             ->setLabel($label)
-            ->addForm($form, $parse, $showWrapper)
+            ->addForm($form, $parse, false, $showWrapper)
             ->addElement('close-tab', null, null, $attributes);
     }
 

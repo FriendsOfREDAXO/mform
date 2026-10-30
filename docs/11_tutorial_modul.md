@@ -95,7 +95,7 @@ echo MForm::factory()
 <?php
 $image    = 'REX_MEDIA[id=1]';
 $headline = 'REX_VALUE[id=2]';
-$html     = 'REX_VALUE[id=3]'; // enthält jetzt fertiges HTML vom Editor
+$html     = 'REX_VALUE[id=3 output=html]'; // enthält jetzt fertiges HTML vom Editor (output=html: nicht escapen)
 
 if ($image) {
     echo '<figure><img src="' . rex_url::media($image) . '" alt="' . rex_escape($headline) . '"></figure>';
@@ -150,7 +150,7 @@ echo MForm::factory()
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
 $headline  = 'REX_VALUE[id=2]';
-$html      = 'REX_VALUE[id=3]';
+$html      = 'REX_VALUE[id=3 output=html]';
 $linkValue = 'REX_VALUE[id=4]'; // der rohe Wert aus dem Custom-Link-Picker
 
 if ($headline) {

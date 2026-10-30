@@ -74,7 +74,9 @@ php bin/console mform:migrate --yform=rex_news.blocks --map='{"REX_MEDIA_1":"med
 php bin/console mform:lint [--module=12] [--yform] [--severity=warning] [--json]
 ```
 
-Weitere Optionen von `mform:migrate`: `--slot=1,3` (nur diese Slots), `--map='{"REX_MEDIA_1":"media"}'` (Key-Map überschreiben), `--merge-columns`, `--json`.
+Weitere Optionen von `mform:migrate`: `--slot=1,3` (nur diese Slots), `--map='{"REX_MEDIA_1":"media"}'` (Key-Map überschreiben – gilt für Analyse, Eingabe- und Ausgabe-Code und Daten), `--merge-columns`, `--json`.
+
+`--apply` und `--create-module` enden mit Exit-Code 1, wenn das Modul kein `MBlock::show()` (mehr) enthält. So brechen Skripte wie `mform:migrate --module=12 --apply && …` ab, statt mit den Folgeschritten weiterzumachen.
 
 `mform:lint` meldet `MBlock::show()`, MBlock-`use`-Statements, `mblock_offline`-Hidden-Felder, numerische Widget-Ids und Präfix-Feldnamen in Repeater-Formularen sowie `rex_var::toArray()` für Repeater-Slots. Exit-Code 1 bei Fehlern, damit er in CI laufen kann.
 

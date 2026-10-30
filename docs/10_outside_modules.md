@@ -172,7 +172,7 @@ $yform->setValueField('custom_link', [
 ]);
 
 $yform->setValueField('custom_link_multi', [
-    'name' => 'links',
+    'name' => 'custom_links',
     'label' => 'Links',
     'intern' => 1,
     'external' => 1,

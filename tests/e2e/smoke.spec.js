@@ -50,7 +50,10 @@ test.describe('MForm Smoke', () => {
         await page.click('li.mform-fb__pal-item[data-type="text"]');
         const code = await page.evaluate(() => { const t = document.querySelector('[data-fb-code]'); return t.value || t.textContent; });
         expect(code).toContain('addCollapseElement(');
-        expect(code).toContain('->addTextField(');
+        // Felder in Containern ausserhalb eines Repeaters brauchen eine Slot-Nummer, keinen Schluessel.
+        expect(code).toContain('->addTextField(1,');
+        const output = await page.evaluate(() => { const t = document.querySelector('[data-fb-output]'); return t.value || t.textContent; });
+        expect(output).toContain('REX_VALUE[1]');
 
         // Live-Vorschau: Iframe bekommt ein Dokument mit dem gerenderten Formular, ohne PHP-Fehler.
         await page.waitForFunction(() => { const f = document.querySelector('[data-fb-preview]'); return !!(f && f.srcdoc && f.srcdoc.length > 500); }, null, { timeout: 15000 });

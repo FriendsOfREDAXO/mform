@@ -72,6 +72,9 @@ Ab Version 9 gibt es eine Kurzform für das Auslesen von Repeater-Werten:
 | `prepareItemsForOutput(array $items)` | Wenn der Array bereits dekodiert vorliegt (z. B. aus einer DB-Abfrage). |
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
+
 // Neu (v9): kürzeste Form im Modul-Output
 $rows = MFormRepeaterHelper::decode(1);
 
@@ -266,6 +269,8 @@ Der Flex-Repeater unterstützt gängige REDAXO-Editoren auch in dynamischen Repe
 Für diese Slots ist `MFormOutputHelper` zuständig:
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
 use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
 // Alle Felder eines Slots als Map (Punkt-Notation 1.1, 1.2, ...)
@@ -296,7 +301,7 @@ Verfügbare Optionen im Repeater-Array:
 - `first_open` (bool, default: `false`): Erstes Item trotz `collapsed=true` geoeffnet lassen.
 - `show_toggle_all` (bool, default: `true`): Button "Alle auf / zu" in der Kopfzeile anzeigen.
 - `show_add_button` (bool, default: `true`): Bei `false` erscheint nur der "Hinzufügen"-Streifen unter der Liste, und nur solange der Repeater leer ist – sobald ein Item existiert, übernimmt das „+"-Icon am Item. Praktisch zusammen mit `default_count => 0`, damit das erste Item trotzdem angelegt werden kann. Gilt auch für verschachtelte Repeater.
-- `open` (bool, default: `true`): Toolbar / Aktionen sind nutzbar; bei `false` wird die Bedienoberflaeche eingefroren (read-only Anzeige).
+- `open` (bool, default: `true`): reserviert. Wird als `data-mfr-open` ausgegeben, derzeit aber nicht ausgewertet – `false` macht den Repeater **nicht** schreibgeschuetzt.
 - `copy_paste` (bool, default: `true`): Pro Item ein Kopieren-Button und ein Einfuegen-Button in der Toolbar.
 - `confirm_delete` (bool, default: `true`): Loeschen eines Items mit Sicherheitsabfrage.
 - `description` (string, default: `''`): Einleitender Text unter der Kopfzeile des Repeaters, z. B. eine kurze Anleitung für Redakteure; darf HTML enthalten. Gilt auch für verschachtelte Repeater.
@@ -315,19 +320,19 @@ Seit **9.0.0** rendert der FlexRepeater alle gaengigen MForm-Wrapper auch innerh
 
 | Wrapper | Methode | Markup im Repeater-Item |
 |---------|---------|-------------------------|
-| Tabs | `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()` | ID-freie `nav-tabs` + `tab-content` (scoped pro Wrapper) |
+| Tabs | `addTabElement()` | ID-freie `nav-tabs` + `tab-content` (scoped pro Wrapper) |
 | Collapse (mit Toggle-Button) | `addCollapseElement()` | `<a data-toggle="collapse">` + `.collapse[data-group-collapse-id=…]` |
-| Collapse-Gruppe (Standalone-Toggle) | `addStartGroupCollapse()` / `addCloseGroupCollapse()` | `.collapse-group[data-group-accordion=0\|1]` |
+| Collapse-Gruppe / Accordion | `addCollapseElement()` / `addAccordionElement()` (automatisch gruppiert) | `.collapse-group[data-group-accordion=0\|1]` |
 | Fieldset | `addFieldsetArea($legend, …)` | `<fieldset><legend>…</legend>…</fieldset>` |
-| Form-Inline | `addStartGroupInline()` / `addCloseGroupInline()` | `<div class="form-inline">` |
-| Spalten-Grid | `addStartGroupColumn()` / `addColumn('col-sm-6')` / `addCloseColumn()` / `addCloseGroupColumn()` | BS3 `row` + `col-*` |
+| Form-Inline | `addInlineElement()` | `<div class="form-inline">` |
+| Spalten-Grid | `addColumnElement()` (automatisch zur `row` gruppiert) | BS3 `row` + `col-*` |
 | Modal | `addModalElement()` | Bootstrap-3 Modal-Block |
 
 ### Tabs im Repeater
 
 Tabs werden ID-frei gerendert. Die Navigation wird innerhalb des naechstgelegenen `.mform-tabs`-Wrappers gescoped und per `data-tab-item`/`data-tab-group-nav-tab-id` verknuepft. Dadurch funktionieren geklonte Repeater-Items und verschachtelte Tab-Strukturen ohne ID-Kollisionen. Aktive Tabs werden weiterhin ueber `data-group-open-tab => true` markiert.
 
-Empfohlener Weg seit 9.1: `addTabElement()` direkt im Repeater-Item-Formular. Falls keine explizite Tab-Gruppe (`addStartGroupTab()` / `addCloseGroupTab()`) vorhanden ist, gruppiert der FlexRepeater-Renderer die Tabs automatisch.
+Empfohlener Weg seit 9.1: `addTabElement()` direkt im Repeater-Item-Formular. Der FlexRepeater-Renderer gruppiert aufeinanderfolgende Tabs automatisch.
 
 ```php
 $itemForm = MForm::factory()
@@ -343,24 +348,6 @@ $itemForm = MForm::factory()
         'tab-icon' => 'fa-cog',
         'tab-style' => 'modern',
     ]);
-
-$mform->addRepeaterElement(1, $itemForm);
-```
-
-Alternative (weiterhin moeglich) ist die explizite Gruppierung mit `addStartGroupTab()` / `addTab()` / `addCloseTab()` / `addCloseGroupTab()`:
-
-```php
-$itemForm = MForm::factory()
-    ->addStartGroupTab('itemTabs')
-        ->addTab('itemTabs', ['data-group-open-tab' => true, 'tab-icon' => 'fa-info'])
-            ->setLabel('Allgemein')
-            ->addTextField('title', ['label' => 'Titel'])
-        ->addCloseTab()
-        ->addTab('itemTabs')
-            ->setLabel('Erweitert')
-            ->addTextAreaField('text', ['label' => 'Text'])
-        ->addCloseTab()
-    ->addCloseGroupTab();
 
 $mform->addRepeaterElement(1, $itemForm);
 ```
@@ -399,14 +386,12 @@ $itemForm = MForm::factory()
 
 ```php
 $itemForm = MForm::factory()
-    ->addStartGroupColumn()
-        ->addColumn('col-sm-6')
-            ->addTextField('left', ['label' => 'Links'])
-        ->addCloseColumn()
-        ->addColumn('col-sm-6')
-            ->addTextField('right', ['label' => 'Rechts'])
-        ->addCloseColumn()
-    ->addCloseGroupColumn();
+    ->addColumnElement(6, MForm::factory()
+        ->addTextField('left', ['label' => 'Links'])
+    )
+    ->addColumnElement(6, MForm::factory()
+        ->addTextField('right', ['label' => 'Rechts'])
+    );
 ```
 
 > **Hinweis Bootstrap-3:** Der Repeater nutzt durchgaengig `form-horizontal` mit `col-sm-3`/`col-sm-9`-Spalten und `row` + `col-*`-Grids. Kein Flex/Grid-CSS, kein `:has()`. Die Layout-Variante des Repeaters laesst sich ueber die Option `'layout' => 'horizontal'|'vertical'|'inline'` umschalten, z. B. `addRepeaterElement($id, $form, true, true, ['layout' => 'vertical'])`.
@@ -437,7 +422,7 @@ use FriendsOfRedaxo\MForm;
 $itemForm = MForm::factory();
 $itemForm->addTextField('title', ['label' => 'Titel']);
 $itemForm->addMediaField('bild', ['label' => 'Bild']);
-$itemForm->addCustomLinkField('link', ['label' => 'Link', 'intern' => 1, 'extern' => 1]);
+$itemForm->addCustomLinkField('link', ['label' => 'Link', 'data-intern' => 'enable', 'data-extern' => 'enable']);
 
 $mform = MForm::factory();
 $mform->addRepeaterElement(1, $itemForm);
@@ -534,7 +519,7 @@ echo $mform->show();
 | `confirm_delete` | bool | `true` | Loeschen mit Bestaetigung |
 | `confirm_delete_msg` | string | `''` | Text der Bestätigungsmeldung |
 | `copy_paste` | bool | `true` | Kopieren/Einfügen-Funktion aktivieren |
-| `open` | bool | `true` | Toolbar / Bedienung aktiv (`false` = read-only) |
+| `open` | bool | `true` | reserviert, derzeit ohne Wirkung |
 | `data_version` | int | `1` | Speicherformat: `1` = reine Liste (wie bisher), `2` = Umschlag `{"__v":2,"items":[...]}` mit Versionsmarker (ab 10.0) |
 
 ### Speicherformat und Version (ab 10.0)
@@ -544,6 +529,9 @@ Der Repeater speichert standardmäßig weiterhin eine reine JSON-Liste (`[{...},
 Typisierter Zugriff auf die Items, unabhängig vom Format:
 
 ```php
+<?php
+use FriendsOfRedaxo\MForm\Output\MFormOutput;
+
 foreach (MFormOutput::from(1)->items() as $item) {
     $image = $item->media('image');            // rex_media|null
     $url   = $item->url('link');               // Artikel-URL, Medien-URL, URL/mailto/tel

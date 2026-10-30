@@ -135,24 +135,7 @@ final class MigrateCommand extends rex_console_command
             return [] === $result['errors'] ? self::SUCCESS : self::FAILURE;
         }
 
-        $analysis = $analyzer->analyze($inputCode, $outputCode);
-        if (!$json) {
-            $io->title(sprintf('Modul %d: %s', $moduleId, $name));
-            $this->printAnalysis($io, $analysis);
-        }
-
-        if (!$analysis['has_mblock']) {
-            $io->warning('Kein MBlock::show() im Eingabe-Code, nichts zu migrieren.');
-
-            return self::SUCCESS;
-        }
-
-        // Slot-Konfiguration: erkannte Slots (oder --slot), Key-Map automatisch (oder --map).
-        $slots = $analysis['slots'];
-        $slotOpt = $input->getOption('slot');
-        if (is_string($slotOpt) && '' !== $slotOpt) {
-            $slots = array_values(array_filter(array_map('trim', explode(',', $slotOpt)), static fn (string $s): bool => '' !== $s));
-        }
+        // --map vor der Analyse-Ausgabe einlesen: Anzeige, Code und Daten nutzen dieselben Namen (#466).
         $mapOverride = null;
         $mapOpt = $input->getOption('map');
         if (is_string($mapOpt) && '' !== $mapOpt) {
@@ -164,10 +147,40 @@ final class MigrateCommand extends rex_console_command
             }
             $mapOverride = array_map('strval', $decoded);
         }
+
+        $analysis = $analyzer->analyze($inputCode, $outputCode);
+        if (null !== $mapOverride) {
+            $analysis = $analyzer->applyKeyMaps($analysis, ['*' => $mapOverride]);
+        }
+        if (!$json) {
+            $io->title(sprintf('Modul %d: %s', $moduleId, $name));
+            $this->printAnalysis($io, $analysis);
+        }
+
+        if (!$analysis['has_mblock']) {
+            $io->warning('Kein MBlock::show() im Eingabe-Code, nichts zu migrieren.');
+
+            // Bei --apply/--create-module ist „nichts zu tun“ ein Fehler, damit Skripte (… && …) abbrechen.
+            return (bool) $input->getOption('apply') || (bool) $input->getOption('create-module') ? self::FAILURE : self::SUCCESS;
+        }
+
+        // Slot-Konfiguration: erkannte Slots (oder --slot), Key-Map aus der Analyse (mit --map uebernommen).
+        $slots = $analysis['slots'];
+        $slotOpt = $input->getOption('slot');
+        if (is_string($slotOpt) && '' !== $slotOpt) {
+            $slots = array_values(array_filter(array_map('trim', explode(',', $slotOpt)), static fn (string $s): bool => '' !== $s));
+        }
         $options = ['merge_columns' => (bool) $input->getOption('merge-columns')];
         $slotConfig = [];
         foreach ($slots as $slot) {
-            $slotConfig[$slot] = ['key_map' => $mapOverride ?? ($analysis['key_maps'][$slot] ?? []), 'options' => $options + ['list_fields' => $analysis['list_fields'][$slot] ?? []]];
+            $keyMap = $analysis['key_maps'][$slot] ?? [];
+            // Keys aus --map, die die Analyse nicht kennt (z. B. nicht erkannte Felder), weiterhin durchreichen.
+            foreach ($mapOverride ?? [] as $legacy => $target) {
+                if (!$this->isKnownLegacyKey($analysis, (string) $slot, (string) $legacy)) {
+                    $keyMap[(string) $legacy] = $target;
+                }
+            }
+            $slotConfig[$slot] = ['key_map' => $keyMap, 'options' => $options + ['list_fields' => $analysis['list_fields'][$slot] ?? []]];
         }
 
         // Code-Konvertierung.
@@ -341,6 +354,27 @@ final class MigrateCommand extends rex_console_command
         $io->writeln('Naechster Schritt: mform:migrate --module=ID (Dry-Run), dann --create-module, --apply und --reassign=NEUE_ID.');
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Ist der Legacy-Key einem erkannten Feld des Slots zugeordnet?
+     *
+     * @param array{calls: list<array{slot: string, fields: list<array{legacy_key: string|null}>}>} $analysis
+     */
+    private function isKnownLegacyKey(array $analysis, string $slot, string $legacy): bool
+    {
+        foreach ($analysis['calls'] as $call) {
+            if ($call['slot'] !== $slot) {
+                continue;
+            }
+            foreach ($call['fields'] as $field) {
+                if ($field['legacy_key'] === $legacy) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

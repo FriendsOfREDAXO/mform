@@ -253,7 +253,7 @@ Modal-Dialog. Felder innerhalb des Modals werden zusammen mit dem Haupt-Formular
 
 ```php
 addConditionalFieldsetArea(
-    float|int|string $sourceField,
+    float|int|string|array $sourceField,
     string $operator = '=',
     string $compareValue = '',
     string $legend = '',
@@ -291,6 +291,11 @@ Fremd-Addons registrieren in ihrer `boot.php` einen Typnamen samt Renderer. Der 
 
 ```php
 // boot.php eines Addons
+use FriendsOfRedaxo\MForm;
+use FriendsOfRedaxo\MForm\DTO\MFormItem;
+use FriendsOfRedaxo\MForm\FieldType\FieldRenderContext;
+use FriendsOfRedaxo\MForm\FieldType\FieldTypeInterface;
+
 MForm::registerFieldType('rating', RatingFieldType::class);
 
 final class RatingFieldType implements FieldTypeInterface
@@ -307,7 +312,7 @@ final class RatingFieldType implements FieldTypeInterface
 }
 
 // im Modul
-->addCustomField('rating', '1.0.rating', ['label' => 'Bewertung'], '3')
+$mform->addCustomField('rating', '1.0.rating', ['label' => 'Bewertung'], '3');
 ```
 
 Ein Element mit `data-mfr-field` pro Feld genügt für den Repeater; komplexere Widgets, die JS brauchen, initialisieren sich über `rex:ready` (Backend) und müssen geklonte Items selbst erkennen.
@@ -401,7 +406,7 @@ Mehrfach-Auswahl-Listbox.
 ```php
 addCheckboxField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
 ```
-Checkbox-Gruppe.
+Einzelne Checkbox (Ein/Aus-Schalter). Gerendert wird nur die erste Option, z. B. `[1 => 'Aktiv']`; gespeichert wird deren Key oder ein leerer Wert. Für eine Mehrfachauswahl `addCheckboxGroupField()` verwenden.
 
 ---
 
@@ -443,7 +448,7 @@ $options[$value] = ['img' => '/path/to/img.svg', 'label' => 'Variante 1'];
 // oder mit SVG-Icon-Set:
 $options[$value] = ['svgIconSet' => '<svg>...</svg>', 'label' => 'Variante 2'];
 // oder mit Layout-Config (LayoutPreviewHelper):
-$options[$value] = ['config' => [...], 'label' => 'Variante 3'];
+$options[$value] = ['config' => [/* ... */], 'label' => 'Variante 3'];
 ```
 
 ---
@@ -477,7 +482,8 @@ addTagsField(float|int|string $id, ?array $suggestions = null, ?array $attribute
 Schlagworte als Pills (ab 10.0). Gespeicherter Wert: kommaseparierter String. `$suggestions` sind Vorschläge; Attribute `allow_new` (Standard `true`), `max` (0 = unbegrenzt), `placeholder`.
 
 ```php
-$mform->addTagsField('tags', ['News', 'Blog'], ['label' => 'Schlagworte', 'max' => 5]);
+// im Repeater-Item-Formular (außerhalb eines Repeaters numerische Slot-ID, z. B. 1)
+$itemForm->addTagsField('tags', ['News', 'Blog'], ['label' => 'Schlagworte', 'max' => 5]);
 // Ausgabe: array_filter(explode(',', $item['tags'] ?? ''))
 ```
 
@@ -489,7 +495,8 @@ addColorSwatchField(float|int|string $id, ?array $swatches = null, ?array $attri
 Farb-Picker mit Text-Input und vordefinierten Farb-Swatches. Gespeicherter Wert: Hex-Code oder CSS-Klasse.
 
 ```php
-$mform->addColorSwatchField('color', [
+// im Repeater-Item-Formular (außerhalb eines Repeaters numerische Slot-ID, z. B. 1)
+$itemForm->addColorSwatchField('color', [
     '#ffffff' => 'Weiß',
     '#000000' => 'Schwarz',
     '.bg-primary' => ['label' => 'Primärfarbe', 'preview' => '#2f77bc'],
@@ -601,7 +608,8 @@ Unterstützte `$attributes` (Repeater-Optionen):
 |-----------|-----|--------------|
 | `label`, `btn_text`, `btn_class` | `string` | Beschriftung, Text und Klasse des Hinzufügen-Buttons |
 | `min`, `max`, `default_count` | `int` | Mindest-, Maximal- und Startanzahl der Items |
-| `collapsed`, `first_open`, `show_toggle_all`, `show_add_button`, `copy_paste`, `open` | `bool` | Bedienung, siehe [Repeater-Optionen](07_repeater.md#vollständige-optionsübersicht) |
+| `collapsed`, `first_open`, `show_toggle_all`, `show_add_button`, `copy_paste` | `bool` | Bedienung, siehe [Repeater-Optionen](07_repeater.md#vollständige-optionsübersicht) |
+| `open` | `bool` | reserviert, derzeit ohne Wirkung |
 | `confirm_delete_msg` | `string` | Angepasste Lösch-Bestätigungsmeldung |
 | `layout` | `string` | `horizontal`, `vertical` oder `inline` |
 | `description` | `string` | Einleitender Text unter der Kopfzeile (ab 10.0) |
@@ -627,7 +635,7 @@ Universelle Low-Level-Methode für alle Feldtypen. Für benutzerdefinierte Felde
 ---
 
 ```php
-addInputs(float|int|string|null $id, string $filename, array $inputsConfig = []): ?MForm
+addInputs(float|int|string|null $id, string $filename, array $inputsConfig = []): MForm
 ```
 Lädt eine externe Input-Klasse aus `mform/inputs/` oder `mfragment/inputs/`.
 
@@ -701,7 +709,7 @@ Setzt die Auswahl-Optionen (für Select, Checkbox, Radio). Format: `[value => la
 ---
 
 ```php
-setOption(mixed $key, mixed $value): MForm
+setOption(int|string $key, mixed $value): MForm
 ```
 Fügt eine einzelne Auswahl-Option hinzu.
 
@@ -723,7 +731,7 @@ Deaktiviert bestimmte Optionen (rendered als `disabled`).
 ---
 
 ```php
-setDisableOption(mixed $key): MForm
+setDisableOption(int|string $key): MForm
 ```
 Deaktiviert eine einzelne Option.
 
@@ -751,7 +759,7 @@ Setzt die sichtbare Anzahl von Einträgen.
 ---
 
 ```php
-setCategory(int|null $catId): MForm
+setCategory(?int $catId): MForm
 ```
 Setzt die Start-Kategorie für Medienpool/Link-Felder.
 
@@ -923,7 +931,7 @@ Gruppiert Items nach einem Feldwert. Gibt `array<string, array<int, array>>` zur
 
 ```php
 $grouped = MFormRepeaterHelper::groupByField($rows, 'category');
-foreach ($grouped as $category => $categoryItems) { ... }
+foreach ($grouped as $category => $categoryItems) { /* ... */ }
 ```
 
 ---
@@ -1077,7 +1085,7 @@ Konvertiert REDAXO-Links (`redaxo://`, `rex://`, numerische IDs) in frontend-URL
 ---
 
 ```php
-MFormOutputHelper::isFirstSlice(mixed $sliceId): bool
+MFormOutputHelper::isFirstSlice(int $sliceId): bool
 ```
 Prüft, ob ein Modul-Slice der erste Slice des aktuellen Artikels ist.
 
@@ -1112,14 +1120,14 @@ Fügt eine HTML-Nachricht zur Backend-Info-Box hinzu.
 ---
 
 ```php
-MFormModuleHelper::addBackendInfoImgMsg(mixed $image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
+MFormModuleHelper::addBackendInfoImgMsg(string $image, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
 ```
 Fügt eine Nachricht mit Vorschau-Bild zur Backend-Info-Box hinzu.
 
 ---
 
 ```php
-MFormModuleHelper::addBackendInfoImgList(mixed $images, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
+MFormModuleHelper::addBackendInfoImgList(array $images, string $message = '', string $mediaType = 'rex_mediapool_detail'): void
 ```
 Fügt eine Nachricht mit mehreren Vorschau-Bildern zur Backend-Info-Box hinzu.
 
@@ -1229,7 +1237,7 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 | `color` | `addColorField()` | Nativer Farbwähler |
 | `select` | `addSelectField()` | Dropdown-Auswahl |
 | `multiselect` | `addMultiSelectField()` | Mehrfach-Auswahl |
-| `checkbox` | `addCheckboxField()` | Checkbox-Gruppe |
+| `checkbox` | `addCheckboxField()` | Einzelne Checkbox (Ein/Aus, nur die erste Option wird gerendert) |
 | `checkbox-group` | `addCheckboxGroupField()` | Visuell gestaltete Checkbox-Gruppe |
 | `tags` | `addTagsField()` | Schlagworte als Pills, kommasepariert |
 | `radio` | `addRadioField()` | Radio-Buttons |
@@ -1259,6 +1267,7 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 ## Vollständiges Verwendungsbeispiel
 
 ```php
+<?php
 // Modul-Input
 
 use FriendsOfRedaxo\MForm;
@@ -1267,7 +1276,7 @@ use FriendsOfRedaxo\MForm\Utils\MFormModuleHelper;
 $config = MFormModuleHelper::mergeInputConfig([
     'show_image' => true,
     'max_items' => 10,
-], rex_var::toArray('REX_VALUE[id=20]'));
+], rex_var::toArray('REX_VALUE[id=20]') ?? []);
 
 $mform = MForm::factory();
 
@@ -1305,6 +1314,7 @@ echo $mform->show();
 ```
 
 ```php
+<?php
 // Modul-Output
 
 use FriendsOfRedaxo\MForm\Repeater\MFormRepeaterHelper;
@@ -1312,7 +1322,7 @@ use FriendsOfRedaxo\MForm\Utils\MFormOutputHelper;
 
 $headline = 'REX_VALUE[id=1]';
 $text     = 'REX_VALUE[id=2 output="html"]';
-$image    = 'REX_VALUE[id=3]';
+$image    = 'REX_MEDIA[id=3]';
 $layout   = 'REX_VALUE[id=4]';
 $items    = MFormRepeaterHelper::decode(5);
 

@@ -166,6 +166,95 @@ final class MBlockModuleAnalyzer
     }
 
     /**
+     * Uebernimmt editierte Zielnamen (Assistent: key_map[slot][legacy] = neu, Konsole: --map)
+     * in eine Analyse: Felder, Key-Maps, Listenfelder und Risiko-Hinweise passen danach
+     * zusammen, sodass Anzeige, Code-Konvertierung und Datenmigration dieselben Namen nutzen.
+     *
+     * Slot `*` gilt fuer alle Slots (Konsole `--map`). Ungueltige oder doppelte Zielnamen
+     * werden verworfen; dann bleibt der automatische Name und es gibt eine Warnung.
+     *
+     * @param Analysis $analysis
+     * @param array<string, array<string, string>> $keyMaps
+     * @return Analysis
+     */
+    public function applyKeyMaps(array $analysis, array $keyMaps): array
+    {
+        if ([] === $keyMaps || [] === $analysis['calls']) {
+            return $analysis;
+        }
+
+        $warnings = $analysis['warnings'];
+        foreach ($analysis['calls'] as $c => $call) {
+            $overrides = $keyMaps[$call['slot']] ?? $keyMaps['*'] ?? [];
+            if ([] === $overrides) {
+                continue;
+            }
+
+            $auto = [];
+            $wanted = [];
+            foreach ($call['fields'] as $i => $field) {
+                if (null === $field['legacy_key'] || null === $field['target']) {
+                    continue;
+                }
+                $auto[$i] = $field['target'];
+                $wanted[$i] = $field['target'];
+                if (!isset($overrides[$field['legacy_key']])) {
+                    continue;
+                }
+                $new = trim($overrides[$field['legacy_key']]);
+                if ('' === $new || $new === $field['target']) {
+                    continue;
+                }
+                if (1 !== preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $new)) {
+                    $warnings[] = sprintf('Slot %s: Zielname "%s" fuer %s ist ungueltig (erlaubt: Buchstaben, Ziffern, Unterstrich; nicht mit Ziffer beginnend). Es bleibt "%s".', $call['slot'], $new, $field['legacy_key'], $field['target']);
+                    continue;
+                }
+                $wanted[$i] = $new;
+            }
+
+            // Doppelte Namen (untereinander oder mit sprechenden Feldern) auf den automatischen Namen zuruecksetzen.
+            $speaking = [];
+            foreach ($call['fields'] as $field) {
+                if (null === $field['legacy_key']) {
+                    $speaking[$field['name']] = true;
+                }
+            }
+            // Wiederholen, bis stabil: ein zurueckgesetzter automatischer Name kann mit einem anderen
+            // ueberschriebenen Namen kollidieren. Jeder Durchlauf setzt mindestens einen Override zurueck.
+            do {
+                $changed = false;
+                $counts = array_count_values($wanted);
+                foreach ($wanted as $i => $name) {
+                    if ($name !== $auto[$i] && ($counts[$name] > 1 || isset($speaking[$name]))) {
+                        $warnings[] = sprintf('Slot %s: Zielname "%s" fuer %s ist doppelt vergeben. Es bleibt "%s".', $call['slot'], $name, $call['fields'][$i]['legacy_key'], $auto[$i]);
+                        $wanted[$i] = $auto[$i];
+                        $changed = true;
+                    }
+                }
+            } while ($changed);
+
+            foreach ($wanted as $i => $name) {
+                $analysis['calls'][$c]['fields'][$i]['target'] = $name;
+            }
+            $analysis['calls'][$c]['key_map'] = $this->buildKeyMap($analysis['calls'][$c]['fields']);
+            $analysis['calls'][$c]['list_fields'] = $this->buildListFields($analysis['calls'][$c]['fields']);
+        }
+
+        $keyMapsOut = [];
+        $listFields = [];
+        foreach ($analysis['calls'] as $call) {
+            $keyMapsOut[$call['slot']] = ($keyMapsOut[$call['slot']] ?? []) + $call['key_map'];
+            $listFields[$call['slot']] = ($listFields[$call['slot']] ?? []) + $call['list_fields'];
+        }
+        $analysis['key_maps'] = $keyMapsOut;
+        $analysis['list_fields'] = $listFields;
+        $analysis['warnings'] = array_values(array_unique($warnings));
+        [$analysis['risk'], $analysis['risk_reasons']] = $this->rateRisk($analysis['has_mblock'], $analysis['calls'], $analysis['nested'], $analysis['gridblock'], $analysis['html_mblock'], $analysis['slots'], $analysis['output_toarray_slots']);
+
+        return $analysis;
+    }
+
+    /**
      * Leitet die Legacy-Key-Map fuer einen Slot ab (Kurzform fuer Aufrufer,
      * die nur die Map brauchen).
      *
@@ -227,7 +316,7 @@ final class MBlockModuleAnalyzer
             $nestedKeys = [];
             $hasOffline = false;
             if ('mform' === $formKind) {
-                $region = self::formRegion($code, $formVar ?? '', $offset) ?? ['offset' => $regionStart, 'code' => substr($code, $regionStart, $offset - $regionStart)];
+                $region = self::formRegion($code, $formVar, $offset) ?? ['offset' => $regionStart, 'code' => substr($code, $regionStart, $offset - $regionStart)];
                 $regionStart = $region['offset'];
                 $fields = $this->collectFields($region['code'], $idToken, $slot, $regionStart, $code);
                 $keyMap = $this->buildKeyMap($fields);
