@@ -117,9 +117,12 @@ if ($moduleId > 0) {
     }
 }
 
-// Key-Maps: Request (editiert) vor Analyse (automatisch).
-$keyMaps = $readKeyMaps();
-if ([] === $keyMaps && null !== $analysis) {
+// Key-Maps: editierte Zielnamen aus dem Request in die Analyse uebernehmen (#466), damit Anzeige,
+// Code-Konvertierung, Probelauf und Datenmigration dieselben Namen verwenden.
+$requestKeyMaps = $readKeyMaps();
+$keyMaps = [];
+if (null !== $analysis) {
+    $analysis = $analyzer->applyKeyMaps($analysis, $requestKeyMaps);
     $keyMaps = $analysis['key_maps'];
 }
 $mergeColumns = 1 === rex_request('merge_columns', 'int', 0);
@@ -142,9 +145,9 @@ $applyResult = null;
 $singleResult = null;
 
 if ('convert' === $func) {
-    $codeAnalysis = $analyzer->analyze($inputCode, $outputCode);
+    $codeAnalysis = $analyzer->applyKeyMaps($analyzer->analyze($inputCode, $outputCode), $requestKeyMaps);
     $inputResult = $converter->convertInput($inputCode, null, $codeAnalysis);
-    $outputResult = $converter->convertOutput($outputCode, implode(',', [] !== $codeAnalysis['slots'] ? $codeAnalysis['slots'] : ['1']), $keyMaps);
+    $outputResult = $converter->convertOutput($outputCode, implode(',', [] !== $codeAnalysis['slots'] ? $codeAnalysis['slots'] : ['1']), $codeAnalysis['key_maps']);
     $convertedInput = $inputResult['code'];
     $convertedOutput = $outputResult['code'];
     $convertResultsHtml = '<hr><div class="row">
@@ -441,6 +444,7 @@ if (null === $analysis) {
 }
 
 // ── Schritt 2: Analyse und Code ─────────────────────────────────────────────
+$keyMapForm = '';
 $analysisHtml = '<div id="mform-migration-step2"></div>'
     . '<p>' . $t('module_headline', rex_escape($module['name']), $module['id']) . ' ' . $riskBadge($analysis['risk']) . '</p>';
 
@@ -449,8 +453,7 @@ if (!$analysis['has_mblock']) {
 } else {
     $analysisHtml .= $renderNotes(array_merge($analysis['risk_reasons'], $analysis['warnings']), []);
 
-    // Key-Map je Slot (editierbar) und Felder.
-    $keyMapForm = '';
+    // Key-Map je Slot (editierbar) und Felder – wird im Konvertierungsformular ausgegeben.
     foreach ($analysis['calls'] as $call) {
         $slot = $call['slot'];
         $fieldRows = '';
@@ -472,15 +475,15 @@ if (!$analysis['has_mblock']) {
             $keyMapForm .= '<p class="text-warning">' . $t('html_form_manual') . '</p>';
         }
     }
-    $analysisHtml .= $keyMapForm;
 }
 
-// Konvertierungsformular (Code editierbar, Key-Map wird mitgeschickt).
+// Konvertierungsformular (Key-Map und Code editierbar; die Key-Map-Felder muessen im Formular liegen, #466).
 $analysisHtml .= '
 <form action="' . $pageUrl() . '#mform-migration-step2" method="post">
     ' . $csrf . '
     <input type="hidden" name="func" value="convert">
     <input type="hidden" name="module_id" value="' . $moduleId . '">
+    ' . $keyMapForm . '
     <p class="rex-note">' . $t('keymap_note') . '</p>
     <div class="row">
         <div class="col-md-6"><div class="form-group"><label class="control-label"><i class="rex-icon fa-sign-in"></i> ' . $t('input_label') . '</label>' . $codeArea('input_code', $inputCode) . '</div></div>

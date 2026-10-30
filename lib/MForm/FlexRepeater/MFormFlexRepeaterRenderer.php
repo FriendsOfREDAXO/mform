@@ -824,11 +824,15 @@ class MFormFlexRepeaterRenderer
         $params = '';
 
         if ('medialist' === $type) {
-            if (isset($attrs['data-media-category']) && '' !== (string) $attrs['data-media-category']) {
-                $params .= '&rex_file_category=' . rawurlencode((string) $attrs['data-media-category']);
+            // Attribute (data-*) oder Parameter wie im klassischen Formular (category/media_category, types), #466
+            $itemParams = $item->getParameter();
+            $category = $attrs['data-media-category'] ?? $itemParams['media_category'] ?? $itemParams['category'] ?? null;
+            if (null !== $category && '' !== (string) $category) {
+                $params .= '&rex_file_category=' . rawurlencode((string) $category);
             }
-            if (isset($attrs['data-media-type']) && '' !== (string) $attrs['data-media-type']) {
-                $params .= '&args[types]=' . rawurlencode((string) $attrs['data-media-type']);
+            $mediaTypes = isset($attrs['data-media-type']) && '' !== (string) $attrs['data-media-type'] ? (string) $attrs['data-media-type'] : self::normalizeMediaTypes($itemParams['types'] ?? null);
+            if (null !== $mediaTypes) {
+                $params .= '&args[types]=' . rawurlencode($mediaTypes);
             }
         }
 
@@ -910,7 +914,7 @@ class MFormFlexRepeaterRenderer
         $attrs = $item->getAttributes();
         $widgetId = '__MFRID__-' . preg_replace('/[^a-z0-9_-]/i', '-', $fieldKey);
 
-        $args = self::mapCustomLinkArgs($attrs, $type);
+        $args = self::mapCustomLinkArgs($attrs, $type, $item->getParameter());
 
         $html = rex_var_custom_link::getWidget(
             $widgetId,
@@ -957,9 +961,10 @@ class MFormFlexRepeaterRenderer
 
     /**
      * @param array<string, mixed> $attrs
+     * @param array<string, mixed> $params Parameter des Feldes (z. B. addMediaField(1, ['types' => 'jpg,png']))
      * @return array<string, mixed>
      */
-    private static function mapCustomLinkArgs(array $attrs, string $type): array
+    private static function mapCustomLinkArgs(array $attrs, string $type, array $params = []): array
     {
         $args = [];
 
@@ -996,6 +1001,23 @@ class MFormFlexRepeaterRenderer
         } elseif (isset($attrs['data-types'])) {
             $args['types'] = $attrs['data-types'];
         }
+        // Medienfelder: Parameter wie im klassischen Formular (types, media_category/category, preview), #466
+        if ('media' === $type || 'mform-media' === $type) {
+            $mediaTypes = self::normalizeMediaTypes($params['types'] ?? null);
+            if (!isset($args['types']) && null !== $mediaTypes) {
+                $args['types'] = $mediaTypes;
+            }
+            if (!isset($args['media_category'])) {
+                if (isset($params['media_category']) && '' !== (string) $params['media_category']) {
+                    $args['media_category'] = $params['media_category'];
+                } elseif (isset($params['category']) && '' !== (string) $params['category']) {
+                    $args['media_category'] = $params['category'];
+                }
+            }
+            if (isset($params['preview'])) {
+                $args['preview'] = $params['preview'];
+            }
+        }
         if (isset($attrs['data-extern-link-prefix'])) {
             $args['external_prefix'] = $attrs['data-extern-link-prefix'];
         }
@@ -1023,6 +1045,22 @@ class MFormFlexRepeaterRenderer
         }
 
         return $args;
+    }
+
+    /**
+     * Dateitypen wie im klassischen Formular: Kleinbuchstaben, ohne Leerzeichen (String oder Liste).
+     */
+    private static function normalizeMediaTypes(mixed $types): ?string
+    {
+        if (is_array($types)) {
+            $types = implode(',', array_map('strval', $types));
+        }
+        if (!is_string($types)) {
+            return null;
+        }
+        $types = str_replace(' ', '', strtolower($types));
+
+        return '' !== $types ? $types : null;
     }
 
     /**

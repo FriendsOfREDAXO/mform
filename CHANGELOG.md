@@ -4,6 +4,17 @@
 
 ### Behoben
 
+- **MBlock-zu-Repeater-Assistent übernahm geänderte Feldnamen nicht** (#466, danke @goldfoot): Die Eingabefelder der Key-Map lagen außerhalb des Konvertierungsformulars und wurden nicht mitgeschickt. Nach „Konvertieren“ sprang die Tabelle auf die automatischen Namen (`media`, `media_2`) zurück, Code, Probelauf und Datenmigration nutzten ebenfalls die automatischen Namen. Die Key-Map ist jetzt Teil des Formulars; Anzeige, Eingabe- und Ausgabe-Code, Probelauf und Datenmigration verwenden dieselben Namen. Ungültige Namen (Leerzeichen, Ziffer am Anfang) und doppelte Namen werden mit Warnung auf den automatischen Namen zurückgesetzt, Medien-/Linklisten werden unter dem neuen Namen normalisiert. Neu: `MBlockModuleAnalyzer::applyKeyMaps()`.
+- **`mform:migrate --map` wirkte nur auf die Daten**: Analyse-Tabelle, Hinweise und erzeugter Code zeigten weiter die automatischen Namen. `--map` gilt jetzt überall. Keys aus `--map`, die die Analyse nicht kennt, werden wie bisher an die Datenmigration durchgereicht.
+- **`mform:migrate --apply` meldete Erfolg, wenn nichts zu migrieren war**: Ohne `MBlock::show()` im Modul enden `--apply` und `--create-module` jetzt mit Exit-Code 1, damit Skripte (`… --apply && …`) abbrechen. Die reine Analyse bleibt bei 0.
+- **Dateityp- und Kategorie-Filter von Medienfeldern im Flex-Repeater ignoriert**: `addMediaField('video', ['types' => 'mp4,mov,webm'])` filterte im klassischen Formular, im Repeater nicht – der Renderer las nur `data-media-type`/`data-types`. Medienfelder und Medienlisten im Repeater übernehmen jetzt wie das klassische Formular die Parameter `types` (Kleinbuchstaben, ohne Leerzeichen), `media_category`/`category` und `preview`. Damit bleibt der Filter auch nach einer MBlock-Migration erhalten.
+
+## Version 10.0.3
+
+Wartungsrelease (20.10.2026). Update von 10.0.2 ohne Datenmigration, keine Breaking Changes.
+
+### Behoben
+
 - **Radio-Felder im Flex-Repeater speicherten beim Umschalten den alten Wert**: Die Radios eines Repeater-Items hatten kein `name`-Attribut und bildeten deshalb keine Radio-Gruppe. Beim Anklicken eines anderen Radios blieb das zuvor gewählte ebenfalls angehakt, und beim Speichern gewann das letzte angehakte Radio in der Liste. Wer etwa bei `addRadioColorField()` von „Gelb“ auf das weiter oben stehende „Weiß“ umschaltete, behielt nach dem Speichern „Gelb“. Betroffen waren auch Radios in Nested Repeatern. Jedes Item (auch Nested-Items, neu hinzugefügte, kopierte und eingefügte) gibt seinen Radios jetzt je Feld einen eigenen `name`, die Gruppen bleiben beim Verschieben erhalten und mischen sich nicht zwischen Items oder mit Nested Repeatern. Das Speicherformat ändert sich nicht.
 
 ## Version 10.0.2

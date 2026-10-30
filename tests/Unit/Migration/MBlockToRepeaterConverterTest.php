@@ -46,6 +46,19 @@ final class MBlockToRepeaterConverterTest extends TestCase
         self::assertStringContainsString('online_offline', implode("\n", $result['notes']));
     }
 
+    public function testConvertInputUsesEditedKeyMap(): void
+    {
+        $code = '<?php $id = 1; $mform = MForm::factory(); $mform->addMediaField(1, ["label" => "Poster"]); $mform->addMediaField(2, ["label" => "Video", "types" => "mp4,mov,webm"]); echo MBlock::show($id, $mform->show(), []);';
+        $analyzer = new \FriendsOfRedaxo\MForm\Migration\MBlockModuleAnalyzer();
+        $analysis = $analyzer->applyKeyMaps($analyzer->analyze($code), ['1' => ['REX_MEDIA_1' => 'poster', 'REX_MEDIA_2' => 'video']]);
+
+        $result = $this->converter->convertInput($code, null, $analysis);
+
+        self::assertStringContainsString("addMediaField('poster'", $result['code']);
+        self::assertStringContainsString("addMediaField('video'", $result['code']);
+        self::assertStringNotContainsString("'media_2'", $result['code']);
+    }
+
     public function testConvertInputWithoutShowCall(): void
     {
         $code = '<?php $id = 1; $f = MForm::factory()->addTextField("$id.0.a"); echo MBlock::show($id, $f, array("min" => 1));';
