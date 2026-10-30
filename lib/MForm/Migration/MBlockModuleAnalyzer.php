@@ -219,13 +219,19 @@ final class MBlockModuleAnalyzer
                     $speaking[$field['name']] = true;
                 }
             }
-            $counts = array_count_values($wanted);
-            foreach ($wanted as $i => $name) {
-                if ($name !== $auto[$i] && ($counts[$name] > 1 || isset($speaking[$name]))) {
-                    $warnings[] = sprintf('Slot %s: Zielname "%s" fuer %s ist doppelt vergeben. Es bleibt "%s".', $call['slot'], $name, $call['fields'][$i]['legacy_key'], $auto[$i]);
-                    $wanted[$i] = $auto[$i];
+            // Wiederholen, bis stabil: ein zurueckgesetzter automatischer Name kann mit einem anderen
+            // ueberschriebenen Namen kollidieren. Jeder Durchlauf setzt mindestens einen Override zurueck.
+            do {
+                $changed = false;
+                $counts = array_count_values($wanted);
+                foreach ($wanted as $i => $name) {
+                    if ($name !== $auto[$i] && ($counts[$name] > 1 || isset($speaking[$name]))) {
+                        $warnings[] = sprintf('Slot %s: Zielname "%s" fuer %s ist doppelt vergeben. Es bleibt "%s".', $call['slot'], $name, $call['fields'][$i]['legacy_key'], $auto[$i]);
+                        $wanted[$i] = $auto[$i];
+                        $changed = true;
+                    }
                 }
-            }
+            } while ($changed);
 
             foreach ($wanted as $i => $name) {
                 $analysis['calls'][$c]['fields'][$i]['target'] = $name;
@@ -310,7 +316,7 @@ final class MBlockModuleAnalyzer
             $nestedKeys = [];
             $hasOffline = false;
             if ('mform' === $formKind) {
-                $region = self::formRegion($code, $formVar ?? '', $offset) ?? ['offset' => $regionStart, 'code' => substr($code, $regionStart, $offset - $regionStart)];
+                $region = self::formRegion($code, $formVar, $offset) ?? ['offset' => $regionStart, 'code' => substr($code, $regionStart, $offset - $regionStart)];
                 $regionStart = $region['offset'];
                 $fields = $this->collectFields($region['code'], $idToken, $slot, $regionStart, $code);
                 $keyMap = $this->buildKeyMap($fields);

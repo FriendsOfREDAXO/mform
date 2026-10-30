@@ -148,6 +148,18 @@ final class MBlockModuleAnalyzerTest extends TestCase
         self::assertSame(['REX_MEDIA_1' => 'media_2', 'REX_MEDIA_2' => 'media'], $swap['key_maps']['1']);
     }
 
+    public function testApplyKeyMapsResolvesFollowUpCollisions(): void
+    {
+        // REX_MEDIA_1/2 kollidieren auf "clip" und fallen auf media/media_2 zurueck;
+        // REX_MEDIA_3 -> "media" kollidiert danach mit dem zurueckgesetzten REX_MEDIA_1.
+        $code = '<?php $id = 1; $f = MForm::factory()->addMediaField(1)->addMediaField(2)->addMediaField(3); echo MBlock::show($id, $f->show());';
+        $edited = $this->analyzer->applyKeyMaps($this->analyzer->analyze($code), ['1' => ['REX_MEDIA_1' => 'clip', 'REX_MEDIA_2' => 'clip', 'REX_MEDIA_3' => 'media']]);
+
+        $targets = array_values($edited['key_maps']['1']);
+        self::assertSame($targets, array_values(array_unique($targets)), 'Zielnamen muessen eindeutig bleiben');
+        self::assertSame(['REX_MEDIA_1' => 'media', 'REX_MEDIA_2' => 'media_2', 'REX_MEDIA_3' => 'media_3'], $edited['key_maps']['1']);
+    }
+
     public function testApplyKeyMapsRenamesListFields(): void
     {
         $code = '<?php $id = 1; $f = MForm::factory()->addMedialistField(1)->addTextField("$id.0.t"); echo MBlock::show($id, $f->show());';

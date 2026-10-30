@@ -73,8 +73,8 @@ MForm ist ein API-getriebenes Formular-Addon mit vielen produktiv genutzten Eins
 ### Slots und Schlüssel
 
 - REDAXO-Slots je Block: `REX_VALUE` 1–20, `REX_MEDIA`, `REX_MEDIALIST`, `REX_LINK`, `REX_LINKLIST` je nur 1–10. Höhere Nummern werden nicht gespeichert.
-- Außerhalb eines Repeaters brauchen Felder eine **numerische Slot-ID** – auch in Spalten, Fieldsets, Tabs, Collapse, Accordion, Inline und Modal (Layout-Wrapper speichern nichts).
-- **String-Schlüssel** gibt es nur innerhalb eines Repeaters. Sie müssen über alle Layout-Wrapper desselben Repeaters eindeutig sein; ein verschachtelter Repeater hat eigene Schlüssel.
+- Außerhalb eines Repeaters brauchen Felder eine **Slot-ID** – auch in Spalten, Fieldsets, Tabs, Collapse, Accordion, Inline und Modal (Layout-Wrapper speichern nichts): numerisch (`3`) oder in Punkt-Notation (`"1.1"`, `"1.titel"`), dann landen mehrere Felder als JSON in einem `REX_VALUE`-Slot (Ausgabe über `MFormOutputHelper::values()`/`value()`). Punkt-IDs als String schreiben – Floats wie `1.10` werden zu `1.1`.
+- **Reine String-Schlüssel** (ohne Slot-Präfix) gibt es nur innerhalb eines Repeaters. Sie müssen über alle Layout-Wrapper desselben Repeaters eindeutig sein; ein verschachtelter Repeater hat eigene Schlüssel.
 - Ausgabe eines Repeater-Slots über `MFormRepeaterHelper::decode(<slot>)` (nicht `rex_var::toArray()`); `decode(<int>)` findet den aktuellen Block über den Artikel-Kontext.
 
 ### Feldtypen
@@ -136,7 +136,8 @@ composer install                              # einmalig: PHPUnit
 vendor/bin/phpunit --testsuite unit           # Unit-Tests (laufen ohne REDAXO)
 find lib pages -name '*.php' -print0 | xargs -0 -n1 php -l   # Syntax
 node --check assets/js/formbuilder.js         # JS-Syntax (analog für geänderte JS-Dateien)
-npm install && npx playwright test            # E2E-Smoke gegen eine laufende Instanz (siehe playwright.config.js)
+npm install && npx playwright install chromium   # einmalig: Playwright und Browser
+npx playwright test                           # E2E-Smoke gegen eine laufende Instanz (siehe playwright.config.js)
 ```
 
 Statische Analyse mit rexstan in einer REDAXO-Instanz (Pfade je nach Setup):
