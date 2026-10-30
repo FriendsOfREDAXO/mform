@@ -191,7 +191,7 @@ class rex_var_custom_link extends rex_var
             }
 
             $args = [];
-            foreach (['category', 'media', 'media_category', 'types', 'external', 'mailto', 'intern', 'phone', 'anchor', 'external_prefix', 'ylink'] as $key) {
+            foreach (['category', 'media', 'media_category', 'types', 'preview', 'external', 'mailto', 'intern', 'phone', 'anchor', 'external_prefix', 'ylink'] as $key) {
                 if ($this->hasArg($key)) {
                     $args[$key] = $this->getArg($key);
                 }
@@ -299,6 +299,8 @@ class rex_var_custom_link extends rex_var
             $class = $args['class'];
         }
         $mediaClass = (isset($args['media']) && 0 == $args['media']) ? ' hidden' : $class;
+        // preview = 0/false blendet die Vorschau-Schaltflaeche aus (Standard: anzeigen, wenn die Datei eine Vorschau erlaubt)
+        $showPreview = !(isset($args['preview']) && in_array(strtolower(trim((string) $args['preview'])), ['0', 'false', 'no', 'off'], true));
         $externalClass = (isset($args['external']) && 0 == $args['external']) ? ' hidden' : $class;
         $emailClass = (isset($args['mailto']) && 0 == $args['mailto']) ? ' hidden' : $class;
         $linkClass = (isset($args['intern']) && 0 == $args['intern']) ? ' hidden' : $class;
@@ -335,8 +337,8 @@ class rex_var_custom_link extends rex_var
         $e['field'] = '<input class="form-control" type="text" name="REX_LINK_NAME[' . $id . ']" value="' . rex_escape($valueName) . '" id="REX_LINK_' . $id . '_NAME" readonly="readonly" /><input type="hidden" name="' . $name . '" id="REX_LINK_' . $id . '" value="' . rex_escape($valueString) . '" />';
         $e['before'] = '<div class="rex-js-widget custom-link' . $wdgtClass . '" data-widget-id="' . $id . '">';
         $e['after'] = '</div>';
-        $e['functionButtons'] = $ylinks . '
-        <a href="#" class="btn btn-popup media_preview_link media_preview_link--leading hidden ' . $mediaClass . '" id="mform_media_preview_' . $id . '" title="' . rex_i18n::msg('var_media_view') . '"><i class="rex-icon fa-eye"></i></a>
+        $e['functionButtons'] = $ylinks . ($showPreview ? '
+        <a href="#" class="btn btn-popup media_preview_link media_preview_link--leading hidden ' . $mediaClass . '" id="mform_media_preview_' . $id . '" title="' . rex_i18n::msg('var_media_view') . '"><i class="rex-icon fa-eye"></i></a>' : '') . '
         <a href="#" class="btn btn-popup intern_link ' . $linkClass . '" id="mform_link_' . $id . '" title="' . rex_i18n::msg('var_link_open') . '"><i class="rex-icon rex-icon-open-linkmap"></i></a>
         <a href="#" class="btn btn-popup external_link ' . $externalClass . '" id="mform_extern_' . $id . '" title="' . rex_i18n::msg('var_extern_link') . '"><i class="rex-icon fa-external-link"></i></a>
         <a href="#" class="btn btn-popup media_link ' . $mediaClass . '" id="mform_media_' . $id . '" title="' . rex_i18n::msg('var_media_open') . '"><i class="rex-icon fa-file-o"></i></a>
