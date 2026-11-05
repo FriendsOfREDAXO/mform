@@ -19,7 +19,7 @@ jobs:
         php-version: ['8.1', '8.2', '8.3', '8.4']
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -43,7 +43,7 @@ jobs:
     if: github.event.pull_request.draft == false
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -71,8 +71,23 @@ jobs:
     env:
       ADDON_KEY: ${{ github.event.repository.name }}
 
+    # ubuntu-latest (26.04) bringt kein MySQL mehr mit
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: redaxo5
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -90,12 +105,6 @@ jobs:
           curl -Ls -o redaxo.zip "https://github.com/redaxo/redaxo/releases/download/$REDAXO_VERSION/redaxo_$REDAXO_VERSION.zip"
           unzip -oq redaxo.zip -d redaxo_cms
           rm redaxo.zip
-
-      # MySQL fuer REDAXO-Setup starten
-      - name: Init database
-        run: |
-          sudo /etc/init.d/mysql start
-          mysql -uroot -h127.0.0.1 -proot -e 'create database redaxo5;'
 
       # REDAXO setup ausfuehren
       - name: Setup REDAXO

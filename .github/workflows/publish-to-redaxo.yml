@@ -10,13 +10,13 @@ jobs:
   redaxo_publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - if: hashFiles('composer.json') != ''
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
       - if: hashFiles('composer.json') != ''
-        uses: ramsey/composer-install@v2
+        uses: ramsey/composer-install@v4
         with:
           composer-options: "--no-dev"
       - uses: FriendsOfREDAXO/installer-action@v1
