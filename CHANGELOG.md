@@ -1,5 +1,18 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.6
+
+Wartungsrelease (05.11.2026). Update von 10.0.5 ohne Datenmigration, keine Breaking Changes.
+
+### Behoben
+
+- **Flex-Repeater: Bedingte Felder in zugeklappten Zeilen falsch sichtbar** (#470): Bei `collapsed => true` war ein per `setVisibleIf()`/`setHiddenIf()` auszublendendes Feld nach dem Aufklappen einer gespeicherten Zeile sichtbar. Die Sichtbarkeitslogik wertete das durch die zugeklappte Zeile unsichtbare Feld als „bereits versteckt“ und setzte den Zustand nie. Maßgeblich ist jetzt nur noch der eigene Anzeigezustand des Felds.
+- **Flex-Repeater: Select in neuen Zeilen ohne Auswahl** (#470): Neue Zeilen setzten Select-Felder auf einen leeren Wert, auch wenn es keine leere Option gibt – der Select stand dann auf „nichts ausgewählt“ statt auf der ersten Option, und davon abhängige bedingte Felder griffen nicht. Ohne leere Option bleibt jetzt die erste Option ausgewählt; gespeicherte Werte sind nicht betroffen.
+
+### Intern
+
+- CI: `actions/checkout@v7`, `ramsey/composer-install@v4`, PHP-Lint zusätzlich mit PHP 8.5; rexstan-Job nutzt einen MySQL-Service-Container (Ubuntu 26.04 bringt kein MySQL mehr mit).
+
 ## Version 10.0.5
 
 Wartungsrelease (30.10.2026), Nachtrag zum Review von #468. Update von 10.0.4 ohne Datenmigration, keine Breaking Changes.

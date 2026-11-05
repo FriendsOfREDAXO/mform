@@ -347,6 +347,16 @@
                 return;
             }
         }
+        if (tag === 'select' && String(value) === '') {
+            // #470: '' ohne passende Option ergaebe selectedIndex=-1 statt des
+            // Browser-Defaults (erste Option). Nicht-leere Werte bleiben unberuehrt.
+            const hasEmptyOption = Array.from(field.options).some(function (o) {
+                return o.value === '';
+            });
+            if (!hasEmptyOption) {
+                return;
+            }
+        }
         field.value = String(value);
     }
 

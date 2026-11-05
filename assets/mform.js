@@ -194,7 +194,10 @@ function initMFormConditionals(mform) {
     function setConditionalVisibility(target, shouldShow, animate) {
         var wasVisible = target.data('mformConditionalVisible');
         if (typeof wasVisible === 'undefined') {
-            wasVisible = !target.hasClass('mform-conditional-hidden') && target.is(':visible');
+            // Nur den eigenen Anzeigezustand werten, nicht :visible (#470):
+            // In einer zugeklappten Repeater-Zeile ist ein Vorfahre display:none,
+            // das Target selbst aber nicht.
+            wasVisible = !target.hasClass('mform-conditional-hidden') && target.css('display') !== 'none';
         }
 
         if (wasVisible === shouldShow) {
