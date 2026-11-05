@@ -194,15 +194,10 @@ function initMFormConditionals(mform) {
     function setConditionalVisibility(target, shouldShow, animate) {
         var wasVisible = target.data('mformConditionalVisible');
         if (typeof wasVisible === 'undefined') {
-            // Nur die eigene Klasse als Ausgangszustand werten, nicht :visible
-            // (siehe #470): In einer zugeklappten Flex-Repeater-Zeile ist das
-            // Feld physisch unsichtbar (display:none durch die Collapse-Logik),
-            // obwohl die Conditional-Logik hier noch nie gelaufen ist. :visible
-            // wertete das faelschlich als "Ausgangszustand = versteckt" und
-            // setConditionalVisibility() brach beim ersten echten Durchlauf ab,
-            // ohne mform-conditional-hidden/display:none zu setzen -- beim
-            // Aufklappen der Zeile war das Feld dann faelschlich sichtbar.
-            wasVisible = !target.hasClass('mform-conditional-hidden');
+            // Nur den eigenen Anzeigezustand werten, nicht :visible (#470):
+            // In einer zugeklappten Repeater-Zeile ist ein Vorfahre display:none,
+            // das Target selbst aber nicht.
+            wasVisible = !target.hasClass('mform-conditional-hidden') && target.css('display') !== 'none';
         }
 
         if (wasVisible === shouldShow) {

@@ -347,19 +347,13 @@
                 return;
             }
         }
-        if (tag === 'select') {
-            // Siehe #470: _emptyData() liefert fuer jedes Feld '', auch fuer
-            // Selects. Hat keine Option den Wert '', setzt field.value = ''
-            // den Select auf selectedIndex=-1 (leer) statt auf die erste
-            // Option, wie es ein natives <select> ohne gesetzten Wert im
-            // Browser tun wuerde. Conditional Fields, die auf einen Wert
-            // pruefen, greifen dadurch bei neuen Zeilen nicht. Hat keine
-            // Option exakt diesen Wert, bleibt der Browser-Default (erste
-            // Option) stattdessen unangetastet.
-            const hasMatchingOption = Array.from(field.options).some(function (o) {
-                return o.value === String(value);
+        if (tag === 'select' && String(value) === '') {
+            // #470: '' ohne passende Option ergaebe selectedIndex=-1 statt des
+            // Browser-Defaults (erste Option). Nicht-leere Werte bleiben unberuehrt.
+            const hasEmptyOption = Array.from(field.options).some(function (o) {
+                return o.value === '';
             });
-            if (!hasMatchingOption) {
+            if (!hasEmptyOption) {
                 return;
             }
         }
