@@ -1,0 +1,14 @@
+<?php
+// Typisches MBlock-Modul aus der Praxis: Kommentare am Zeilenende, Felder mit Block-Index > 0
+$id = 1;
+$mform = new MForm();
+$mform->addFieldset('Links');
+$mform->addTextField("$id.0.icon", array('label' => 'Icon')); // use string for x.0 json values
+$mform->addCustomLinkField("$id.0.1", array('label' => 'Link'));
+$mform->addSelectField("$id.2.target");
+$mform->setLabel('Open in new window?');
+$mform->setOptions(array('' => 'No', 'blank' => 'Yes'));
+$mform->addTextField("$id.0.text", array('label' => 'Link text')); // use string for x.0 json values
+$mform->addTextField("$id.0.alt", array('label' => 'Alternative text')); # Hash-Kommentar
+$mform->addTextAreaField("$id.3.content", array('label' => 'Content'));
+echo MBlock::show($id, $mform->show(), array('min' => 1, 'max' => 40));

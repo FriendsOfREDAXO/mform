@@ -393,10 +393,12 @@ final class MBlockModuleAnalyzer
     {
         $fields = [];
 
-        // Praefix-Felder: "$id.0.name" | '1.0.name' | "$id.0.inner.0.name" (verschachtelt)
-        $prefixes = [preg_quote($slot, '/') . '\.0\.'];
+        // Praefix-Felder: "$id.0.name" | '1.0.name' | "$id.0.inner.0.name" (verschachtelt).
+        // Der Block-Index muss nicht 0 sein ("$id.2.extern"): MBlock schreibt ihn beim
+        // Umnummerieren ohnehin um, gespeichert wird nur der Feldname.
+        $prefixes = [preg_quote($slot, '/') . '\.\d+\.'];
         if (str_starts_with($idToken, '$')) {
-            $prefixes[] = preg_quote($idToken, '/') . '\.0\.';
+            $prefixes[] = preg_quote($idToken, '/') . '\.\d+\.';
         }
         $prefixPattern = '(?:' . implode('|', $prefixes) . ')';
 
@@ -405,7 +407,7 @@ final class MBlockModuleAnalyzer
                 $method = $match[1][0];
                 $name = $match[3][0];
                 $line = $this->lineAt($fullCode, $regionStart + (int) $match[0][1]);
-                if (preg_match('/^(\w+)\.0\.(\w+)$/', $name, $nm)) {
+                if (preg_match('/^(\w+)\.\d+\.(\w+)$/', $name, $nm)) {
                     $fields[] = ['name' => $nm[1], 'type' => 'nested', 'legacy_key' => null, 'target' => null, 'line' => $line];
                     continue;
                 }
@@ -670,7 +672,10 @@ final class MBlockModuleAnalyzer
         while ($pos < $callOffset) {
             $end = self::scanStatementEnd($code, $pos, $callOffset);
             $statement = substr($code, $pos, $end - $pos);
-            $keep = $first || preg_match($ownPattern, $statement);
+            // Kommentare am Zeilenende ("$f->add...(); // Hinweis") gehoeren zum Anfang der
+            // naechsten Anweisung; fuer die Zuordnung zum Formular werden sie uebersprungen.
+            $probe = (string) preg_replace('~\A(?:\s*(?://|#(?!\[))[^\n]*(?:\n|\z))*~', '', $statement);
+            $keep = $first || preg_match($ownPattern, $probe);
             $first = false;
             $result .= $keep ? $statement : (string) preg_replace('/[^\n]/', ' ', $statement);
             $pos = $end;

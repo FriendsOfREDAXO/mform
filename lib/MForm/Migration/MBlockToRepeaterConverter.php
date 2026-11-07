@@ -656,11 +656,12 @@ final class MBlockToRepeaterConverter
      */
     private function stripFieldPrefixes(string $code, string $idToken, string $numericId): string
     {
+        // Block-Index beliebig ("$id.2.extern"), MBlock speichert nur den Feldnamen
         $alternatives = [];
         if (str_starts_with($idToken, '$')) {
-            $alternatives[] = preg_quote($idToken, '/') . '\.0\.';
+            $alternatives[] = preg_quote($idToken, '/') . '\.\d+\.';
         }
-        $alternatives[] = preg_quote($numericId, '/') . '\.0\.';
+        $alternatives[] = preg_quote($numericId, '/') . '\.\d+\.';
         $alternatives = array_values(array_unique($alternatives));
 
         $prefixPattern = '(?:' . implode('|', $alternatives) . ')';
@@ -672,7 +673,7 @@ final class MBlockToRepeaterConverter
             static function (array $m) use (&$stripped, &$nestedStripped): string {
                 ++$stripped;
                 $name = $m[2];
-                if (preg_match('/^\w+\.0\.(\w+)$/', $name, $nm)) {
+                if (preg_match('/^\w+\.\d+\.(\w+)$/', $name, $nm)) {
                     ++$nestedStripped;
                     $name = $nm[1];
                 }
