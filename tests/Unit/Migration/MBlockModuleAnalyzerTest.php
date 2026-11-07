@@ -207,4 +207,25 @@ final class MBlockModuleAnalyzerTest extends TestCase
         self::assertStringNotContainsString('addMediaField', $region['code']);
         self::assertSame($offset - $region['offset'], strlen($region['code']));
     }
+
+    public function testKeepsFieldsAfterTrailingComments(): void
+    {
+        $analysis = $this->analyzer->analyze(self::fixture('mblock_trailing_comments_input.php.txt'));
+        $names = array_map(static fn (array $f): string => $f['name'], $analysis['calls'][0]['fields']);
+
+        // Folgezeilen eines Aufrufs mit "// Kommentar" bzw. "# Kommentar" am Ende duerfen nicht verloren gehen.
+        self::assertContains('1', $names, 'Custom-Link nach Zeile mit Kommentar');
+        self::assertContains('alt', $names, 'Feld nach Zeile mit Kommentar');
+        self::assertContains('content', $names, 'Feld nach Zeile mit Hash-Kommentar');
+        self::assertSame(['1' => 'link'], $analysis['key_maps']['1']);
+    }
+
+    public function testRecognizesFieldsWithNonZeroBlockIndex(): void
+    {
+        $analysis = $this->analyzer->analyze(self::fixture('mblock_trailing_comments_input.php.txt'));
+        $names = array_map(static fn (array $f): string => $f['name'], $analysis['calls'][0]['fields']);
+
+        self::assertContains('target', $names, '"$id.2.target"');
+        self::assertContains('content', $names, '"$id.3.content"');
+    }
 }

@@ -220,4 +220,16 @@ final class MBlockToRepeaterConverterTest extends TestCase
 
         self::assertSame($once, $twice);
     }
+
+    public function testConvertInputStripsNonZeroBlockIndexAndKeepsCommentedLines(): void
+    {
+        $code = $this->converter->convertInput(self::fixture('mblock_trailing_comments_input.php.txt'))['code'];
+
+        self::assertStringContainsString("->addCustomLinkField('link'", $code);
+        self::assertStringContainsString("->addSelectField('target'", $code);
+        self::assertStringContainsString("->addTextAreaField('content'", $code);
+        self::assertStringContainsString("->addTextField('alt'", $code);
+        self::assertStringNotContainsString('$id.2.', $code);
+        self::assertStringNotContainsString('$id.3.', $code);
+    }
 }

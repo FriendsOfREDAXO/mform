@@ -1,5 +1,12 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.7 (unveröffentlicht)
+
+### Behoben
+
+- **MBlock-Migration: Felder nach Zeilen mit Kommentar am Ende fehlten:** Steht hinter einem Aufruf ein Kommentar (`$mform->addTextField("$id.0.text"); // Hinweis`), gehörte er für den Analyzer zum Anfang der nächsten Anweisung. Die wurde deshalb nicht mehr dem Block-Formular zugeordnet und fehlte in Analyse, Key-Map und Konvertierung – etwa ein `addCustomLinkField("$id.0.1")`, dessen Daten dann nicht auf `link` umbenannt wurden. Kommentare am Anfang einer Anweisung werden jetzt übersprungen.
+- **MBlock-Migration: Feldnamen mit Block-Index ungleich 0:** `"$id.2.extern"` oder `'1.3.content'` wurden weder erkannt noch konvertiert. MBlock schreibt den Block-Index beim Umnummerieren ohnehin um und speichert nur den Feldnamen; Analyzer und Konverter behandeln jetzt jeden Index wie `0`.
+
 ## Version 10.0.6
 
 Wartungsrelease (05.11.2026). Update von 10.0.5 ohne Datenmigration, keine Breaking Changes.
