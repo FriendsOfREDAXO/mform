@@ -375,6 +375,47 @@ final class MBlockToRepeaterConverterTest extends TestCase
         self::assertStringContainsString('Stelle sicher', implode("\n", $result['notes']));
     }
 
+    public function testConvertOutputReviewEdgeCases(): void
+    {
+        // declare(strict_types) muss das erste Statement bleiben.
+        $declared = "<?php\n/* Modul */\ndeclare(strict_types=1);\n\$items = \$this->getCurrentSlice()->getValueArray(1);\nforeach (\$items as \$item) { echo \$item['REX_MEDIA_1']; }";
+        $converted = $this->converter->convertOutput($declared, '1')['code'];
+        self::assertStringContainsString("declare(strict_types=1);\nuse FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;", $converted);
+        self::assertValidPhp($converted);
+
+        // Neu belegte Slice-Variable ist nicht eindeutig der aktuelle Slice.
+        $reassigned = '<?php $slice = $this->getCurrentSlice(); $slice = $otherSlice; $items = $slice->getValueArray(1);';
+        self::assertStringContainsString('$slice->getValueArray(1)', $this->converter->convertOutput($reassigned, '1')['code']);
+
+        // ++/-- brauchen eine Variable.
+        $increment = '<?php foreach (rex_var::toArray("REX_VALUE[1]") as $item) { $item[\'REX_LINK_1\']++; --$item["REX_LINK_2"]; }';
+        $converted = $this->converter->convertOutput($increment, '1')['code'];
+        self::assertStringContainsString("\$item['link']++;", $converted);
+        self::assertStringContainsString("--\$item['link_2'];", $converted);
+        self::assertValidPhp($converted);
+    }
+
+    public function testConvertInputUseStatementEdgeCases(): void
+    {
+        $sameLine = "<?php use FriendsOfRedaxo\\MForm; \$f = MForm::factory()->addTextField('1.0.a'); echo MBlock::show(1, \$f);";
+        self::assertSame(1, substr_count($this->converter->convertInput($sameLine)['code'], 'use FriendsOfRedaxo\MForm;'));
+
+        $commented = "<?php\n// Modul\ndeclare(strict_types=1);\n\$f = MForm::factory()->addTextField('1.0.a');\necho MBlock::show(1, \$f);";
+        $converted = $this->converter->convertInput($commented)['code'];
+        self::assertStringContainsString("declare(strict_types=1);\nuse FriendsOfRedaxo\\MForm;", $converted);
+        self::assertValidPhp($converted);
+    }
+
+    public function testConvertInputRenamesBlockFormUpToReassignment(): void
+    {
+        $code = "<?php\n\$mform = new MForm();\n\$mform->addTextField('1.0.a');\n\$blocks = MBlock::show(1, \$mform->show());\n\$mform->addTextField('1.0.b');\n\$mform = new MForm();\n\$mform->addHtml(\$blocks);\necho \$mform->show();";
+        $converted = $this->converter->convertInput($code)['code'];
+
+        self::assertStringContainsString("\$repeaterForm->addTextField('b');\n\$mform = new MForm();", $converted);
+        self::assertStringContainsString('$mform->addFlexRepeaterElement(1, $repeaterForm)', $converted);
+        self::assertValidPhp($converted);
+    }
+
     private static function assertValidPhp(string $code): void
     {
         $file = tempnam(sys_get_temp_dir(), 'mform-lint');

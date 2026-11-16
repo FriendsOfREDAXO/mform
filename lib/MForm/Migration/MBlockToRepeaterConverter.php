@@ -176,8 +176,13 @@ final class MBlockToRepeaterConverter
         // filtert aber keine deaktivierten Items. Nur Slices des aktuellen Moduls umstellen.
         $sliceVars = ['$this->getCurrentSlice()' => true];
         if (preg_match_all('/(\$\w+)\s*=\s*\$this->getCurrentSlice\(\)\s*;/', $code, $sliceMatches)) {
-            foreach ($sliceMatches[1] as $sliceVar) {
-                $sliceVars[$sliceVar] = true;
+            foreach (array_unique($sliceMatches[1]) as $sliceVar) {
+                // Wird die Variable auch anders belegt, ist die Bindung nicht eindeutig.
+                $assignments = preg_match_all('/' . preg_quote($sliceVar, '/') . '\s*=(?![=>])/', $code);
+                $ownAssignments = preg_match_all('/' . preg_quote($sliceVar, '/') . '\s*=\s*\$this->getCurrentSlice\(\)\s*;/', $code);
+                if ($assignments === $ownAssignments) {
+                    $sliceVars[$sliceVar] = true;
+                }
             }
         }
         $replacedValueArray = 0;
@@ -772,7 +777,7 @@ final class MBlockToRepeaterConverter
      *
      * Ohne Umbenennung bekaeme der Repeater das Einstellungs-Formular selbst
      * (`$mform->addFlexRepeaterElement($id, $mform)`). Das Block-Formular wird daher
-     * bis einschliesslich `MBlock::show()` umbenannt (`$repeaterForm`).
+     * bis zur Neubelegung umbenannt (`$repeaterForm`).
      */
     private function renameReassignedBlockForms(string $code): string
     {
@@ -797,7 +802,7 @@ final class MBlockToRepeaterConverter
                     continue;
                 }
                 $between = substr($rest, 0, (int) $hm[0][1]);
-                if (!preg_match('/' . preg_quote($formVar, '/') . '\s*=(?![=>])/', $between)) {
+                if (!preg_match('/' . preg_quote($formVar, '/') . '\s*=(?![=>])/', $between, $reassign, PREG_OFFSET_CAPTURE)) {
                     continue;
                 }
 
@@ -812,9 +817,11 @@ final class MBlockToRepeaterConverter
                     $newVar = '$repeaterForm' . $i;
                 }
 
+                // Umbenennen ab der Erzeugung bis direkt vor die Neubelegung (auch Aufrufe nach MBlock::show()).
                 $start = (int) $region['offset'];
-                $segment = (string) preg_replace('/' . preg_quote($formVar, '/') . '\b/', $newVar, substr($code, $start, $stmtEnd - $start));
-                $code = substr($code, 0, $start) . $segment . substr($code, $stmtEnd);
+                $end = $stmtEnd + (int) $reassign[0][1];
+                $segment = (string) preg_replace('/' . preg_quote($formVar, '/') . '\b/', $newVar, substr($code, $start, $end - $start));
+                $code = substr($code, 0, $start) . $segment . substr($code, $end);
 
                 $this->formRenames[$formVar][] = $newVar;
                 $this->note(sprintf(
@@ -1122,7 +1129,7 @@ final class MBlockToRepeaterConverter
      * in denen PHP keinen Ausdruck erlaubt, wird anders umgeschrieben:
      * - `isset($item['REX_MEDIA_1'])` -> `(isset($item['media']) || isset($item['REX_MEDIA_1']))`
      * - `unset($item['REX_MEDIA_1'])` -> `unset($item['media'], $item['REX_MEDIA_1'])`
-     * - isset() mit mehreren Argumenten, Zuweisungen, `{$item[...]}` in Strings: nur neuer Key
+     * - isset() mit mehreren Argumenten, Zuweisungen, `++`/`--`, `{$item[...]}` in Strings: nur neuer Key
      *
      * @param array<string, array<string, string>> $keyMaps
      */
@@ -1226,8 +1233,8 @@ final class MBlockToRepeaterConverter
                     ++$fallbacks;
                     $replacement = $new . ', ' . $old;
                 } elseif ('isset' === $enclosing
-                    || preg_match('/^\s*(?:\*\*|\?\?|<<|>>|[-+*\/.%|&^])?=(?![=>])/', $after)
-                    || preg_match('/=\s*&\s*$/', $before)
+                    || preg_match('/^\s*(?:(?:\*\*|\?\?|<<|>>|[-+*\/.%|&^])?=(?![=>])|\+\+|--)/', $after)
+                    || preg_match('/(?:=\s*&|\+\+|--)\s*$/', $before)
                     || str_ends_with($before, '{')
                 ) {
                     ++$renamedOnly;
@@ -1288,7 +1295,7 @@ final class MBlockToRepeaterConverter
             $insertPos = $last[1] + strlen($last[0]);
             $code = substr($code, 0, $insertPos) . "\n" . $useStatement . substr($code, $insertPos);
         } elseif (($phpPos = strpos($code, '<?php')) !== false) {
-            $afterPhp = $phpPos + 5;
+            $afterPhp = self::afterPhpHeader($code, $phpPos);
             $code = substr($code, 0, $afterPhp) . "\n" . $useStatement . substr($code, $afterPhp);
         }
         $this->note('`use FriendsOfRedaxo\\MForm\\Repeater\\MFormRepeaterHelper;` automatisch ergaenzt.');
@@ -1318,7 +1325,7 @@ final class MBlockToRepeaterConverter
     {
         $scan = MBlockModuleAnalyzer::blankComments($code);
         if (!preg_match('/(?:\bnew\s+|(?<![\\\\\w$>:]))MForm\s*(?:::|\(|;)/', $scan)
-            || preg_match('/^\s*use\s+\\\\?FriendsOfRedaxo\\\\MForm\s*;/mi', $scan)) {
+            || preg_match('/(?<![\w$>:])use\s+\\\\?FriendsOfRedaxo\\\\MForm\s*;/i', $scan)) {
             return;
         }
 
@@ -1326,18 +1333,30 @@ final class MBlockToRepeaterConverter
         $phpPos = strpos($code, '<?php');
         if (false === $phpPos
             || preg_match('/^\s*namespace\s+[\w\\\\]+\s*[;{]/mi', $scan)
-            || preg_match('/^\s*use\s+[^;(]*\bMForm\s*;/mi', $scan)) {
+            || preg_match('/(?<![\w$>:])use\s+[^;(]*\bMForm\s*;/i', $scan)) {
             $this->note('Stelle sicher, dass `use FriendsOfRedaxo\\MForm;` im Code vorhanden ist.');
 
             return;
         }
 
-        $insertPos = $phpPos + 5;
-        if (preg_match('/\G\s*declare\s*\([^)]*\)\s*;/A', $code, $dm, 0, $insertPos)) {
-            $insertPos += strlen($dm[0]);
-        }
+        $insertPos = self::afterPhpHeader($code, $phpPos);
         $code = substr($code, 0, $insertPos) . "\n" . $useStatement . substr($code, $insertPos);
         $this->note('`use FriendsOfRedaxo\\MForm;` automatisch ergaenzt.');
+    }
+
+    /**
+     * Position hinter `<?php` und einem `declare(...)`-Vorspann (Kommentare davor werden
+     * uebersprungen). Ohne `declare` direkt hinter `<?php`.
+     */
+    private static function afterPhpHeader(string $code, int $phpPos): int
+    {
+        $insertPos = $phpPos + 5;
+        $header = '~\G(?:\s+|//[^\n]*|#(?!\[)[^\n]*|/\*.*?\*/)*declare\s*\([^)]*\)\s*;~As';
+        while (preg_match($header, $code, $dm, 0, $insertPos)) {
+            $insertPos += strlen($dm[0]);
+        }
+
+        return $insertPos;
     }
 
     private function note(string $text): void
