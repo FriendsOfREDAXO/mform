@@ -1,5 +1,22 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.0.8
+
+Wartungsrelease (16.11.2026). Update von 10.0.7 ohne Datenmigration, keine Breaking Changes. Betrifft nur die MBlock-Migration (`mform:migrate --show-code`, Assistent „MBlock zu Repeater“).
+
+### Behoben
+
+- **MBlock-Migration: Ausgabe mit `isset($item['REX_MEDIA_1'])` war kein gültiges PHP:** Der Fallback auf den neuen Key machte daraus `isset(($item['media'] ?? …))` – PHP bricht mit „Cannot use isset() on the result of an expression“ ab. In `isset()` entsteht jetzt `(isset($item['media']) || isset($item['REX_MEDIA_1']))`, in `unset()` werden beide Keys entfernt; bei Zuweisungen, `++`/`--`, `isset()` mit mehreren Argumenten und `{$item[...]}` in Strings wird nur der Key umbenannt. Gilt auch für numerische Keys (`$item[1]`).
+- **MBlock-Migration: Repeater bekam das Einstellungs-Formular statt der Block-Felder:** Bei `$blocks = MBlock::show($id, $mform->show()); $mform = new MForm(); … $mform->addHtml($blocks);` entstand `$mform->addFlexRepeaterElement($id, $mform)`. Wird die Formular-Variable zwischen `MBlock::show()` und `addHtml()` neu belegt, heißt das Block-Formular bis zur Neubelegung jetzt `$repeaterForm`; der Konverter weist darauf hin.
+- **MBlock-Migration: `$slice->getValueArray(n)` in der Ausgabe nicht erkannt:** Ausgaben, die die Items über `$slice->getValueArray(1)` bzw. `$this->getCurrentSlice()->getValueArray(1)` lesen, wurden nicht auf `MFormRepeaterHelper::decode(1)` umgestellt – deaktivierte Items wären sichtbar geblieben, und Zugriffe wie `$item["REX_MEDIA_1"]` bekamen keinen Fallback. Beide Schreibweisen werden jetzt wie `rex_var::toArray("REX_VALUE[n]")` behandelt; Einstellungs-Slots, fremde und neu belegte Slice-Variablen bleiben unverändert. Ohne erkannten Repeater-Zugriff behauptet die Warnung zu `REX_MEDIA_n` nicht mehr, es seien Fallbacks ergänzt worden.
+- **MBlock-Migration: `\MBlock::show()` wurde zu `\MForm::factory()`:** Der führende Backslash bzw. `FriendsOfRedaxo\MBlock\` vor `MBlock::show()` bleibt nicht mehr stehen. Außerdem werden Item-Variablen auch in `foreach (MFormRepeaterHelper::decode(1) as $item)` erkannt.
+
+- **MBlock-Migration: `use …\Repeater\MFormRepeaterHelper;` vor `declare(strict_types=1)`:** Der Import landete vor dem `declare`-Statement, das dann nicht mehr das erste Statement war. Er steht jetzt dahinter.
+
+### Verbessert
+
+- **MBlock-Migration: `use FriendsOfRedaxo\MForm;` wird ergänzt:** Nutzt der konvertierte Eingabe-Code `new MForm()` oder `MForm::factory()` ohne Import, setzt der Konverter `use FriendsOfRedaxo\MForm;` hinter das erste `<?php` (bzw. hinter `declare(...)`, auch nach Kommentaren), statt nur darauf hinzuweisen. Bei Namespaces oder einem anderen `MForm`-Import bleibt es beim Hinweis.
+
 ## Version 10.0.7
 
 Wartungsrelease (07.11.2026). Update von 10.0.6 ohne Datenmigration, keine Breaking Changes.
