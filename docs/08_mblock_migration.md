@@ -24,15 +24,16 @@ Eingabe:
 - Feldnamen-Präfixe `"$id.0.feld"` / `'1.0.feld'` → `'feld'` (für alle Slots des Moduls, andere Slots wie `2.0.setting` bleiben)
 - numerische Widgets im Block-Formular → Zielname aus der Key-Map (`addMediaField('media')`, `addCustomLinkField('link')`)
 - `MBlock::show($id, $form->show(), [...])` und `MBlock::show($id, $form, [...])` → `MForm::factory()->addFlexRepeaterElement($id, $form, [...])->show()`
-- `$blocks = MBlock::show(...)` + `->addHtml($blocks)` → `->addFlexRepeaterElement(...)` direkt im Formular-Baum
+- `$blocks = MBlock::show(...)` + `->addHtml($blocks)` → `->addFlexRepeaterElement(...)` direkt im Formular-Baum; wird die Formular-Variable dazwischen für das Einstellungs-Formular neu belegt (`$mform = new MForm();`), heißt das Block-Formular danach `$repeaterForm`
 - Optionen: `min`, `max`, `copy_paste` werden übernommen; `online_offline`, `sortable`, `toggle`, `delete_confirm` entfallen (der Repeater hat das immer); unbekannte Optionen werden gemeldet
 - Hidden-Feld `mblock_offline` und `use ...MBlock;` entfallen
 - auskommentierter Code wird ignoriert
+- fehlt `use FriendsOfRedaxo\MForm;`, wird es hinter dem ersten `<?php` ergänzt (nicht bei Namespaces oder einem anderen `MForm`-Import)
 
 Ausgabe:
 
-- `rex_var::toArray("REX_VALUE[n]")` → `MFormRepeaterHelper::decode(n)` für alle Repeater-Slots, andere Slots bleiben
-- Zugriffe auf `$item['REX_MEDIA_1']`, `$item[1]` bekommen einen Fallback `($item['media'] ?? ($item['REX_MEDIA_1'] ?? ''))`
+- `rex_var::toArray("REX_VALUE[n]")` und `$slice->getValueArray(n)` / `$this->getCurrentSlice()->getValueArray(n)` → `MFormRepeaterHelper::decode(n)` für alle Repeater-Slots, andere Slots bleiben
+- Zugriffe auf `$item['REX_MEDIA_1']`, `$item["REX_MEDIA_1"]`, `$item[1]` bekommen einen Fallback `($item['media'] ?? ($item['REX_MEDIA_1'] ?? ''))`; in `isset()` wird daraus `(isset($item['media']) || isset($item['REX_MEDIA_1']))`, in `unset()` werden beide Keys entfernt, bei Zuweisungen und `{$item[...]}` in Strings wird nur der Key umbenannt
 
 Daten:
 
