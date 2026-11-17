@@ -140,6 +140,13 @@ Gespeichert wird wie bei `addSelectField()` der Array-Key. Im Hintergrund bleibt
 <?php
 use FriendsOfRedaxo\MForm;
 
+// Vorschaubilder: Bild-URL (z. B. aus dem Medienpool) oder ein SVG als data-URI
+$textPreview = rex_url::media('preview-text.svg');
+$imagePreview = 'data:image/svg+xml;base64,' . base64_encode(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80"><rect width="120" height="80" fill="#fff"/>'
+    . '<rect x="10" y="14" width="46" height="36" fill="#9fc3e3"/><rect x="64" y="18" width="44" height="5" fill="#68727d"/></svg>'
+);
+
 $types = [
     'text'  => ['img' => $textPreview,  'label' => 'Text',        'description' => 'Überschrift und Fließtext'],
     'image' => ['img' => $imagePreview, 'label' => 'Bild + Text', 'description' => 'Bild links, Text rechts'],
@@ -154,6 +161,8 @@ echo MForm::factory()
 ```
 
 Ausgabe wie bei einem Select: `'REX_VALUE[id=1]'` bzw. im Repeater `$item['type']`. Demo: *MForm → Demo → Basis → Bild-Picker*.
+
+Der Picker startet bei `rex:ready` von selbst, auch in neuen Repeater-Items. Wer Felder per eigenem Skript nachlädt, ruft `window.MFormImgPicker.init(container)` auf.
 
 addRadioColorField
 ```php

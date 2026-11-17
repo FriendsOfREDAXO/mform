@@ -175,6 +175,11 @@
         }
 
         function onOutside(event) {
+            // Element inzwischen entfernt (z. B. Repeater-Item gelöscht): Listener aufräumen
+            if (!wrap.isConnected) {
+                document.removeEventListener('mousedown', onOutside, true);
+                return;
+            }
             if (!wrap.contains(event.target)) {
                 close(false);
             }
@@ -287,6 +292,12 @@
                 setActive(items.indexOf(item));
             }
         });
+        // Fokus verlässt den Picker (Tab, Shift+Tab, Klick in ein anderes Feld, Screenreader-Navigation)
+        wrap.addEventListener('focusout', function (event) {
+            if (!event.relatedTarget || !wrap.contains(event.relatedTarget)) {
+                close(false);
+            }
+        });
         // Wert von außen geändert (Repeater: Kopieren/Einfügen, Zurücksetzen)
         select.addEventListener('change', render);
 
@@ -296,6 +307,9 @@
     function init(root) {
         (root || document).querySelectorAll('select.mform-img-picker').forEach(enhance);
     }
+
+    // Für eigene Skripte und Tests: MFormImgPicker.init(container) baut neue Picker im Container auf
+    window.MFormImgPicker = { init: init };
 
     if (window.jQuery) {
         window.jQuery(document).on('rex:ready', function (event, container) {
