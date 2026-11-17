@@ -162,6 +162,8 @@ echo MForm::factory()
 
 Ausgabe wie bei einem Select: `'REX_VALUE[id=1]'` bzw. im Repeater `$item['type']`. Demo: *MForm → Demo → Basis → Bild-Picker*.
 
+Die Kachelbreite im Fenster (Standard 84 px) lässt sich per CSS-Variable ändern, z. B. `.mein-modul { --mform-img-picker-tile: 120px; }`.
+
 Der Picker startet bei `rex:ready` von selbst, auch in neuen Repeater-Items. Wer Felder per eigenem Skript nachlädt, ruft `window.MFormImgPicker.init(container)` auf.
 
 addRadioColorField
