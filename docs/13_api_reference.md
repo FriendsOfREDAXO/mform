@@ -465,6 +465,18 @@ $options[$value] = ['icon' => 'fa fa-home', 'label' => 'Startseite'];
 ---
 
 ```php
+addImgPickerField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
+```
+Bild-Picker (ab 10.1): kompakt wie ein Select mit Vorschaubild der gewählten Option, ein Klick öffnet alle Optionen als Bildkacheln. Gespeichert wird der Key wie bei `addSelectField()`; `setVisibleIf()` und Conditional Fieldsets funktionieren unverändert. Options-Format wie `addRadioImgField()` (`img`), zusätzlich `description` und `icon`:
+
+```php
+$options[$value] = ['img' => 'data:image/svg+xml;base64,…', 'label' => 'Text', 'description' => 'Überschrift und Fließtext'];
+$options[$value] = ['icon' => 'rex-icon fa-film', 'label' => 'Video'];
+```
+
+---
+
+```php
 addRadioColorField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): MForm
 ```
 Radio-Gruppe mit Farb-Swatches.
@@ -1236,6 +1248,7 @@ Vollständige Liste aller intern verwendeten Feld-Typen (für `addElement()`):
 | `email` | `addEmailField()` | E-Mail-Adresse |
 | `color` | `addColorField()` | Nativer Farbwähler |
 | `select` | `addSelectField()` | Dropdown-Auswahl |
+| `select` | `addImgPickerField()` | Kompakte Auswahl mit Vorschaubild, öffnet Bildkacheln |
 | `multiselect` | `addMultiSelectField()` | Mehrfach-Auswahl |
 | `checkbox` | `addCheckboxField()` | Einzelne Checkbox (Ein/Aus, nur die erste Option wird gerendert) |
 | `checkbox-group` | `addCheckboxGroupField()` | Visuell gestaltete Checkbox-Gruppe |

@@ -29,6 +29,8 @@ Eine Datenmigration gibt es nicht, das Update ist ein normales Addon-Update. Vor
 
 ## Felder
 
+- **Bild-Picker (10.1):** `addImgPickerField()` – kompakte Auswahl mit Vorschaubild, öffnet alle Optionen als Bildkacheln; Optionen wie `addRadioImgField()`, optional mit `description` oder `icon`. Details: [Grundlagen](01_basics.md#checkbox-und-radio-elemente).
+
 - **HTML5-Felder:** `addNumberField()`, `addRangeField()` (mit Live-Wert), `addDateField()`, `addDateTimeField()`, `addTimeField()`, `addEmailField()`, `addColorField()`. Details: [Grundlagen](01_basics.md#weitere-html5-elemente).
 - **Tags-Feld:** `addTagsField()` für Schlagworte als Pills mit Vorschlägen, `allow_new` und `max`, gespeichert kommasepariert. Details: [Erweiterte Beispiele](06_advanced.md#beispiel-addtagsfield--schlagworte-als-pills-ab-100).
 - **Mehrere Bedingungen:** `setVisibleIf()` nimmt eine Liste, `addVisibleIf()` hängt an, `setVisibleIfLogic('any')` lässt eine genügen, `setHiddenIf()` blendet aus; `addConditionalFieldsetArea()` ebenfalls mit Liste. Details: [Erweiterte Beispiele](06_advanced.md#beispiel-visible_if-ohne-wrapper).

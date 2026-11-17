@@ -113,6 +113,7 @@ mform_example_base_html5_inputs = HTML5 input fields [number, range, date, time,
 mform_example_base_select = Select and multiselect elements
 mform_example_base_checkradio = Checkbox and radio elements
 mform_example_base_radio_special = Visual radio variants [image, icon, color]
+mform_example_base_img_picker = Image picker [compact selection with preview image]
 mform_example_base_info = Structured info elements
 mform_example_base_system = System button elements
 mform_example_base_widgets = MForm widget elements

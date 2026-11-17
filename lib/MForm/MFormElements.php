@@ -17,6 +17,7 @@ use FriendsOfRedaxo\MForm\Handler\MFormParameterHandler;
 use FriendsOfRedaxo\MForm\Handler\MFormValueHandler;
 use FriendsOfRedaxo\MForm\Inputs\MFormInputsInterface;
 use FriendsOfRedaxo\MForm\Utils\HtmlToSvgConverter;
+use FriendsOfRedaxo\MForm\Utils\MFormImgPicker;
 use FriendsOfRedaxo\MForm\Utils\MFormLayoutPreviewHelper;
 use rex_addon;
 use rex_be_controller;
@@ -520,6 +521,24 @@ abstract class MFormElements
 
         $this->addOptionField('radio', $id, $attributes, $newOptions, $defaultValue);
         return $this;
+    }
+
+    /**
+     * Bild-Picker: kompakt wie eine Auswahlliste, zeigt die gewählte Option mit Vorschaubild.
+     * Ein Klick öffnet ein Fenster mit allen Optionen als Bildkacheln (Tastatur: Pfeile, Enter, Esc).
+     * Gespeichert wird wie bei addSelectField(); visible_if, Conditional Fieldsets und der Repeater funktionieren unverändert.
+     *
+     * $options['text'] = ['label' => 'Text', 'img' => $svgDataUri, 'description' => 'optional'];
+     * $mform->addImgPickerField('type', $options, ['label' => 'Typ'], 'text');
+     *
+     * @param array<string|int, mixed>|null $options gleiche Struktur wie addRadioImgField() ('img'), optional 'description' oder 'icon'
+     * @param array<string, mixed>|null $attributes
+     */
+    public function addImgPickerField(float|int|string $id, ?array $options = null, ?array $attributes = null, ?string $defaultValue = null): static
+    {
+        [$labels, $meta] = MFormImgPicker::split($options ?? []);
+
+        return $this->addOptionField('select', $id, MFormImgPicker::attributes($attributes ?? [], $meta), $labels, $defaultValue);
     }
 
     /**
