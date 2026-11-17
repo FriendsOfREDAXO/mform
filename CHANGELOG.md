@@ -1,5 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.1.1
+
+Wartungsrelease. Update von 10.1.0 ohne Datenmigration, keine Breaking Changes.
+
+### Verbessert
+
+- **Bild-Picker: kompaktere Kacheln.** Die Kacheln im Auswahlfenster von `addImgPickerField()` waren zu groß (mindestens 150 px breit, drei pro Zeile in einem normalen Feld). Jetzt mindestens 84 px, also etwa vier pro Zeile, mit kleinerer Schrift für Name und Beschreibung. Die Breite lässt sich pro Projekt über die CSS-Variable `--mform-img-picker-tile` anpassen.
+
 ## Version 10.1.0
 
 Feature-Release (17.11.2026). Update von 10.0.8 ohne Datenmigration, keine Breaking Changes.
