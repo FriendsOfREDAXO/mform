@@ -10,6 +10,7 @@ Kniffe und Praxisbeispiele, wie MForm-Elemente an die jeweiligen Anforderungen a
 | `addToggleCheckboxField` | ja | – | – |
 | `addRadioImgField` | ja | – | – |
 | `addRadioIconField` | ja | – | – |
+| `addImgPickerField` | ja | – | – |
 | `addRadioColorField` | ja | – | – |
 | `addColorSwatchField` | ja | – | ja |
 | `addTagsField` | ja | – | – |
@@ -44,6 +45,7 @@ MForm stellt folgende Element-Methoden bereit:
   - `addRadioField`
   - `addRadioImgField`
   - `addRadioIconField`
+  - `addImgPickerField`
   - `addRadioColorField`
   - `addColorSwatchField`
   - `addCheckboxGroupField`

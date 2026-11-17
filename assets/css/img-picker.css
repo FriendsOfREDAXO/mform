@@ -1,0 +1,166 @@
+/* ==========================================================================
+   MForm Bild-Picker (MForm::addImgPickerField) – Farben aus mform-tokens.css
+   ========================================================================== */
+.mform-img-picker {
+    position: relative;
+    max-width: 100%;
+}
+
+/* Das <select> bleibt für Wert, Bedingungen und Repeater im Formular, ist aber unsichtbar */
+.mform-img-picker__native {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    border: 0 !important;
+    white-space: nowrap !important;
+}
+
+.mform-img-picker__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 5px 34px 5px 6px;
+    position: relative;
+    border: 1px solid var(--mform-input-border);
+    border-radius: var(--mform-radius);
+    background: var(--mform-input-bg);
+    color: var(--mform-text);
+    text-align: left;
+    cursor: pointer;
+}
+.mform-img-picker__toggle:hover {
+    border-color: var(--mform-border-strong);
+}
+.mform-img-picker__toggle:focus-visible,
+.mform-img-picker.is-open .mform-img-picker__toggle {
+    outline: 0;
+    border-color: var(--mform-focus);
+    box-shadow: 0 0 0 3px var(--mform-focus-ring);
+}
+.mform-img-picker__toggle:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+.mform-img-picker__caret {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    margin-top: -6px;
+    border-right: 2px solid var(--mform-muted);
+    border-bottom: 2px solid var(--mform-muted);
+    transform: rotate(45deg);
+    transition: transform .15s ease;
+}
+.mform-img-picker.is-open .mform-img-picker__caret {
+    margin-top: -2px;
+    transform: rotate(-135deg);
+}
+
+/* Vorschaubild im Feld: klein, im Fenster: Kachel */
+.mform-img-picker__img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 48px;
+    height: 32px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--mform-surface-alt);
+}
+.mform-img-picker__img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.mform-img-picker__img--icon {
+    font-size: 18px;
+    color: var(--mform-muted);
+}
+.mform-img-picker__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.mform-img-picker__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mform-img-picker__desc {
+    color: var(--mform-muted);
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.mform-img-picker__panel {
+    position: absolute;
+    z-index: 1050;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    max-height: min(60vh, 520px);
+    overflow: auto;
+    padding: 8px;
+    border: 1px solid var(--mform-border-strong);
+    border-radius: var(--mform-radius-lg);
+    background: var(--mform-surface);
+    box-shadow: var(--mform-shadow-lift);
+}
+.mform-img-picker__panel[hidden] {
+    display: none;
+}
+.mform-img-picker__panel:focus {
+    outline: 0;
+}
+.mform-img-picker__option {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px;
+    border: 2px solid transparent;
+    border-radius: var(--mform-radius-lg);
+    color: var(--mform-text);
+    cursor: pointer;
+}
+.mform-img-picker__option .mform-img-picker__img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+}
+.mform-img-picker__option .mform-img-picker__img--icon {
+    font-size: 28px;
+}
+.mform-img-picker__option .mform-img-picker__label {
+    white-space: normal;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.mform-img-picker__option.is-active {
+    background: var(--mform-hover);
+}
+.mform-img-picker__option[aria-selected="true"] {
+    border-color: var(--mform-success);
+}
+.mform-img-picker__option[aria-disabled="true"] {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mform-img-picker__caret {
+        transition: none;
+    }
+}

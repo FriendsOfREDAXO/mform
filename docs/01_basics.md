@@ -130,6 +130,31 @@ $mform = MForm::factory()
 echo $mform->show();
 ```
 
+addImgPickerField (ab 10.1)
+
+Kompakt wie eine Auswahlliste: Im Formular steht nur die gewählte Option mit kleinem Vorschaubild. Ein Klick öffnet ein Fenster mit allen Optionen als Bildkacheln – praktisch, wenn `addRadioImgField()` zu viel Platz braucht, etwa für die Typ-Auswahl in einem Repeater-Item. Die Optionen haben dieselbe Struktur wie bei `addRadioImgField()` (`img` + `label`), dazu optional `description` (kurzer Text unter dem Namen) oder `icon` (Font-Icon statt Bild).
+
+Gespeichert wird wie bei `addSelectField()` der Array-Key. Im Hintergrund bleibt ein `<select>` im Formular, deshalb funktionieren `setVisibleIf()`, Conditional Fieldsets, der Flex-Repeater und Kopieren/Einfügen unverändert. Bedienung per Tastatur: Pfeiltasten (im Raster), Pos1/Ende, Enter oder Leertaste wählt, Esc schließt.
+
+```php
+<?php
+use FriendsOfRedaxo\MForm;
+
+$types = [
+    'text'  => ['img' => $textPreview,  'label' => 'Text',        'description' => 'Überschrift und Fließtext'],
+    'image' => ['img' => $imagePreview, 'label' => 'Bild + Text', 'description' => 'Bild links, Text rechts'],
+    'video' => ['icon' => 'rex-icon fa-film', 'label' => 'Video', 'description' => 'YouTube oder MP4'],
+];
+
+echo MForm::factory()
+    ->addImgPickerField(1, $types, ['label' => 'Inhaltstyp'], 'text')
+    ->addMediaField(2, ['label' => 'Bild'])
+        ->setVisibleIf(1, '=', 'image')
+    ->show();
+```
+
+Ausgabe wie bei einem Select: `'REX_VALUE[id=1]'` bzw. im Repeater `$item['type']`. Demo: *MForm → Demo → Basis → Bild-Picker*.
+
 addRadioColorField
 ```php
 <?php

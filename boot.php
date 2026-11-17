@@ -34,11 +34,13 @@ if (rex::isBackend()) {
     // widgets
     rex_view::addCssFile($addon->getAssetsUrl('css/imglist.css'));
     rex_view::addCssFile($addon->getAssetsUrl('css/list-widget.css'));
+    rex_view::addCssFile($addon->getAssetsUrl('css/img-picker.css'));
     rex_view::addJsFile($addon->getAssetsUrl('js/mediaplace-bridge.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/linkmap-bridge.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/imglist.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/sortable.min.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/list-widget.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('js/img-picker.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/customlink.js'));
     rex_view::addJsFile($addon->getAssetsUrl('js/a11y-check.js'));
     rex_view::setJsProperty('mform_a11y', [

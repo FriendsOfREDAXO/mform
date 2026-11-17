@@ -1,5 +1,13 @@
 # MForm - REDAXO Addon für Modul-Input-Formulare
 
+## Version 10.1.0
+
+Feature-Release (17.11.2026). Update von 10.0.8 ohne Datenmigration, keine Breaking Changes.
+
+### Neu
+
+- **Bild-Picker `addImgPickerField()`:** Kompakte Auswahl mit Vorschaubild. Im Formular steht nur die gewählte Option, ein Klick öffnet alle Optionen als Bildkacheln (mit optionaler Beschreibung). Gedacht für Auswahlen, bei denen `addRadioImgField()` zu viel Platz braucht – etwa die Typ-Auswahl in Repeater-Items. Optionen wie bei `addRadioImgField()` (`img` + `label`), zusätzlich `description` oder `icon`. Gespeichert wird wie bei `addSelectField()`; im Hintergrund bleibt ein `<select>`, deshalb funktionieren `setVisibleIf()`, Conditional Fieldsets, Flex-Repeater und Kopieren/Einfügen unverändert. Bedienbar per Tastatur (Pfeiltasten im Raster, Pos1/Ende, Enter/Leertaste, Esc), Hell- und Dunkelmodus über die MForm-Tokens. Doku: [Grundlagen](docs/01_basics.md), Demo: *Demo → Basis → Bild-Picker*.
+
 ## Version 10.0.8
 
 Wartungsrelease (16.11.2026). Update von 10.0.7 ohne Datenmigration, keine Breaking Changes. Betrifft nur die MBlock-Migration (`mform:migrate --show-code`, Assistent „MBlock zu Repeater“).
